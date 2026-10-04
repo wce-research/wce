@@ -483,7 +483,26 @@ def opt_subunits(key):
     return [(f"d{d}_{reg}", (lambda d=d, reg=reg: [_row(down_task(key, d, reg), optimizer_diagnosis(down_task(key, d, reg), int(key)))])) for d in DOWN_DEPTHS for reg in GEN_REGIMES]
 
 
-SUBUNITS = {"deepvo": vo_subunits, "deepopt": opt_subunits, "deepdown": down_subunits, "deepprofile": profile_subunits, "deepdev": dev_subunits, "deepgen": gen_subunits, "deepcover": cover_subunits, "deepprim": prim_subunits, "deepneural": neural_subunits}
+# ================================================================ sous-jalon Objective Alignment & Conditional Optimization (dev)
+
+def obj_subunits(key):
+    """Étude par candidat. Clés 300–307 : jeu de RÉGLAGE de la porte ; clés 200–215 : jeu d'ÉVALUATION (structures disjointes)."""
+    from core.deep_objective import candidate_study
+    return [(f"d{d}_{reg}", (lambda d=d, reg=reg: [_row(down_task(key, d, reg), {"task_set": "tuning" if int(key) >= 300 else "evaluation", "task_id": f"{key}_{d}_{reg}", **r}) for r in candidate_study(down_task(key, d, reg), int(key))])) for d in DOWN_DEPTHS for reg in GEN_REGIMES]
+
+
+def e2e_subunits(key):
+    from core.deep_objective import E2E_POLICIES, e2e_run
+    return [(f"d{d}_{reg}_{lit}_{pol}", (lambda d=d, reg=reg, lit=lit, pol=pol: [_row(down_task(key, d, reg), {"task_id": f"{key}_{d}_{reg}", **e2e_run(down_task(key, d, reg), pol, lit, int(key))})]))
+            for d in DOWN_DEPTHS for reg in GEN_REGIMES for lit in ("discovered", "true") for pol in E2E_POLICIES]
+
+
+def resid_subunits(key):
+    from core.deep_objective import RESIDUAL_TASKS, residual_case
+    return [(f"t{k}_{d}_{reg}", (lambda k=k, d=d, reg=reg: [_row(down_task(k, d, reg), {"task_id": f"{k}_{d}_{reg}", **residual_case(down_task(k, d, reg), int(k))})])) for k, d, reg in RESIDUAL_TASKS]
+
+
+SUBUNITS = {"deepobj": obj_subunits, "deepe2e": e2e_subunits, "deepresid": resid_subunits, "deepvo": vo_subunits, "deepopt": opt_subunits, "deepdown": down_subunits, "deepprofile": profile_subunits, "deepdev": dev_subunits, "deepgen": gen_subunits, "deepcover": cover_subunits, "deepprim": prim_subunits, "deepneural": neural_subunits}
 
 
 def subunit_ids(kind, key): return [sid for sid, _ in SUBUNITS[kind](key)]

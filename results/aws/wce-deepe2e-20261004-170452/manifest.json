@@ -1,0 +1,125 @@
+{
+ "run_id": "wce-deepe2e-20261004-170452",
+ "git_commit": "8cf30e94ebfd17da8a78b2cdcb14ec6e7a4837df",
+ "code_hash": "9799f6cb646004e7",
+ "config_hash": "d8327f664211",
+ "timestamp": "20261004-170452",
+ "region": "eu-north-1",
+ "identity": "AWSReservedSSO_WCE-Research-Runner_251aca5f63af0b9d",
+ "instance_type": "c6i.xlarge",
+ "image": "763104351884.dkr.ecr.eu-north-1.amazonaws.com/pytorch-training:2.5.1-cpu-py311-ubuntu22.04-sagemaker",
+ "backend": "ec2",
+ "kind": "deepe2e",
+ "keys": [
+  "200",
+  "201",
+  "202",
+  "203",
+  "204",
+  "205",
+  "206",
+  "207",
+  "208",
+  "209",
+  "210",
+  "211",
+  "212",
+  "213",
+  "214",
+  "215"
+ ],
+ "jobs": [
+  {
+   "name": "wce-deepe2e-20261004-170452-s0",
+   "units": 8,
+   "unit_list": [
+    {
+     "kind": "deepe2e",
+     "key": "200"
+    },
+    {
+     "kind": "deepe2e",
+     "key": "202"
+    },
+    {
+     "kind": "deepe2e",
+     "key": "204"
+    },
+    {
+     "kind": "deepe2e",
+     "key": "206"
+    },
+    {
+     "kind": "deepe2e",
+     "key": "208"
+    },
+    {
+     "kind": "deepe2e",
+     "key": "210"
+    },
+    {
+     "kind": "deepe2e",
+     "key": "212"
+    },
+    {
+     "kind": "deepe2e",
+     "key": "214"
+    }
+   ],
+   "output": "s3://wce-research/robust/runs/wce-deepe2e-20261004-170452/wce-deepe2e-20261004-170452-s0/",
+   "instance_id": "i-0ecb306b4fc247b6d",
+   "command_id": "1a21d49b-13de-478b-9047-4a54ad1d4539",
+   "instance_state": "terminated",
+   "status": "Completed",
+   "failure": "",
+   "runtime_s": 1017.0
+  },
+  {
+   "name": "wce-deepe2e-20261004-170452-s1",
+   "units": 8,
+   "unit_list": [
+    {
+     "kind": "deepe2e",
+     "key": "201"
+    },
+    {
+     "kind": "deepe2e",
+     "key": "203"
+    },
+    {
+     "kind": "deepe2e",
+     "key": "205"
+    },
+    {
+     "kind": "deepe2e",
+     "key": "207"
+    },
+    {
+     "kind": "deepe2e",
+     "key": "209"
+    },
+    {
+     "kind": "deepe2e",
+     "key": "211"
+    },
+    {
+     "kind": "deepe2e",
+     "key": "213"
+    },
+    {
+     "kind": "deepe2e",
+     "key": "215"
+    }
+   ],
+   "output": "s3://wce-research/robust/runs/wce-deepe2e-20261004-170452/wce-deepe2e-20261004-170452-s1/",
+   "instance_id": "i-0ab2192b85761c0c8",
+   "command_id": "38ea73fd-8e45-46ee-b46c-a9f24f31e5ac",
+   "instance_state": "terminated",
+   "status": "Completed",
+   "failure": "",
+   "runtime_s": 1070.0
+  }
+ ],
+ "status": "Completed",
+ "max_runtime": 10800
+}

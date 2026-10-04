@@ -656,6 +656,26 @@ deep-vo-aggregate:
 deep-vo-report:
 	$(PYTHON) -m core.deep_vo_report report
 
+# sous-jalon Objective Alignment & Conditional Optimization (dev)
+.PHONY: deep-run-objectives deep-run-residual deep-tune-gate deep-run-e2e deep-obj-aggregate deep-obj-report
+deep-run-objectives:
+	$(DEEP_BACKEND) $(AWSPY) submit --kind deepobj --keys 300-307,200-215 --shards $(DEEP_SHARDS) --instance $(DEEP_INSTANCE) --max-runtime 10800
+
+deep-run-residual:
+	$(DEEP_BACKEND) $(AWSPY) submit --kind deepresid --keys 0 --shards 1 --instance $(DEEP_INSTANCE) --max-runtime 3600
+
+deep-tune-gate:
+	$(PYTHON) -m core.deep_obj_report tune
+
+deep-run-e2e:
+	$(DEEP_BACKEND) $(AWSPY) submit --kind deepe2e --keys 200-215 --shards $(DEEP_SHARDS) --instance $(DEEP_INSTANCE) --max-runtime 10800
+
+deep-obj-aggregate:
+	$(PYTHON) -m core.deep_obj_report aggregate
+
+deep-obj-report:
+	$(PYTHON) -m core.deep_obj_report report
+
 deep-progress:
 	$(AWSPY) progress $(if $(RUN),--run $(RUN),)
 

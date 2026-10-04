@@ -1,0 +1,8 @@
+{
+ "objective": "robust",
+ "residual_z": 4.0,
+ "gap_z": -1.0,
+ "min_gain": 2.0,
+ "tuning_score": 0.93353,
+ "tuned_on": "448 candidats du jeu de r\u00e9glage (dev, cl\u00e9s 300\u2013307)"
+}

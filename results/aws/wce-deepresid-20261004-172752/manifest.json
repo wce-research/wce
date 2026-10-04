@@ -1,0 +1,37 @@
+{
+ "run_id": "wce-deepresid-20261004-172752",
+ "git_commit": "8cf30e94ebfd17da8a78b2cdcb14ec6e7a4837df",
+ "code_hash": "7d02d1e485015528",
+ "config_hash": "bc9dfd5f7f89",
+ "timestamp": "20261004-172752",
+ "region": "eu-north-1",
+ "identity": "AWSReservedSSO_WCE-Research-Runner_251aca5f63af0b9d",
+ "instance_type": "c6i.xlarge",
+ "image": "763104351884.dkr.ecr.eu-north-1.amazonaws.com/pytorch-training:2.5.1-cpu-py311-ubuntu22.04-sagemaker",
+ "backend": "ec2",
+ "kind": "deepresid",
+ "keys": [
+  "0"
+ ],
+ "jobs": [
+  {
+   "name": "wce-deepresid-20261004-172752-s0",
+   "units": 1,
+   "unit_list": [
+    {
+     "kind": "deepresid",
+     "key": "0"
+    }
+   ],
+   "output": "s3://wce-research/robust/runs/wce-deepresid-20261004-172752/wce-deepresid-20261004-172752-s0/",
+   "instance_id": "i-0b4e68f682fa901f4",
+   "command_id": "c4e43711-8ee5-416f-a0df-ea4d6a804b96",
+   "instance_state": "shutting-down",
+   "status": "Completed",
+   "failure": "",
+   "runtime_s": 108.0
+  }
+ ],
+ "status": "Completed",
+ "max_runtime": 3600
+}

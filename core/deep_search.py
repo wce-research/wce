@@ -82,7 +82,7 @@ class DeepSearch:
         self.library, self.use_families, self.hierarchy, self.top_operands, self.atom_steps, self.dedup = library, use_families, hierarchy and strategy != "flat", top_operands, atom_steps, dedup
         self.time_budget, self.patience = time_budget, patience
         self.fact_inits, self.fact_rounds, self.fact_top, self.fact_polish, self.geometry, self.fact_time = fact_inits, fact_rounds, fact_top, fact_polish, geometry, fact_time
-        self.validated = validated                                                               # None (pipeline d'origine) | "profiled" | "surrogate"
+        self.validated = validated                                                               # None (toujours optimiser) | "profiled" | "surrogate" (garde-fou) | "never" | "gate"
         self.fact_feedback, self.fact_separation, self.fact_literals, self.fact_discovery, self.fact_residual, self.discovery = fact_feedback, fact_separation, fact_literals, fact_discovery, fact_residual, None
 
     # ---- état ---------------------------------------------------------------------------------
@@ -90,7 +90,7 @@ class DeepSearch:
         self.data = data.with_flip(noise) if noise is not None else data; self.noise = float(self.data.flip.mean())
         self.store = StructureStore(); self.counter = FitCounter(self.budget); self.hyps: Dict[str, WorldHypothesis] = {}; self.preds: Dict[str, torch.Tensor] = {}
         self.trace: List[dict] = []; self.n = len(self.data); self.t0 = time.time(); self.generated = 0; self.fitted = 0; self.pruned = 0; self.fit_seconds = 0.0
-        self.per_depth = {}; self._best_ev = float("-inf"); self._stall = -1; self.synth_seconds = 0.0; self.compositions = 0; self.gen_stats = []; self.transactions = []
+        self.per_depth = {}; self._best_ev = float("-inf"); self._stall = -1; self.synth_seconds = 0.0; self.compositions = 0; self.gen_stats = []; self.transactions = []; self.decisions = []
 
     def _stop(self): return self.counter.exhausted() or (self.time_budget is not None and time.time() - self.t0 > self.time_budget)
 
@@ -114,7 +114,15 @@ class DeepSearch:
         """Ajuste un squelette (K initialisations en lot). Avec `data` (cible résiduelle), renvoie les paramètres sans
         enregistrer d'hypothèse de monde."""
         t = time.time()
-        if data is None and self.validated is not None and len(inits) == 1:
+        if data is None and self.validated in ("never", "gate") and len(inits) == 1:
+            # Politiques d'optimisation conditionnelle (seul étage modifié) : `never` préserve le candidat tel quel ;
+            # `gate` décide PRESERVE / OPTIMIZE sur des signaux observables puis valide (core.deep_optgate).
+            if self.validated == "never": row = torch.as_tensor(inits[0], dtype=DT).reshape(-1)
+            else:
+                from core.deep_optgate import conditional_fit
+                dec = conditional_fit(skel, self.data, inits[0], counter=self.counter, steps=steps); self.decisions.append(dec); row = torch.tensor(dec.result, dtype=DT)
+            th = row.reshape(1, -1); ll = loglik_batch(skel, th, self.data, self.gamma)
+        elif data is None and self.validated is not None and len(inits) == 1:
             # GARDE-FOU (seul étage modifié) : un candidat EXISTANT n'est remplacé par sa version ajustée que si le
             # critère observable s'améliore — propose → evaluate → commit / rollback (core.deep_fit.validated_fit).
             row, tx = validated_fit(skel, self.data, inits[0], steps=steps, gamma=self.gamma, counter=self.counter, criterion=self.validated); self.transactions.append(tx)
@@ -324,7 +332,8 @@ class DeepSearch:
         stats = {"strategy": self.strategy, "fit_equivalents": round(self.counter.fit_equivalents, 2), "generated": self.generated, "fitted": self.fitted, "pruned": self.pruned,
                  "distinct_structures": len(self.hyps), "families": len({h.family for h in self.hyps.values()}), "seconds": round(time.time() - self.t0, 3), "fit_seconds": round(self.fit_seconds, 3), "synthesis_seconds": round(self.synth_seconds, 3), "compositions": self.compositions,
                  "generation": self.gen_stats[-1] if self.gen_stats else {}, "validated": self.validated, "transactions": len(self.transactions), "commits": sum(t.accepted for t in self.transactions),
-                 "rollbacks": sum(not t.accepted for t in self.transactions),
+                 "rollbacks": sum(not t.accepted for t in self.transactions), "decisions": len(self.decisions), "preserved": sum(d.action == "PRESERVE" for d in self.decisions),
+                 "gate_rollbacks": sum(d.rolled_back for d in self.decisions),
                  "per_depth": {str(k): v for k, v in sorted(self.per_depth.items())}, "store": self.store.stats(), "budget_exhausted": self.counter.exhausted()}
         return SearchOutcome(ranked, self.trace, stats, self.noise, self.store, self.preds, dict(self.hyps), self.discovery)
 

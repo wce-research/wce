@@ -1,0 +1,165 @@
+{
+ "run_id": "wce-deepobj-20261004-165859",
+ "git_commit": "8cf30e94ebfd17da8a78b2cdcb14ec6e7a4837df",
+ "code_hash": "777d80403d878ff6",
+ "config_hash": "0da5b4e49f1e",
+ "timestamp": "20261004-165859",
+ "region": "eu-north-1",
+ "identity": "AWSReservedSSO_WCE-Research-Runner_251aca5f63af0b9d",
+ "instance_type": "c6i.xlarge",
+ "image": "763104351884.dkr.ecr.eu-north-1.amazonaws.com/pytorch-training:2.5.1-cpu-py311-ubuntu22.04-sagemaker",
+ "backend": "ec2",
+ "kind": "deepobj",
+ "keys": [
+  "300",
+  "301",
+  "302",
+  "303",
+  "304",
+  "305",
+  "306",
+  "307",
+  "200",
+  "201",
+  "202",
+  "203",
+  "204",
+  "205",
+  "206",
+  "207",
+  "208",
+  "209",
+  "210",
+  "211",
+  "212",
+  "213",
+  "214",
+  "215"
+ ],
+ "jobs": [
+  {
+   "name": "wce-deepobj-20261004-165859-s0",
+   "units": 12,
+   "unit_list": [
+    {
+     "kind": "deepobj",
+     "key": "300"
+    },
+    {
+     "kind": "deepobj",
+     "key": "302"
+    },
+    {
+     "kind": "deepobj",
+     "key": "304"
+    },
+    {
+     "kind": "deepobj",
+     "key": "306"
+    },
+    {
+     "kind": "deepobj",
+     "key": "200"
+    },
+    {
+     "kind": "deepobj",
+     "key": "202"
+    },
+    {
+     "kind": "deepobj",
+     "key": "204"
+    },
+    {
+     "kind": "deepobj",
+     "key": "206"
+    },
+    {
+     "kind": "deepobj",
+     "key": "208"
+    },
+    {
+     "kind": "deepobj",
+     "key": "210"
+    },
+    {
+     "kind": "deepobj",
+     "key": "212"
+    },
+    {
+     "kind": "deepobj",
+     "key": "214"
+    }
+   ],
+   "output": "s3://wce-research/robust/runs/wce-deepobj-20261004-165859/wce-deepobj-20261004-165859-s0/",
+   "instance_id": "i-0523d1a3dbcf552ba",
+   "command_id": "407d163c-6b98-437a-940c-b1a1eeb0d3e1",
+   "instance_state": "terminated",
+   "status": "Completed",
+   "failure": "",
+   "runtime_s": 279.0
+  },
+  {
+   "name": "wce-deepobj-20261004-165859-s1",
+   "units": 12,
+   "unit_list": [
+    {
+     "kind": "deepobj",
+     "key": "301"
+    },
+    {
+     "kind": "deepobj",
+     "key": "303"
+    },
+    {
+     "kind": "deepobj",
+     "key": "305"
+    },
+    {
+     "kind": "deepobj",
+     "key": "307"
+    },
+    {
+     "kind": "deepobj",
+     "key": "201"
+    },
+    {
+     "kind": "deepobj",
+     "key": "203"
+    },
+    {
+     "kind": "deepobj",
+     "key": "205"
+    },
+    {
+     "kind": "deepobj",
+     "key": "207"
+    },
+    {
+     "kind": "deepobj",
+     "key": "209"
+    },
+    {
+     "kind": "deepobj",
+     "key": "211"
+    },
+    {
+     "kind": "deepobj",
+     "key": "213"
+    },
+    {
+     "kind": "deepobj",
+     "key": "215"
+    }
+   ],
+   "output": "s3://wce-research/robust/runs/wce-deepobj-20261004-165859/wce-deepobj-20261004-165859-s1/",
+   "instance_id": "i-0794ca2077e68c23b",
+   "command_id": "72ffe1e6-9bd3-4688-8519-a139813bf4d8",
+   "instance_state": "shutting-down",
+   "status": "Completed",
+   "failure": "",
+   "runtime_s": 295.0
+  }
+ ],
+ "status": "Completed",
+ "max_runtime": 10800
+}
