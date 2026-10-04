@@ -1,0 +1,592 @@
+{
+ "milestone": "WCE Deep Compositional Structure Discovery & Model-Class Boundary",
+ "frozen_on": "2026-10-04",
+ "sha256": "d57e9d761d165ef9d86ec7ee5c9c5c7909c4b1622425c2d2379cbdddaf1a6ca2",
+ "n_tasks": 72,
+ "generator": "core/deep_world.py : sealed_task(index), split 'sealed' (base de graines 3 000 000)",
+ "spec": [
+  {
+   "seed": 0,
+   "depth": 1,
+   "category": "in_class",
+   "regime": "standard",
+   "kind": "iid",
+   "unseen": null
+  },
+  {
+   "seed": 1,
+   "depth": 1,
+   "category": "in_class",
+   "regime": "rich",
+   "kind": "boundary",
+   "unseen": null
+  },
+  {
+   "seed": 2,
+   "depth": 1,
+   "category": "in_class",
+   "regime": "hard",
+   "kind": "grouped_outliers",
+   "unseen": null
+  },
+  {
+   "seed": 3,
+   "depth": 1,
+   "category": "in_class",
+   "regime": "standard",
+   "kind": "iid",
+   "unseen": null
+  },
+  {
+   "seed": 4,
+   "depth": 1,
+   "category": "in_class",
+   "regime": "rich",
+   "kind": "boundary",
+   "unseen": null
+  },
+  {
+   "seed": 5,
+   "depth": 1,
+   "category": "in_class",
+   "regime": "hard",
+   "kind": "grouped_outliers",
+   "unseen": null
+  },
+  {
+   "seed": 6,
+   "depth": 2,
+   "category": "in_class",
+   "regime": "standard",
+   "kind": "iid",
+   "unseen": null
+  },
+  {
+   "seed": 7,
+   "depth": 2,
+   "category": "in_class",
+   "regime": "rich",
+   "kind": "boundary",
+   "unseen": null
+  },
+  {
+   "seed": 8,
+   "depth": 2,
+   "category": "in_class",
+   "regime": "hard",
+   "kind": "grouped_outliers",
+   "unseen": null
+  },
+  {
+   "seed": 9,
+   "depth": 2,
+   "category": "in_class",
+   "regime": "standard",
+   "kind": "iid",
+   "unseen": null
+  },
+  {
+   "seed": 10,
+   "depth": 2,
+   "category": "in_class",
+   "regime": "rich",
+   "kind": "boundary",
+   "unseen": null
+  },
+  {
+   "seed": 11,
+   "depth": 2,
+   "category": "in_class",
+   "regime": "hard",
+   "kind": "grouped_outliers",
+   "unseen": null
+  },
+  {
+   "seed": 12,
+   "depth": 3,
+   "category": "in_class",
+   "regime": "standard",
+   "kind": "iid",
+   "unseen": true
+  },
+  {
+   "seed": 13,
+   "depth": 3,
+   "category": "in_class",
+   "regime": "rich",
+   "kind": "boundary",
+   "unseen": false
+  },
+  {
+   "seed": 14,
+   "depth": 3,
+   "category": "in_class",
+   "regime": "hard",
+   "kind": "grouped_outliers",
+   "unseen": true
+  },
+  {
+   "seed": 15,
+   "depth": 3,
+   "category": "in_class",
+   "regime": "standard",
+   "kind": "iid",
+   "unseen": false
+  },
+  {
+   "seed": 16,
+   "depth": 3,
+   "category": "in_class",
+   "regime": "rich",
+   "kind": "boundary",
+   "unseen": true
+  },
+  {
+   "seed": 17,
+   "depth": 3,
+   "category": "in_class",
+   "regime": "hard",
+   "kind": "grouped_outliers",
+   "unseen": false
+  },
+  {
+   "seed": 18,
+   "depth": 4,
+   "category": "in_class",
+   "regime": "standard",
+   "kind": "iid",
+   "unseen": true
+  },
+  {
+   "seed": 19,
+   "depth": 4,
+   "category": "in_class",
+   "regime": "rich",
+   "kind": "boundary",
+   "unseen": false
+  },
+  {
+   "seed": 20,
+   "depth": 4,
+   "category": "in_class",
+   "regime": "hard",
+   "kind": "grouped_outliers",
+   "unseen": true
+  },
+  {
+   "seed": 21,
+   "depth": 4,
+   "category": "in_class",
+   "regime": "standard",
+   "kind": "iid",
+   "unseen": false
+  },
+  {
+   "seed": 22,
+   "depth": 4,
+   "category": "in_class",
+   "regime": "rich",
+   "kind": "boundary",
+   "unseen": true
+  },
+  {
+   "seed": 23,
+   "depth": 4,
+   "category": "in_class",
+   "regime": "hard",
+   "kind": "grouped_outliers",
+   "unseen": false
+  },
+  {
+   "seed": 24,
+   "depth": 5,
+   "category": "in_class",
+   "regime": "standard",
+   "kind": "iid",
+   "unseen": true
+  },
+  {
+   "seed": 25,
+   "depth": 5,
+   "category": "in_class",
+   "regime": "rich",
+   "kind": "boundary",
+   "unseen": false
+  },
+  {
+   "seed": 26,
+   "depth": 5,
+   "category": "in_class",
+   "regime": "hard",
+   "kind": "grouped_outliers",
+   "unseen": true
+  },
+  {
+   "seed": 27,
+   "depth": 5,
+   "category": "in_class",
+   "regime": "standard",
+   "kind": "iid",
+   "unseen": false
+  },
+  {
+   "seed": 28,
+   "depth": 5,
+   "category": "in_class",
+   "regime": "rich",
+   "kind": "boundary",
+   "unseen": true
+  },
+  {
+   "seed": 29,
+   "depth": 5,
+   "category": "in_class",
+   "regime": "hard",
+   "kind": "grouped_outliers",
+   "unseen": false
+  },
+  {
+   "seed": 30,
+   "depth": 6,
+   "category": "in_class",
+   "regime": "standard",
+   "kind": "iid",
+   "unseen": true
+  },
+  {
+   "seed": 31,
+   "depth": 6,
+   "category": "in_class",
+   "regime": "rich",
+   "kind": "boundary",
+   "unseen": false
+  },
+  {
+   "seed": 32,
+   "depth": 6,
+   "category": "in_class",
+   "regime": "hard",
+   "kind": "grouped_outliers",
+   "unseen": true
+  },
+  {
+   "seed": 33,
+   "depth": 6,
+   "category": "in_class",
+   "regime": "standard",
+   "kind": "iid",
+   "unseen": false
+  },
+  {
+   "seed": 34,
+   "depth": 6,
+   "category": "in_class",
+   "regime": "rich",
+   "kind": "boundary",
+   "unseen": true
+  },
+  {
+   "seed": 35,
+   "depth": 6,
+   "category": "in_class",
+   "regime": "hard",
+   "kind": "grouped_outliers",
+   "unseen": false
+  },
+  {
+   "seed": 36,
+   "depth": null,
+   "category": "extreme_noise",
+   "regime": "standard",
+   "kind": "iid",
+   "unseen": null
+  },
+  {
+   "seed": 37,
+   "depth": null,
+   "category": "extreme_noise",
+   "regime": "rich",
+   "kind": "boundary",
+   "unseen": null
+  },
+  {
+   "seed": 38,
+   "depth": null,
+   "category": "extreme_noise",
+   "regime": "standard",
+   "kind": "grouped_outliers",
+   "unseen": null
+  },
+  {
+   "seed": 39,
+   "depth": null,
+   "category": "extreme_noise",
+   "regime": "rich",
+   "kind": "iid",
+   "unseen": null
+  },
+  {
+   "seed": 40,
+   "depth": null,
+   "category": "deep",
+   "regime": "standard",
+   "kind": "iid",
+   "unseen": null
+  },
+  {
+   "seed": 41,
+   "depth": null,
+   "category": "deep",
+   "regime": "rich",
+   "kind": "boundary",
+   "unseen": null
+  },
+  {
+   "seed": 42,
+   "depth": null,
+   "category": "deep",
+   "regime": "standard",
+   "kind": "grouped_outliers",
+   "unseen": null
+  },
+  {
+   "seed": 43,
+   "depth": null,
+   "category": "deep",
+   "regime": "rich",
+   "kind": "iid",
+   "unseen": null
+  },
+  {
+   "seed": 44,
+   "depth": null,
+   "category": "few_data",
+   "regime": "standard",
+   "kind": "iid",
+   "unseen": null
+  },
+  {
+   "seed": 45,
+   "depth": null,
+   "category": "few_data",
+   "regime": "rich",
+   "kind": "boundary",
+   "unseen": null
+  },
+  {
+   "seed": 46,
+   "depth": null,
+   "category": "few_data",
+   "regime": "standard",
+   "kind": "grouped_outliers",
+   "unseen": null
+  },
+  {
+   "seed": 47,
+   "depth": null,
+   "category": "few_data",
+   "regime": "rich",
+   "kind": "iid",
+   "unseen": null
+  },
+  {
+   "seed": 48,
+   "depth": null,
+   "category": "primitive_absent",
+   "regime": "standard",
+   "kind": "iid",
+   "unseen": null
+  },
+  {
+   "seed": 49,
+   "depth": null,
+   "category": "primitive_absent",
+   "regime": "rich",
+   "kind": "boundary",
+   "unseen": null
+  },
+  {
+   "seed": 50,
+   "depth": null,
+   "category": "primitive_absent",
+   "regime": "standard",
+   "kind": "grouped_outliers",
+   "unseen": null
+  },
+  {
+   "seed": 51,
+   "depth": null,
+   "category": "primitive_absent",
+   "regime": "rich",
+   "kind": "iid",
+   "unseen": null
+  },
+  {
+   "seed": 52,
+   "depth": null,
+   "category": "composition_absent",
+   "regime": "standard",
+   "kind": "iid",
+   "unseen": null
+  },
+  {
+   "seed": 53,
+   "depth": null,
+   "category": "composition_absent",
+   "regime": "rich",
+   "kind": "boundary",
+   "unseen": null
+  },
+  {
+   "seed": 54,
+   "depth": null,
+   "category": "composition_absent",
+   "regime": "standard",
+   "kind": "grouped_outliers",
+   "unseen": null
+  },
+  {
+   "seed": 55,
+   "depth": null,
+   "category": "composition_absent",
+   "regime": "rich",
+   "kind": "iid",
+   "unseen": null
+  },
+  {
+   "seed": 56,
+   "depth": null,
+   "category": "relation_absent",
+   "regime": "standard",
+   "kind": "iid",
+   "unseen": null
+  },
+  {
+   "seed": 57,
+   "depth": null,
+   "category": "relation_absent",
+   "regime": "rich",
+   "kind": "boundary",
+   "unseen": null
+  },
+  {
+   "seed": 58,
+   "depth": null,
+   "category": "relation_absent",
+   "regime": "standard",
+   "kind": "grouped_outliers",
+   "unseen": null
+  },
+  {
+   "seed": 59,
+   "depth": null,
+   "category": "relation_absent",
+   "regime": "rich",
+   "kind": "iid",
+   "unseen": null
+  },
+  {
+   "seed": 60,
+   "depth": null,
+   "category": "dynamic_incompatible",
+   "regime": "standard",
+   "kind": "iid",
+   "unseen": null
+  },
+  {
+   "seed": 61,
+   "depth": null,
+   "category": "dynamic_incompatible",
+   "regime": "rich",
+   "kind": "boundary",
+   "unseen": null
+  },
+  {
+   "seed": 62,
+   "depth": null,
+   "category": "dynamic_incompatible",
+   "regime": "standard",
+   "kind": "grouped_outliers",
+   "unseen": null
+  },
+  {
+   "seed": 63,
+   "depth": null,
+   "category": "dynamic_incompatible",
+   "regime": "rich",
+   "kind": "iid",
+   "unseen": null
+  },
+  {
+   "seed": 64,
+   "depth": null,
+   "category": "distribution_shift",
+   "regime": "standard",
+   "kind": "iid",
+   "unseen": null
+  },
+  {
+   "seed": 65,
+   "depth": null,
+   "category": "distribution_shift",
+   "regime": "rich",
+   "kind": "boundary",
+   "unseen": null
+  },
+  {
+   "seed": 66,
+   "depth": null,
+   "category": "distribution_shift",
+   "regime": "standard",
+   "kind": "grouped_outliers",
+   "unseen": null
+  },
+  {
+   "seed": 67,
+   "depth": null,
+   "category": "distribution_shift",
+   "regime": "rich",
+   "kind": "iid",
+   "unseen": null
+  },
+  {
+   "seed": 68,
+   "depth": null,
+   "category": "partial",
+   "regime": "standard",
+   "kind": "iid",
+   "unseen": null
+  },
+  {
+   "seed": 69,
+   "depth": null,
+   "category": "partial",
+   "regime": "rich",
+   "kind": "boundary",
+   "unseen": null
+  },
+  {
+   "seed": 70,
+   "depth": null,
+   "category": "partial",
+   "regime": "standard",
+   "kind": "grouped_outliers",
+   "unseen": null
+  },
+  {
+   "seed": 71,
+   "depth": null,
+   "category": "partial",
+   "regime": "rich",
+   "kind": "iid",
+   "unseen": null
+  }
+ ],
+ "rules": [
+  "Évaluation UNE SEULE FOIS, en fin de jalon, configuration figée.",
+  "Interdit à toute inspection adaptative : ni lecture, ni tracé, ni résumé, ni diagnostic avant l'évaluation finale.",
+  "Aucun réglage, choix d'hyperparamètre ou sélection de méthode ne peut dépendre du lot scellé.",
+  "Le lot scellé du jalon précédent (jalon-robust-reconstruction) est consommé et reste interdit.",
+  "Vérification d'intégrité : make deep-check (recalcule l'empreinte sans exposer le contenu au code d'inférence)."
+ ]
+}
