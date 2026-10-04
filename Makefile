@@ -676,6 +676,40 @@ deep-obj-aggregate:
 deep-obj-report:
 	$(PYTHON) -m core.deep_obj_report report
 
+# sous-jalon Robust Primitive Discovery (dev uniquement ; amont : proposition → validation → estimation → ensemble)
+DEEP_RP_KEYS ?= 0-15
+DEEP_RP_CHAIN_KEYS ?= 400-415
+.PHONY: deep-rp-test deep-rp-inspect deep-rp-diagnose deep-rp-tune deep-rp-smoke deep-run-rp deep-run-rp-chain deep-rp-aggregate deep-rp-report
+deep-rp-test:
+	$(PYTHON) -m unittest tests.test_deep_robust_primitives
+
+deep-rp-smoke:
+	$(PYTHON) -m core.deep_rp_report smoke
+
+deep-rp-diagnose:
+	$(PYTHON) -m core.deep_rp_report diagnose
+
+deep-rp-chain-smoke:
+	$(PYTHON) -m core.deep_rp_report chain-smoke
+
+deep-rp-tune:
+	$(PYTHON) -m core.deep_rp_report tune
+
+deep-rp-inspect:
+	$(PYTHON) -m core.deep_rp_report inspect
+
+deep-run-rp:
+	$(DEEP_BACKEND) $(AWSPY) submit --kind deeprp --keys $(DEEP_RP_KEYS) --shards $(DEEP_SHARDS) --instance $(DEEP_INSTANCE) --max-runtime 10800
+
+deep-run-rp-chain:
+	$(DEEP_BACKEND) $(AWSPY) submit --kind deeprp --keys $(DEEP_RP_CHAIN_KEYS) --shards $(DEEP_SHARDS) --instance $(DEEP_INSTANCE) --max-runtime 21600
+
+deep-rp-aggregate:
+	$(PYTHON) -m core.deep_rp_report aggregate
+
+deep-rp-report:
+	$(PYTHON) -m core.deep_rp_report report
+
 deep-progress:
 	$(AWSPY) progress $(if $(RUN),--run $(RUN),)
 

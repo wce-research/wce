@@ -502,7 +502,15 @@ def resid_subunits(key):
     return [(f"t{k}_{d}_{reg}", (lambda k=k, d=d, reg=reg: [_row(down_task(k, d, reg), {"task_id": f"{k}_{d}_{reg}", **residual_case(down_task(k, d, reg), int(k))})])) for k, d, reg in RESIDUAL_TASKS]
 
 
-SUBUNITS = {"deepobj": obj_subunits, "deepe2e": e2e_subunits, "deepresid": resid_subunits, "deepvo": vo_subunits, "deepopt": opt_subunits, "deepdown": down_subunits, "deepprofile": profile_subunits, "deepdev": dev_subunits, "deepgen": gen_subunits, "deepcover": cover_subunits, "deepprim": prim_subunits, "deepneural": neural_subunits}
+# ================================================================ sous-jalon Robust Primitive Discovery (dev)
+
+def rp_subunits(key):
+    """Clés 0–15 : banc atomique (scènes 2000+) ; clés 400+ : chaîne aval avec plafonds oracle (tâches jamais utilisées)."""
+    from core.deep_robust_prim import subunits
+    return subunits(key)
+
+
+SUBUNITS = {"deeprp": rp_subunits, "deepobj": obj_subunits, "deepe2e": e2e_subunits, "deepresid": resid_subunits, "deepvo": vo_subunits, "deepopt": opt_subunits, "deepdown": down_subunits, "deepprofile": profile_subunits, "deepdev": dev_subunits, "deepgen": gen_subunits, "deepcover": cover_subunits, "deepprim": prim_subunits, "deepneural": neural_subunits}
 
 
 def subunit_ids(kind, key): return [sid for sid, _ in SUBUNITS[kind](key)]
