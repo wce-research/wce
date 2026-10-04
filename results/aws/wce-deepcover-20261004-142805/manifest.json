@@ -1,0 +1,75 @@
+{
+ "run_id": "wce-deepcover-20261004-142805",
+ "git_commit": "7eb00e12431b1b0640a0ee1f7085f1bb8c0df2b8",
+ "code_hash": "ac2d59786a04ae8f",
+ "config_hash": "dbdbf0956861",
+ "timestamp": "20261004-142805",
+ "region": "eu-north-1",
+ "identity": "AWSReservedSSO_WCE-Research-Runner_251aca5f63af0b9d",
+ "instance_type": "c6i.xlarge",
+ "image": "763104351884.dkr.ecr.eu-north-1.amazonaws.com/pytorch-training:2.5.1-cpu-py311-ubuntu22.04-sagemaker",
+ "backend": "ec2",
+ "kind": "deepcover",
+ "keys": [
+  "0",
+  "1",
+  "2",
+  "3",
+  "4",
+  "5"
+ ],
+ "jobs": [
+  {
+   "name": "wce-deepcover-20261004-142805-s0",
+   "units": 3,
+   "unit_list": [
+    {
+     "kind": "deepcover",
+     "key": "0"
+    },
+    {
+     "kind": "deepcover",
+     "key": "2"
+    },
+    {
+     "kind": "deepcover",
+     "key": "4"
+    }
+   ],
+   "output": "s3://wce-research/robust/runs/wce-deepcover-20261004-142805/wce-deepcover-20261004-142805-s0/",
+   "instance_id": "i-0d60e2e576249843c",
+   "command_id": "a674ab3e-0ed3-41d1-b04a-44c96e4878be",
+   "instance_state": "running",
+   "status": "Completed",
+   "failure": "",
+   "runtime_s": 1048.0
+  },
+  {
+   "name": "wce-deepcover-20261004-142805-s1",
+   "units": 3,
+   "unit_list": [
+    {
+     "kind": "deepcover",
+     "key": "1"
+    },
+    {
+     "kind": "deepcover",
+     "key": "3"
+    },
+    {
+     "kind": "deepcover",
+     "key": "5"
+    }
+   ],
+   "output": "s3://wce-research/robust/runs/wce-deepcover-20261004-142805/wce-deepcover-20261004-142805-s1/",
+   "instance_id": "i-0f7c55c77ec95c7cd",
+   "command_id": "7a612c8d-d3c7-43f9-8337-7e5af4f13136",
+   "instance_state": "terminated",
+   "status": "Completed",
+   "failure": "",
+   "runtime_s": 959.0
+  }
+ ],
+ "status": "Completed",
+ "max_runtime": 21600
+}

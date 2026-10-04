@@ -1,0 +1,20 @@
+{
+ "exact_forms": {
+  "1": 8,
+  "2": 108,
+  "3": 2088
+ },
+ "upper_bound_forms": {
+  "1": 8.0,
+  "2": 108.0,
+  "3": 2592.0,
+  "4": 79866.0,
+  "5": 2756592.0,
+  "6": 102116376.0
+ },
+ "raw_unary_nodes": 45,
+ "well_typed": 30,
+ "grammar_atoms": 8,
+ "typing_reduction_atoms": 0.33333333333333337,
+ "typing_reduction_depth3": 0.7037037037037037
+}

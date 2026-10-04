@@ -28,7 +28,11 @@ from core.deep_fit import DT, FitCounter, FitData, approx_evidence, fit_batch, h
 from core.deep_structure import (COMBINATORS, COMPACT_PARAMS, FragmentLibrary, StructureStore, WorldHypothesis, description_bits, family_of, is_composite,
                                  n_atoms, normalize, skel_key)
 
-STRATEGIES = ("flat", "bottom_up", "top_down", "bidirectional", "best_first")
+STRATEGIES = ("flat", "bottom_up", "top_down", "bidirectional", "best_first", "factorized")
+
+
+def _leaves(p: BNode):
+    return [l for c in p.children for l in _leaves(c)] if is_composite(p) else [p]
 
 
 def estimate_noise_nn(X, y):
@@ -70,6 +74,7 @@ class SearchOutcome:
     store: StructureStore
     preds: Dict[str, torch.Tensor] = field(default_factory=dict)
     all: Dict[str, WorldHypothesis] = field(default_factory=dict)        # toutes les structures ajustées (sans dédoublonnage fonctionnel)
+    discovery: object = None                                             # résultat de PrimitiveDiscovery (si utilisée)
 
     def best(self): return self.hypotheses[0] if self.hypotheses else None
 
@@ -78,18 +83,21 @@ class DeepSearch:
     """Recherche hiérarchique. `hierarchy=False` désactive résidus, cache et réutilisation (ablation)."""
 
     def __init__(self, strategy="bottom_up", budget=150.0, max_depth=6, beam=3, gamma=0.02, seed=0, library: Optional[FragmentLibrary] = None,
-                 use_families=True, hierarchy=True, top_operands=2, atom_steps=50, dedup=True, time_budget=None, patience=1):
+                 use_families=True, hierarchy=True, top_operands=2, atom_steps=50, dedup=True, time_budget=None, patience=1,
+                 fact_inits=6, fact_rounds=3, fact_top=4, fact_polish=8, geometry=False, fact_time=30.0, fact_feedback=True, fact_separation=False, fact_literals=None, fact_discovery=None, fact_residual=True):
         assert strategy in STRATEGIES
         self.strategy, self.budget, self.max_depth, self.beam, self.gamma, self.seed = strategy, budget, max_depth, beam, gamma, seed
         self.library, self.use_families, self.hierarchy, self.top_operands, self.atom_steps, self.dedup = library, use_families, hierarchy and strategy != "flat", top_operands, atom_steps, dedup
         self.time_budget, self.patience = time_budget, patience
+        self.fact_inits, self.fact_rounds, self.fact_top, self.fact_polish, self.geometry, self.fact_time = fact_inits, fact_rounds, fact_top, fact_polish, geometry, fact_time
+        self.fact_feedback, self.fact_separation, self.fact_literals, self.fact_discovery, self.fact_residual, self.discovery = fact_feedback, fact_separation, fact_literals, fact_discovery, fact_residual, None
 
     # ---- état ---------------------------------------------------------------------------------
     def _setup(self, data: FitData, noise):
         self.data = data.with_flip(noise) if noise is not None else data; self.noise = float(self.data.flip.mean())
         self.store = StructureStore(); self.counter = FitCounter(self.budget); self.hyps: Dict[str, WorldHypothesis] = {}; self.preds: Dict[str, torch.Tensor] = {}
         self.trace: List[dict] = []; self.n = len(self.data); self.t0 = time.time(); self.generated = 0; self.fitted = 0; self.pruned = 0; self.fit_seconds = 0.0
-        self.per_depth = {}; self._best_ev = float("-inf"); self._stall = -1
+        self.per_depth = {}; self._best_ev = float("-inf"); self._stall = -1; self.synth_seconds = 0.0; self.compositions = 0; self.gen_stats = []
 
     def _stop(self): return self.counter.exhausted() or (self.time_budget is not None and time.time() - self.t0 > self.time_budget)
 
@@ -307,16 +315,60 @@ class DeepSearch:
         if noise is None: noise = 0.10
         self._setup(data, noise); self._log("candidate_generation", strategy=self.strategy, noise=round(self.noise, 4), budget=self.budget)
         self._fit_atoms()
-        {"flat": self._run_flat, "bottom_up": self._run_bottom_up, "top_down": self._run_top_down, "bidirectional": self._run_bidirectional, "best_first": self._run_best_first}[self.strategy]()
+        {"flat": self._run_flat, "bottom_up": self._run_bottom_up, "top_down": self._run_top_down, "bidirectional": self._run_bidirectional, "best_first": self._run_best_first, "factorized": self._run_factorized}[self.strategy]()
         sel = self._simplify(); ranked = self._ranked(); ranked = [sel] + [h for h in ranked if h.key != sel.key]
         ev = torch.tensor([h.evidence for h in ranked], dtype=DT); m = torch.softmax(ev, 0)
         for h, mm in zip(ranked, m.tolist()): h.mass = mm
         for d, st in self.per_depth.items(): st["kept"] = sum(1 for h in ranked if h.depth == d)
         self._log("selection", key=sel.key, depth=sel.depth, evidence=round(sel.evidence, 3))
         stats = {"strategy": self.strategy, "fit_equivalents": round(self.counter.fit_equivalents, 2), "generated": self.generated, "fitted": self.fitted, "pruned": self.pruned,
-                 "distinct_structures": len(self.hyps), "families": len({h.family for h in self.hyps.values()}), "seconds": round(time.time() - self.t0, 3), "fit_seconds": round(self.fit_seconds, 3),
+                 "distinct_structures": len(self.hyps), "families": len({h.family for h in self.hyps.values()}), "seconds": round(time.time() - self.t0, 3), "fit_seconds": round(self.fit_seconds, 3), "synthesis_seconds": round(self.synth_seconds, 3), "compositions": self.compositions,
+                 "generation": self.gen_stats[-1] if self.gen_stats else {},
                  "per_depth": {str(k): v for k, v in sorted(self.per_depth.items())}, "store": self.store.stats(), "budget_exhausted": self.counter.exhausted()}
-        return SearchOutcome(ranked, self.trace, stats, self.noise, self.store, self.preds, dict(self.hyps))
+        return SearchOutcome(ranked, self.trace, stats, self.noise, self.store, self.preds, dict(self.hyps), self.discovery)
+
+    def _atom_literals(self, data: FitData, n_init, steps, origin):
+        """Littéraux par gradient : TOUTES les initialisations ajustées de chaque type d'atome sont gardées (des optimums
+        locaux différents correspondent à des atomes différents de la structure)."""
+        out = []
+        for a in self._atoms():
+            if self._stop(): break
+            t = time.time(); th, _ = fit_batch(a, data, heuristic_inits(a, data, n_init, self.seed + len(out)), steps=steps, gamma=self.gamma, counter=self.counter); self.fit_seconds += time.time() - t
+            self.generated += n_init; out += [a.with_params(row.tolist()) for row in th]
+        self._log("substructure_discovery", origin=origin, literals=len(out)); return out
+
+    def _run_factorized(self):
+        """Génération factorisée (core.deep_generation) : littéraux (gradient multi-initialisations + géométrie des
+        frontières) → synthèse booléenne sur signatures → quelques candidats polis conjointement. Des tours résiduels
+        ajoutent les atomes que la meilleure formule n'explique pas encore."""
+        from core.deep_generation import generate_candidates
+        Xf = self.data.X.float(); self.gen_stats = []; seen = set()
+        if self.fact_literals is not None: lits = list(self.fact_literals)                       # littéraux fournis (diagnostic oracle, ou primitives déjà découvertes)
+        elif self.fact_discovery is not None:                                                  # PrimitiveDiscovery : proposition + validation WCE
+            from core.deep_primitives import discover
+            dsc = discover(Xf, self.data.y.long(), self.fact_discovery, seed=self.seed); self.counter.fit_equivalents += dsc.fit_equivalents; self.discovery = dsc
+            lits = dsc.primitives.literals(alternatives=2); self._log("substructure_discovery", origin="primitive_discovery", classes=len(dsc.primitives), proposals=dsc.proposals)
+        else: lits = self._atom_literals(self.data, self.fact_inits, self.atom_steps, "global")
+        if self.fact_separation:
+            from core.deep_generation import discover_atoms_by_separation
+            more, st = discover_atoms_by_separation(self._atoms(), Xf, self.data.y, seed=self.seed, counter=self.counter); lits += more; self._log("substructure_discovery", origin="separation", literals=len(more))
+        for rnd in range(self.fact_rounds + 1):
+            t = time.time(); gen = generate_candidates(Xf, self.data.y, max_depth=self.max_depth, top=self.fact_top, seed=self.seed, extra_literals=lits, geometry=self.geometry, time_budget=self.fact_time)
+            self.synth_seconds += time.time() - t; self.gen_stats.append(gen.stats); self.compositions += gen.stats.get("attempted", 0) + gen.stats.get("pairs_scored", 0)
+            self._log("composition", round=rnd, literals=gen.stats.get("S1"), candidates=len(gen.programs), pairs_scored=gen.stats.get("pairs_scored"))
+            order = sorted(range(len(gen.programs)), key=lambda i: -gen.info[i]["score"])
+            for i in order[: self.fact_polish]:
+                p = gen.programs[i]; k = skel_key(p)
+                if self._stop(): break
+                if (k, rnd) in seen or k in self.hyps: continue
+                seen.add((k, rnd)); h = self._fit(p.skeleton(), torch.tensor([p.param_vector()], dtype=DT), 100, f"factorized_r{rnd}")
+                if h is not None and self.fact_feedback: lits += _leaves(h.program)                  # atomes polis EN CONTEXTE (masquage pris en compte) → nouveaux littéraux
+            if rnd == self.fact_rounds or self._stop() or not self._ranked(): break
+            if not self.fact_residual: continue
+            best = self._ranked()[0]; a = self.preds[best.key]
+            for comb in COMBINATORS:                                          # atomes manquants : ajustés sur ce que la meilleure structure n'explique pas
+                r, w, _ = residual_target(comb, a, self.data.y)
+                if float(w.sum()) >= 8: lits += self._atom_literals(self.data.with_target(r, w * self.data.weight), 2, self.atom_steps, f"residual_{comb}")
 
     def _run_bidirectional(self):
         """Montée courte (niveau 2 par résidu) pour peupler la bibliothèque locale, puis descente avec rencontre."""

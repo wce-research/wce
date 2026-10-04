@@ -72,6 +72,8 @@ def build_tarball():
                     rel = os.path.relpath(f, ROOT); h.update(rel.encode()); h.update(open(f, "rb").read()); tar.add(f, arcname=rel)
         res = os.path.join(ROOT, "results", "active_stability_calibration.json")
         if os.path.exists(res): tar.add(res, arcname="results/active_stability_calibration.json")
+        for f in sorted(glob.glob(os.path.join(ROOT, "results", "deep_configs", "*.json"))):                 # configurations figées et poids du proposeur compact
+            rel = os.path.relpath(f, ROOT); h.update(rel.encode()); h.update(open(f, "rb").read()); tar.add(f, arcname=rel)
     return buf.getvalue(), h.hexdigest()[:16]
 
 

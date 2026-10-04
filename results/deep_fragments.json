@@ -1,0 +1,48 @@
+{
+ "library_size": 32,
+ "families": [
+  "XOR(?0, dot.le)",
+  "XOR(?0, dot.in)",
+  "XOR(?0, norm.ge)",
+  "XOR(?0, norm.in)",
+  "XOR(?0, norm.le)",
+  "XOR(dot.in, ?0)",
+  "XOR(norm.ge, ?0)",
+  "XOR(norm.in, ?0)"
+ ],
+ "schemas_proposed_by_families": 30,
+ "new_schemas_from_families": 16,
+ "two_atom_forms_total": 108,
+ "by_depth": {
+  "3": {
+   "two_atom_substructures": 60,
+   "in_library_exact": 0.5833333333333334,
+   "covered_with_anti_unification": 0.6833333333333333,
+   "oracle_path_shortening": 0.11666666666666672
+  },
+  "4": {
+   "two_atom_substructures": 68,
+   "in_library_exact": 0.6176470588235294,
+   "covered_with_anti_unification": 0.7352941176470589,
+   "oracle_path_shortening": 0.10000000000000005
+  },
+  "5": {
+   "two_atom_substructures": 94,
+   "in_library_exact": 0.6702127659574468,
+   "covered_with_anti_unification": 0.7872340425531915,
+   "oracle_path_shortening": 0.11666666666666657
+  },
+  "6": {
+   "two_atom_substructures": 96,
+   "in_library_exact": 0.5833333333333334,
+   "covered_with_anti_unification": 0.6979166666666666,
+   "oracle_path_shortening": 0.0848484848484848
+  }
+ },
+ "compression": {
+  "raw_bits": 1425.2932501298083,
+  "with_library_bits": 1226.1398625987983,
+  "library_bits": 365.05865002596164,
+  "net_gain_bits": -165.90526249495173
+ }
+}

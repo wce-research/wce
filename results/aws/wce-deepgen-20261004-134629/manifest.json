@@ -1,0 +1,85 @@
+{
+ "run_id": "wce-deepgen-20261004-134629",
+ "git_commit": "7eb00e12431b1b0640a0ee1f7085f1bb8c0df2b8",
+ "code_hash": "8b0150b2f6eb5e3a",
+ "config_hash": "325761fbe96b",
+ "timestamp": "20261004-134629",
+ "region": "eu-north-1",
+ "identity": "AWSReservedSSO_WCE-Research-Runner_251aca5f63af0b9d",
+ "instance_type": "c6i.xlarge",
+ "image": "763104351884.dkr.ecr.eu-north-1.amazonaws.com/pytorch-training:2.5.1-cpu-py311-ubuntu22.04-sagemaker",
+ "backend": "ec2",
+ "kind": "deepgen",
+ "keys": [
+  "0",
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7"
+ ],
+ "jobs": [
+  {
+   "name": "wce-deepgen-20261004-134629-s0",
+   "units": 4,
+   "unit_list": [
+    {
+     "kind": "deepgen",
+     "key": "0"
+    },
+    {
+     "kind": "deepgen",
+     "key": "2"
+    },
+    {
+     "kind": "deepgen",
+     "key": "4"
+    },
+    {
+     "kind": "deepgen",
+     "key": "6"
+    }
+   ],
+   "output": "s3://wce-research/robust/runs/wce-deepgen-20261004-134629/wce-deepgen-20261004-134629-s0/",
+   "instance_id": "i-079d3ed9e684e494c",
+   "command_id": "fdc1615e-5109-450e-a10b-dc15d46d2cbc",
+   "instance_state": "terminated",
+   "status": "Completed",
+   "failure": "",
+   "runtime_s": 2148.0
+  },
+  {
+   "name": "wce-deepgen-20261004-134629-s1",
+   "units": 4,
+   "unit_list": [
+    {
+     "kind": "deepgen",
+     "key": "1"
+    },
+    {
+     "kind": "deepgen",
+     "key": "3"
+    },
+    {
+     "kind": "deepgen",
+     "key": "5"
+    },
+    {
+     "kind": "deepgen",
+     "key": "7"
+    }
+   ],
+   "output": "s3://wce-research/robust/runs/wce-deepgen-20261004-134629/wce-deepgen-20261004-134629-s1/",
+   "instance_id": "i-0b4d7587f98fc1d61",
+   "command_id": "7d1a6ce0-9f5d-4147-b79d-12671f2cbef1",
+   "instance_state": "terminated",
+   "status": "Completed",
+   "failure": "",
+   "runtime_s": 2407.0
+  }
+ ],
+ "status": "Completed",
+ "max_runtime": 21600
+}

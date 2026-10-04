@@ -1,0 +1,85 @@
+{
+ "run_id": "wce-deepdev-20261004-124648",
+ "git_commit": "f998e98d7f2fcf02b07d4b61cc0908101de9fcf5",
+ "code_hash": "9ff5c4ec137f2782",
+ "config_hash": "c02ac1156ff9",
+ "timestamp": "20261004-124648",
+ "region": "eu-north-1",
+ "identity": "AWSReservedSSO_WCE-Research-Runner_251aca5f63af0b9d",
+ "instance_type": "c6i.xlarge",
+ "image": "763104351884.dkr.ecr.eu-north-1.amazonaws.com/pytorch-training:2.5.1-cpu-py311-ubuntu22.04-sagemaker",
+ "backend": "ec2",
+ "kind": "deepdev",
+ "keys": [
+  "0",
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7"
+ ],
+ "jobs": [
+  {
+   "name": "wce-deepdev-20261004-124648-s0",
+   "units": 4,
+   "unit_list": [
+    {
+     "kind": "deepdev",
+     "key": "0"
+    },
+    {
+     "kind": "deepdev",
+     "key": "2"
+    },
+    {
+     "kind": "deepdev",
+     "key": "4"
+    },
+    {
+     "kind": "deepdev",
+     "key": "6"
+    }
+   ],
+   "output": "s3://wce-research/robust/runs/wce-deepdev-20261004-124648/wce-deepdev-20261004-124648-s0/",
+   "instance_id": "i-0118453edf31056a3",
+   "command_id": "25e430c6-a484-4d6e-8971-14977108aede",
+   "instance_state": "terminated",
+   "status": "Completed",
+   "failure": "",
+   "runtime_s": 1133.0
+  },
+  {
+   "name": "wce-deepdev-20261004-124648-s1",
+   "units": 4,
+   "unit_list": [
+    {
+     "kind": "deepdev",
+     "key": "1"
+    },
+    {
+     "kind": "deepdev",
+     "key": "3"
+    },
+    {
+     "kind": "deepdev",
+     "key": "5"
+    },
+    {
+     "kind": "deepdev",
+     "key": "7"
+    }
+   ],
+   "output": "s3://wce-research/robust/runs/wce-deepdev-20261004-124648/wce-deepdev-20261004-124648-s1/",
+   "instance_id": "i-0fa243789fcdd2532",
+   "command_id": "100e5e87-6f05-4db1-acb8-736afe3d7230",
+   "instance_state": "terminated",
+   "status": "Completed",
+   "failure": "",
+   "runtime_s": 1238.0
+  }
+ ],
+ "status": "Completed",
+ "max_runtime": 21600
+}

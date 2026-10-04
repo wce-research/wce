@@ -1,0 +1,37 @@
+{
+ "run_id": "wce-deepprofile-20261004-123704",
+ "git_commit": "f998e98d7f2fcf02b07d4b61cc0908101de9fcf5",
+ "code_hash": "9ff5c4ec137f2782",
+ "config_hash": "f836cf910804",
+ "timestamp": "20261004-123704",
+ "region": "eu-north-1",
+ "identity": "AWSReservedSSO_WCE-Research-Runner_251aca5f63af0b9d",
+ "instance_type": "c6i.xlarge",
+ "image": "763104351884.dkr.ecr.eu-north-1.amazonaws.com/pytorch-training:2.5.1-cpu-py311-ubuntu22.04-sagemaker",
+ "backend": "ec2",
+ "kind": "deepprofile",
+ "keys": [
+  "0"
+ ],
+ "jobs": [
+  {
+   "name": "wce-deepprofile-20261004-123704-s0",
+   "units": 1,
+   "unit_list": [
+    {
+     "kind": "deepprofile",
+     "key": "0"
+    }
+   ],
+   "output": "s3://wce-research/robust/runs/wce-deepprofile-20261004-123704/wce-deepprofile-20261004-123704-s0/",
+   "instance_id": "i-09a340c27419ddfd8",
+   "command_id": "53f0d526-1481-448d-8aa1-00e470e4a57c",
+   "instance_state": "running",
+   "status": "Completed",
+   "failure": "",
+   "runtime_s": 351.0
+  }
+ ],
+ "status": "Completed",
+ "max_runtime": 10800
+}

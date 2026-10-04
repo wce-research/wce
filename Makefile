@@ -581,6 +581,55 @@ deep-profile:
 deep-run-dev:
 	$(DEEP_BACKEND) $(AWSPY) submit --kind deepdev --keys $(DEEP_DEV_KEYS) --shards $(DEEP_SHARDS) --instance $(DEEP_INSTANCE) --max-runtime 21600
 
+# sous-jalon Deep Candidate Generation (dev uniquement ; jamais le lot scellé)
+DEEP_GEN_KEYS ?= 0-7
+DEEP_COVER_KEYS ?= 0-5
+.PHONY: deep-cover-aggregate deep-run-cover deep-run-gen deep-reachability deep-coverage deep-fragments deep-gen-aggregate deep-gen-report deep-profile-generation
+deep-run-gen:
+	$(DEEP_BACKEND) $(AWSPY) submit --kind deepgen --keys $(DEEP_GEN_KEYS) --shards $(DEEP_SHARDS) --instance $(DEEP_INSTANCE) --max-runtime 21600
+
+deep-profile-generation:
+	$(DEEP_BACKEND) $(AWSPY) submit --kind deepgen --keys 100 --shards 1 --instance $(DEEP_INSTANCE) --max-runtime 10800
+
+deep-run-cover:
+	$(DEEP_BACKEND) $(AWSPY) submit --kind deepcover --keys $(DEEP_COVER_KEYS) --shards $(DEEP_SHARDS) --instance $(DEEP_INSTANCE) --max-runtime 21600
+
+deep-reachability:
+	$(PYTHON) -m core.deep_gen_report reachability
+
+deep-coverage:
+	$(PYTHON) -m core.deep_gen_report coverage
+
+deep-fragments:
+	$(PYTHON) -m core.deep_gen_report fragments
+
+deep-cover-aggregate:
+	$(PYTHON) -m core.deep_gen_report cover
+
+deep-gen-aggregate deep-aggregate:
+	$(PYTHON) -m core.deep_gen_report aggregate
+
+deep-gen-report:
+	$(PYTHON) -m core.deep_gen_report report
+
+# sous-jalon Primitive Discovery (dev uniquement)
+DEEP_PRIM_KEYS ?= 0-7
+.PHONY: deep-train-proposer deep-install-proposer deep-run-prim deep-prim-aggregate deep-prim-report
+deep-train-proposer:
+	$(DEEP_BACKEND) $(AWSPY) submit --kind deepneural --keys 0-1 --shards 1 --instance $(DEEP_INSTANCE) --max-runtime 7200
+
+deep-install-proposer:
+	$(PYTHON) -m core.deep_prim_report install
+
+deep-run-prim:
+	$(DEEP_BACKEND) $(AWSPY) submit --kind deepprim --keys $(DEEP_PRIM_KEYS) --shards $(DEEP_SHARDS) --instance $(DEEP_INSTANCE) --max-runtime 21600
+
+deep-prim-aggregate:
+	$(PYTHON) -m core.deep_prim_report aggregate
+
+deep-prim-report:
+	$(PYTHON) -m core.deep_prim_report report
+
 deep-progress:
 	$(AWSPY) progress $(if $(RUN),--run $(RUN),)
 

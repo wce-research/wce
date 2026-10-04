@@ -275,7 +275,7 @@ for _i in range(15): setattr(FitTests, f"test_compiled_random_tree_{_i}", _mk_fw
 # ================================================================ recherche
 
 class SearchTests(unittest.TestCase):
-    def test_strategies(self): self.assertEqual(STRATEGIES, ("flat", "bottom_up", "top_down", "bidirectional", "best_first"))
+    def test_strategies(self): self.assertEqual(STRATEGIES, ("flat", "bottom_up", "top_down", "bidirectional", "best_first", "factorized"))
     def test_normalize_matches_interned(self):
         p = C("xor", RING, C("and", HALF, DISC)); n = normalize(p); self.assertEqual(skel_key(n), json.dumps(n.skeleton().to_dict(), sort_keys=True)); X = X0(200); self.assertTrue(torch.equal(predict(n, X), predict(p, X)))
     def test_normalize_idempotent(self): p = normalize(C("xor", RING, C("and", HALF, DISC))); self.assertEqual(normalize(p), p)
@@ -489,7 +489,7 @@ class ExperimentTests(unittest.TestCase):
         t = DW.make_task(0, 2); tr = t.world.truth; bad = tr.skeleton().with_params([9.0] * tr.n_params()); self.assertEqual(DX.truth_fate(t, {"a": bad}, DISC)["fate"], "generated_bad_fit")
     def test_fate_ooc(self): self.assertEqual(DX.truth_fate(DW.make_task(1, category="partial"), {"a": DISC}, DISC)["fate"], "out_of_class")
     def test_fate_counts_substructures(self): t = DW.make_task(0, 3); tr = t.world.truth; r = DX.truth_fate(t, {"a": tr}, tr); self.assertEqual(r["true_substructures_found"], r["true_substructures"])
-    def test_profile_subunits(self): ids = DX.subunit_ids("deepprofile", 0); self.assertEqual(len(ids), 6 * 2 * 6); self.assertEqual(len(set(ids)), len(ids))
+    def test_profile_subunits(self): ids = DX.subunit_ids("deepprofile", 0); self.assertEqual(len(ids), 6 * 2 * 7); self.assertEqual(len(set(ids)), len(ids))
     def test_dev_subunits(self): ids = DX.subunit_ids("deepdev", 0); self.assertEqual(len(ids), 7 * (1 + len(DX.dev_grid()))); self.assertEqual(len(set(ids)), len(ids))
     def test_dev_uses_dev_split(self): self.assertTrue(all(t.split == "dev" for _, t in DX.dev_tasks(0)))
     def test_dev_tasks_deterministic(self): self.assertEqual([t.world.uid for _, t in DX.dev_tasks(3)], [t.world.uid for _, t in DX.dev_tasks(3)])
@@ -503,7 +503,7 @@ class ExperimentTests(unittest.TestCase):
     def test_validation_measures_not_used_for_fit(self): src = inspect.getsource(DX.run_new); self.assertLess(src.index("active_identification("), src.index('task.oracle(Xin, "precise", g)'))
     def test_entry_knows_deep_kinds(self):
         import wce_aws.sm_entry as ENT
-        self.assertEqual(len(ENT.sub_ids("deepprofile", "0")), 72); self.assertIn('kind.startswith("deep")', inspect.getsource(ENT.run_sub))
+        self.assertEqual(len(ENT.sub_ids("deepprofile", "0")), 84); self.assertIn('kind.startswith("deep")', inspect.getsource(ENT.run_sub))
     def test_make_targets(self):
         mk = open("Makefile").read()
         for t in ("deep-check:", "deep-test:", "deep-profile:", "deep-run-dev:", "deep-progress:", "deep-resume:", "deep-fetch:", "deep-timing:"): self.assertIn(t, mk)

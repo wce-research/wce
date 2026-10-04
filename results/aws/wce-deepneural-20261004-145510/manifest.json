@@ -1,0 +1,42 @@
+{
+ "run_id": "wce-deepneural-20261004-145510",
+ "git_commit": "7eb00e12431b1b0640a0ee1f7085f1bb8c0df2b8",
+ "code_hash": "8a93ef45b657e229",
+ "config_hash": "be4aef7dbd38",
+ "timestamp": "20261004-145510",
+ "region": "eu-north-1",
+ "identity": "AWSReservedSSO_WCE-Research-Runner_251aca5f63af0b9d",
+ "instance_type": "c6i.xlarge",
+ "image": "763104351884.dkr.ecr.eu-north-1.amazonaws.com/pytorch-training:2.5.1-cpu-py311-ubuntu22.04-sagemaker",
+ "backend": "ec2",
+ "kind": "deepneural",
+ "keys": [
+  "0",
+  "1"
+ ],
+ "jobs": [
+  {
+   "name": "wce-deepneural-20261004-145510-s0",
+   "units": 2,
+   "unit_list": [
+    {
+     "kind": "deepneural",
+     "key": "0"
+    },
+    {
+     "kind": "deepneural",
+     "key": "1"
+    }
+   ],
+   "output": "s3://wce-research/robust/runs/wce-deepneural-20261004-145510/wce-deepneural-20261004-145510-s0/",
+   "instance_id": "i-0456395a36a7d53f8",
+   "command_id": "7dc4e0e8-6747-477a-bf4d-7f6b99162d75",
+   "instance_state": "terminated",
+   "status": "Completed",
+   "failure": "",
+   "runtime_s": 232.0
+  }
+ ],
+ "status": "Completed",
+ "max_runtime": 7200
+}

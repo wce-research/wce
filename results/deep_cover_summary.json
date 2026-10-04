@@ -1,0 +1,158 @@
+{
+ "d2/standard": {
+  "tasks": 6,
+  "forms_fitted": 116,
+  "truth_selected": 0.16666666666666666,
+  "truth_rank_median": 36,
+  "truth_in_top5": 0.16666666666666666,
+  "forms_within_bf20": 2.3333333333333335,
+  "best_is_functional": 0.0,
+  "best_full_agreement": 0.925555557012558,
+  "fit_equivalents": 464.0,
+  "cpu_seconds": 18.315,
+  "strategies": {
+   "baseline": {
+    "coverage_depth": 0.5833,
+    "forms_at_depth": 63.0,
+    "truth_generated": 0.8333
+   },
+   "bidirectional": {
+    "coverage_depth": 0.1096,
+    "forms_at_depth": 11.8333,
+    "truth_generated": 0.3333
+   },
+   "bottom_up": {
+    "coverage_depth": 0.1636,
+    "forms_at_depth": 17.6667,
+    "truth_generated": 0.5
+   },
+   "factorized": {
+    "coverage_depth": 0.0309,
+    "forms_at_depth": 3.3333,
+    "truth_generated": 0.0
+   },
+   "flat": {
+    "coverage_depth": 0.5833,
+    "forms_at_depth": 63.0,
+    "truth_generated": 0.8333
+   }
+  }
+ },
+ "d2/rich": {
+  "tasks": 6,
+  "forms_fitted": 116,
+  "truth_selected": 0.3333333333333333,
+  "truth_rank_median": 40,
+  "truth_in_top5": 0.3333333333333333,
+  "forms_within_bf20": 1.3333333333333333,
+  "best_is_functional": 0.0,
+  "best_full_agreement": 0.9792777796586355,
+  "fit_equivalents": 464.0,
+  "cpu_seconds": 18.6717,
+  "strategies": {
+   "baseline": {
+    "coverage_depth": 0.5833,
+    "forms_at_depth": 63.0,
+    "truth_generated": 0.8333
+   },
+   "bidirectional": {
+    "coverage_depth": 0.1065,
+    "forms_at_depth": 11.5,
+    "truth_generated": 0.3333
+   },
+   "bottom_up": {
+    "coverage_depth": 0.1543,
+    "forms_at_depth": 16.6667,
+    "truth_generated": 0.3333
+   },
+   "factorized": {
+    "coverage_depth": 0.0401,
+    "forms_at_depth": 4.3333,
+    "truth_generated": 0.3333
+   },
+   "flat": {
+    "coverage_depth": 0.5833,
+    "forms_at_depth": 63.0,
+    "truth_generated": 0.8333
+   }
+  }
+ },
+ "d3/standard": {
+  "tasks": 6,
+  "forms_fitted": 2204,
+  "truth_selected": 0.0,
+  "truth_rank_median": 915,
+  "truth_in_top5": 0.0,
+  "forms_within_bf20": 5.833333333333333,
+  "best_is_functional": 0.0,
+  "best_full_agreement": 0.8662777841091156,
+  "fit_equivalents": 8816.0,
+  "cpu_seconds": 419.9183,
+  "strategies": {
+   "baseline": {
+    "coverage_depth": 0.017,
+    "forms_at_depth": 35.5,
+    "truth_generated": 0.0
+   },
+   "bidirectional": {
+    "coverage_depth": 0.0,
+    "forms_at_depth": 0.0,
+    "truth_generated": 0.0
+   },
+   "bottom_up": {
+    "coverage_depth": 0.0074,
+    "forms_at_depth": 15.5,
+    "truth_generated": 0.0
+   },
+   "factorized": {
+    "coverage_depth": 0.0028,
+    "forms_at_depth": 5.8333,
+    "truth_generated": 0.0
+   },
+   "flat": {
+    "coverage_depth": 0.0294,
+    "forms_at_depth": 61.3333,
+    "truth_generated": 0.1667
+   }
+  }
+ },
+ "d3/rich": {
+  "tasks": 6,
+  "forms_fitted": 2204,
+  "truth_selected": 0.0,
+  "truth_rank_median": 821,
+  "truth_in_top5": 0.0,
+  "forms_within_bf20": 1.5,
+  "best_is_functional": 0.0,
+  "best_full_agreement": 0.9320555627346039,
+  "fit_equivalents": 8816.0,
+  "cpu_seconds": 469.915,
+  "strategies": {
+   "baseline": {
+    "coverage_depth": 0.0189,
+    "forms_at_depth": 39.5,
+    "truth_generated": 0.1667
+   },
+   "bidirectional": {
+    "coverage_depth": 0.0001,
+    "forms_at_depth": 0.1667,
+    "truth_generated": 0.0
+   },
+   "bottom_up": {
+    "coverage_depth": 0.0072,
+    "forms_at_depth": 15.0,
+    "truth_generated": 0.0
+   },
+   "factorized": {
+    "coverage_depth": 0.0037,
+    "forms_at_depth": 7.6667,
+    "truth_generated": 0.0
+   },
+   "flat": {
+    "coverage_depth": 0.0293,
+    "forms_at_depth": 61.1667,
+    "truth_generated": 0.0
+   }
+  }
+ }
+}

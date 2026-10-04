@@ -339,7 +339,7 @@ class FragmentLibrary:
     (sinon ce serait de la mémorisation d'instance). Taille bornée (MAX_FRAGMENTS)."""
 
     def __init__(self, min_support=2, min_parameterizations=2, max_fragments=MAX_FRAGMENTS):
-        self.min_support, self.min_param, self.max_fragments = min_support, min_parameterizations, max_fragments
+        self.min_support, self.min_param, self.max_fragments = min_support, min_parameterizations, max_fragments; self.family_support, self.max_families = 3, 8
         self._cand: Dict[str, Fragment] = {}; self._params: Dict[str, set] = defaultdict(set); self.fragments: List[Fragment] = []
         self.families: List[StructureFamily] = []
 
@@ -365,9 +365,18 @@ class FragmentLibrary:
             f.parameterizations = len(self._params[k])
             if f.frequency >= self.min_support and f.parameterizations >= self.min_param: ok.append(f)
         ok.sort(key=lambda f: (-f.frequency * (f.n_atoms - 1), f.key)); self.fragments = ok[: self.max_fragments]
-        by_size = defaultdict(list)
-        for f in self.fragments: by_size[f.n_atoms].append(f.skeleton)
-        self.families = [fam for fam in (anti_unify(v) for v in by_size.values() if len(v) >= 2) if not fam.is_trivial]
+        # Familles : anti-unification PAR PAIRES de fragments de même taille (anti-unifier tout un groupe hétérogène ne
+        # donne que le schéma trivial). On garde les schémas à UNE variable soutenus par au moins `family_support`
+        # fragments, les plus soutenus d'abord.
+        pats: Dict[str, StructureFamily] = {}
+        for i, f in enumerate(self.fragments):
+            for g2 in self.fragments[i + 1:]:
+                if f.n_atoms != g2.n_atoms: continue
+                fam = anti_unify([f.skeleton, g2.skeleton])
+                if fam.is_trivial or len(fam.variables) != 1: continue
+                pats.setdefault(fam.render(), fam)
+        for fam in pats.values(): fam.support = sum(fam.matches(f.skeleton) is not None for f in self.fragments)
+        self.families = sorted((f for f in pats.values() if f.support >= self.family_support), key=lambda f: (-f.support, f.render()))[: self.max_families]
         return self.fragments
 
     def __len__(self): return len(self.fragments)

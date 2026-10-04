@@ -149,3 +149,22 @@ def approx_evidence(n_params: int, n_atoms: int, ll: float, n_obs: int, bits_per
     """Évidence APPROCHÉE (type BIC + a priori structurel), même forme que le jalon précédent : ce n'est pas une
     marginale exacte."""
     return ll - 0.5 * n_params * math.log(max(1, n_obs)) - (2 * n_atoms - 1) * bits_per_node * math.log(2)
+
+
+# ================================================================ ajustement par SÉPARATION (changement scientifique, pas une optimisation)
+
+def separation_fit(skel: BNode, P, Q, pair_weight, inits, steps=50, lr=0.05, counter: Optional[FitCounter] = None):
+    """SCIENTIFIC CHANGE (génération de candidats) — objectif indépendant de la polarité : ajuster un atome pour que sa
+    frontière passe ENTRE les deux points de chaque paire de frontière (points voisins d'étiquettes opposées).
+    Dans une composition and / or / xor, un atome masqué par un XOR n'est pas corrélé à la cible, mais sa frontière reste
+    visible localement : cet objectif la trouve là où l'ajustement sur la cible échoue.
+    Probabilité de séparation d'une paire : m(P)(1 − m(Q)) + m(Q)(1 − m(P)), m = appartenance adoucie.
+    Renvoie (theta [K, np], séparation pondérée dure [K])."""
+    th = (inits if torch.is_tensor(inits) else torch.stack([torch.as_tensor(i, dtype=DT) for i in inits])).clone().to(DT).requires_grad_(True)
+    fn = compile_skeleton(skel); P, Q, w = P.to(DT)[None], Q.to(DT)[None], pair_weight.to(DT); opt = torch.optim.Adam([th], lr=lr)
+    for t in range(steps):
+        opt.zero_grad(); kk = 3.0 + 12.0 * t / steps; sig = lambda z: torch.sigmoid(kk * z)
+        mp, mq = fn(th, P, sig), fn(th, Q, sig); (-(w * (mp * (1 - mq) + mq * (1 - mp))).sum()).backward(); opt.step()
+    th = th.detach()
+    if counter is not None: counter.charge(len(th), steps)
+    hard = lambda z: (z >= 0).to(DT); return th, (w * (fn(th, P, hard) != fn(th, Q, hard)).to(DT)).sum(1)
