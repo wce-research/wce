@@ -24,7 +24,7 @@ from typing import Dict, List, Optional, Sequence
 import torch
 
 from core.boundary_program import BNode
-from core.deep_fit import DT, FitCounter, FitData, approx_evidence, fit_batch, heuristic_inits, loglik_batch, predict_batch
+from core.deep_fit import DT, FitCounter, FitData, approx_evidence, fit_batch, heuristic_inits, loglik_batch, predict_batch, profiled_loglik, validated_fit
 from core.deep_structure import (COMBINATORS, COMPACT_PARAMS, FragmentLibrary, StructureStore, WorldHypothesis, description_bits, family_of, is_composite,
                                  n_atoms, normalize, skel_key)
 
@@ -53,14 +53,6 @@ def residual_target(comb: str, a, y):
     raise KeyError(comb)
 
 
-def profiled_loglik(pred, data: FitData):
-    """logL des prédictions DURES avec bruit PROFILÉ : le taux de retournement ε est un paramètre de nuisance estimé
-    par hypothèse (ε̂ = taux d'erreur lissé). Le bruit du monde n'a donc pas à être connu : une structure plus profonde
-    n'est préférée que si la baisse d'erreur paie sa pénalité de complexité."""
-    w = data.weight; n = float(w.sum()); e = float(((pred != data.y).to(DT) * w).sum()); eps = min(0.49, max(1e-3, (e + 0.5) / (n + 1.0)))
-    return e * math.log(eps) + (n - e) * math.log(1 - eps)
-
-
 def combine(comb: str, a, b):
     return a * b if comb == "and" else a + b - a * b if comb == "or" else (a - b).abs()
 
@@ -84,12 +76,13 @@ class DeepSearch:
 
     def __init__(self, strategy="bottom_up", budget=150.0, max_depth=6, beam=3, gamma=0.02, seed=0, library: Optional[FragmentLibrary] = None,
                  use_families=True, hierarchy=True, top_operands=2, atom_steps=50, dedup=True, time_budget=None, patience=1,
-                 fact_inits=6, fact_rounds=3, fact_top=4, fact_polish=8, geometry=False, fact_time=30.0, fact_feedback=True, fact_separation=False, fact_literals=None, fact_discovery=None, fact_residual=True):
+                 fact_inits=6, fact_rounds=3, fact_top=4, fact_polish=8, geometry=False, fact_time=30.0, fact_feedback=True, fact_separation=False, fact_literals=None, fact_discovery=None, fact_residual=True, validated=None):
         assert strategy in STRATEGIES
         self.strategy, self.budget, self.max_depth, self.beam, self.gamma, self.seed = strategy, budget, max_depth, beam, gamma, seed
         self.library, self.use_families, self.hierarchy, self.top_operands, self.atom_steps, self.dedup = library, use_families, hierarchy and strategy != "flat", top_operands, atom_steps, dedup
         self.time_budget, self.patience = time_budget, patience
         self.fact_inits, self.fact_rounds, self.fact_top, self.fact_polish, self.geometry, self.fact_time = fact_inits, fact_rounds, fact_top, fact_polish, geometry, fact_time
+        self.validated = validated                                                               # None (pipeline d'origine) | "profiled" | "surrogate"
         self.fact_feedback, self.fact_separation, self.fact_literals, self.fact_discovery, self.fact_residual, self.discovery = fact_feedback, fact_separation, fact_literals, fact_discovery, fact_residual, None
 
     # ---- état ---------------------------------------------------------------------------------
@@ -97,7 +90,7 @@ class DeepSearch:
         self.data = data.with_flip(noise) if noise is not None else data; self.noise = float(self.data.flip.mean())
         self.store = StructureStore(); self.counter = FitCounter(self.budget); self.hyps: Dict[str, WorldHypothesis] = {}; self.preds: Dict[str, torch.Tensor] = {}
         self.trace: List[dict] = []; self.n = len(self.data); self.t0 = time.time(); self.generated = 0; self.fitted = 0; self.pruned = 0; self.fit_seconds = 0.0
-        self.per_depth = {}; self._best_ev = float("-inf"); self._stall = -1; self.synth_seconds = 0.0; self.compositions = 0; self.gen_stats = []
+        self.per_depth = {}; self._best_ev = float("-inf"); self._stall = -1; self.synth_seconds = 0.0; self.compositions = 0; self.gen_stats = []; self.transactions = []
 
     def _stop(self): return self.counter.exhausted() or (self.time_budget is not None and time.time() - self.t0 > self.time_budget)
 
@@ -120,7 +113,14 @@ class DeepSearch:
     def _fit(self, skel: BNode, inits, steps, origin, data: Optional[FitData] = None):
         """Ajuste un squelette (K initialisations en lot). Avec `data` (cible résiduelle), renvoie les paramètres sans
         enregistrer d'hypothèse de monde."""
-        t = time.time(); th, ll = fit_batch(skel, data or self.data, inits, steps=steps, gamma=self.gamma, counter=self.counter); self.fit_seconds += time.time() - t
+        t = time.time()
+        if data is None and self.validated is not None and len(inits) == 1:
+            # GARDE-FOU (seul étage modifié) : un candidat EXISTANT n'est remplacé par sa version ajustée que si le
+            # critère observable s'améliore — propose → evaluate → commit / rollback (core.deep_fit.validated_fit).
+            row, tx = validated_fit(skel, self.data, inits[0], steps=steps, gamma=self.gamma, counter=self.counter, criterion=self.validated); self.transactions.append(tx)
+            th = row.reshape(1, -1); ll = loglik_batch(skel, th, self.data, self.gamma)
+        else: th, ll = fit_batch(skel, data or self.data, inits, steps=steps, gamma=self.gamma, counter=self.counter)
+        self.fit_seconds += time.time() - t
         self.generated += 1; self.per_depth.setdefault(n_atoms(skel), {"generated": 0, "fitted": 0, "kept": 0})["generated"] += 1
         i = int(ll.argmax()); prog = skel.skeleton().with_params(th[i].tolist())
         return prog if data is not None else self._register(prog, float(ll[i]), origin)
@@ -323,7 +323,8 @@ class DeepSearch:
         self._log("selection", key=sel.key, depth=sel.depth, evidence=round(sel.evidence, 3))
         stats = {"strategy": self.strategy, "fit_equivalents": round(self.counter.fit_equivalents, 2), "generated": self.generated, "fitted": self.fitted, "pruned": self.pruned,
                  "distinct_structures": len(self.hyps), "families": len({h.family for h in self.hyps.values()}), "seconds": round(time.time() - self.t0, 3), "fit_seconds": round(self.fit_seconds, 3), "synthesis_seconds": round(self.synth_seconds, 3), "compositions": self.compositions,
-                 "generation": self.gen_stats[-1] if self.gen_stats else {},
+                 "generation": self.gen_stats[-1] if self.gen_stats else {}, "validated": self.validated, "transactions": len(self.transactions), "commits": sum(t.accepted for t in self.transactions),
+                 "rollbacks": sum(not t.accepted for t in self.transactions),
                  "per_depth": {str(k): v for k, v in sorted(self.per_depth.items())}, "store": self.store.stats(), "budget_exhausted": self.counter.exhausted()}
         return SearchOutcome(ranked, self.trace, stats, self.noise, self.store, self.preds, dict(self.hyps), self.discovery)
 

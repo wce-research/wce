@@ -466,7 +466,24 @@ def down_subunits(key):
     return [(f"d{d}_{reg}", (lambda d=d, reg=reg: [_row(down_task(key, d, reg), {"experiment": "downstream", **trace_task(down_task(key, d, reg), int(key))})])) for d in DOWN_DEPTHS for reg in GEN_REGIMES]
 
 
-SUBUNITS = {"deepdown": down_subunits, "deepprofile": profile_subunits, "deepdev": dev_subunits, "deepgen": gen_subunits, "deepcover": cover_subunits, "deepprim": prim_subunits, "deepneural": neural_subunits}
+# ================================================================ sous-jalon Validated Optimizer (dev, vrais atomes fournis)
+
+VO_ARMS = ("A", "B", "C")
+
+
+def vo_subunits(key):
+    """Expérience contrôlée : clés 0–15 = les 128 tâches du diagnostic aval ; clés 100–115 = 128 NOUVELLES tâches de dev."""
+    from core.deep_validated import arm_run
+    return [(f"d{d}_{reg}_{arm}", (lambda d=d, reg=reg, arm=arm: [_row(down_task(key, d, reg), {"experiment": "arms", "task_set": "new" if int(key) >= 100 else "diagnostic", "task_id": f"{key}_{d}_{reg}", **arm_run(down_task(key, d, reg), arm, int(key))})]))
+            for d in DOWN_DEPTHS for reg in GEN_REGIMES for arm in VO_ARMS]
+
+
+def opt_subunits(key):
+    from core.deep_validated import optimizer_diagnosis
+    return [(f"d{d}_{reg}", (lambda d=d, reg=reg: [_row(down_task(key, d, reg), optimizer_diagnosis(down_task(key, d, reg), int(key)))])) for d in DOWN_DEPTHS for reg in GEN_REGIMES]
+
+
+SUBUNITS = {"deepvo": vo_subunits, "deepopt": opt_subunits, "deepdown": down_subunits, "deepprofile": profile_subunits, "deepdev": dev_subunits, "deepgen": gen_subunits, "deepcover": cover_subunits, "deepprim": prim_subunits, "deepneural": neural_subunits}
 
 
 def subunit_ids(kind, key): return [sid for sid, _ in SUBUNITS[kind](key)]

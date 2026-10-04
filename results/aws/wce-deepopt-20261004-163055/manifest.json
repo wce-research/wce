@@ -1,0 +1,85 @@
+{
+ "run_id": "wce-deepopt-20261004-163055",
+ "git_commit": "3074abe848d53879b9e02925d24a68437e8b6f52",
+ "code_hash": "e44b00822e7e9497",
+ "config_hash": "8d8399d9afc8",
+ "timestamp": "20261004-163055",
+ "region": "eu-north-1",
+ "identity": "AWSReservedSSO_WCE-Research-Runner_251aca5f63af0b9d",
+ "instance_type": "c6i.xlarge",
+ "image": "763104351884.dkr.ecr.eu-north-1.amazonaws.com/pytorch-training:2.5.1-cpu-py311-ubuntu22.04-sagemaker",
+ "backend": "ec2",
+ "kind": "deepopt",
+ "keys": [
+  "0",
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7"
+ ],
+ "jobs": [
+  {
+   "name": "wce-deepopt-20261004-163055-s0",
+   "units": 4,
+   "unit_list": [
+    {
+     "kind": "deepopt",
+     "key": "0"
+    },
+    {
+     "kind": "deepopt",
+     "key": "2"
+    },
+    {
+     "kind": "deepopt",
+     "key": "4"
+    },
+    {
+     "kind": "deepopt",
+     "key": "6"
+    }
+   ],
+   "output": "s3://wce-research/robust/runs/wce-deepopt-20261004-163055/wce-deepopt-20261004-163055-s0/",
+   "instance_id": "i-00320e0d8f94f8170",
+   "command_id": "312263dc-461c-4b1a-874e-11d97d7f6c63",
+   "instance_state": "terminated",
+   "status": "Completed",
+   "failure": "",
+   "runtime_s": 111.0
+  },
+  {
+   "name": "wce-deepopt-20261004-163055-s1",
+   "units": 4,
+   "unit_list": [
+    {
+     "kind": "deepopt",
+     "key": "1"
+    },
+    {
+     "kind": "deepopt",
+     "key": "3"
+    },
+    {
+     "kind": "deepopt",
+     "key": "5"
+    },
+    {
+     "kind": "deepopt",
+     "key": "7"
+    }
+   ],
+   "output": "s3://wce-research/robust/runs/wce-deepopt-20261004-163055/wce-deepopt-20261004-163055-s1/",
+   "instance_id": "i-09a76e5a1dccb8294",
+   "command_id": "45fb7640-dc7e-4f13-ba46-3aee348b3e2c",
+   "instance_state": "terminated",
+   "status": "Completed",
+   "failure": "",
+   "runtime_s": 116.0
+  }
+ ],
+ "status": "Completed",
+ "max_runtime": 10800
+}

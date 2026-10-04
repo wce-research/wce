@@ -1,0 +1,205 @@
+{
+ "run_id": "wce-deepvo-20261004-162019",
+ "git_commit": "3074abe848d53879b9e02925d24a68437e8b6f52",
+ "code_hash": "e44b00822e7e9497",
+ "config_hash": "3e7f0ead79fe",
+ "timestamp": "20261004-162019",
+ "region": "eu-north-1",
+ "identity": "AWSReservedSSO_WCE-Research-Runner_251aca5f63af0b9d",
+ "instance_type": "c6i.xlarge",
+ "image": "763104351884.dkr.ecr.eu-north-1.amazonaws.com/pytorch-training:2.5.1-cpu-py311-ubuntu22.04-sagemaker",
+ "backend": "ec2",
+ "kind": "deepvo",
+ "keys": [
+  "0",
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9",
+  "10",
+  "11",
+  "12",
+  "13",
+  "14",
+  "15",
+  "100",
+  "101",
+  "102",
+  "103",
+  "104",
+  "105",
+  "106",
+  "107",
+  "108",
+  "109",
+  "110",
+  "111",
+  "112",
+  "113",
+  "114",
+  "115"
+ ],
+ "jobs": [
+  {
+   "name": "wce-deepvo-20261004-162019-s0",
+   "units": 16,
+   "unit_list": [
+    {
+     "kind": "deepvo",
+     "key": "0"
+    },
+    {
+     "kind": "deepvo",
+     "key": "2"
+    },
+    {
+     "kind": "deepvo",
+     "key": "4"
+    },
+    {
+     "kind": "deepvo",
+     "key": "6"
+    },
+    {
+     "kind": "deepvo",
+     "key": "8"
+    },
+    {
+     "kind": "deepvo",
+     "key": "10"
+    },
+    {
+     "kind": "deepvo",
+     "key": "12"
+    },
+    {
+     "kind": "deepvo",
+     "key": "14"
+    },
+    {
+     "kind": "deepvo",
+     "key": "100"
+    },
+    {
+     "kind": "deepvo",
+     "key": "102"
+    },
+    {
+     "kind": "deepvo",
+     "key": "104"
+    },
+    {
+     "kind": "deepvo",
+     "key": "106"
+    },
+    {
+     "kind": "deepvo",
+     "key": "108"
+    },
+    {
+     "kind": "deepvo",
+     "key": "110"
+    },
+    {
+     "kind": "deepvo",
+     "key": "112"
+    },
+    {
+     "kind": "deepvo",
+     "key": "114"
+    }
+   ],
+   "output": "s3://wce-research/robust/runs/wce-deepvo-20261004-162019/wce-deepvo-20261004-162019-s0/",
+   "instance_id": "i-08363f63fae84cf62",
+   "command_id": "a6371119-30cd-4849-b03e-4698d56ed6b9",
+   "instance_state": "terminated",
+   "status": "Completed",
+   "failure": "",
+   "runtime_s": 530.0
+  },
+  {
+   "name": "wce-deepvo-20261004-162019-s1",
+   "units": 16,
+   "unit_list": [
+    {
+     "kind": "deepvo",
+     "key": "1"
+    },
+    {
+     "kind": "deepvo",
+     "key": "3"
+    },
+    {
+     "kind": "deepvo",
+     "key": "5"
+    },
+    {
+     "kind": "deepvo",
+     "key": "7"
+    },
+    {
+     "kind": "deepvo",
+     "key": "9"
+    },
+    {
+     "kind": "deepvo",
+     "key": "11"
+    },
+    {
+     "kind": "deepvo",
+     "key": "13"
+    },
+    {
+     "kind": "deepvo",
+     "key": "15"
+    },
+    {
+     "kind": "deepvo",
+     "key": "101"
+    },
+    {
+     "kind": "deepvo",
+     "key": "103"
+    },
+    {
+     "kind": "deepvo",
+     "key": "105"
+    },
+    {
+     "kind": "deepvo",
+     "key": "107"
+    },
+    {
+     "kind": "deepvo",
+     "key": "109"
+    },
+    {
+     "kind": "deepvo",
+     "key": "111"
+    },
+    {
+     "kind": "deepvo",
+     "key": "113"
+    },
+    {
+     "kind": "deepvo",
+     "key": "115"
+    }
+   ],
+   "output": "s3://wce-research/robust/runs/wce-deepvo-20261004-162019/wce-deepvo-20261004-162019-s1/",
+   "instance_id": "i-02cc47bb70bef314a",
+   "command_id": "42e30fa7-8423-492f-8d9e-eeb761bcd239",
+   "instance_state": "terminated",
+   "status": "Completed",
+   "failure": "",
+   "runtime_s": 558.0
+  }
+ ],
+ "status": "Completed",
+ "max_runtime": 10800
+}

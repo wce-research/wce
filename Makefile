@@ -642,6 +642,20 @@ deep-down-aggregate:
 deep-down-report:
 	$(PYTHON) -m core.deep_down_report report
 
+# sous-jalon Validated Optimizer (dev, vrais atomes fournis)
+.PHONY: deep-run-arms deep-run-optimizer deep-vo-aggregate deep-vo-report
+deep-run-arms:
+	$(DEEP_BACKEND) $(AWSPY) submit --kind deepvo --keys 0-15,100-115 --shards $(DEEP_SHARDS) --instance $(DEEP_INSTANCE) --max-runtime 10800
+
+deep-run-optimizer:
+	$(DEEP_BACKEND) $(AWSPY) submit --kind deepopt --keys 0-7 --shards $(DEEP_SHARDS) --instance $(DEEP_INSTANCE) --max-runtime 10800
+
+deep-vo-aggregate:
+	$(PYTHON) -m core.deep_vo_report aggregate
+
+deep-vo-report:
+	$(PYTHON) -m core.deep_vo_report report
+
 deep-progress:
 	$(AWSPY) progress $(if $(RUN),--run $(RUN),)
 

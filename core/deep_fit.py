@@ -1,14 +1,21 @@
-"""Moteur d'ajustement PAR LOTS (optimisation de performance du point chaud `fit_robust`).
+"""Moteur d'ajustement PAR LOTS — une AUTRE IMPLÉMENTATION de l'ajustement, pas une optimisation transparente.
 
-PERFORMANCE OPTIMIZATION, pas changement scientifique : même vraisemblance (contamination), même schéma de raideur,
-même optimiseur (Adam, mêmes hyperparamètres), mêmes initialisations possibles. Ce qui change :
-  * le parcours d'arbre est COMPILÉ une fois par squelette (décalages de paramètres pré-calculés, plus de récursion
-    Python ni de `n_params()` à chaque évaluation) ;
-  * K initialisations (ou K candidats de même squelette) sont ajustées EN UN SEUL passage, tenseur [K, P] : le coût
-    Python / autograd par pas est payé une fois au lieu de K.
-Chaque ligne du lot est indépendante (la perte est une somme sur les lignes, Adam est élément par élément) : la
-trajectoire d'une ligne est celle d'un ajustement isolé. `tests/test_deep.py` mesure l'écart numérique avec
-`fit_robust` (référence gelée).
+Même vraisemblance (contamination), même schéma de raideur, même optimiseur (Adam, mêmes hyperparamètres) que
+`fit_robust` (jalon précédent). Ce qui change :
+  * le parcours d'arbre est COMPILÉ une fois par squelette (décalages de paramètres pré-calculés) ;
+  * K initialisations (ou K candidats de même squelette) sont ajustées EN UN SEUL passage, tenseur [K, P].
+
+Compromis vitesse / fidélité MESURÉ (docs/rapport_validated_optimizer.md) :
+  * vitesse : ≈ 7× par lot de 8 initialisations ; ≈ 1,1× pour un ajustement isolé ;
+  * fidélité : sur des cas courts et bien conditionnés l'écart avec `fit_robust` est ≈ 1e-7 ; sur des candidats
+    composites et 100 pas, l'écart de paramètres dépasse 1e-3 dans une part non négligeable des tâches (l'ancien
+    ajusteur arrondit l'initialisation en simple précision et l'optimisation amplifie cet écart). Le premier classé
+    reste le même dans ≈ 98 % des tâches, l'ordre complet dans ≈ 87 %.
+L'hypothèse pré-enregistrée H10(b) (écart ≤ 1e-6) est donc RÉFUTÉE sur les composites : ce moteur n'est PAS
+numériquement équivalent à l'ancien en général, bien que les deux aient le même comportement scientifique mesuré
+(même issue au seuil 0,99 sur les mêmes points de départ).
+
+Ce fichier contient aussi l'ajustement VALIDÉ (propose → evaluate → commit / rollback), seul garde-fou du pipeline.
 """
 from __future__ import annotations
 
@@ -118,6 +125,14 @@ class FitCounter:
     def remaining(self): return math.inf if self.budget is None else max(0.0, self.budget - self.fit_equivalents)
 
 
+def profiled_loglik(pred, data: FitData):
+    """logL des prédictions DURES avec bruit PROFILÉ : le taux de retournement ε est un paramètre de nuisance estimé
+    par hypothèse (ε̂ = taux d'erreur lissé). Le bruit du monde n'a donc pas à être connu : une structure plus profonde
+    n'est préférée que si la baisse d'erreur paie sa pénalité de complexité."""
+    w = data.weight; n = float(w.sum()); e = float(((pred != data.y).to(DT) * w).sum()); eps = min(0.49, max(1e-3, (e + 0.5) / (n + 1.0)))
+    return e * math.log(eps) + (n - e) * math.log(1 - eps)
+
+
 def fit_batch(skel: BNode, data: FitData, inits, steps=100, gamma=0.02, lr=0.05, counter: Optional[FitCounter] = None):
     """Ajuste K jeux de paramètres d'un même squelette en un passage. Renvoie (theta [K, P], logL [K]).
     Schéma identique à `fit_robust` : Adam(lr), raideur k = 4 + 20·t/steps, vraisemblance à contamination."""
@@ -168,3 +183,62 @@ def separation_fit(skel: BNode, P, Q, pair_weight, inits, steps=50, lr=0.05, cou
     th = th.detach()
     if counter is not None: counter.charge(len(th), steps)
     hard = lambda z: (z >= 0).to(DT); return th, (w * (fn(th, P, hard) != fn(th, Q, hard)).to(DT)).sum(1)
+
+
+# ================================================================ ajustement VALIDÉ : propose → evaluate → commit / rollback
+
+ACCEPT_TOL = 1e-9                 # tolérance numérique (nats) : en deçà, l'état ajusté n'est pas considéré comme meilleur
+CRITERIA = ("profiled", "surrogate")
+
+
+@dataclass(frozen=True)
+class FitTransaction:
+    """Trace d'un ajustement validé. L'état initial n'est jamais modifié : c'est un tenseur distinct, conservé jusqu'à
+    la décision."""
+    before: tuple                  # paramètres de l'état initial (immuable)
+    proposal: tuple                # paramètres proposés par l'optimiseur
+    criterion: str
+    value_before: float
+    value_after: float
+    accepted: bool
+    reason: str                    # "improved" | "not_improved" | "equal" | "non_finite_proposal" | "non_finite_before"
+
+    @property
+    def committed(self): return self.proposal if self.accepted else self.before
+
+
+def fit_criterion(skel: BNode, theta_row, data: FitData, criterion="profiled", gamma=0.02) -> float:
+    """Critère OBSERVABLE d'un état (aucune vérité) : `profiled` = vraisemblance profilée des prédictions dures sur les
+    observations (celle que le système utilise ensuite pour enregistrer et classer) ; `surrogate` = vraisemblance
+    robuste adoucie (raideur 30) que l'optimiseur maximise."""
+    th = theta_row.reshape(1, -1).to(DT)
+    if criterion == "profiled": return profiled_loglik(predict_batch(skel, th, data.X)[0].to(DT), data)
+    if criterion == "surrogate": return float(loglik_batch(skel, th, data, gamma)[0])
+    raise KeyError(criterion)
+
+
+def decide(value_before: float, value_after: float, proposal_finite: bool, tol=ACCEPT_TOL):
+    """Règle d'acceptation, déterministe :
+      * proposition non finie (NaN / inf dans les paramètres ou dans le critère) → rollback ;
+      * état initial au critère non fini et proposition finie → commit (on ne peut pas faire pire) ;
+      * amélioration stricte au-delà de la tolérance (après − avant > tol) → commit ;
+      * égalité à la tolérance près (|après − avant| ≤ tol) → rollback : sans preuve d'amélioration, l'état initial
+        est conservé ;
+      * sinon → rollback."""
+    if not proposal_finite or not math.isfinite(value_after): return False, "non_finite_proposal"
+    if not math.isfinite(value_before): return True, "non_finite_before"
+    d = value_after - value_before
+    if d > tol: return True, "improved"
+    return False, "equal" if abs(d) <= tol else "not_improved"
+
+
+def validated_fit(skel: BNode, data: FitData, init_row, steps=100, gamma=0.02, lr=0.05, counter: Optional[FitCounter] = None, criterion="profiled", tol=ACCEPT_TOL):
+    """Ajustement à sémantique transactionnelle : état initial → proposition de l'optimiseur → évaluation sur le
+    critère observable → commit ou rollback. L'optimiseur (`fit_batch`) est inchangé ; seul le remplacement de l'état
+    est conditionné. Renvoie (paramètres retenus [P], FitTransaction)."""
+    before = torch.as_tensor(init_row, dtype=DT).reshape(-1).clone(); frozen = before.clone()                       # l'état initial n'est pas modifié en place
+    prop, _ = fit_batch(skel, data, before.reshape(1, -1), steps=steps, gamma=gamma, lr=lr, counter=counter); prop = prop[0]
+    assert torch.equal(before, frozen), "l'optimiseur a modifié l'état initial en place"
+    finite = bool(torch.isfinite(prop).all()); vb = fit_criterion(skel, before, data, criterion, gamma); va = fit_criterion(skel, prop, data, criterion, gamma) if finite else float("nan")
+    ok, reason = decide(vb, va, finite, tol); tx = FitTransaction(tuple(before.tolist()), tuple(prop.tolist()), criterion, vb, va, ok, reason)
+    return (prop if ok else before), tx

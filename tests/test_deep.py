@@ -257,7 +257,8 @@ class FitTests(unittest.TestCase):
         d = data_for(RING); i = heuristic_inits(A[5], d, 2, 3); a, _ = fit_batch(A[5], d, i, steps=20); b, _ = fit_batch(A[5], d, i, steps=20); self.assertTrue(torch.equal(a, b))
     def test_evidence_penalizes(self): self.assertGreater(approx_evidence(2, 1, -50.0, 200), approx_evidence(6, 3, -50.0, 200))
     def test_fitdata_add(self): d = data_for(DISC, 50).add(X0(3, 5), torch.ones(3), 0.02); self.assertEqual(len(d.X), 53); self.assertAlmostEqual(float(d.flip[-1]), 0.02)
-    def test_marked_as_performance_optimization(self): self.assertIn("PERFORMANCE OPTIMIZATION", inspect.getsource(DF)); self.assertIn("pas changement scientifique", inspect.getsource(DF))
+    def test_not_claimed_numerically_equivalent(self):
+        src = inspect.getsource(DF); self.assertIn("AUTRE IMPLÉMENTATION", src); self.assertIn("H10(b)", src); self.assertIn("RÉFUTÉE", src); self.assertIn("n'est PAS\nnumériquement équivalent", src); self.assertNotIn("pas changement scientifique", src)
     def test_same_optimizer_schedule(self): src = inspect.getsource(fit_batch); self.assertIn("4.0 + 20.0 * t / steps", src); self.assertIn("torch.optim.Adam", src)
 
 
