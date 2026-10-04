@@ -1,0 +1,20 @@
+services:
+  web:
+    read_only: false
+    develop:
+      watch:
+        - action: sync+restart
+          path: ./app
+          target: /app/app
+        - action: sync+restart
+          path: ./core
+          target: /app/core
+        - action: sync+restart
+          path: ./language
+          target: /app/language
+        - action: sync+restart
+          path: ./physics
+          target: /app/physics
+        - action: sync+restart
+          path: ./logic
+          target: /app/logic

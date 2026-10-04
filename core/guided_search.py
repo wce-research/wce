@@ -1,0 +1,165 @@
+"""Distillation WCE -> neuronal, et recherche de programmes guidée.
+
+WCE reste l'arbitre : le neuronal apprend à PROPOSER (ordre des candidats), la vérification
+structurelle n'est jamais supprimée.
+"""
+from __future__ import annotations
+
+import itertools
+import random
+import time
+from typing import Dict, List, Sequence
+
+import torch
+
+from core.invariants import Invariant
+from core.symbolic import PRIMITIVES, compose, random_sequences
+from core.symbolic_lifelong import K_MAX, pair_features, routing_scores
+
+LIBRARY = [p for name, p in PRIMITIVES.items() if name != "identity"]
+
+
+# ================================================================ P. distillation du routeur
+
+def distill_router(system, per_context=64, steps=400, seed=0):
+    """Enseignant : l'identification structurelle WCE. Élève : la tête neuronale de l'encodeur de contexte.
+    Données générées par les Skills elles-mêmes (rejeu structurel), étiquetées par WCE — pas de task_id."""
+    gen = torch.Generator().manual_seed(seed)
+    ids = {cid: i for i, cid in enumerate(system.contexts)}
+    feats, labels, agreed = [], [], 0
+    for cid, ctx in system.contexts.items():
+        x = random_sequences(per_context, gen)
+        y = ctx.skill.spec.apply(x)
+        for i in range(per_context):
+            teacher = system.identify(x[i:i + 1], y[i:i + 1], "structural")
+            if teacher is None: continue
+            agreed += teacher == cid
+            feats.append(pair_features(x[i:i + 1], y[i:i + 1])); labels.append(ids[teacher] % K_MAX)
+    system.encoder.train(torch.cat(feats), torch.tensor(labels), steps=steps, seed=seed)
+    system._update_prototypes()
+    return {"examples": len(labels), "teacher_self_agreement": round(agreed / max(1, len(labels)), 3)}
+
+
+def distillation_experiment(system, families, n=48):
+    before = routing_scores(system, families, n=n)
+    info = distill_router(system)
+    after = routing_scores(system, families, n=n)
+    return {"before": before, "after": after, **info}
+
+
+# ================================================================ Q. proposeur de primitives
+
+class PrimitiveProposer(torch.nn.Module):
+    """MLP multi-label (features relationnelles (x, y) -> primitives probablement impliquées)."""
+
+    def __init__(self, hidden=64, seed=0):
+        super().__init__()
+        torch.manual_seed(seed)
+        from core.symbolic_lifelong import FEATURES
+        self.net = torch.nn.Sequential(torch.nn.Linear(FEATURES, hidden), torch.nn.ReLU(), torch.nn.Linear(hidden, len(LIBRARY)))
+
+    @property
+    def parameter_count(self): return sum(p.numel() for p in self.parameters())
+
+    def scores(self, xs, ys):
+        with torch.no_grad(): return torch.sigmoid(self.net(pair_features(xs, ys))).mean(0)
+
+
+def random_program(rng, depth):
+    return [rng.choice(LIBRARY) for _ in range(depth)]
+
+
+def teacher_dataset(n=3000, seed=0, max_depth=3):
+    """Programmes aléatoires exécutés par WCE : (x, y) -> primitives utilisées (enseignant structurel)."""
+    rng = random.Random(seed); gen = torch.Generator().manual_seed(seed)
+    xs, ys, targets = [], [], []
+    for _ in range(n):
+        prog = random_program(rng, rng.randint(1, max_depth))
+        x = random_sequences(1, gen); y = compose(*prog).apply(x)
+        t = torch.zeros(len(LIBRARY))
+        for p in prog: t[LIBRARY.index(p)] = 1.0
+        xs.append(x); ys.append(y); targets.append(t)
+    return torch.cat(xs), torch.cat(ys), torch.stack(targets)
+
+
+def train_proposer(n=3000, steps=600, seed=0):
+    x, y, t = teacher_dataset(n, seed)
+    model = PrimitiveProposer(seed=seed)
+    feats = pair_features(x, y)
+    opt = torch.optim.Adam(model.parameters(), lr=0.01)
+    for _ in range(steps):
+        opt.zero_grad(); torch.nn.functional.binary_cross_entropy_with_logits(model.net(feats), t).backward(); opt.step()
+    return model
+
+
+def _programs(max_depth):
+    for depth in range(1, max_depth + 1):
+        yield from itertools.product(LIBRARY, repeat=depth)
+
+
+def _consistent(combo, xs, ys, multiset_changed):
+    if multiset_changed and all(Invariant.SYMBOL_MULTISET in c.preserves.invariants for c in combo): return None
+    out = xs
+    for c in combo: out = c.apply(out)
+    return bool((out == ys).all())
+
+
+def unguided_search(xs, ys, max_depth=3, budget=5000):
+    multiset_changed = bool((xs.sort(1).values != ys.sort(1).values).any())
+    nodes = 0
+    for combo in _programs(max_depth):
+        ok = _consistent(combo, xs, ys, multiset_changed)
+        if ok is None: continue
+        nodes += 1
+        if ok: return compose(*combo), nodes
+        if nodes >= budget: break
+    return None, nodes
+
+
+def guided_search(xs, ys, scores, max_depth=3, budget=5000):
+    """Ordre des candidats donné par le proposeur (log-score moyen + coût de profondeur) ;
+    chaque candidat reste vérifié structurellement sur tous les exemples."""
+    multiset_changed = bool((xs.sort(1).values != ys.sort(1).values).any())
+    logp = {p.name: float(torch.log(s.clamp_min(1e-4))) for p, s in zip(LIBRARY, scores)}
+    ranked = sorted(_programs(max_depth), key=lambda c: -(sum(logp[p.name] for p in c) - 0.5 * len(c)))
+    nodes = 0
+    for combo in ranked:
+        ok = _consistent(combo, xs, ys, multiset_changed)
+        if ok is None: continue
+        nodes += 1
+        if ok: return compose(*combo), nodes
+        if nodes >= budget: break
+    return None, nodes
+
+
+def guided_search_experiment(tasks=40, examples=4, seed=7, proposer=None):
+    """Tâches de profondeur 3 (au-delà de la recherche WCE par défaut) : non guidé vs guidé."""
+    proposer = proposer or train_proposer()
+    rng = random.Random(seed); gen = torch.Generator().manual_seed(seed)
+    rows = []
+    for _ in range(tasks):
+        prog = random_program(rng, 3)
+        x = random_sequences(examples, gen); y = compose(*prog).apply(x)
+        xt = random_sequences(64, gen); yt = compose(*prog).apply(xt)
+        t0 = time.time(); pu, nu = unguided_search(x, y); tu = time.time() - t0
+        t0 = time.time(); pg, ng = guided_search(x, y, proposer.scores(x, y)); tg = time.time() - t0
+        gen_ok = lambda p: p is not None and bool((p.apply(xt) == yt).all())
+        rows.append({"unguided_nodes": nu, "guided_nodes": ng, "unguided_success": gen_ok(pu), "guided_success": gen_ok(pg),
+                     "unguided_depth": len(getattr(pu, "transformations", [pu])) if pu else None,
+                     "guided_depth": len(getattr(pg, "transformations", [pg])) if pg else None,
+                     "unguided_seconds": tu, "guided_seconds": tg})
+    mean = lambda k: round(sum(r[k] for r in rows) / len(rows), 2)
+    return {"tasks": tasks, "proposer_parameters": proposer.parameter_count,
+            "unguided_nodes": mean("unguided_nodes"), "guided_nodes": mean("guided_nodes"),
+            "unguided_success": mean("unguided_success"), "guided_success": mean("guided_success"),
+            "max_depth_reached_unguided": max((r["unguided_depth"] or 0) for r in rows),
+            "max_depth_reached_guided": max((r["guided_depth"] or 0) for r in rows),
+            "unguided_seconds": round(sum(r["unguided_seconds"] for r in rows), 2),
+            "guided_seconds": round(sum(r["guided_seconds"] for r in rows), 2), "rows": rows}
+
+
+def language_guided_program(text):
+    """Le langage comme guide : 'retourne puis décale' donne directement l'ordre des primitives ;
+    la recherche se réduit à la vérification d'un seul programme."""
+    from core.language_core import build_interpretation, parse
+    return parse(text)

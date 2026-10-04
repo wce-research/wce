@@ -1,0 +1,260 @@
+{
+ "last_observation": {
+  "n": 373,
+  "success": 0.5898,
+  "false_confident": 0.118,
+  "abstention": 0.5952,
+  "conflict": {
+   "precision": 0.0,
+   "recall": 0.0,
+   "tp": 0,
+   "fp": 0,
+   "fn": 6
+  },
+  "ece": {
+   "loc_present": 0.1302,
+   "loc_past": 0.2284,
+   "height_present": 0.1434,
+   "height_past": 0.1743,
+   "owner_present": 0.1011,
+   "owner_past": 0.1003,
+   "color_present": 0.1109,
+   "color_past": 0.0944
+  },
+  "prediction_sets": {
+   "loc": {
+    "coverage90": 0.867,
+    "width": 2.64
+   },
+   "height": {
+    "coverage90": 0.851,
+    "width": 2.96
+   },
+   "owner": {
+    "coverage90": 0.913,
+    "width": 1.74
+   },
+   "color": {
+    "coverage90": 0.985,
+    "width": 2.28
+   }
+  },
+  "by_type": {
+   "present": {
+    "success": 0.528,
+    "fc": 0.215
+   },
+   "past": {
+    "success": 0.572,
+    "fc": 0.056
+   },
+   "still_on_table": {
+    "success": 0.833,
+    "fc": 0.083
+   },
+   "before_fall": {
+    "success": 0.846,
+    "fc": 0.0
+   }
+  },
+  "seconds": 0.0
+ },
+ "static_votes": {
+  "n": 373,
+  "success": 0.5737,
+  "false_confident": 0.2815,
+  "abstention": 0.2922,
+  "conflict": {
+   "precision": 0.0,
+   "recall": 0.0,
+   "tp": 0,
+   "fp": 0,
+   "fn": 6
+  },
+  "ece": {
+   "loc_present": 0.3147,
+   "loc_past": 0.1708,
+   "height_present": 0.4456,
+   "height_past": 0.3103,
+   "owner_present": 0.1194,
+   "owner_past": 0.0583,
+   "color_present": 0.0649,
+   "color_past": 0.077
+  },
+  "prediction_sets": {
+   "loc": {
+    "coverage90": 0.817,
+    "width": 1.51
+   },
+   "height": {
+    "coverage90": 0.687,
+    "width": 1.42
+   },
+   "owner": {
+    "coverage90": 0.928,
+    "width": 1.29
+   },
+   "color": {
+    "coverage90": 0.985,
+    "width": 1.32
+   }
+  },
+  "by_type": {
+   "present": {
+    "success": 0.569,
+    "fc": 0.368
+   },
+   "past": {
+    "success": 0.567,
+    "fc": 0.206
+   },
+   "still_on_table": {
+    "success": 0.639,
+    "fc": 0.278
+   },
+   "before_fall": {
+    "success": 0.538,
+    "fc": 0.385
+   }
+  },
+  "seconds": 0.0
+ },
+ "no_hazard": {
+  "n": 373,
+  "success": 0.6863,
+  "false_confident": 0.2922,
+  "abstention": 0.1635,
+  "conflict": {
+   "precision": 0.5,
+   "recall": 0.167,
+   "tp": 1,
+   "fp": 1,
+   "fn": 5
+  },
+  "ece": {
+   "loc_present": 0.057,
+   "loc_past": 0.1567,
+   "height_present": 0.5739,
+   "height_past": 0.3515,
+   "owner_present": 0.0776,
+   "owner_past": 0.1005,
+   "color_present": 0.0444,
+   "color_past": 0.0444
+  },
+  "prediction_sets": {
+   "loc": {
+    "coverage90": 0.868,
+    "width": 1.24
+   },
+   "height": {
+    "coverage90": 0.569,
+    "width": 1.22
+   },
+   "owner": {
+    "coverage90": 0.917,
+    "width": 1.19
+   },
+   "color": {
+    "coverage90": 1.0,
+    "width": 1.28
+   }
+  },
+  "by_type": {
+   "present": {
+    "success": 0.646,
+    "fc": 0.354
+   },
+   "past": {
+    "success": 0.717,
+    "fc": 0.244
+   },
+   "still_on_table": {
+    "success": 0.778,
+    "fc": 0.194
+   },
+   "before_fall": {
+    "success": 0.462,
+    "fc": 0.538
+   }
+  },
+  "seconds": 0.22
+ },
+ "temporal": {
+  "n": 373,
+  "success": 0.9678,
+  "false_confident": 0.0214,
+  "abstention": 0.4021,
+  "conflict": {
+   "precision": 1.0,
+   "recall": 0.833,
+   "tp": 5,
+   "fp": 0,
+   "fn": 1
+  },
+  "ece": {
+   "loc_present": 0.1503,
+   "loc_past": 0.0692,
+   "height_present": 0.2024,
+   "height_past": 0.0655,
+   "owner_present": 0.0435,
+   "owner_past": 0.0515,
+   "color_present": 0.0449,
+   "color_past": 0.0451
+  },
+  "prediction_sets": {
+   "loc": {
+    "coverage90": 0.975,
+    "width": 1.93
+   },
+   "height": {
+    "coverage90": 0.958,
+    "width": 2.18
+   },
+   "owner": {
+    "coverage90": 0.931,
+    "width": 1.28
+   },
+   "color": {
+    "coverage90": 1.0,
+    "width": 1.28
+   }
+  },
+  "by_type": {
+   "present": {
+    "success": 0.951,
+    "fc": 0.042
+   },
+   "past": {
+    "success": 0.978,
+    "fc": 0.006
+   },
+   "still_on_table": {
+    "success": 0.972,
+    "fc": 0.028
+   },
+   "before_fall": {
+    "success": 1.0,
+    "fc": 0.0
+   }
+  },
+  "seconds": 0.35
+ },
+ "hazards": {
+  "loc": [
+   0.0848,
+   "DYNAMIC_FAST"
+  ],
+  "height": [
+   0.1104,
+   "DYNAMIC_FAST"
+  ],
+  "owner": [
+   0.0073,
+   "DYNAMIC_SLOW"
+  ],
+  "color": [
+   0.0001,
+   "STATIC_LIKE"
+  ]
+ }
+}

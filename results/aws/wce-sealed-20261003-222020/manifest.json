@@ -1,0 +1,165 @@
+{
+ "run_id": "wce-sealed-20261003-222020",
+ "git_commit": "no-git",
+ "code_hash": "18aec2f476c98b15",
+ "config_hash": "641839021460",
+ "timestamp": "20261003-222020",
+ "region": "eu-north-1",
+ "identity": "AWSReservedSSO_WCE-Research-Runner_251aca5f63af0b9d",
+ "instance_type": "c6i.xlarge",
+ "image": "763104351884.dkr.ecr.eu-north-1.amazonaws.com/pytorch-training:2.5.1-cpu-py311-ubuntu22.04-sagemaker",
+ "backend": "ec2",
+ "kind": "sealed",
+ "keys": [
+  "0",
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9",
+  "10",
+  "11",
+  "12",
+  "13",
+  "14",
+  "15",
+  "16",
+  "17",
+  "18",
+  "19",
+  "20",
+  "21",
+  "22",
+  "23"
+ ],
+ "jobs": [
+  {
+   "name": "wce-sealed-20261003-222020-s0",
+   "units": 12,
+   "unit_list": [
+    {
+     "kind": "sealed",
+     "key": "0"
+    },
+    {
+     "kind": "sealed",
+     "key": "2"
+    },
+    {
+     "kind": "sealed",
+     "key": "4"
+    },
+    {
+     "kind": "sealed",
+     "key": "6"
+    },
+    {
+     "kind": "sealed",
+     "key": "8"
+    },
+    {
+     "kind": "sealed",
+     "key": "10"
+    },
+    {
+     "kind": "sealed",
+     "key": "12"
+    },
+    {
+     "kind": "sealed",
+     "key": "14"
+    },
+    {
+     "kind": "sealed",
+     "key": "16"
+    },
+    {
+     "kind": "sealed",
+     "key": "18"
+    },
+    {
+     "kind": "sealed",
+     "key": "20"
+    },
+    {
+     "kind": "sealed",
+     "key": "22"
+    }
+   ],
+   "output": "s3://wce-research/robust/runs/wce-sealed-20261003-222020/wce-sealed-20261003-222020-s0/",
+   "instance_id": "i-0c3d47694af3036e4",
+   "command_id": "cda694f1-b3d8-4837-a8a7-9ff3079ab304",
+   "instance_state": "terminated",
+   "status": "Completed",
+   "failure": "",
+   "runtime_s": 504.0
+  },
+  {
+   "name": "wce-sealed-20261003-222020-s1",
+   "units": 12,
+   "unit_list": [
+    {
+     "kind": "sealed",
+     "key": "1"
+    },
+    {
+     "kind": "sealed",
+     "key": "3"
+    },
+    {
+     "kind": "sealed",
+     "key": "5"
+    },
+    {
+     "kind": "sealed",
+     "key": "7"
+    },
+    {
+     "kind": "sealed",
+     "key": "9"
+    },
+    {
+     "kind": "sealed",
+     "key": "11"
+    },
+    {
+     "kind": "sealed",
+     "key": "13"
+    },
+    {
+     "kind": "sealed",
+     "key": "15"
+    },
+    {
+     "kind": "sealed",
+     "key": "17"
+    },
+    {
+     "kind": "sealed",
+     "key": "19"
+    },
+    {
+     "kind": "sealed",
+     "key": "21"
+    },
+    {
+     "kind": "sealed",
+     "key": "23"
+    }
+   ],
+   "output": "s3://wce-research/robust/runs/wce-sealed-20261003-222020/wce-sealed-20261003-222020-s1/",
+   "instance_id": "i-003d9a03a3bf10b14",
+   "command_id": "4cf34710-8a71-4930-b073-8bd39024ec61",
+   "instance_state": "terminated",
+   "status": "Completed",
+   "failure": "",
+   "runtime_s": 558.0
+  }
+ ],
+ "status": "Completed",
+ "max_runtime": 21600
+}

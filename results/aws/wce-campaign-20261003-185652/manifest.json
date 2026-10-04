@@ -1,0 +1,635 @@
+{
+ "run_id": "wce-campaign-20261003-185652",
+ "git_commit": "no-git",
+ "code_hash": "05c3dc1958571141",
+ "config_hash": "73c3b5e6dfd2",
+ "timestamp": "20261003-185652",
+ "region": "eu-north-1",
+ "identity": "AWSReservedSSO_WCE-Research-Runner_251aca5f63af0b9d",
+ "instance_type": "c6i.xlarge",
+ "image": "763104351884.dkr.ecr.eu-north-1.amazonaws.com/pytorch-training:2.5.1-cpu-py311-ubuntu22.04-sagemaker",
+ "backend": "ec2",
+ "kind": "campaign",
+ "keys": [
+  "noise:0",
+  "noise:1",
+  "noise:2",
+  "noise:3",
+  "noise:4",
+  "noise:5",
+  "noise:6",
+  "noise:7",
+  "noise:8",
+  "noise:9",
+  "noise:10",
+  "noise:11",
+  "noise:12",
+  "noise:13",
+  "noise:14",
+  "noise:15",
+  "hard:0",
+  "hard:1",
+  "hard:2",
+  "hard:3",
+  "hard:4",
+  "hard:5",
+  "hard:6",
+  "hard:7",
+  "hard:8",
+  "hard:9",
+  "hard:10",
+  "hard:11",
+  "hard:12",
+  "hard:13",
+  "hard:14",
+  "hard:15",
+  "repeat:0",
+  "repeat:1",
+  "repeat:2",
+  "repeat:3",
+  "repeat:4",
+  "repeat:5",
+  "repeat:6",
+  "repeat:7",
+  "repeat:8",
+  "repeat:9",
+  "repeat:10",
+  "repeat:11",
+  "repeat:12",
+  "repeat:13",
+  "repeat:14",
+  "repeat:15",
+  "family:0",
+  "family:1",
+  "family:2",
+  "family:3",
+  "family:4",
+  "family:5",
+  "family:6",
+  "family:7",
+  "family:8",
+  "family:9",
+  "family:10",
+  "family:11",
+  "family:12",
+  "family:13",
+  "family:14",
+  "family:15",
+  "capacity:0",
+  "capacity:1",
+  "capacity:2",
+  "capacity:3",
+  "capacity:4",
+  "capacity:5",
+  "capacity:6",
+  "capacity:7",
+  "capacity:8",
+  "capacity:9",
+  "capacity:10",
+  "capacity:11",
+  "capacity:12",
+  "capacity:13",
+  "capacity:14",
+  "capacity:15",
+  "identifiability:0",
+  "identifiability:1",
+  "identifiability:2",
+  "identifiability:3",
+  "identifiability:4",
+  "identifiability:5",
+  "identifiability:6",
+  "identifiability:7",
+  "identifiability:8",
+  "identifiability:9",
+  "identifiability:10",
+  "identifiability:11",
+  "identifiability:12",
+  "identifiability:13",
+  "identifiability:14",
+  "identifiability:15",
+  "calibration:0",
+  "calibration:1",
+  "calibration:2",
+  "calibration:3",
+  "calibration:4",
+  "calibration:5",
+  "calibration:6",
+  "calibration:7",
+  "calibration:8",
+  "calibration:9",
+  "calibration:10",
+  "calibration:11",
+  "calibration:12",
+  "calibration:13",
+  "calibration:14",
+  "calibration:15",
+  "caltrain:0",
+  "caltrain:1",
+  "caltrain:2",
+  "caltrain:3",
+  "caltrain:4",
+  "caltrain:5"
+ ],
+ "jobs": [
+  {
+   "name": "wce-campaign-20261003-185652-s0",
+   "units": 59,
+   "unit_list": [
+    {
+     "kind": "noise",
+     "key": "0"
+    },
+    {
+     "kind": "noise",
+     "key": "2"
+    },
+    {
+     "kind": "noise",
+     "key": "4"
+    },
+    {
+     "kind": "noise",
+     "key": "6"
+    },
+    {
+     "kind": "noise",
+     "key": "8"
+    },
+    {
+     "kind": "noise",
+     "key": "10"
+    },
+    {
+     "kind": "noise",
+     "key": "12"
+    },
+    {
+     "kind": "noise",
+     "key": "14"
+    },
+    {
+     "kind": "hard",
+     "key": "0"
+    },
+    {
+     "kind": "hard",
+     "key": "2"
+    },
+    {
+     "kind": "hard",
+     "key": "4"
+    },
+    {
+     "kind": "hard",
+     "key": "6"
+    },
+    {
+     "kind": "hard",
+     "key": "8"
+    },
+    {
+     "kind": "hard",
+     "key": "10"
+    },
+    {
+     "kind": "hard",
+     "key": "12"
+    },
+    {
+     "kind": "hard",
+     "key": "14"
+    },
+    {
+     "kind": "repeat",
+     "key": "0"
+    },
+    {
+     "kind": "repeat",
+     "key": "2"
+    },
+    {
+     "kind": "repeat",
+     "key": "4"
+    },
+    {
+     "kind": "repeat",
+     "key": "6"
+    },
+    {
+     "kind": "repeat",
+     "key": "8"
+    },
+    {
+     "kind": "repeat",
+     "key": "10"
+    },
+    {
+     "kind": "repeat",
+     "key": "12"
+    },
+    {
+     "kind": "repeat",
+     "key": "14"
+    },
+    {
+     "kind": "family",
+     "key": "0"
+    },
+    {
+     "kind": "family",
+     "key": "2"
+    },
+    {
+     "kind": "family",
+     "key": "4"
+    },
+    {
+     "kind": "family",
+     "key": "6"
+    },
+    {
+     "kind": "family",
+     "key": "8"
+    },
+    {
+     "kind": "family",
+     "key": "10"
+    },
+    {
+     "kind": "family",
+     "key": "12"
+    },
+    {
+     "kind": "family",
+     "key": "14"
+    },
+    {
+     "kind": "capacity",
+     "key": "0"
+    },
+    {
+     "kind": "capacity",
+     "key": "2"
+    },
+    {
+     "kind": "capacity",
+     "key": "4"
+    },
+    {
+     "kind": "capacity",
+     "key": "6"
+    },
+    {
+     "kind": "capacity",
+     "key": "8"
+    },
+    {
+     "kind": "capacity",
+     "key": "10"
+    },
+    {
+     "kind": "capacity",
+     "key": "12"
+    },
+    {
+     "kind": "capacity",
+     "key": "14"
+    },
+    {
+     "kind": "identifiability",
+     "key": "0"
+    },
+    {
+     "kind": "identifiability",
+     "key": "2"
+    },
+    {
+     "kind": "identifiability",
+     "key": "4"
+    },
+    {
+     "kind": "identifiability",
+     "key": "6"
+    },
+    {
+     "kind": "identifiability",
+     "key": "8"
+    },
+    {
+     "kind": "identifiability",
+     "key": "10"
+    },
+    {
+     "kind": "identifiability",
+     "key": "12"
+    },
+    {
+     "kind": "identifiability",
+     "key": "14"
+    },
+    {
+     "kind": "calibration",
+     "key": "0"
+    },
+    {
+     "kind": "calibration",
+     "key": "2"
+    },
+    {
+     "kind": "calibration",
+     "key": "4"
+    },
+    {
+     "kind": "calibration",
+     "key": "6"
+    },
+    {
+     "kind": "calibration",
+     "key": "8"
+    },
+    {
+     "kind": "calibration",
+     "key": "10"
+    },
+    {
+     "kind": "calibration",
+     "key": "12"
+    },
+    {
+     "kind": "calibration",
+     "key": "14"
+    },
+    {
+     "kind": "caltrain",
+     "key": "0"
+    },
+    {
+     "kind": "caltrain",
+     "key": "2"
+    },
+    {
+     "kind": "caltrain",
+     "key": "4"
+    }
+   ],
+   "output": "s3://wce-research/robust/runs/wce-campaign-20261003-185652/wce-campaign-20261003-185652-s0/",
+   "instance_id": "i-00dbcca0ca1d93e09",
+   "command_id": "8fb86d7f-96c5-4914-8d29-26bd89460ac8",
+   "instance_state": "terminated",
+   "status": "Completed",
+   "failure": "",
+   "runtime_s": 5393.0
+  },
+  {
+   "name": "wce-campaign-20261003-185652-s1",
+   "units": 59,
+   "unit_list": [
+    {
+     "kind": "noise",
+     "key": "1"
+    },
+    {
+     "kind": "noise",
+     "key": "3"
+    },
+    {
+     "kind": "noise",
+     "key": "5"
+    },
+    {
+     "kind": "noise",
+     "key": "7"
+    },
+    {
+     "kind": "noise",
+     "key": "9"
+    },
+    {
+     "kind": "noise",
+     "key": "11"
+    },
+    {
+     "kind": "noise",
+     "key": "13"
+    },
+    {
+     "kind": "noise",
+     "key": "15"
+    },
+    {
+     "kind": "hard",
+     "key": "1"
+    },
+    {
+     "kind": "hard",
+     "key": "3"
+    },
+    {
+     "kind": "hard",
+     "key": "5"
+    },
+    {
+     "kind": "hard",
+     "key": "7"
+    },
+    {
+     "kind": "hard",
+     "key": "9"
+    },
+    {
+     "kind": "hard",
+     "key": "11"
+    },
+    {
+     "kind": "hard",
+     "key": "13"
+    },
+    {
+     "kind": "hard",
+     "key": "15"
+    },
+    {
+     "kind": "repeat",
+     "key": "1"
+    },
+    {
+     "kind": "repeat",
+     "key": "3"
+    },
+    {
+     "kind": "repeat",
+     "key": "5"
+    },
+    {
+     "kind": "repeat",
+     "key": "7"
+    },
+    {
+     "kind": "repeat",
+     "key": "9"
+    },
+    {
+     "kind": "repeat",
+     "key": "11"
+    },
+    {
+     "kind": "repeat",
+     "key": "13"
+    },
+    {
+     "kind": "repeat",
+     "key": "15"
+    },
+    {
+     "kind": "family",
+     "key": "1"
+    },
+    {
+     "kind": "family",
+     "key": "3"
+    },
+    {
+     "kind": "family",
+     "key": "5"
+    },
+    {
+     "kind": "family",
+     "key": "7"
+    },
+    {
+     "kind": "family",
+     "key": "9"
+    },
+    {
+     "kind": "family",
+     "key": "11"
+    },
+    {
+     "kind": "family",
+     "key": "13"
+    },
+    {
+     "kind": "family",
+     "key": "15"
+    },
+    {
+     "kind": "capacity",
+     "key": "1"
+    },
+    {
+     "kind": "capacity",
+     "key": "3"
+    },
+    {
+     "kind": "capacity",
+     "key": "5"
+    },
+    {
+     "kind": "capacity",
+     "key": "7"
+    },
+    {
+     "kind": "capacity",
+     "key": "9"
+    },
+    {
+     "kind": "capacity",
+     "key": "11"
+    },
+    {
+     "kind": "capacity",
+     "key": "13"
+    },
+    {
+     "kind": "capacity",
+     "key": "15"
+    },
+    {
+     "kind": "identifiability",
+     "key": "1"
+    },
+    {
+     "kind": "identifiability",
+     "key": "3"
+    },
+    {
+     "kind": "identifiability",
+     "key": "5"
+    },
+    {
+     "kind": "identifiability",
+     "key": "7"
+    },
+    {
+     "kind": "identifiability",
+     "key": "9"
+    },
+    {
+     "kind": "identifiability",
+     "key": "11"
+    },
+    {
+     "kind": "identifiability",
+     "key": "13"
+    },
+    {
+     "kind": "identifiability",
+     "key": "15"
+    },
+    {
+     "kind": "calibration",
+     "key": "1"
+    },
+    {
+     "kind": "calibration",
+     "key": "3"
+    },
+    {
+     "kind": "calibration",
+     "key": "5"
+    },
+    {
+     "kind": "calibration",
+     "key": "7"
+    },
+    {
+     "kind": "calibration",
+     "key": "9"
+    },
+    {
+     "kind": "calibration",
+     "key": "11"
+    },
+    {
+     "kind": "calibration",
+     "key": "13"
+    },
+    {
+     "kind": "calibration",
+     "key": "15"
+    },
+    {
+     "kind": "caltrain",
+     "key": "1"
+    },
+    {
+     "kind": "caltrain",
+     "key": "3"
+    },
+    {
+     "kind": "caltrain",
+     "key": "5"
+    }
+   ],
+   "output": "s3://wce-research/robust/runs/wce-campaign-20261003-185652/wce-campaign-20261003-185652-s1/",
+   "instance_id": "i-02ee10dc05d2b483a",
+   "command_id": "cdbafacc-b741-4733-802c-3a692d755280",
+   "instance_state": "terminated",
+   "status": "Completed",
+   "failure": "",
+   "runtime_s": 5262.0
+  }
+ ],
+ "status": "Completed",
+ "max_runtime": 28800
+}

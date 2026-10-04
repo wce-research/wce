@@ -1,0 +1,3 @@
+# Optional dependency for the scientific modules and full unittest suite.
+# Install with the PyTorch CPU wheel index; the web container does not need it.
+torch==2.12.0

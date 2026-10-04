@@ -1,0 +1,239 @@
+{
+ "last_observation": {
+  "n": 449,
+  "success": 0.2561,
+  "false_confident": 0.0245,
+  "abstention": 0.7194,
+  "measurements": 0.0,
+  "cost": 0.0,
+  "destructive": 0,
+  "agent_peeks": 0,
+  "calibration_ece": 0.0786,
+  "by_type": {
+   "where_now": {
+    "success": 0.167,
+    "fc": 0.017,
+    "n": 120
+   },
+   "where_at": {
+    "success": 0.0,
+    "fc": 0.0,
+    "n": 120
+   },
+   "height_now": {
+    "success": 0.567,
+    "fc": 0.067,
+    "n": 120
+   },
+   "color_of_relational": {
+    "success": 0.458,
+    "fc": 0.017,
+    "n": 59
+   },
+   "before_fall": {
+    "success": 0.0,
+    "fc": 0.0,
+    "n": 30
+   }
+  }
+ },
+ "static": {
+  "n": 449,
+  "success": 0.3853,
+  "false_confident": 0.2673,
+  "abstention": 0.3474,
+  "measurements": 0.0,
+  "cost": 0.0,
+  "destructive": 0,
+  "agent_peeks": 0,
+  "calibration_ece": 0.3563,
+  "by_type": {
+   "where_now": {
+    "success": 0.35,
+    "fc": 0.408,
+    "n": 120
+   },
+   "where_at": {
+    "success": 0.475,
+    "fc": 0.283,
+    "n": 120
+   },
+   "height_now": {
+    "success": 0.392,
+    "fc": 0.233,
+    "n": 120
+   },
+   "color_of_relational": {
+    "success": 0.424,
+    "fc": 0.153,
+    "n": 59
+   },
+   "before_fall": {
+    "success": 0.067,
+    "fc": 0.0,
+    "n": 30
+   }
+  }
+ },
+ "temporal": {
+  "n": 449,
+  "success": 0.539,
+  "false_confident": 0.0334,
+  "abstention": 0.4276,
+  "measurements": 0.0,
+  "cost": 0.0,
+  "destructive": 0,
+  "agent_peeks": 0,
+  "calibration_ece": 0.0737,
+  "by_type": {
+   "where_now": {
+    "success": 0.525,
+    "fc": 0.017,
+    "n": 120
+   },
+   "where_at": {
+    "success": 0.558,
+    "fc": 0.0,
+    "n": 120
+   },
+   "height_now": {
+    "success": 0.633,
+    "fc": 0.1,
+    "n": 120
+   },
+   "color_of_relational": {
+    "success": 0.576,
+    "fc": 0.017,
+    "n": 59
+   },
+   "before_fall": {
+    "success": 0.067,
+    "fc": 0.0,
+    "n": 30
+   }
+  }
+ },
+ "temporal_passive": {
+  "n": 449,
+  "success": 0.6281,
+  "false_confident": 0.029,
+  "abstention": 0.343,
+  "measurements": 0.396,
+  "cost": 0.087,
+  "destructive": 0,
+  "agent_peeks": 0,
+  "calibration_ece": 0.0487,
+  "ig_predicted": 0.265,
+  "ig_realized": 0.2678,
+  "ig_corr": 0.872,
+  "by_type": {
+   "where_now": {
+    "success": 0.633,
+    "fc": 0.025,
+    "n": 120
+   },
+   "where_at": {
+    "success": 0.633,
+    "fc": 0.0,
+    "n": 120
+   },
+   "height_now": {
+    "success": 0.683,
+    "fc": 0.075,
+    "n": 120
+   },
+   "color_of_relational": {
+    "success": 0.78,
+    "fc": 0.017,
+    "n": 59
+   },
+   "before_fall": {
+    "success": 0.067,
+    "fc": 0.0,
+    "n": 30
+   }
+  }
+ },
+ "temporal_active": {
+  "n": 449,
+  "success": 0.7595,
+  "false_confident": 0.0423,
+  "abstention": 0.1982,
+  "measurements": 0.414,
+  "cost": 0.144,
+  "destructive": 0,
+  "agent_peeks": 0,
+  "calibration_ece": 0.0522,
+  "ig_predicted": 0.6533,
+  "ig_realized": 0.6396,
+  "ig_corr": 0.786,
+  "by_type": {
+   "where_now": {
+    "success": 0.925,
+    "fc": 0.075,
+    "n": 120
+   },
+   "where_at": {
+    "success": 0.625,
+    "fc": 0.0,
+    "n": 120
+   },
+   "height_now": {
+    "success": 0.792,
+    "fc": 0.075,
+    "n": 120
+   },
+   "color_of_relational": {
+    "success": 0.983,
+    "fc": 0.017,
+    "n": 59
+   },
+   "before_fall": {
+    "success": 0.067,
+    "fc": 0.0,
+    "n": 30
+   }
+  }
+ },
+ "full_algebra": {
+  "n": 449,
+  "success": 0.7082,
+  "false_confident": 0.029,
+  "abstention": 0.2628,
+  "measurements": 0.717,
+  "cost": 0.188,
+  "destructive": 0,
+  "agent_peeks": 0,
+  "calibration_ece": 0.033,
+  "ig_predicted": 0.4353,
+  "ig_realized": 0.4305,
+  "ig_corr": 0.84,
+  "by_type": {
+   "where_now": {
+    "success": 0.717,
+    "fc": 0.025,
+    "n": 120
+   },
+   "where_at": {
+    "success": 0.625,
+    "fc": 0.017,
+    "n": 120
+   },
+   "height_now": {
+    "success": 0.817,
+    "fc": 0.067,
+    "n": 120
+   },
+   "color_of_relational": {
+    "success": 1.0,
+    "fc": 0.0,
+    "n": 59
+   },
+   "before_fall": {
+    "success": 0.0,
+    "fc": 0.0,
+    "n": 30
+   }
+  }
+ }
+}

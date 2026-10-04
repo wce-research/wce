@@ -1,0 +1,37 @@
+{
+ "database": {
+  "credible": 0.625,
+  "predictive": 0.938,
+  "w_credible": 0.046,
+  "w_predictive": 0.071,
+  "n": 16
+ },
+ "all": {
+  "credible": 0.604,
+  "predictive": 0.927,
+  "w_credible": 0.101,
+  "w_predictive": 0.212,
+  "n": 96
+ },
+ "sensor": {
+  "credible": 0.688,
+  "predictive": 0.938,
+  "w_credible": 0.088,
+  "w_predictive": 0.148,
+  "n": 32
+ },
+ "document": {
+  "credible": 0.688,
+  "predictive": 0.875,
+  "w_credible": 0.106,
+  "w_predictive": 0.253,
+  "n": 16
+ },
+ "speaker": {
+  "credible": 0.469,
+  "predictive": 0.938,
+  "w_credible": 0.138,
+  "w_predictive": 0.326,
+  "n": 32
+ }
+}

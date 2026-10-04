@@ -1,0 +1,125 @@
+{
+ "run_id": "wce-main-20261003-153754",
+ "git_commit": "no-git",
+ "code_hash": "b918a808d34dc51a",
+ "config_hash": "3e122a7c5785",
+ "timestamp": "20261003-153754",
+ "region": "eu-north-1",
+ "identity": "AWSReservedSSO_WCE-Research-Runner_251aca5f63af0b9d",
+ "instance_type": "c6i.xlarge",
+ "image": "763104351884.dkr.ecr.eu-north-1.amazonaws.com/pytorch-training:2.5.1-cpu-py311-ubuntu22.04-sagemaker",
+ "backend": "ec2",
+ "kind": "main",
+ "keys": [
+  "0",
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9",
+  "10",
+  "11",
+  "12",
+  "13",
+  "14",
+  "15"
+ ],
+ "jobs": [
+  {
+   "name": "wce-main-20261003-153754-s0",
+   "units": 8,
+   "unit_list": [
+    {
+     "kind": "main",
+     "key": "0"
+    },
+    {
+     "kind": "main",
+     "key": "2"
+    },
+    {
+     "kind": "main",
+     "key": "4"
+    },
+    {
+     "kind": "main",
+     "key": "6"
+    },
+    {
+     "kind": "main",
+     "key": "8"
+    },
+    {
+     "kind": "main",
+     "key": "10"
+    },
+    {
+     "kind": "main",
+     "key": "12"
+    },
+    {
+     "kind": "main",
+     "key": "14"
+    }
+   ],
+   "output": "s3://wce-research/robust/runs/wce-main-20261003-153754/wce-main-20261003-153754-s0/",
+   "instance_id": "i-066820e9b2cf78300",
+   "command_id": "d7444a4e-149e-4e64-8f5a-cef956114666",
+   "instance_state": "terminated",
+   "status": "Completed",
+   "failure": "",
+   "runtime_s": 6475.0
+  },
+  {
+   "name": "wce-main-20261003-153754-s1",
+   "units": 8,
+   "unit_list": [
+    {
+     "kind": "main",
+     "key": "1"
+    },
+    {
+     "kind": "main",
+     "key": "3"
+    },
+    {
+     "kind": "main",
+     "key": "5"
+    },
+    {
+     "kind": "main",
+     "key": "7"
+    },
+    {
+     "kind": "main",
+     "key": "9"
+    },
+    {
+     "kind": "main",
+     "key": "11"
+    },
+    {
+     "kind": "main",
+     "key": "13"
+    },
+    {
+     "kind": "main",
+     "key": "15"
+    }
+   ],
+   "output": "s3://wce-research/robust/runs/wce-main-20261003-153754/wce-main-20261003-153754-s1/",
+   "instance_id": "i-08b73e8c30b56f413",
+   "command_id": "a5903a77-7c3e-46df-a490-52e2914d2b9b",
+   "instance_state": "terminated",
+   "status": "Completed",
+   "failure": "",
+   "runtime_s": 7945.0
+  }
+ ],
+ "status": "Completed",
+ "max_runtime": 21600
+}

@@ -1,0 +1,362 @@
+{
+ "streams": [
+  {
+   "vanilla": {
+    "average_accuracy": 0.5049,
+    "new_task": 0.7767,
+    "retention": 0.5049,
+    "forgetting": 0.2574,
+    "backward_transfer": -0.2574,
+    "calibration_ece": 0.3928,
+    "total_memory_bytes": 6920,
+    "reuse_ratio": 0.0,
+    "neural_params": 1730,
+    "kinds": {
+     "train": 100
+    }
+   },
+   "raw_replay": {
+    "average_accuracy": 0.5974,
+    "new_task": 0.7282,
+    "retention": 0.5974,
+    "forgetting": 0.1201,
+    "backward_transfer": -0.1192,
+    "calibration_ece": 0.3084,
+    "total_memory_bytes": 317320,
+    "reuse_ratio": 0.0,
+    "neural_params": 1730,
+    "kinds": {
+     "train": 100
+    }
+   },
+   "generative_replay": {
+    "average_accuracy": 0.5535,
+    "new_task": 0.713,
+    "retention": 0.5535,
+    "forgetting": 0.148,
+    "backward_transfer": -0.1461,
+    "calibration_ece": 0.3627,
+    "total_memory_bytes": 76120,
+    "reuse_ratio": 0.0,
+    "neural_params": 1730,
+    "kinds": {
+     "train": 100
+    }
+   },
+   "first_order_constraints": {
+    "average_accuracy": 0.5607,
+    "new_task": 0.7078,
+    "retention": 0.5607,
+    "forgetting": 0.1281,
+    "backward_transfer": -0.1265,
+    "calibration_ece": 0.2261,
+    "total_memory_bytes": 12047720,
+    "reuse_ratio": 0.0,
+    "neural_params": 1730,
+    "kinds": {
+     "train": 100
+    }
+   },
+   "structural_growth": {
+    "average_accuracy": 0.8325,
+    "new_task": 0.847,
+    "retention": 0.8325,
+    "forgetting": 0.0034,
+    "backward_transfer": -0.0034,
+    "calibration_ece": 0.1267,
+    "total_memory_bytes": 201349,
+    "reuse_ratio": 0.29,
+    "neural_params": 21726,
+    "kinds": {
+     "grow": 71,
+     "reactivate": 29
+    }
+   },
+   "compositional_old": {
+    "average_accuracy": 0.8263,
+    "new_task": 0.838,
+    "retention": 0.8263,
+    "forgetting": 0.0028,
+    "backward_transfer": 0.0024,
+    "calibration_ece": 0.1245,
+    "total_memory_bytes": 155419,
+    "reuse_ratio": 0.4,
+    "neural_params": 12600,
+    "kinds": {
+     "grow": 30,
+     "reactivate": 25,
+     "reuse": 14,
+     "adapter": 30,
+     "compose": 1
+    }
+   },
+   "generative_certificates": {
+    "average_accuracy": 0.8279,
+    "new_task": 0.8378,
+    "retention": 0.8279,
+    "forgetting": 0.0028,
+    "backward_transfer": 0.0042,
+    "calibration_ece": 0.1254,
+    "total_memory_bytes": 182224,
+    "reuse_ratio": 0.35,
+    "neural_params": 11532,
+    "kinds": {
+     "grow": 28,
+     "reactivate": 28,
+     "reuse": 7,
+     "adapter": 26,
+     "refine_adapter": 11
+    }
+   },
+   "generative_second_order": {
+    "average_accuracy": 0.8279,
+    "new_task": 0.8378,
+    "retention": 0.8279,
+    "forgetting": 0.0028,
+    "backward_transfer": 0.0042,
+    "calibration_ece": 0.1254,
+    "total_memory_bytes": 182224,
+    "reuse_ratio": 0.35,
+    "neural_params": 11532,
+    "kinds": {
+     "grow": 28,
+     "reactivate": 28,
+     "reuse": 7,
+     "adapter": 26,
+     "refine_adapter": 11
+    }
+   },
+   "full": {
+    "average_accuracy": 0.852,
+    "new_task": 0.8733,
+    "retention": 0.852,
+    "forgetting": 0.0107,
+    "backward_transfer": -0.0097,
+    "calibration_ece": 0.1413,
+    "total_memory_bytes": 59708,
+    "reuse_ratio": 0.32,
+    "neural_params": 1950,
+    "kinds": {
+     "rule": 45,
+     "reactivate": 23,
+     "reuse": 9,
+     "grow": 7,
+     "refine_rule": 10,
+     "noise_ignored": 5,
+     "adapter": 1
+    }
+   }
+  },
+  {
+   "vanilla": {
+    "average_accuracy": 0.5231,
+    "new_task": 0.7655,
+    "retention": 0.5231,
+    "forgetting": 0.2381,
+    "backward_transfer": -0.2381,
+    "calibration_ece": 0.3886,
+    "total_memory_bytes": 6920,
+    "reuse_ratio": 0.0,
+    "neural_params": 1730,
+    "kinds": {
+     "train": 100
+    }
+   },
+   "raw_replay": {
+    "average_accuracy": 0.6181,
+    "new_task": 0.7281,
+    "retention": 0.6181,
+    "forgetting": 0.1067,
+    "backward_transfer": -0.1031,
+    "calibration_ece": 0.2942,
+    "total_memory_bytes": 317320,
+    "reuse_ratio": 0.0,
+    "neural_params": 1730,
+    "kinds": {
+     "train": 100
+    }
+   },
+   "generative_replay": {
+    "average_accuracy": 0.5439,
+    "new_task": 0.7088,
+    "retention": 0.5439,
+    "forgetting": 0.1599,
+    "backward_transfer": -0.1598,
+    "calibration_ece": 0.3712,
+    "total_memory_bytes": 76120,
+    "reuse_ratio": 0.0,
+    "neural_params": 1730,
+    "kinds": {
+     "train": 100
+    }
+   },
+   "first_order_constraints": {
+    "average_accuracy": 0.5641,
+    "new_task": 0.7045,
+    "retention": 0.5641,
+    "forgetting": 0.124,
+    "backward_transfer": -0.1238,
+    "calibration_ece": 0.21,
+    "total_memory_bytes": 12047720,
+    "reuse_ratio": 0.0,
+    "neural_params": 1730,
+    "kinds": {
+     "train": 100
+    }
+   },
+   "structural_growth": {
+    "average_accuracy": 0.8272,
+    "new_task": 0.8317,
+    "retention": 0.8272,
+    "forgetting": 0.0006,
+    "backward_transfer": 0.0013,
+    "calibration_ece": 0.1318,
+    "total_memory_bytes": 206955,
+    "reuse_ratio": 0.27,
+    "neural_params": 22338,
+    "kinds": {
+     "grow": 73,
+     "reactivate": 27
+    }
+   },
+   "compositional_old": {
+    "average_accuracy": 0.8226,
+    "new_task": 0.828,
+    "retention": 0.8226,
+    "forgetting": 0.0,
+    "backward_transfer": 0.0018,
+    "calibration_ece": 0.1283,
+    "total_memory_bytes": 139353,
+    "reuse_ratio": 0.46,
+    "neural_params": 10956,
+    "kinds": {
+     "grow": 25,
+     "reactivate": 26,
+     "adapter": 29,
+     "reuse": 20
+    }
+   },
+   "generative_certificates": {
+    "average_accuracy": 0.8232,
+    "new_task": 0.8284,
+    "retention": 0.8232,
+    "forgetting": 0.0,
+    "backward_transfer": 0.0018,
+    "calibration_ece": 0.1265,
+    "total_memory_bytes": 179008,
+    "reuse_ratio": 0.42,
+    "neural_params": 10728,
+    "kinds": {
+     "grow": 25,
+     "reactivate": 26,
+     "adapter": 27,
+     "reuse": 16,
+     "refine_adapter": 5,
+     "refine": 1
+    }
+   },
+   "generative_second_order": {
+    "average_accuracy": 0.8232,
+    "new_task": 0.8284,
+    "retention": 0.8232,
+    "forgetting": 0.0,
+    "backward_transfer": 0.0018,
+    "calibration_ece": 0.1265,
+    "total_memory_bytes": 179008,
+    "reuse_ratio": 0.42,
+    "neural_params": 10728,
+    "kinds": {
+     "grow": 25,
+     "reactivate": 26,
+     "adapter": 27,
+     "reuse": 16,
+     "refine_adapter": 5,
+     "refine": 1
+    }
+   },
+   "full": {
+    "average_accuracy": 0.8819,
+    "new_task": 0.8836,
+    "retention": 0.8819,
+    "forgetting": 0.0005,
+    "backward_transfer": 0.0005,
+    "calibration_ece": 0.1136,
+    "total_memory_bytes": 56940,
+    "reuse_ratio": 0.42,
+    "neural_params": 2064,
+    "kinds": {
+     "rule": 38,
+     "refine_rule": 9,
+     "reuse": 14,
+     "reactivate": 27,
+     "grow": 6,
+     "compose": 1,
+     "refine": 2,
+     "noise_ignored": 1,
+     "adapter": 2
+    }
+   }
+  }
+ ],
+ "law": {
+  "active": {
+   "identification": 0.9167,
+   "experiments": 23.0833,
+   "prediction_error": 0.0109,
+   "invariants_ok": 1.0
+  },
+  "random": {
+   "identification": 0.25,
+   "experiments": 30.0,
+   "prediction_error": 0.2936,
+   "invariants_ok": 1.0
+  }
+ },
+ "capacity": {
+  "neural_only": {
+   "unlimited": {
+    "accuracy": 0.7508,
+    "new_task": 0.7517,
+    "params": 5352,
+    "peak_params": 5352,
+    "operations": {},
+    "distill_rejected": 0,
+    "distill_params_saved": 0,
+    "budget_exceeded_at_end": false
+   },
+   "pressure": {
+    "accuracy": 0.7508,
+    "new_task": 0.7517,
+    "params": 5352,
+    "peak_params": 5352,
+    "operations": {
+     "prune_skill": 1
+    },
+    "distill_rejected": 17,
+    "distill_params_saved": 0,
+    "budget_exceeded_at_end": true
+   },
+   "accuracy_loss": 0.0
+  },
+  "mixed": {
+   "unlimited": {
+    "accuracy": 0.7912,
+    "params": 5808,
+    "operations": {},
+    "distill_rejected": 0,
+    "budget_exceeded_at_end": false
+   },
+   "pressure": {
+    "accuracy": 0.7921,
+    "params": 5502,
+    "operations": {
+     "prune_skill": 1,
+     "distill_symbolic": 1
+    },
+    "distill_rejected": 12,
+    "budget_exceeded_at_end": true
+   },
+   "accuracy_loss": -0.0009
+  }
+ }
+}

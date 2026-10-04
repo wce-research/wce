@@ -1,0 +1,7160 @@
+{
+ "seeds": [
+  0,
+  1,
+  2,
+  3,
+  4,
+  5,
+  6,
+  7
+ ],
+ "summary": {
+  "no_elimination": {
+   "success_orig": {
+    "mean": 0.5597,
+    "sd": 0.0631,
+    "ci95": [
+     0.507,
+     0.6124
+    ],
+    "n": 8
+   },
+   "false_confident_orig": {
+    "mean": 0.0294,
+    "sd": 0.0198,
+    "ci95": [
+     0.0128,
+     0.0459
+    ],
+    "n": 8
+   },
+   "abstention_orig": {
+    "mean": 0.7321,
+    "sd": 0.0841,
+    "ci95": [
+     0.6617,
+     0.8024
+    ],
+    "n": 8
+   },
+   "coverage_orig": {
+    "mean": 0.5309,
+    "sd": 0.1052,
+    "ci95": [
+     0.4429,
+     0.6189
+    ],
+    "n": 8
+   },
+   "success_ideal": {
+    "mean": 0.5334,
+    "sd": 0.0666,
+    "ci95": [
+     0.4778,
+     0.5891
+    ],
+    "n": 8
+   },
+   "false_confident_ideal": {
+    "mean": 0.0422,
+    "sd": 0.0244,
+    "ci95": [
+     0.0218,
+     0.0626
+    ],
+    "n": 8
+   },
+   "abstention_ideal": {
+    "mean": 0.7321,
+    "sd": 0.0841,
+    "ci95": [
+     0.6617,
+     0.8024
+    ],
+    "n": 8
+   },
+   "coverage_ideal": {
+    "mean": 0.5017,
+    "sd": 0.1162,
+    "ci95": [
+     0.4045,
+     0.5989
+    ],
+    "n": 8
+   },
+   "lexical_coverage": {
+    "mean": 0.2917,
+    "sd": 0.1179,
+    "ci95": [
+     0.1931,
+     0.3902
+    ],
+    "n": 8
+   },
+   "lexical_wrong": {
+    "mean": 0.0,
+    "sd": 0.0,
+    "ci95": [
+     0.0,
+     0.0
+    ],
+    "n": 8
+   },
+   "object_identity_accuracy": {
+    "mean": 0.9939,
+    "sd": 0.0173,
+    "ci95": [
+     0.9794,
+     1.0084
+    ],
+    "n": 8
+   }
+  },
+  "callex": {
+   "success_orig": {
+    "mean": 0.597,
+    "sd": 0.0738,
+    "ci95": [
+     0.5354,
+     0.6587
+    ],
+    "n": 8
+   },
+   "false_confident_orig": {
+    "mean": 0.0342,
+    "sd": 0.0259,
+    "ci95": [
+     0.0126,
+     0.0559
+    ],
+    "n": 8
+   },
+   "abstention_orig": {
+    "mean": 0.7092,
+    "sd": 0.0936,
+    "ci95": [
+     0.6309,
+     0.7874
+    ],
+    "n": 8
+   },
+   "coverage_orig": {
+    "mean": 0.5721,
+    "sd": 0.1221,
+    "ci95": [
+     0.47,
+     0.6742
+    ],
+    "n": 8
+   },
+   "success_ideal": {
+    "mean": 0.5705,
+    "sd": 0.0805,
+    "ci95": [
+     0.5032,
+     0.6378
+    ],
+    "n": 8
+   },
+   "false_confident_ideal": {
+    "mean": 0.0489,
+    "sd": 0.0283,
+    "ci95": [
+     0.0252,
+     0.0725
+    ],
+    "n": 8
+   },
+   "abstention_ideal": {
+    "mean": 0.7092,
+    "sd": 0.0936,
+    "ci95": [
+     0.6309,
+     0.7874
+    ],
+    "n": 8
+   },
+   "coverage_ideal": {
+    "mean": 0.5402,
+    "sd": 0.1368,
+    "ci95": [
+     0.4258,
+     0.6545
+    ],
+    "n": 8
+   },
+   "lexical_coverage": {
+    "mean": 0.5208,
+    "sd": 0.226,
+    "ci95": [
+     0.3318,
+     0.7098
+    ],
+    "n": 8
+   },
+   "lexical_wrong": {
+    "mean": 0.0,
+    "sd": 0.0,
+    "ci95": [
+     0.0,
+     0.0
+    ],
+    "n": 8
+   },
+   "object_identity_accuracy": {
+    "mean": 0.9942,
+    "sd": 0.0165,
+    "ci95": [
+     0.9803,
+     1.008
+    ],
+    "n": 8
+   }
+  },
+  "entitled": {
+   "success_orig": {
+    "mean": 0.5914,
+    "sd": 0.0719,
+    "ci95": [
+     0.5313,
+     0.6515
+    ],
+    "n": 8
+   },
+   "false_confident_orig": {
+    "mean": 0.0321,
+    "sd": 0.0274,
+    "ci95": [
+     0.0092,
+     0.055
+    ],
+    "n": 8
+   },
+   "abstention_orig": {
+    "mean": 0.7173,
+    "sd": 0.0909,
+    "ci95": [
+     0.6413,
+     0.7933
+    ],
+    "n": 8
+   },
+   "coverage_orig": {
+    "mean": 0.5591,
+    "sd": 0.1159,
+    "ci95": [
+     0.4621,
+     0.656
+    ],
+    "n": 8
+   },
+   "success_ideal": {
+    "mean": 0.5655,
+    "sd": 0.0782,
+    "ci95": [
+     0.5001,
+     0.6309
+    ],
+    "n": 8
+   },
+   "false_confident_ideal": {
+    "mean": 0.0464,
+    "sd": 0.0286,
+    "ci95": [
+     0.0225,
+     0.0703
+    ],
+    "n": 8
+   },
+   "abstention_ideal": {
+    "mean": 0.7173,
+    "sd": 0.0909,
+    "ci95": [
+     0.6413,
+     0.7933
+    ],
+    "n": 8
+   },
+   "coverage_ideal": {
+    "mean": 0.5276,
+    "sd": 0.1309,
+    "ci95": [
+     0.4181,
+     0.637
+    ],
+    "n": 8
+   },
+   "lexical_coverage": {
+    "mean": 0.5208,
+    "sd": 0.226,
+    "ci95": [
+     0.3318,
+     0.7098
+    ],
+    "n": 8
+   },
+   "lexical_wrong": {
+    "mean": 0.0,
+    "sd": 0.0,
+    "ci95": [
+     0.0,
+     0.0
+    ],
+    "n": 8
+   },
+   "object_identity_accuracy": {
+    "mean": 0.9942,
+    "sd": 0.0165,
+    "ci95": [
+     0.9803,
+     1.008
+    ],
+    "n": 8
+   }
+  },
+  "unified": {
+   "success_orig": {
+    "mean": 0.5631,
+    "sd": 0.0935,
+    "ci95": [
+     0.4849,
+     0.6412
+    ],
+    "n": 8
+   },
+   "false_confident_orig": {
+    "mean": 0.0838,
+    "sd": 0.0512,
+    "ci95": [
+     0.041,
+     0.1266
+    ],
+    "n": 8
+   },
+   "abstention_orig": {
+    "mean": 0.639,
+    "sd": 0.0598,
+    "ci95": [
+     0.589,
+     0.689
+    ],
+    "n": 8
+   },
+   "coverage_orig": {
+    "mean": 0.6219,
+    "sd": 0.1037,
+    "ci95": [
+     0.5351,
+     0.7086
+    ],
+    "n": 8
+   },
+   "success_ideal": {
+    "mean": 0.5451,
+    "sd": 0.0799,
+    "ci95": [
+     0.4783,
+     0.6119
+    ],
+    "n": 8
+   },
+   "false_confident_ideal": {
+    "mean": 0.0927,
+    "sd": 0.0403,
+    "ci95": [
+     0.059,
+     0.1263
+    ],
+    "n": 8
+   },
+   "abstention_ideal": {
+    "mean": 0.639,
+    "sd": 0.0598,
+    "ci95": [
+     0.589,
+     0.689
+    ],
+    "n": 8
+   },
+   "coverage_ideal": {
+    "mean": 0.6007,
+    "sd": 0.0873,
+    "ci95": [
+     0.5277,
+     0.6736
+    ],
+    "n": 8
+   },
+   "lexical_coverage": {
+    "mean": 0.25,
+    "sd": 0.1543,
+    "ci95": [
+     0.121,
+     0.379
+    ],
+    "n": 8
+   },
+   "lexical_wrong": {
+    "mean": 0.0,
+    "sd": 0.0,
+    "ci95": [
+     0.0,
+     0.0
+    ],
+    "n": 8
+   },
+   "object_identity_accuracy": {
+    "mean": 0.9516,
+    "sd": 0.0403,
+    "ci95": [
+     0.9179,
+     0.9853
+    ],
+    "n": 8
+   }
+  },
+  "unified_entitled": {
+   "success_orig": {
+    "mean": 0.5531,
+    "sd": 0.1048,
+    "ci95": [
+     0.4655,
+     0.6407
+    ],
+    "n": 8
+   },
+   "false_confident_orig": {
+    "mean": 0.037,
+    "sd": 0.0254,
+    "ci95": [
+     0.0158,
+     0.0582
+    ],
+    "n": 8
+   },
+   "abstention_orig": {
+    "mean": 0.7387,
+    "sd": 0.094,
+    "ci95": [
+     0.66,
+     0.8173
+    ],
+    "n": 8
+   },
+   "coverage_orig": {
+    "mean": 0.499,
+    "sd": 0.1314,
+    "ci95": [
+     0.3891,
+     0.6089
+    ],
+    "n": 8
+   },
+   "success_ideal": {
+    "mean": 0.5307,
+    "sd": 0.095,
+    "ci95": [
+     0.4513,
+     0.6101
+    ],
+    "n": 8
+   },
+   "false_confident_ideal": {
+    "mean": 0.0488,
+    "sd": 0.0286,
+    "ci95": [
+     0.0249,
+     0.0728
+    ],
+    "n": 8
+   },
+   "abstention_ideal": {
+    "mean": 0.7387,
+    "sd": 0.094,
+    "ci95": [
+     0.66,
+     0.8173
+    ],
+    "n": 8
+   },
+   "coverage_ideal": {
+    "mean": 0.4739,
+    "sd": 0.1273,
+    "ci95": [
+     0.3674,
+     0.5803
+    ],
+    "n": 8
+   },
+   "lexical_coverage": {
+    "mean": 0.5,
+    "sd": 0.126,
+    "ci95": [
+     0.3947,
+     0.6053
+    ],
+    "n": 8
+   },
+   "lexical_wrong": {
+    "mean": 0.0,
+    "sd": 0.0,
+    "ci95": [
+     0.0,
+     0.0
+    ],
+    "n": 8
+   },
+   "object_identity_accuracy": {
+    "mean": 0.954,
+    "sd": 0.0393,
+    "ci95": [
+     0.9212,
+     0.9869
+    ],
+    "n": 8
+   }
+  }
+ },
+ "comparisons": {
+  "entitled_vs_no_elimination": {
+   "success_orig": {
+    "mean": 0.0317,
+    "sd": 0.0399,
+    "ci95": [
+     -0.0017,
+     0.065
+    ],
+    "n": 8,
+    "seeds_positive": 6,
+    "seeds_negative": 1
+   },
+   "false_confident_orig": {
+    "mean": 0.0027,
+    "sd": 0.008,
+    "ci95": [
+     -0.0039,
+     0.0094
+    ],
+    "n": 8,
+    "seeds_positive": 3,
+    "seeds_negative": 3
+   },
+   "abstention_orig": {
+    "mean": -0.0148,
+    "sd": 0.0207,
+    "ci95": [
+     -0.0321,
+     0.0025
+    ],
+    "n": 8,
+    "seeds_positive": 0,
+    "seeds_negative": 7
+   },
+   "coverage_orig": {
+    "mean": 0.0282,
+    "sd": 0.0404,
+    "ci95": [
+     -0.0056,
+     0.062
+    ],
+    "n": 8,
+    "seeds_positive": 5,
+    "seeds_negative": 1
+   },
+   "success_ideal": {
+    "mean": 0.0321,
+    "sd": 0.0423,
+    "ci95": [
+     -0.0032,
+     0.0674
+    ],
+    "n": 8,
+    "seeds_positive": 6,
+    "seeds_negative": 2
+   },
+   "false_confident_ideal": {
+    "mean": 0.0042,
+    "sd": 0.0077,
+    "ci95": [
+     -0.0022,
+     0.0106
+    ],
+    "n": 8,
+    "seeds_positive": 3,
+    "seeds_negative": 2
+   },
+   "abstention_ideal": {
+    "mean": -0.0148,
+    "sd": 0.0207,
+    "ci95": [
+     -0.0321,
+     0.0025
+    ],
+    "n": 8,
+    "seeds_positive": 0,
+    "seeds_negative": 7
+   },
+   "coverage_ideal": {
+    "mean": 0.0259,
+    "sd": 0.0432,
+    "ci95": [
+     -0.0102,
+     0.062
+    ],
+    "n": 8,
+    "seeds_positive": 5,
+    "seeds_negative": 2
+   }
+  },
+  "callex_vs_no_elimination": {
+   "success_orig": {
+    "mean": 0.0373,
+    "sd": 0.0423,
+    "ci95": [
+     0.002,
+     0.0727
+    ],
+    "n": 8,
+    "seeds_positive": 8,
+    "seeds_negative": 0
+   },
+   "false_confident_orig": {
+    "mean": 0.0049,
+    "sd": 0.0064,
+    "ci95": [
+     -0.0005,
+     0.0103
+    ],
+    "n": 8,
+    "seeds_positive": 5,
+    "seeds_negative": 0
+   },
+   "abstention_orig": {
+    "mean": -0.0229,
+    "sd": 0.0234,
+    "ci95": [
+     -0.0424,
+     -0.0034
+    ],
+    "n": 8,
+    "seeds_positive": 0,
+    "seeds_negative": 7
+   },
+   "coverage_orig": {
+    "mean": 0.0412,
+    "sd": 0.0469,
+    "ci95": [
+     0.002,
+     0.0805
+    ],
+    "n": 8,
+    "seeds_positive": 7,
+    "seeds_negative": 0
+   },
+   "success_ideal": {
+    "mean": 0.0371,
+    "sd": 0.0446,
+    "ci95": [
+     -0.0003,
+     0.0744
+    ],
+    "n": 8,
+    "seeds_positive": 7,
+    "seeds_negative": 0
+   },
+   "false_confident_ideal": {
+    "mean": 0.0067,
+    "sd": 0.006,
+    "ci95": [
+     0.0017,
+     0.0117
+    ],
+    "n": 8,
+    "seeds_positive": 6,
+    "seeds_negative": 0
+   },
+   "abstention_ideal": {
+    "mean": -0.0229,
+    "sd": 0.0234,
+    "ci95": [
+     -0.0424,
+     -0.0034
+    ],
+    "n": 8,
+    "seeds_positive": 0,
+    "seeds_negative": 7
+   },
+   "coverage_ideal": {
+    "mean": 0.0385,
+    "sd": 0.0498,
+    "ci95": [
+     -0.0032,
+     0.0802
+    ],
+    "n": 8,
+    "seeds_positive": 6,
+    "seeds_negative": 0
+   }
+  },
+  "unified_entitled_vs_no_elimination": {
+   "success_orig": {
+    "mean": -0.0066,
+    "sd": 0.0722,
+    "ci95": [
+     -0.067,
+     0.0538
+    ],
+    "n": 8,
+    "seeds_positive": 4,
+    "seeds_negative": 4
+   },
+   "false_confident_orig": {
+    "mean": 0.0076,
+    "sd": 0.013,
+    "ci95": [
+     -0.0032,
+     0.0185
+    ],
+    "n": 8,
+    "seeds_positive": 4,
+    "seeds_negative": 2
+   },
+   "abstention_orig": {
+    "mean": 0.0066,
+    "sd": 0.0515,
+    "ci95": [
+     -0.0365,
+     0.0496
+    ],
+    "n": 8,
+    "seeds_positive": 5,
+    "seeds_negative": 3
+   },
+   "coverage_orig": {
+    "mean": -0.0319,
+    "sd": 0.1092,
+    "ci95": [
+     -0.1232,
+     0.0595
+    ],
+    "n": 8,
+    "seeds_positive": 2,
+    "seeds_negative": 4
+   },
+   "success_ideal": {
+    "mean": -0.0027,
+    "sd": 0.0624,
+    "ci95": [
+     -0.0549,
+     0.0494
+    ],
+    "n": 8,
+    "seeds_positive": 4,
+    "seeds_negative": 4
+   },
+   "false_confident_ideal": {
+    "mean": 0.0067,
+    "sd": 0.0146,
+    "ci95": [
+     -0.0055,
+     0.0189
+    ],
+    "n": 8,
+    "seeds_positive": 6,
+    "seeds_negative": 2
+   },
+   "abstention_ideal": {
+    "mean": 0.0066,
+    "sd": 0.0515,
+    "ci95": [
+     -0.0365,
+     0.0496
+    ],
+    "n": 8,
+    "seeds_positive": 5,
+    "seeds_negative": 3
+   },
+   "coverage_ideal": {
+    "mean": -0.0278,
+    "sd": 0.1065,
+    "ci95": [
+     -0.1168,
+     0.0612
+    ],
+    "n": 8,
+    "seeds_positive": 4,
+    "seeds_negative": 4
+   }
+  },
+  "unified_entitled_vs_entitled": {
+   "success_orig": {
+    "mean": -0.0383,
+    "sd": 0.058,
+    "ci95": [
+     -0.0868,
+     0.0102
+    ],
+    "n": 8,
+    "seeds_positive": 2,
+    "seeds_negative": 6
+   },
+   "false_confident_orig": {
+    "mean": 0.0049,
+    "sd": 0.013,
+    "ci95": [
+     -0.006,
+     0.0157
+    ],
+    "n": 8,
+    "seeds_positive": 5,
+    "seeds_negative": 2
+   },
+   "abstention_orig": {
+    "mean": 0.0214,
+    "sd": 0.0524,
+    "ci95": [
+     -0.0225,
+     0.0652
+    ],
+    "n": 8,
+    "seeds_positive": 5,
+    "seeds_negative": 3
+   },
+   "coverage_orig": {
+    "mean": -0.06,
+    "sd": 0.1101,
+    "ci95": [
+     -0.1521,
+     0.032
+    ],
+    "n": 8,
+    "seeds_positive": 2,
+    "seeds_negative": 5
+   },
+   "success_ideal": {
+    "mean": -0.0348,
+    "sd": 0.0498,
+    "ci95": [
+     -0.0765,
+     0.0068
+    ],
+    "n": 8,
+    "seeds_positive": 3,
+    "seeds_negative": 5
+   },
+   "false_confident_ideal": {
+    "mean": 0.0025,
+    "sd": 0.0125,
+    "ci95": [
+     -0.008,
+     0.0129
+    ],
+    "n": 8,
+    "seeds_positive": 4,
+    "seeds_negative": 3
+   },
+   "abstention_ideal": {
+    "mean": 0.0214,
+    "sd": 0.0524,
+    "ci95": [
+     -0.0225,
+     0.0652
+    ],
+    "n": 8,
+    "seeds_positive": 5,
+    "seeds_negative": 3
+   },
+   "coverage_ideal": {
+    "mean": -0.0537,
+    "sd": 0.1061,
+    "ci95": [
+     -0.1424,
+     0.035
+    ],
+    "n": 8,
+    "seeds_positive": 3,
+    "seeds_negative": 5
+   }
+  },
+  "unified_vs_no_elimination": {
+   "success_orig": {
+    "mean": 0.0033,
+    "sd": 0.0636,
+    "ci95": [
+     -0.0498,
+     0.0565
+    ],
+    "n": 8,
+    "seeds_positive": 4,
+    "seeds_negative": 4
+   },
+   "false_confident_orig": {
+    "mean": 0.0544,
+    "sd": 0.0535,
+    "ci95": [
+     0.0097,
+     0.0991
+    ],
+    "n": 8,
+    "seeds_positive": 7,
+    "seeds_negative": 0
+   },
+   "abstention_orig": {
+    "mean": -0.0931,
+    "sd": 0.0637,
+    "ci95": [
+     -0.1464,
+     -0.0398
+    ],
+    "n": 8,
+    "seeds_positive": 0,
+    "seeds_negative": 8
+   },
+   "coverage_orig": {
+    "mean": 0.091,
+    "sd": 0.0941,
+    "ci95": [
+     0.0123,
+     0.1697
+    ],
+    "n": 8,
+    "seeds_positive": 6,
+    "seeds_negative": 2
+   },
+   "success_ideal": {
+    "mean": 0.0117,
+    "sd": 0.0495,
+    "ci95": [
+     -0.0297,
+     0.053
+    ],
+    "n": 8,
+    "seeds_positive": 5,
+    "seeds_negative": 3
+   },
+   "false_confident_ideal": {
+    "mean": 0.0505,
+    "sd": 0.0469,
+    "ci95": [
+     0.0113,
+     0.0897
+    ],
+    "n": 8,
+    "seeds_positive": 7,
+    "seeds_negative": 0
+   },
+   "abstention_ideal": {
+    "mean": -0.0931,
+    "sd": 0.0637,
+    "ci95": [
+     -0.1464,
+     -0.0398
+    ],
+    "n": 8,
+    "seeds_positive": 0,
+    "seeds_negative": 8
+   },
+   "coverage_ideal": {
+    "mean": 0.099,
+    "sd": 0.0946,
+    "ci95": [
+     0.0199,
+     0.1781
+    ],
+    "n": 8,
+    "seeds_positive": 6,
+    "seeds_negative": 2
+   }
+  }
+ },
+ "alignment": {
+  "no_elimination": {
+   "precision": {
+    "mean": 0.8634,
+    "sd": 0.0817,
+    "ci95": [
+     0.7951,
+     0.9317
+    ],
+    "n": 8
+   },
+   "recall": {
+    "mean": 0.4312,
+    "sd": 0.0916,
+    "ci95": [
+     0.3546,
+     0.5078
+    ],
+    "n": 8
+   },
+   "f1": {
+    "mean": 0.569,
+    "sd": 0.0788,
+    "ci95": [
+     0.5031,
+     0.6349
+    ],
+    "n": 8
+   }
+  },
+  "callex": {
+   "precision": {
+    "mean": 0.8616,
+    "sd": 0.0669,
+    "ci95": [
+     0.8056,
+     0.9175
+    ],
+    "n": 8
+   },
+   "recall": {
+    "mean": 0.5369,
+    "sd": 0.1274,
+    "ci95": [
+     0.4303,
+     0.6434
+    ],
+    "n": 8
+   },
+   "f1": {
+    "mean": 0.651,
+    "sd": 0.0917,
+    "ci95": [
+     0.5743,
+     0.7276
+    ],
+    "n": 8
+   }
+  },
+  "entitled": {
+   "precision": {
+    "mean": 0.8616,
+    "sd": 0.0669,
+    "ci95": [
+     0.8056,
+     0.9175
+    ],
+    "n": 8
+   },
+   "recall": {
+    "mean": 0.5369,
+    "sd": 0.1274,
+    "ci95": [
+     0.4303,
+     0.6434
+    ],
+    "n": 8
+   },
+   "f1": {
+    "mean": 0.651,
+    "sd": 0.0917,
+    "ci95": [
+     0.5743,
+     0.7276
+    ],
+    "n": 8
+   }
+  },
+  "unified": {
+   "precision": {
+    "mean": 0.8444,
+    "sd": 0.0659,
+    "ci95": [
+     0.7892,
+     0.8995
+    ],
+    "n": 8
+   },
+   "recall": {
+    "mean": 0.4114,
+    "sd": 0.0989,
+    "ci95": [
+     0.3287,
+     0.4942
+    ],
+    "n": 8
+   },
+   "f1": {
+    "mean": 0.5455,
+    "sd": 0.0787,
+    "ci95": [
+     0.4797,
+     0.6114
+    ],
+    "n": 8
+   }
+  },
+  "unified_entitled": {
+   "precision": {
+    "mean": 0.8389,
+    "sd": 0.0563,
+    "ci95": [
+     0.7918,
+     0.886
+    ],
+    "n": 8
+   },
+   "recall": {
+    "mean": 0.4832,
+    "sd": 0.1224,
+    "ci95": [
+     0.3809,
+     0.5855
+    ],
+    "n": 8
+   },
+   "f1": {
+    "mean": 0.6032,
+    "sd": 0.0871,
+    "ci95": [
+     0.5304,
+     0.676
+    ],
+    "n": 8
+   }
+  }
+ },
+ "alignment_by_entitlement": {
+  "no_elimination": {
+   "ASSERTED": {
+    "n": 93,
+    "raw_correct_vs_ideal": 0.9032
+   },
+   "QUALIFIED": {
+    "n": 0,
+    "raw_correct_vs_ideal": 0.0
+   },
+   "ASKED": {
+    "n": 28,
+    "raw_correct_vs_ideal": 0.9643
+   },
+   "WITHHELD": {
+    "n": 250,
+    "raw_correct_vs_ideal": 0.356
+   }
+  },
+  "callex": {
+   "ASSERTED": {
+    "n": 112,
+    "raw_correct_vs_ideal": 0.875
+   },
+   "QUALIFIED": {
+    "n": 3,
+    "raw_correct_vs_ideal": 0.3333
+   },
+   "ASKED": {
+    "n": 28,
+    "raw_correct_vs_ideal": 0.9643
+   },
+   "WITHHELD": {
+    "n": 228,
+    "raw_correct_vs_ideal": 0.3816
+   }
+  },
+  "entitled": {
+   "ASSERTED": {
+    "n": 112,
+    "raw_correct_vs_ideal": 0.875
+   },
+   "QUALIFIED": {
+    "n": 3,
+    "raw_correct_vs_ideal": 0.3333
+   },
+   "ASKED": {
+    "n": 28,
+    "raw_correct_vs_ideal": 0.9643
+   },
+   "WITHHELD": {
+    "n": 228,
+    "raw_correct_vs_ideal": 0.3816
+   }
+  },
+  "unified": {
+   "ASSERTED": {
+    "n": 67,
+    "raw_correct_vs_ideal": 0.9104
+   },
+   "QUALIFIED": {
+    "n": 59,
+    "raw_correct_vs_ideal": 0.4576
+   },
+   "ASKED": {
+    "n": 24,
+    "raw_correct_vs_ideal": 1.0
+   },
+   "WITHHELD": {
+    "n": 221,
+    "raw_correct_vs_ideal": 0.3258
+   }
+  },
+  "unified_entitled": {
+   "ASSERTED": {
+    "n": 73,
+    "raw_correct_vs_ideal": 0.8904
+   },
+   "QUALIFIED": {
+    "n": 61,
+    "raw_correct_vs_ideal": 0.4754
+   },
+   "ASKED": {
+    "n": 24,
+    "raw_correct_vs_ideal": 1.0
+   },
+   "WITHHELD": {
+    "n": 213,
+    "raw_correct_vs_ideal": 0.3333
+   }
+  }
+ },
+ "audit": {
+  "no_elimination": {
+   "oracle_too_strict": 3,
+   "logical_elimination": 0,
+   "hidden_information": 0,
+   "real_ambiguity": 23,
+   "bad_propagation": 43,
+   "bad_lexical_hypothesis": 6,
+   "temporal_error": 8
+  },
+  "callex": {
+   "oracle_too_strict": 3,
+   "logical_elimination": 0,
+   "hidden_information": 0,
+   "real_ambiguity": 23,
+   "bad_propagation": 62,
+   "bad_lexical_hypothesis": 1,
+   "temporal_error": 8
+  },
+  "entitled": {
+   "oracle_too_strict": 3,
+   "logical_elimination": 0,
+   "hidden_information": 0,
+   "real_ambiguity": 23,
+   "bad_propagation": 62,
+   "bad_lexical_hypothesis": 1,
+   "temporal_error": 8
+  },
+  "unified": {
+   "oracle_too_strict": 27,
+   "logical_elimination": 0,
+   "hidden_information": 35,
+   "real_ambiguity": 104,
+   "bad_propagation": 54,
+   "bad_lexical_hypothesis": 8,
+   "temporal_error": 10
+  },
+  "unified_entitled": {
+   "oracle_too_strict": 28,
+   "logical_elimination": 0,
+   "hidden_information": 36,
+   "real_ambiguity": 103,
+   "bad_propagation": 71,
+   "bad_lexical_hypothesis": 3,
+   "temporal_error": 13
+  }
+ },
+ "attribution_ideal": {
+  "no_elimination": {
+   "LEXICAL": 0.1147,
+   "REFERENCE": 0.0679,
+   "EVIDENCE": 0.048,
+   "SOURCE": 0.0038,
+   "TEMPORAL": 0.0213,
+   "GRAMMAR": 0.0017,
+   "PLANNER": 0.0,
+   "KNOWABILITY_REFERENCE": 0.0,
+   "UNSUPPORTED_INFERENCE": 0.0003
+  },
+  "callex": {
+   "LEXICAL": 0.0815,
+   "REFERENCE": 0.0778,
+   "EVIDENCE": 0.0612,
+   "SOURCE": 0.0046,
+   "TEMPORAL": 0.0204,
+   "GRAMMAR": 0.0024,
+   "PLANNER": 0.0,
+   "KNOWABILITY_REFERENCE": 0.0,
+   "UNSUPPORTED_INFERENCE": 0.0003
+  },
+  "entitled": {
+   "LEXICAL": 0.0833,
+   "REFERENCE": 0.0788,
+   "EVIDENCE": 0.0607,
+   "SOURCE": 0.0054,
+   "TEMPORAL": 0.0204,
+   "GRAMMAR": 0.0024,
+   "PLANNER": 0.0,
+   "KNOWABILITY_REFERENCE": 0.0,
+   "UNSUPPORTED_INFERENCE": 0.0003
+  },
+  "unified": {
+   "LEXICAL": 0.1187,
+   "REFERENCE": 0.0774,
+   "EVIDENCE": 0.0459,
+   "SOURCE": 0.0036,
+   "TEMPORAL": 0.0177,
+   "GRAMMAR": 0.0021,
+   "PLANNER": 0.0,
+   "KNOWABILITY_REFERENCE": 0.0,
+   "UNSUPPORTED_INFERENCE": 0.0003
+  },
+  "unified_entitled": {
+   "LEXICAL": 0.0925,
+   "REFERENCE": 0.098,
+   "EVIDENCE": 0.055,
+   "SOURCE": 0.0047,
+   "TEMPORAL": 0.0243,
+   "GRAMMAR": 0.0028,
+   "PLANNER": 0.0,
+   "KNOWABILITY_REFERENCE": 0.0,
+   "UNSUPPORTED_INFERENCE": 0.0003
+  }
+ },
+ "attribution_orig": {
+  "no_elimination": {
+   "LEXICAL": 0.1078,
+   "REFERENCE": 0.0499,
+   "EVIDENCE": 0.0378,
+   "SOURCE": 0.0038,
+   "TEMPORAL": 0.0159,
+   "GRAMMAR": 0.0017,
+   "PLANNER": 0.0,
+   "KNOWABILITY_REFERENCE": 0.0126,
+   "UNSUPPORTED_INFERENCE": 0.0003
+  },
+  "callex": {
+   "LEXICAL": 0.0743,
+   "REFERENCE": 0.0564,
+   "EVIDENCE": 0.0478,
+   "SOURCE": 0.0046,
+   "TEMPORAL": 0.015,
+   "GRAMMAR": 0.0024,
+   "PLANNER": 0.0,
+   "KNOWABILITY_REFERENCE": 0.0155,
+   "UNSUPPORTED_INFERENCE": 0.0003
+  },
+  "entitled": {
+   "LEXICAL": 0.0765,
+   "REFERENCE": 0.0574,
+   "EVIDENCE": 0.0474,
+   "SOURCE": 0.0054,
+   "TEMPORAL": 0.015,
+   "GRAMMAR": 0.0024,
+   "PLANNER": 0.0,
+   "KNOWABILITY_REFERENCE": 0.0158,
+   "UNSUPPORTED_INFERENCE": 0.0003
+  },
+  "unified": {
+   "LEXICAL": 0.1149,
+   "REFERENCE": 0.0609,
+   "EVIDENCE": 0.035,
+   "SOURCE": 0.0036,
+   "TEMPORAL": 0.0137,
+   "GRAMMAR": 0.0021,
+   "PLANNER": 0.0,
+   "KNOWABILITY_REFERENCE": 0.0152,
+   "UNSUPPORTED_INFERENCE": 0.0003
+  },
+  "unified_entitled": {
+   "LEXICAL": 0.0867,
+   "REFERENCE": 0.079,
+   "EVIDENCE": 0.0423,
+   "SOURCE": 0.0047,
+   "TEMPORAL": 0.0189,
+   "GRAMMAR": 0.0028,
+   "PLANNER": 0.0,
+   "KNOWABILITY_REFERENCE": 0.0165,
+   "UNSUPPORTED_INFERENCE": 0.0003
+  }
+ },
+ "conversion": {
+  "callex": {
+   "correct_asserted": 43,
+   "correct_qualified": 3,
+   "correctly_withheld": 0,
+   "withheld_but_correct": 2,
+   "wrong_asserted": 22,
+   "wrong_qualified": 0
+  },
+  "entitled": {
+   "correct_asserted": 43,
+   "correct_qualified": 3,
+   "correctly_withheld": 0,
+   "withheld_but_correct": 2,
+   "wrong_asserted": 22,
+   "wrong_qualified": 0
+  },
+  "unified": {
+   "correct_asserted": 55,
+   "correct_qualified": 86,
+   "correctly_withheld": 7,
+   "withheld_but_correct": 14,
+   "wrong_asserted": 20,
+   "wrong_qualified": 128
+  },
+  "unified_entitled": {
+   "correct_asserted": 90,
+   "correct_qualified": 103,
+   "correctly_withheld": 3,
+   "withheld_but_correct": 0,
+   "wrong_asserted": 40,
+   "wrong_qualified": 133
+  }
+ },
+ "lexical_calibration": {
+  "no_elimination": {
+   "n": 48,
+   "ece": 0.4814,
+   "brier": 0.3513,
+   "bins": [
+    {
+     "bin": "0.0-0.1",
+     "n": 17,
+     "confidence": 0.045,
+     "accuracy": 0.235
+    },
+    {
+     "bin": "0.1-0.2",
+     "n": 6,
+     "confidence": 0.16,
+     "accuracy": 1.0
+    },
+    {
+     "bin": "0.2-0.3",
+     "n": 6,
+     "confidence": 0.249,
+     "accuracy": 1.0
+    },
+    {
+     "bin": "0.3-0.4",
+     "n": 4,
+     "confidence": 0.348,
+     "accuracy": 1.0
+    },
+    {
+     "bin": "0.4-0.5",
+     "n": 10,
+     "confidence": 0.444,
+     "accuracy": 1.0
+    },
+    {
+     "bin": "0.5-0.6",
+     "n": 4,
+     "confidence": 0.541,
+     "accuracy": 1.0
+    },
+    {
+     "bin": "0.6-0.7",
+     "n": 1,
+     "confidence": 0.668,
+     "accuracy": 1.0
+    }
+   ]
+  },
+  "callex": {
+   "n": 48,
+   "ece": 0.1485,
+   "brier": 0.0787,
+   "bins": [
+    {
+     "bin": "0.3-0.4",
+     "n": 1,
+     "confidence": 0.357,
+     "accuracy": 1.0
+    },
+    {
+     "bin": "0.4-0.5",
+     "n": 4,
+     "confidence": 0.456,
+     "accuracy": 0.75
+    },
+    {
+     "bin": "0.5-0.6",
+     "n": 3,
+     "confidence": 0.541,
+     "accuracy": 0.0
+    },
+    {
+     "bin": "0.6-0.7",
+     "n": 3,
+     "confidence": 0.662,
+     "accuracy": 0.333
+    },
+    {
+     "bin": "0.7-0.8",
+     "n": 6,
+     "confidence": 0.746,
+     "accuracy": 1.0
+    },
+    {
+     "bin": "0.8-0.9",
+     "n": 3,
+     "confidence": 0.835,
+     "accuracy": 1.0
+    },
+    {
+     "bin": "0.9-1.0",
+     "n": 28,
+     "confidence": 0.976,
+     "accuracy": 1.0
+    }
+   ]
+  },
+  "entitled": {
+   "n": 48,
+   "ece": 0.1485,
+   "brier": 0.0787,
+   "bins": [
+    {
+     "bin": "0.3-0.4",
+     "n": 1,
+     "confidence": 0.357,
+     "accuracy": 1.0
+    },
+    {
+     "bin": "0.4-0.5",
+     "n": 4,
+     "confidence": 0.456,
+     "accuracy": 0.75
+    },
+    {
+     "bin": "0.5-0.6",
+     "n": 3,
+     "confidence": 0.541,
+     "accuracy": 0.0
+    },
+    {
+     "bin": "0.6-0.7",
+     "n": 3,
+     "confidence": 0.662,
+     "accuracy": 0.333
+    },
+    {
+     "bin": "0.7-0.8",
+     "n": 6,
+     "confidence": 0.746,
+     "accuracy": 1.0
+    },
+    {
+     "bin": "0.8-0.9",
+     "n": 3,
+     "confidence": 0.835,
+     "accuracy": 1.0
+    },
+    {
+     "bin": "0.9-1.0",
+     "n": 28,
+     "confidence": 0.976,
+     "accuracy": 1.0
+    }
+   ]
+  },
+  "unified": {
+   "n": 48,
+   "ece": 0.5327,
+   "brier": 0.3882,
+   "bins": [
+    {
+     "bin": "0.0-0.1",
+     "n": 10,
+     "confidence": 0.029,
+     "accuracy": 0.0
+    },
+    {
+     "bin": "0.1-0.2",
+     "n": 12,
+     "confidence": 0.159,
+     "accuracy": 1.0
+    },
+    {
+     "bin": "0.2-0.3",
+     "n": 7,
+     "confidence": 0.249,
+     "accuracy": 1.0
+    },
+    {
+     "bin": "0.3-0.4",
+     "n": 8,
+     "confidence": 0.331,
+     "accuracy": 0.875
+    },
+    {
+     "bin": "0.4-0.5",
+     "n": 8,
+     "confidence": 0.447,
+     "accuracy": 1.0
+    },
+    {
+     "bin": "0.5-0.6",
+     "n": 1,
+     "confidence": 0.567,
+     "accuracy": 1.0
+    },
+    {
+     "bin": "0.6-0.7",
+     "n": 2,
+     "confidence": 0.636,
+     "accuracy": 1.0
+    }
+   ]
+  },
+  "unified_entitled": {
+   "n": 48,
+   "ece": 0.0878,
+   "brier": 0.0797,
+   "bins": [
+    {
+     "bin": "0.4-0.5",
+     "n": 1,
+     "confidence": 0.433,
+     "accuracy": 0.0
+    },
+    {
+     "bin": "0.5-0.6",
+     "n": 4,
+     "confidence": 0.539,
+     "accuracy": 0.25
+    },
+    {
+     "bin": "0.6-0.7",
+     "n": 5,
+     "confidence": 0.651,
+     "accuracy": 0.8
+    },
+    {
+     "bin": "0.7-0.8",
+     "n": 4,
+     "confidence": 0.779,
+     "accuracy": 0.75
+    },
+    {
+     "bin": "0.8-0.9",
+     "n": 2,
+     "confidence": 0.85,
+     "accuracy": 0.5
+    },
+    {
+     "bin": "0.9-1.0",
+     "n": 32,
+     "confidence": 0.967,
+     "accuracy": 1.0
+    }
+   ]
+  }
+ },
+ "pareto": {
+  "no_elimination": [
+   {
+    "wrong": 100,
+    "abstain": 0.5,
+    "allow_l2": false,
+    "threshold": 0.995,
+    "success": 0.4537,
+    "false_confident": 0.0134,
+    "abstention": 0.8649
+   },
+   {
+    "wrong": 100,
+    "abstain": 0.5,
+    "allow_l2": true,
+    "threshold": 0.995,
+    "success": 0.4537,
+    "false_confident": 0.0134,
+    "abstention": 0.8649
+   },
+   {
+    "wrong": 50,
+    "abstain": 0.5,
+    "allow_l2": false,
+    "threshold": 0.99,
+    "success": 0.4611,
+    "false_confident": 0.0141,
+    "abstention": 0.8561
+   },
+   {
+    "wrong": 50,
+    "abstain": 0.5,
+    "allow_l2": true,
+    "threshold": 0.99,
+    "success": 0.4611,
+    "false_confident": 0.0141,
+    "abstention": 0.8561
+   },
+   {
+    "wrong": 100,
+    "abstain": 1,
+    "allow_l2": false,
+    "threshold": 0.99,
+    "success": 0.4611,
+    "false_confident": 0.0141,
+    "abstention": 0.8561
+   },
+   {
+    "wrong": 100,
+    "abstain": 1,
+    "allow_l2": true,
+    "threshold": 0.99,
+    "success": 0.4611,
+    "false_confident": 0.0141,
+    "abstention": 0.8561
+   },
+   {
+    "wrong": 20,
+    "abstain": 0.5,
+    "allow_l2": false,
+    "threshold": 0.975,
+    "success": 0.4692,
+    "false_confident": 0.0145,
+    "abstention": 0.8476
+   },
+   {
+    "wrong": 20,
+    "abstain": 0.5,
+    "allow_l2": true,
+    "threshold": 0.975,
+    "success": 0.4692,
+    "false_confident": 0.0145,
+    "abstention": 0.8476
+   },
+   {
+    "wrong": 50,
+    "abstain": 2,
+    "allow_l2": false,
+    "threshold": 0.96,
+    "success": 0.4707,
+    "false_confident": 0.0156,
+    "abstention": 0.8444
+   },
+   {
+    "wrong": 50,
+    "abstain": 2,
+    "allow_l2": true,
+    "threshold": 0.96,
+    "success": 0.4707,
+    "false_confident": 0.0156,
+    "abstention": 0.8444
+   },
+   {
+    "wrong": 10,
+    "abstain": 0.5,
+    "allow_l2": false,
+    "threshold": 0.95,
+    "success": 0.4717,
+    "false_confident": 0.0177,
+    "abstention": 0.8398
+   },
+   {
+    "wrong": 10,
+    "abstain": 0.5,
+    "allow_l2": true,
+    "threshold": 0.95,
+    "success": 0.4717,
+    "false_confident": 0.0177,
+    "abstention": 0.8398
+   },
+   {
+    "wrong": 20,
+    "abstain": 1,
+    "allow_l2": false,
+    "threshold": 0.95,
+    "success": 0.4717,
+    "false_confident": 0.0177,
+    "abstention": 0.8398
+   },
+   {
+    "wrong": 20,
+    "abstain": 1,
+    "allow_l2": true,
+    "threshold": 0.95,
+    "success": 0.4717,
+    "false_confident": 0.0177,
+    "abstention": 0.8398
+   },
+   {
+    "wrong": 2,
+    "abstain": 0.5,
+    "allow_l2": false,
+    "threshold": 0.75,
+    "success": 0.4844,
+    "false_confident": 0.0255,
+    "abstention": 0.8126
+   },
+   {
+    "wrong": 2,
+    "abstain": 0.5,
+    "allow_l2": true,
+    "threshold": 0.75,
+    "success": 0.4844,
+    "false_confident": 0.0255,
+    "abstention": 0.8126
+   },
+   {
+    "wrong": 5,
+    "abstain": 2,
+    "allow_l2": false,
+    "threshold": 0.6,
+    "success": 0.4844,
+    "false_confident": 0.0255,
+    "abstention": 0.8126
+   },
+   {
+    "wrong": 5,
+    "abstain": 2,
+    "allow_l2": true,
+    "threshold": 0.6,
+    "success": 0.4844,
+    "false_confident": 0.0255,
+    "abstention": 0.8126
+   },
+   {
+    "wrong": 2,
+    "abstain": 1,
+    "allow_l2": false,
+    "threshold": 0.5,
+    "success": 0.4958,
+    "false_confident": 0.0258,
+    "abstention": 0.8006
+   },
+   {
+    "wrong": 2,
+    "abstain": 1,
+    "allow_l2": true,
+    "threshold": 0.5,
+    "success": 0.4958,
+    "false_confident": 0.0258,
+    "abstention": 0.8006
+   },
+   {
+    "wrong": 2,
+    "abstain": 2,
+    "allow_l2": false,
+    "threshold": 0.0,
+    "success": 0.5591,
+    "false_confident": 0.0293,
+    "abstention": 0.7327
+   },
+   {
+    "wrong": 2,
+    "abstain": 2,
+    "allow_l2": true,
+    "threshold": 0.0,
+    "success": 0.5591,
+    "false_confident": 0.0293,
+    "abstention": 0.7327
+   }
+  ],
+  "callex": [
+   {
+    "wrong": 100,
+    "abstain": 0.5,
+    "allow_l2": false,
+    "threshold": 0.995,
+    "success": 0.4837,
+    "false_confident": 0.0134,
+    "abstention": 0.8586
+   },
+   {
+    "wrong": 100,
+    "abstain": 0.5,
+    "allow_l2": true,
+    "threshold": 0.995,
+    "success": 0.4837,
+    "false_confident": 0.0134,
+    "abstention": 0.8586
+   },
+   {
+    "wrong": 50,
+    "abstain": 0.5,
+    "allow_l2": false,
+    "threshold": 0.99,
+    "success": 0.5046,
+    "false_confident": 0.0145,
+    "abstention": 0.8359
+   },
+   {
+    "wrong": 50,
+    "abstain": 0.5,
+    "allow_l2": true,
+    "threshold": 0.99,
+    "success": 0.5046,
+    "false_confident": 0.0145,
+    "abstention": 0.8359
+   },
+   {
+    "wrong": 100,
+    "abstain": 1,
+    "allow_l2": false,
+    "threshold": 0.99,
+    "success": 0.5046,
+    "false_confident": 0.0145,
+    "abstention": 0.8359
+   },
+   {
+    "wrong": 100,
+    "abstain": 1,
+    "allow_l2": true,
+    "threshold": 0.99,
+    "success": 0.5046,
+    "false_confident": 0.0145,
+    "abstention": 0.8359
+   },
+   {
+    "wrong": 50,
+    "abstain": 1,
+    "allow_l2": false,
+    "threshold": 0.98,
+    "success": 0.5191,
+    "false_confident": 0.0163,
+    "abstention": 0.8193
+   },
+   {
+    "wrong": 50,
+    "abstain": 1,
+    "allow_l2": true,
+    "threshold": 0.98,
+    "success": 0.5191,
+    "false_confident": 0.0163,
+    "abstention": 0.8193
+   },
+   {
+    "wrong": 100,
+    "abstain": 2,
+    "allow_l2": false,
+    "threshold": 0.98,
+    "success": 0.5191,
+    "false_confident": 0.0163,
+    "abstention": 0.8193
+   },
+   {
+    "wrong": 100,
+    "abstain": 2,
+    "allow_l2": true,
+    "threshold": 0.98,
+    "success": 0.5191,
+    "false_confident": 0.0163,
+    "abstention": 0.8193
+   },
+   {
+    "wrong": 20,
+    "abstain": 0.5,
+    "allow_l2": false,
+    "threshold": 0.975,
+    "success": 0.523,
+    "false_confident": 0.0166,
+    "abstention": 0.8147
+   },
+   {
+    "wrong": 20,
+    "abstain": 0.5,
+    "allow_l2": true,
+    "threshold": 0.975,
+    "success": 0.523,
+    "false_confident": 0.0166,
+    "abstention": 0.8147
+   },
+   {
+    "wrong": 50,
+    "abstain": 2,
+    "allow_l2": false,
+    "threshold": 0.96,
+    "success": 0.5318,
+    "false_confident": 0.018,
+    "abstention": 0.8034
+   },
+   {
+    "wrong": 50,
+    "abstain": 2,
+    "allow_l2": true,
+    "threshold": 0.96,
+    "success": 0.5318,
+    "false_confident": 0.018,
+    "abstention": 0.8034
+   },
+   {
+    "wrong": 10,
+    "abstain": 0.5,
+    "allow_l2": false,
+    "threshold": 0.95,
+    "success": 0.5368,
+    "false_confident": 0.0198,
+    "abstention": 0.7956
+   },
+   {
+    "wrong": 10,
+    "abstain": 0.5,
+    "allow_l2": true,
+    "threshold": 0.95,
+    "success": 0.5368,
+    "false_confident": 0.0198,
+    "abstention": 0.7956
+   },
+   {
+    "wrong": 20,
+    "abstain": 1,
+    "allow_l2": false,
+    "threshold": 0.95,
+    "success": 0.5368,
+    "false_confident": 0.0198,
+    "abstention": 0.7956
+   },
+   {
+    "wrong": 20,
+    "abstain": 1,
+    "allow_l2": true,
+    "threshold": 0.95,
+    "success": 0.5368,
+    "false_confident": 0.0198,
+    "abstention": 0.7956
+   },
+   {
+    "wrong": 5,
+    "abstain": 0.5,
+    "allow_l2": false,
+    "threshold": 0.9,
+    "success": 0.5456,
+    "false_confident": 0.0322,
+    "abstention": 0.7631
+   },
+   {
+    "wrong": 5,
+    "abstain": 0.5,
+    "allow_l2": true,
+    "threshold": 0.9,
+    "success": 0.5456,
+    "false_confident": 0.0322,
+    "abstention": 0.7631
+   },
+   {
+    "wrong": 10,
+    "abstain": 1,
+    "allow_l2": false,
+    "threshold": 0.9,
+    "success": 0.5456,
+    "false_confident": 0.0322,
+    "abstention": 0.7631
+   },
+   {
+    "wrong": 10,
+    "abstain": 1,
+    "allow_l2": true,
+    "threshold": 0.9,
+    "success": 0.5456,
+    "false_confident": 0.0322,
+    "abstention": 0.7631
+   },
+   {
+    "wrong": 20,
+    "abstain": 2,
+    "allow_l2": false,
+    "threshold": 0.9,
+    "success": 0.5456,
+    "false_confident": 0.0322,
+    "abstention": 0.7631
+   },
+   {
+    "wrong": 20,
+    "abstain": 2,
+    "allow_l2": true,
+    "threshold": 0.9,
+    "success": 0.5456,
+    "false_confident": 0.0322,
+    "abstention": 0.7631
+   },
+   {
+    "wrong": 2,
+    "abstain": 0.5,
+    "allow_l2": false,
+    "threshold": 0.75,
+    "success": 0.5477,
+    "false_confident": 0.0325,
+    "abstention": 0.7603
+   },
+   {
+    "wrong": 2,
+    "abstain": 0.5,
+    "allow_l2": true,
+    "threshold": 0.75,
+    "success": 0.5477,
+    "false_confident": 0.0325,
+    "abstention": 0.7603
+   },
+   {
+    "wrong": 5,
+    "abstain": 2,
+    "allow_l2": false,
+    "threshold": 0.6,
+    "success": 0.5477,
+    "false_confident": 0.0325,
+    "abstention": 0.7603
+   },
+   {
+    "wrong": 5,
+    "abstain": 2,
+    "allow_l2": true,
+    "threshold": 0.6,
+    "success": 0.5477,
+    "false_confident": 0.0325,
+    "abstention": 0.7603
+   },
+   {
+    "wrong": 2,
+    "abstain": 1,
+    "allow_l2": false,
+    "threshold": 0.5,
+    "success": 0.5481,
+    "false_confident": 0.0329,
+    "abstention": 0.7595
+   },
+   {
+    "wrong": 2,
+    "abstain": 1,
+    "allow_l2": true,
+    "threshold": 0.5,
+    "success": 0.5481,
+    "false_confident": 0.0329,
+    "abstention": 0.7595
+   },
+   {
+    "wrong": 2,
+    "abstain": 2,
+    "allow_l2": false,
+    "threshold": 0.0,
+    "success": 0.5972,
+    "false_confident": 0.0343,
+    "abstention": 0.709
+   },
+   {
+    "wrong": 2,
+    "abstain": 2,
+    "allow_l2": true,
+    "threshold": 0.0,
+    "success": 0.5972,
+    "false_confident": 0.0343,
+    "abstention": 0.709
+   }
+  ],
+  "unified": [
+   {
+    "wrong": 100,
+    "abstain": 0.5,
+    "allow_l2": false,
+    "threshold": 0.995,
+    "success": 0.4318,
+    "false_confident": 0.017,
+    "abstention": 0.8716
+   },
+   {
+    "wrong": 50,
+    "abstain": 0.5,
+    "allow_l2": false,
+    "threshold": 0.99,
+    "success": 0.4409,
+    "false_confident": 0.0177,
+    "abstention": 0.861
+   },
+   {
+    "wrong": 100,
+    "abstain": 1,
+    "allow_l2": false,
+    "threshold": 0.99,
+    "success": 0.4409,
+    "false_confident": 0.0177,
+    "abstention": 0.861
+   },
+   {
+    "wrong": 50,
+    "abstain": 1,
+    "allow_l2": false,
+    "threshold": 0.98,
+    "success": 0.4448,
+    "false_confident": 0.018,
+    "abstention": 0.8564
+   },
+   {
+    "wrong": 100,
+    "abstain": 2,
+    "allow_l2": false,
+    "threshold": 0.98,
+    "success": 0.4448,
+    "false_confident": 0.018,
+    "abstention": 0.8564
+   },
+   {
+    "wrong": 20,
+    "abstain": 0.5,
+    "allow_l2": false,
+    "threshold": 0.975,
+    "success": 0.4487,
+    "false_confident": 0.0184,
+    "abstention": 0.8522
+   },
+   {
+    "wrong": 50,
+    "abstain": 2,
+    "allow_l2": false,
+    "threshold": 0.96,
+    "success": 0.4501,
+    "false_confident": 0.0194,
+    "abstention": 0.849
+   },
+   {
+    "wrong": 10,
+    "abstain": 0.5,
+    "allow_l2": false,
+    "threshold": 0.95,
+    "success": 0.4519,
+    "false_confident": 0.0202,
+    "abstention": 0.8465
+   },
+   {
+    "wrong": 20,
+    "abstain": 1,
+    "allow_l2": false,
+    "threshold": 0.95,
+    "success": 0.4519,
+    "false_confident": 0.0202,
+    "abstention": 0.8465
+   },
+   {
+    "wrong": 5,
+    "abstain": 2,
+    "allow_l2": false,
+    "threshold": 0.6,
+    "success": 0.4657,
+    "false_confident": 0.0286,
+    "abstention": 0.8172
+   },
+   {
+    "wrong": 2,
+    "abstain": 1,
+    "allow_l2": false,
+    "threshold": 0.5,
+    "success": 0.4671,
+    "false_confident": 0.029,
+    "abstention": 0.8154
+   },
+   {
+    "wrong": 2,
+    "abstain": 2,
+    "allow_l2": false,
+    "threshold": 0.0,
+    "success": 0.523,
+    "false_confident": 0.0343,
+    "abstention": 0.7518
+   },
+   {
+    "wrong": 2,
+    "abstain": 2,
+    "allow_l2": true,
+    "threshold": 0.0,
+    "success": 0.5612,
+    "false_confident": 0.0842,
+    "abstention": 0.64
+   }
+  ]
+ },
+ "pareto_points": {
+  "no_elimination": [
+   {
+    "wrong": 2,
+    "abstain": 0.5,
+    "allow_l2": false,
+    "threshold": 0.75,
+    "success": 0.4844,
+    "false_confident": 0.0255,
+    "abstention": 0.8126
+   },
+   {
+    "wrong": 2,
+    "abstain": 0.5,
+    "allow_l2": true,
+    "threshold": 0.75,
+    "success": 0.4844,
+    "false_confident": 0.0255,
+    "abstention": 0.8126
+   },
+   {
+    "wrong": 2,
+    "abstain": 1,
+    "allow_l2": false,
+    "threshold": 0.5,
+    "success": 0.4958,
+    "false_confident": 0.0258,
+    "abstention": 0.8006
+   },
+   {
+    "wrong": 2,
+    "abstain": 1,
+    "allow_l2": true,
+    "threshold": 0.5,
+    "success": 0.4958,
+    "false_confident": 0.0258,
+    "abstention": 0.8006
+   },
+   {
+    "wrong": 2,
+    "abstain": 2,
+    "allow_l2": false,
+    "threshold": 0.0,
+    "success": 0.5591,
+    "false_confident": 0.0293,
+    "abstention": 0.7327
+   },
+   {
+    "wrong": 2,
+    "abstain": 2,
+    "allow_l2": true,
+    "threshold": 0.0,
+    "success": 0.5591,
+    "false_confident": 0.0293,
+    "abstention": 0.7327
+   },
+   {
+    "wrong": 5,
+    "abstain": 0.5,
+    "allow_l2": false,
+    "threshold": 0.9,
+    "success": 0.4841,
+    "false_confident": 0.0255,
+    "abstention": 0.8129
+   },
+   {
+    "wrong": 5,
+    "abstain": 0.5,
+    "allow_l2": true,
+    "threshold": 0.9,
+    "success": 0.4841,
+    "false_confident": 0.0255,
+    "abstention": 0.8129
+   },
+   {
+    "wrong": 5,
+    "abstain": 1,
+    "allow_l2": false,
+    "threshold": 0.8,
+    "success": 0.4841,
+    "false_confident": 0.0255,
+    "abstention": 0.8129
+   },
+   {
+    "wrong": 5,
+    "abstain": 1,
+    "allow_l2": true,
+    "threshold": 0.8,
+    "success": 0.4841,
+    "false_confident": 0.0255,
+    "abstention": 0.8129
+   },
+   {
+    "wrong": 5,
+    "abstain": 2,
+    "allow_l2": false,
+    "threshold": 0.6,
+    "success": 0.4844,
+    "false_confident": 0.0255,
+    "abstention": 0.8126
+   },
+   {
+    "wrong": 5,
+    "abstain": 2,
+    "allow_l2": true,
+    "threshold": 0.6,
+    "success": 0.4844,
+    "false_confident": 0.0255,
+    "abstention": 0.8126
+   },
+   {
+    "wrong": 10,
+    "abstain": 0.5,
+    "allow_l2": false,
+    "threshold": 0.95,
+    "success": 0.4717,
+    "false_confident": 0.0177,
+    "abstention": 0.8398
+   },
+   {
+    "wrong": 10,
+    "abstain": 0.5,
+    "allow_l2": true,
+    "threshold": 0.95,
+    "success": 0.4717,
+    "false_confident": 0.0177,
+    "abstention": 0.8398
+   },
+   {
+    "wrong": 10,
+    "abstain": 1,
+    "allow_l2": false,
+    "threshold": 0.9,
+    "success": 0.4841,
+    "false_confident": 0.0255,
+    "abstention": 0.8129
+   },
+   {
+    "wrong": 10,
+    "abstain": 1,
+    "allow_l2": true,
+    "threshold": 0.9,
+    "success": 0.4841,
+    "false_confident": 0.0255,
+    "abstention": 0.8129
+   },
+   {
+    "wrong": 10,
+    "abstain": 2,
+    "allow_l2": false,
+    "threshold": 0.8,
+    "success": 0.4841,
+    "false_confident": 0.0255,
+    "abstention": 0.8129
+   },
+   {
+    "wrong": 10,
+    "abstain": 2,
+    "allow_l2": true,
+    "threshold": 0.8,
+    "success": 0.4841,
+    "false_confident": 0.0255,
+    "abstention": 0.8129
+   },
+   {
+    "wrong": 20,
+    "abstain": 0.5,
+    "allow_l2": false,
+    "threshold": 0.975,
+    "success": 0.4692,
+    "false_confident": 0.0145,
+    "abstention": 0.8476
+   },
+   {
+    "wrong": 20,
+    "abstain": 0.5,
+    "allow_l2": true,
+    "threshold": 0.975,
+    "success": 0.4692,
+    "false_confident": 0.0145,
+    "abstention": 0.8476
+   },
+   {
+    "wrong": 20,
+    "abstain": 1,
+    "allow_l2": false,
+    "threshold": 0.95,
+    "success": 0.4717,
+    "false_confident": 0.0177,
+    "abstention": 0.8398
+   },
+   {
+    "wrong": 20,
+    "abstain": 1,
+    "allow_l2": true,
+    "threshold": 0.95,
+    "success": 0.4717,
+    "false_confident": 0.0177,
+    "abstention": 0.8398
+   },
+   {
+    "wrong": 20,
+    "abstain": 2,
+    "allow_l2": false,
+    "threshold": 0.9,
+    "success": 0.4841,
+    "false_confident": 0.0255,
+    "abstention": 0.8129
+   },
+   {
+    "wrong": 20,
+    "abstain": 2,
+    "allow_l2": true,
+    "threshold": 0.9,
+    "success": 0.4841,
+    "false_confident": 0.0255,
+    "abstention": 0.8129
+   },
+   {
+    "wrong": 50,
+    "abstain": 0.5,
+    "allow_l2": false,
+    "threshold": 0.99,
+    "success": 0.4611,
+    "false_confident": 0.0141,
+    "abstention": 0.8561
+   },
+   {
+    "wrong": 50,
+    "abstain": 0.5,
+    "allow_l2": true,
+    "threshold": 0.99,
+    "success": 0.4611,
+    "false_confident": 0.0141,
+    "abstention": 0.8561
+   },
+   {
+    "wrong": 50,
+    "abstain": 1,
+    "allow_l2": false,
+    "threshold": 0.98,
+    "success": 0.4671,
+    "false_confident": 0.0145,
+    "abstention": 0.8497
+   },
+   {
+    "wrong": 50,
+    "abstain": 1,
+    "allow_l2": true,
+    "threshold": 0.98,
+    "success": 0.4671,
+    "false_confident": 0.0145,
+    "abstention": 0.8497
+   },
+   {
+    "wrong": 50,
+    "abstain": 2,
+    "allow_l2": false,
+    "threshold": 0.96,
+    "success": 0.4707,
+    "false_confident": 0.0156,
+    "abstention": 0.8444
+   },
+   {
+    "wrong": 50,
+    "abstain": 2,
+    "allow_l2": true,
+    "threshold": 0.96,
+    "success": 0.4707,
+    "false_confident": 0.0156,
+    "abstention": 0.8444
+   },
+   {
+    "wrong": 100,
+    "abstain": 0.5,
+    "allow_l2": false,
+    "threshold": 0.995,
+    "success": 0.4537,
+    "false_confident": 0.0134,
+    "abstention": 0.8649
+   },
+   {
+    "wrong": 100,
+    "abstain": 0.5,
+    "allow_l2": true,
+    "threshold": 0.995,
+    "success": 0.4537,
+    "false_confident": 0.0134,
+    "abstention": 0.8649
+   },
+   {
+    "wrong": 100,
+    "abstain": 1,
+    "allow_l2": false,
+    "threshold": 0.99,
+    "success": 0.4611,
+    "false_confident": 0.0141,
+    "abstention": 0.8561
+   },
+   {
+    "wrong": 100,
+    "abstain": 1,
+    "allow_l2": true,
+    "threshold": 0.99,
+    "success": 0.4611,
+    "false_confident": 0.0141,
+    "abstention": 0.8561
+   },
+   {
+    "wrong": 100,
+    "abstain": 2,
+    "allow_l2": false,
+    "threshold": 0.98,
+    "success": 0.4671,
+    "false_confident": 0.0145,
+    "abstention": 0.8497
+   },
+   {
+    "wrong": 100,
+    "abstain": 2,
+    "allow_l2": true,
+    "threshold": 0.98,
+    "success": 0.4671,
+    "false_confident": 0.0145,
+    "abstention": 0.8497
+   }
+  ],
+  "callex": [
+   {
+    "wrong": 2,
+    "abstain": 0.5,
+    "allow_l2": false,
+    "threshold": 0.75,
+    "success": 0.5477,
+    "false_confident": 0.0325,
+    "abstention": 0.7603
+   },
+   {
+    "wrong": 2,
+    "abstain": 0.5,
+    "allow_l2": true,
+    "threshold": 0.75,
+    "success": 0.5477,
+    "false_confident": 0.0325,
+    "abstention": 0.7603
+   },
+   {
+    "wrong": 2,
+    "abstain": 1,
+    "allow_l2": false,
+    "threshold": 0.5,
+    "success": 0.5481,
+    "false_confident": 0.0329,
+    "abstention": 0.7595
+   },
+   {
+    "wrong": 2,
+    "abstain": 1,
+    "allow_l2": true,
+    "threshold": 0.5,
+    "success": 0.5481,
+    "false_confident": 0.0329,
+    "abstention": 0.7595
+   },
+   {
+    "wrong": 2,
+    "abstain": 2,
+    "allow_l2": false,
+    "threshold": 0.0,
+    "success": 0.5972,
+    "false_confident": 0.0343,
+    "abstention": 0.709
+   },
+   {
+    "wrong": 2,
+    "abstain": 2,
+    "allow_l2": true,
+    "threshold": 0.0,
+    "success": 0.5972,
+    "false_confident": 0.0343,
+    "abstention": 0.709
+   },
+   {
+    "wrong": 5,
+    "abstain": 0.5,
+    "allow_l2": false,
+    "threshold": 0.9,
+    "success": 0.5456,
+    "false_confident": 0.0322,
+    "abstention": 0.7631
+   },
+   {
+    "wrong": 5,
+    "abstain": 0.5,
+    "allow_l2": true,
+    "threshold": 0.9,
+    "success": 0.5456,
+    "false_confident": 0.0322,
+    "abstention": 0.7631
+   },
+   {
+    "wrong": 5,
+    "abstain": 1,
+    "allow_l2": false,
+    "threshold": 0.8,
+    "success": 0.547,
+    "false_confident": 0.0325,
+    "abstention": 0.761
+   },
+   {
+    "wrong": 5,
+    "abstain": 1,
+    "allow_l2": true,
+    "threshold": 0.8,
+    "success": 0.547,
+    "false_confident": 0.0325,
+    "abstention": 0.761
+   },
+   {
+    "wrong": 5,
+    "abstain": 2,
+    "allow_l2": false,
+    "threshold": 0.6,
+    "success": 0.5477,
+    "false_confident": 0.0325,
+    "abstention": 0.7603
+   },
+   {
+    "wrong": 5,
+    "abstain": 2,
+    "allow_l2": true,
+    "threshold": 0.6,
+    "success": 0.5477,
+    "false_confident": 0.0325,
+    "abstention": 0.7603
+   },
+   {
+    "wrong": 10,
+    "abstain": 0.5,
+    "allow_l2": false,
+    "threshold": 0.95,
+    "success": 0.5368,
+    "false_confident": 0.0198,
+    "abstention": 0.7956
+   },
+   {
+    "wrong": 10,
+    "abstain": 0.5,
+    "allow_l2": true,
+    "threshold": 0.95,
+    "success": 0.5368,
+    "false_confident": 0.0198,
+    "abstention": 0.7956
+   },
+   {
+    "wrong": 10,
+    "abstain": 1,
+    "allow_l2": false,
+    "threshold": 0.9,
+    "success": 0.5456,
+    "false_confident": 0.0322,
+    "abstention": 0.7631
+   },
+   {
+    "wrong": 10,
+    "abstain": 1,
+    "allow_l2": true,
+    "threshold": 0.9,
+    "success": 0.5456,
+    "false_confident": 0.0322,
+    "abstention": 0.7631
+   },
+   {
+    "wrong": 10,
+    "abstain": 2,
+    "allow_l2": false,
+    "threshold": 0.8,
+    "success": 0.547,
+    "false_confident": 0.0325,
+    "abstention": 0.761
+   },
+   {
+    "wrong": 10,
+    "abstain": 2,
+    "allow_l2": true,
+    "threshold": 0.8,
+    "success": 0.547,
+    "false_confident": 0.0325,
+    "abstention": 0.761
+   },
+   {
+    "wrong": 20,
+    "abstain": 0.5,
+    "allow_l2": false,
+    "threshold": 0.975,
+    "success": 0.523,
+    "false_confident": 0.0166,
+    "abstention": 0.8147
+   },
+   {
+    "wrong": 20,
+    "abstain": 0.5,
+    "allow_l2": true,
+    "threshold": 0.975,
+    "success": 0.523,
+    "false_confident": 0.0166,
+    "abstention": 0.8147
+   },
+   {
+    "wrong": 20,
+    "abstain": 1,
+    "allow_l2": false,
+    "threshold": 0.95,
+    "success": 0.5368,
+    "false_confident": 0.0198,
+    "abstention": 0.7956
+   },
+   {
+    "wrong": 20,
+    "abstain": 1,
+    "allow_l2": true,
+    "threshold": 0.95,
+    "success": 0.5368,
+    "false_confident": 0.0198,
+    "abstention": 0.7956
+   },
+   {
+    "wrong": 20,
+    "abstain": 2,
+    "allow_l2": false,
+    "threshold": 0.9,
+    "success": 0.5456,
+    "false_confident": 0.0322,
+    "abstention": 0.7631
+   },
+   {
+    "wrong": 20,
+    "abstain": 2,
+    "allow_l2": true,
+    "threshold": 0.9,
+    "success": 0.5456,
+    "false_confident": 0.0322,
+    "abstention": 0.7631
+   },
+   {
+    "wrong": 50,
+    "abstain": 0.5,
+    "allow_l2": false,
+    "threshold": 0.99,
+    "success": 0.5046,
+    "false_confident": 0.0145,
+    "abstention": 0.8359
+   },
+   {
+    "wrong": 50,
+    "abstain": 0.5,
+    "allow_l2": true,
+    "threshold": 0.99,
+    "success": 0.5046,
+    "false_confident": 0.0145,
+    "abstention": 0.8359
+   },
+   {
+    "wrong": 50,
+    "abstain": 1,
+    "allow_l2": false,
+    "threshold": 0.98,
+    "success": 0.5191,
+    "false_confident": 0.0163,
+    "abstention": 0.8193
+   },
+   {
+    "wrong": 50,
+    "abstain": 1,
+    "allow_l2": true,
+    "threshold": 0.98,
+    "success": 0.5191,
+    "false_confident": 0.0163,
+    "abstention": 0.8193
+   },
+   {
+    "wrong": 50,
+    "abstain": 2,
+    "allow_l2": false,
+    "threshold": 0.96,
+    "success": 0.5318,
+    "false_confident": 0.018,
+    "abstention": 0.8034
+   },
+   {
+    "wrong": 50,
+    "abstain": 2,
+    "allow_l2": true,
+    "threshold": 0.96,
+    "success": 0.5318,
+    "false_confident": 0.018,
+    "abstention": 0.8034
+   },
+   {
+    "wrong": 100,
+    "abstain": 0.5,
+    "allow_l2": false,
+    "threshold": 0.995,
+    "success": 0.4837,
+    "false_confident": 0.0134,
+    "abstention": 0.8586
+   },
+   {
+    "wrong": 100,
+    "abstain": 0.5,
+    "allow_l2": true,
+    "threshold": 0.995,
+    "success": 0.4837,
+    "false_confident": 0.0134,
+    "abstention": 0.8586
+   },
+   {
+    "wrong": 100,
+    "abstain": 1,
+    "allow_l2": false,
+    "threshold": 0.99,
+    "success": 0.5046,
+    "false_confident": 0.0145,
+    "abstention": 0.8359
+   },
+   {
+    "wrong": 100,
+    "abstain": 1,
+    "allow_l2": true,
+    "threshold": 0.99,
+    "success": 0.5046,
+    "false_confident": 0.0145,
+    "abstention": 0.8359
+   },
+   {
+    "wrong": 100,
+    "abstain": 2,
+    "allow_l2": false,
+    "threshold": 0.98,
+    "success": 0.5191,
+    "false_confident": 0.0163,
+    "abstention": 0.8193
+   },
+   {
+    "wrong": 100,
+    "abstain": 2,
+    "allow_l2": true,
+    "threshold": 0.98,
+    "success": 0.5191,
+    "false_confident": 0.0163,
+    "abstention": 0.8193
+   }
+  ],
+  "unified": [
+   {
+    "wrong": 2,
+    "abstain": 0.5,
+    "allow_l2": false,
+    "threshold": 0.75,
+    "success": 0.4653,
+    "false_confident": 0.0286,
+    "abstention": 0.8175
+   },
+   {
+    "wrong": 2,
+    "abstain": 0.5,
+    "allow_l2": true,
+    "threshold": 0.75,
+    "success": 0.494,
+    "false_confident": 0.0767,
+    "abstention": 0.7178
+   },
+   {
+    "wrong": 2,
+    "abstain": 1,
+    "allow_l2": false,
+    "threshold": 0.5,
+    "success": 0.4671,
+    "false_confident": 0.029,
+    "abstention": 0.8154
+   },
+   {
+    "wrong": 2,
+    "abstain": 1,
+    "allow_l2": true,
+    "threshold": 0.5,
+    "success": 0.4975,
+    "false_confident": 0.0778,
+    "abstention": 0.7129
+   },
+   {
+    "wrong": 2,
+    "abstain": 2,
+    "allow_l2": false,
+    "threshold": 0.0,
+    "success": 0.523,
+    "false_confident": 0.0343,
+    "abstention": 0.7518
+   },
+   {
+    "wrong": 2,
+    "abstain": 2,
+    "allow_l2": true,
+    "threshold": 0.0,
+    "success": 0.5612,
+    "false_confident": 0.0842,
+    "abstention": 0.64
+   },
+   {
+    "wrong": 5,
+    "abstain": 0.5,
+    "allow_l2": false,
+    "threshold": 0.9,
+    "success": 0.4625,
+    "false_confident": 0.0286,
+    "abstention": 0.8204
+   },
+   {
+    "wrong": 5,
+    "abstain": 0.5,
+    "allow_l2": true,
+    "threshold": 0.9,
+    "success": 0.4841,
+    "false_confident": 0.0721,
+    "abstention": 0.7348
+   },
+   {
+    "wrong": 5,
+    "abstain": 1,
+    "allow_l2": false,
+    "threshold": 0.8,
+    "success": 0.465,
+    "false_confident": 0.0286,
+    "abstention": 0.8179
+   },
+   {
+    "wrong": 5,
+    "abstain": 1,
+    "allow_l2": true,
+    "threshold": 0.8,
+    "success": 0.4933,
+    "false_confident": 0.0767,
+    "abstention": 0.7185
+   },
+   {
+    "wrong": 5,
+    "abstain": 2,
+    "allow_l2": false,
+    "threshold": 0.6,
+    "success": 0.4657,
+    "false_confident": 0.0286,
+    "abstention": 0.8172
+   },
+   {
+    "wrong": 5,
+    "abstain": 2,
+    "allow_l2": true,
+    "threshold": 0.6,
+    "success": 0.494,
+    "false_confident": 0.0771,
+    "abstention": 0.7171
+   },
+   {
+    "wrong": 10,
+    "abstain": 0.5,
+    "allow_l2": false,
+    "threshold": 0.95,
+    "success": 0.4519,
+    "false_confident": 0.0202,
+    "abstention": 0.8465
+   },
+   {
+    "wrong": 10,
+    "abstain": 0.5,
+    "allow_l2": true,
+    "threshold": 0.95,
+    "success": 0.4703,
+    "false_confident": 0.0591,
+    "abstention": 0.7712
+   },
+   {
+    "wrong": 10,
+    "abstain": 1,
+    "allow_l2": false,
+    "threshold": 0.9,
+    "success": 0.4625,
+    "false_confident": 0.0286,
+    "abstention": 0.8204
+   },
+   {
+    "wrong": 10,
+    "abstain": 1,
+    "allow_l2": true,
+    "threshold": 0.9,
+    "success": 0.4841,
+    "false_confident": 0.0721,
+    "abstention": 0.7348
+   },
+   {
+    "wrong": 10,
+    "abstain": 2,
+    "allow_l2": false,
+    "threshold": 0.8,
+    "success": 0.465,
+    "false_confident": 0.0286,
+    "abstention": 0.8179
+   },
+   {
+    "wrong": 10,
+    "abstain": 2,
+    "allow_l2": true,
+    "threshold": 0.8,
+    "success": 0.4933,
+    "false_confident": 0.0767,
+    "abstention": 0.7185
+   },
+   {
+    "wrong": 20,
+    "abstain": 0.5,
+    "allow_l2": false,
+    "threshold": 0.975,
+    "success": 0.4487,
+    "false_confident": 0.0184,
+    "abstention": 0.8522
+   },
+   {
+    "wrong": 20,
+    "abstain": 0.5,
+    "allow_l2": true,
+    "threshold": 0.975,
+    "success": 0.4678,
+    "false_confident": 0.0414,
+    "abstention": 0.7953
+   },
+   {
+    "wrong": 20,
+    "abstain": 1,
+    "allow_l2": false,
+    "threshold": 0.95,
+    "success": 0.4519,
+    "false_confident": 0.0202,
+    "abstention": 0.8465
+   },
+   {
+    "wrong": 20,
+    "abstain": 1,
+    "allow_l2": true,
+    "threshold": 0.95,
+    "success": 0.4703,
+    "false_confident": 0.0591,
+    "abstention": 0.7712
+   },
+   {
+    "wrong": 20,
+    "abstain": 2,
+    "allow_l2": false,
+    "threshold": 0.9,
+    "success": 0.4625,
+    "false_confident": 0.0286,
+    "abstention": 0.8204
+   },
+   {
+    "wrong": 20,
+    "abstain": 2,
+    "allow_l2": true,
+    "threshold": 0.9,
+    "success": 0.4841,
+    "false_confident": 0.0721,
+    "abstention": 0.7348
+   },
+   {
+    "wrong": 50,
+    "abstain": 0.5,
+    "allow_l2": false,
+    "threshold": 0.99,
+    "success": 0.4409,
+    "false_confident": 0.0177,
+    "abstention": 0.861
+   },
+   {
+    "wrong": 50,
+    "abstain": 0.5,
+    "allow_l2": true,
+    "threshold": 0.99,
+    "success": 0.46,
+    "false_confident": 0.0297,
+    "abstention": 0.8179
+   },
+   {
+    "wrong": 50,
+    "abstain": 1,
+    "allow_l2": false,
+    "threshold": 0.98,
+    "success": 0.4448,
+    "false_confident": 0.018,
+    "abstention": 0.8564
+   },
+   {
+    "wrong": 50,
+    "abstain": 1,
+    "allow_l2": true,
+    "threshold": 0.98,
+    "success": 0.4664,
+    "false_confident": 0.0332,
+    "abstention": 0.8076
+   },
+   {
+    "wrong": 50,
+    "abstain": 2,
+    "allow_l2": false,
+    "threshold": 0.96,
+    "success": 0.4501,
+    "false_confident": 0.0194,
+    "abstention": 0.849
+   },
+   {
+    "wrong": 50,
+    "abstain": 2,
+    "allow_l2": true,
+    "threshold": 0.96,
+    "success": 0.4692,
+    "false_confident": 0.0562,
+    "abstention": 0.7758
+   },
+   {
+    "wrong": 100,
+    "abstain": 0.5,
+    "allow_l2": false,
+    "threshold": 0.995,
+    "success": 0.4318,
+    "false_confident": 0.017,
+    "abstention": 0.8716
+   },
+   {
+    "wrong": 100,
+    "abstain": 0.5,
+    "allow_l2": true,
+    "threshold": 0.995,
+    "success": 0.4466,
+    "false_confident": 0.0279,
+    "abstention": 0.8349
+   },
+   {
+    "wrong": 100,
+    "abstain": 1,
+    "allow_l2": false,
+    "threshold": 0.99,
+    "success": 0.4409,
+    "false_confident": 0.0177,
+    "abstention": 0.861
+   },
+   {
+    "wrong": 100,
+    "abstain": 1,
+    "allow_l2": true,
+    "threshold": 0.99,
+    "success": 0.46,
+    "false_confident": 0.0297,
+    "abstention": 0.8179
+   },
+   {
+    "wrong": 100,
+    "abstain": 2,
+    "allow_l2": false,
+    "threshold": 0.98,
+    "success": 0.4448,
+    "false_confident": 0.018,
+    "abstention": 0.8564
+   },
+   {
+    "wrong": 100,
+    "abstain": 2,
+    "allow_l2": true,
+    "threshold": 0.98,
+    "success": 0.4664,
+    "false_confident": 0.0332,
+    "abstention": 0.8076
+   }
+  ]
+ },
+ "curves": {
+  "no_elimination": {
+   "belief": {
+    "n": 756,
+    "ece": 0.3081,
+    "brier": 0.3125,
+    "bins": [
+     {
+      "bin": "0.0-0.1",
+      "n": 135,
+      "confidence": 0.0,
+      "accuracy": 0.956
+     },
+     {
+      "bin": "0.5-0.6",
+      "n": 2,
+      "confidence": 0.568,
+      "accuracy": 0.5
+     },
+     {
+      "bin": "0.7-0.8",
+      "n": 2,
+      "confidence": 0.779,
+      "accuracy": 1.0
+     },
+     {
+      "bin": "0.9-1.0",
+      "n": 617,
+      "confidence": 0.988,
+      "accuracy": 0.82
+     }
+    ]
+   },
+   "entitlement": {
+    "n": 756,
+    "ece": 0.3414,
+    "brier": 0.3304,
+    "bins": [
+     {
+      "bin": "0.0-0.1",
+      "n": 135,
+      "confidence": 0.0,
+      "accuracy": 0.956
+     },
+     {
+      "bin": "0.2-0.3",
+      "n": 1,
+      "confidence": 0.24,
+      "accuracy": 0.0
+     },
+     {
+      "bin": "0.3-0.4",
+      "n": 7,
+      "confidence": 0.38,
+      "accuracy": 0.714
+     },
+     {
+      "bin": "0.4-0.5",
+      "n": 49,
+      "confidence": 0.441,
+      "accuracy": 0.898
+     },
+     {
+      "bin": "0.5-0.6",
+      "n": 34,
+      "confidence": 0.532,
+      "accuracy": 0.882
+     },
+     {
+      "bin": "0.7-0.8",
+      "n": 1,
+      "confidence": 0.779,
+      "accuracy": 1.0
+     },
+     {
+      "bin": "0.9-1.0",
+      "n": 529,
+      "confidence": 0.985,
+      "accuracy": 0.811
+     }
+    ]
+   },
+   "final": {
+    "n": 756,
+    "ece": 0.3414,
+    "brier": 0.3304,
+    "bins": [
+     {
+      "bin": "0.0-0.1",
+      "n": 135,
+      "confidence": 0.0,
+      "accuracy": 0.956
+     },
+     {
+      "bin": "0.2-0.3",
+      "n": 1,
+      "confidence": 0.24,
+      "accuracy": 0.0
+     },
+     {
+      "bin": "0.3-0.4",
+      "n": 7,
+      "confidence": 0.38,
+      "accuracy": 0.714
+     },
+     {
+      "bin": "0.4-0.5",
+      "n": 49,
+      "confidence": 0.441,
+      "accuracy": 0.898
+     },
+     {
+      "bin": "0.5-0.6",
+      "n": 34,
+      "confidence": 0.532,
+      "accuracy": 0.882
+     },
+     {
+      "bin": "0.7-0.8",
+      "n": 1,
+      "confidence": 0.779,
+      "accuracy": 1.0
+     },
+     {
+      "bin": "0.9-1.0",
+      "n": 529,
+      "confidence": 0.985,
+      "accuracy": 0.811
+     }
+    ]
+   }
+  },
+  "callex": {
+   "belief": {
+    "n": 823,
+    "ece": 0.316,
+    "brier": 0.3188,
+    "bins": [
+     {
+      "bin": "0.0-0.1",
+      "n": 143,
+      "confidence": 0.0,
+      "accuracy": 0.958
+     },
+     {
+      "bin": "0.5-0.6",
+      "n": 2,
+      "confidence": 0.52,
+      "accuracy": 0.5
+     },
+     {
+      "bin": "0.7-0.8",
+      "n": 2,
+      "confidence": 0.779,
+      "accuracy": 1.0
+     },
+     {
+      "bin": "0.9-1.0",
+      "n": 676,
+      "confidence": 0.989,
+      "accuracy": 0.808
+     }
+    ]
+   },
+   "entitlement": {
+    "n": 823,
+    "ece": 0.3108,
+    "brier": 0.317,
+    "bins": [
+     {
+      "bin": "0.0-0.1",
+      "n": 143,
+      "confidence": 0.0,
+      "accuracy": 0.958
+     },
+     {
+      "bin": "0.5-0.6",
+      "n": 2,
+      "confidence": 0.518,
+      "accuracy": 0.5
+     },
+     {
+      "bin": "0.7-0.8",
+      "n": 2,
+      "confidence": 0.774,
+      "accuracy": 1.0
+     },
+     {
+      "bin": "0.8-0.9",
+      "n": 6,
+      "confidence": 0.888,
+      "accuracy": 0.667
+     },
+     {
+      "bin": "0.9-1.0",
+      "n": 670,
+      "confidence": 0.984,
+      "accuracy": 0.809
+     }
+    ]
+   },
+   "final": {
+    "n": 823,
+    "ece": 0.3108,
+    "brier": 0.317,
+    "bins": [
+     {
+      "bin": "0.0-0.1",
+      "n": 143,
+      "confidence": 0.0,
+      "accuracy": 0.958
+     },
+     {
+      "bin": "0.5-0.6",
+      "n": 2,
+      "confidence": 0.518,
+      "accuracy": 0.5
+     },
+     {
+      "bin": "0.7-0.8",
+      "n": 2,
+      "confidence": 0.774,
+      "accuracy": 1.0
+     },
+     {
+      "bin": "0.8-0.9",
+      "n": 6,
+      "confidence": 0.888,
+      "accuracy": 0.667
+     },
+     {
+      "bin": "0.9-1.0",
+      "n": 670,
+      "confidence": 0.984,
+      "accuracy": 0.809
+     }
+    ]
+   }
+  },
+  "entitled": {
+   "belief": {
+    "n": 823,
+    "ece": 0.316,
+    "brier": 0.3188,
+    "bins": [
+     {
+      "bin": "0.0-0.1",
+      "n": 143,
+      "confidence": 0.0,
+      "accuracy": 0.958
+     },
+     {
+      "bin": "0.5-0.6",
+      "n": 2,
+      "confidence": 0.52,
+      "accuracy": 0.5
+     },
+     {
+      "bin": "0.7-0.8",
+      "n": 2,
+      "confidence": 0.779,
+      "accuracy": 1.0
+     },
+     {
+      "bin": "0.9-1.0",
+      "n": 676,
+      "confidence": 0.989,
+      "accuracy": 0.808
+     }
+    ]
+   },
+   "entitlement": {
+    "n": 823,
+    "ece": 0.3108,
+    "brier": 0.317,
+    "bins": [
+     {
+      "bin": "0.0-0.1",
+      "n": 143,
+      "confidence": 0.0,
+      "accuracy": 0.958
+     },
+     {
+      "bin": "0.5-0.6",
+      "n": 2,
+      "confidence": 0.518,
+      "accuracy": 0.5
+     },
+     {
+      "bin": "0.7-0.8",
+      "n": 2,
+      "confidence": 0.774,
+      "accuracy": 1.0
+     },
+     {
+      "bin": "0.8-0.9",
+      "n": 6,
+      "confidence": 0.888,
+      "accuracy": 0.667
+     },
+     {
+      "bin": "0.9-1.0",
+      "n": 670,
+      "confidence": 0.984,
+      "accuracy": 0.809
+     }
+    ]
+   },
+   "final": {
+    "n": 800,
+    "ece": 0.3062,
+    "brier": 0.3121,
+    "bins": [
+     {
+      "bin": "0.0-0.1",
+      "n": 130,
+      "confidence": 0.0,
+      "accuracy": 0.985
+     },
+     {
+      "bin": "0.9-1.0",
+      "n": 670,
+      "confidence": 0.984,
+      "accuracy": 0.809
+     }
+    ]
+   }
+  },
+  "unified": {
+   "belief": {
+    "n": 1018,
+    "ece": 0.3618,
+    "brier": 0.3647,
+    "bins": [
+     {
+      "bin": "0.0-0.1",
+      "n": 140,
+      "confidence": 0.0,
+      "accuracy": 0.914
+     },
+     {
+      "bin": "0.5-0.6",
+      "n": 2,
+      "confidence": 0.595,
+      "accuracy": 0.5
+     },
+     {
+      "bin": "0.7-0.8",
+      "n": 2,
+      "confidence": 0.779,
+      "accuracy": 1.0
+     },
+     {
+      "bin": "0.8-0.9",
+      "n": 3,
+      "confidence": 0.873,
+      "accuracy": 0.333
+     },
+     {
+      "bin": "0.9-1.0",
+      "n": 871,
+      "confidence": 0.99,
+      "accuracy": 0.716
+     }
+    ]
+   },
+   "entitlement": {
+    "n": 1018,
+    "ece": 0.3777,
+    "brier": 0.3735,
+    "bins": [
+     {
+      "bin": "0.0-0.1",
+      "n": 140,
+      "confidence": 0.0,
+      "accuracy": 0.914
+     },
+     {
+      "bin": "0.2-0.3",
+      "n": 9,
+      "confidence": 0.281,
+      "accuracy": 0.889
+     },
+     {
+      "bin": "0.3-0.4",
+      "n": 7,
+      "confidence": 0.379,
+      "accuracy": 0.714
+     },
+     {
+      "bin": "0.4-0.5",
+      "n": 50,
+      "confidence": 0.441,
+      "accuracy": 0.92
+     },
+     {
+      "bin": "0.5-0.6",
+      "n": 12,
+      "confidence": 0.563,
+      "accuracy": 0.833
+     },
+     {
+      "bin": "0.6-0.7",
+      "n": 2,
+      "confidence": 0.612,
+      "accuracy": 0.5
+     },
+     {
+      "bin": "0.7-0.8",
+      "n": 2,
+      "confidence": 0.785,
+      "accuracy": 1.0
+     },
+     {
+      "bin": "0.8-0.9",
+      "n": 46,
+      "confidence": 0.854,
+      "accuracy": 0.696
+     },
+     {
+      "bin": "0.9-1.0",
+      "n": 750,
+      "confidence": 0.983,
+      "accuracy": 0.699
+     }
+    ]
+   },
+   "final": {
+    "n": 1018,
+    "ece": 0.3777,
+    "brier": 0.3735,
+    "bins": [
+     {
+      "bin": "0.0-0.1",
+      "n": 140,
+      "confidence": 0.0,
+      "accuracy": 0.914
+     },
+     {
+      "bin": "0.2-0.3",
+      "n": 9,
+      "confidence": 0.281,
+      "accuracy": 0.889
+     },
+     {
+      "bin": "0.3-0.4",
+      "n": 7,
+      "confidence": 0.379,
+      "accuracy": 0.714
+     },
+     {
+      "bin": "0.4-0.5",
+      "n": 50,
+      "confidence": 0.441,
+      "accuracy": 0.92
+     },
+     {
+      "bin": "0.5-0.6",
+      "n": 12,
+      "confidence": 0.563,
+      "accuracy": 0.833
+     },
+     {
+      "bin": "0.6-0.7",
+      "n": 2,
+      "confidence": 0.612,
+      "accuracy": 0.5
+     },
+     {
+      "bin": "0.7-0.8",
+      "n": 2,
+      "confidence": 0.785,
+      "accuracy": 1.0
+     },
+     {
+      "bin": "0.8-0.9",
+      "n": 46,
+      "confidence": 0.854,
+      "accuracy": 0.696
+     },
+     {
+      "bin": "0.9-1.0",
+      "n": 750,
+      "confidence": 0.983,
+      "accuracy": 0.699
+     }
+    ]
+   }
+  },
+  "unified_entitled": {
+   "belief": {
+    "n": 1098,
+    "ece": 0.3652,
+    "brier": 0.3682,
+    "bins": [
+     {
+      "bin": "0.0-0.1",
+      "n": 150,
+      "confidence": 0.0,
+      "accuracy": 0.927
+     },
+     {
+      "bin": "0.5-0.6",
+      "n": 2,
+      "confidence": 0.559,
+      "accuracy": 0.5
+     },
+     {
+      "bin": "0.7-0.8",
+      "n": 2,
+      "confidence": 0.779,
+      "accuracy": 1.0
+     },
+     {
+      "bin": "0.8-0.9",
+      "n": 3,
+      "confidence": 0.873,
+      "accuracy": 0.333
+     },
+     {
+      "bin": "0.9-1.0",
+      "n": 941,
+      "confidence": 0.989,
+      "accuracy": 0.713
+     }
+    ]
+   },
+   "entitlement": {
+    "n": 1098,
+    "ece": 0.3532,
+    "brier": 0.3618,
+    "bins": [
+     {
+      "bin": "0.0-0.1",
+      "n": 150,
+      "confidence": 0.0,
+      "accuracy": 0.927
+     },
+     {
+      "bin": "0.5-0.6",
+      "n": 2,
+      "confidence": 0.557,
+      "accuracy": 0.5
+     },
+     {
+      "bin": "0.7-0.8",
+      "n": 5,
+      "confidence": 0.763,
+      "accuracy": 1.0
+     },
+     {
+      "bin": "0.8-0.9",
+      "n": 60,
+      "confidence": 0.862,
+      "accuracy": 0.8
+     },
+     {
+      "bin": "0.9-1.0",
+      "n": 881,
+      "confidence": 0.982,
+      "accuracy": 0.705
+     }
+    ]
+   },
+   "final": {
+    "n": 734,
+    "ece": 0.3404,
+    "brier": 0.3458,
+    "bins": [
+     {
+      "bin": "0.0-0.1",
+      "n": 132,
+      "confidence": 0.0,
+      "accuracy": 0.97
+     },
+     {
+      "bin": "0.9-1.0",
+      "n": 602,
+      "confidence": 0.983,
+      "accuracy": 0.781
+     }
+    ]
+   }
+  }
+ },
+ "per_seed": [
+  {
+   "no_elimination": {
+    "success_orig": 0.5795148247978437,
+    "false_confident_orig": 0.016172506738544475,
+    "abstention_orig": 0.7008086253369272,
+    "coverage_orig": 0.6521739130434783,
+    "success_ideal": 0.5390835579514824,
+    "false_confident_ideal": 0.04043126684636118,
+    "abstention_ideal": 0.7008086253369272,
+    "coverage_ideal": 0.6114649681528662,
+    "alignment": {
+     "precision": 0.9032258064516129,
+     "recall": 0.535031847133758,
+     "f1": 0.672,
+     "by_entitlement": {
+      "ASSERTED": {
+       "n": 93,
+       "raw_correct_vs_ideal": 0.9032
+      },
+      "QUALIFIED": {
+       "n": 0,
+       "raw_correct_vs_ideal": 0.0
+      },
+      "ASKED": {
+       "n": 28,
+       "raw_correct_vs_ideal": 0.9643
+      },
+      "WITHHELD": {
+       "n": 250,
+       "raw_correct_vs_ideal": 0.356
+      }
+     }
+    },
+    "audit": {
+     "oracle_too_strict": 0,
+     "logical_elimination": 0,
+     "hidden_information": 0,
+     "real_ambiguity": 1,
+     "bad_propagation": 3,
+     "bad_lexical_hypothesis": 1,
+     "temporal_error": 1
+    },
+    "attribution_ideal": {
+     "LEXICAL": 0.1078,
+     "REFERENCE": 0.0485,
+     "EVIDENCE": 0.0216,
+     "SOURCE": 0.0054,
+     "TEMPORAL": 0.0216,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_secondary": {
+     "LEXICAL": 0.0,
+     "REFERENCE": 0.0108,
+     "EVIDENCE": 0.0,
+     "SOURCE": 0.0027,
+     "TEMPORAL": 0.0,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_orig": {
+     "LEXICAL": 0.0943,
+     "REFERENCE": 0.0216,
+     "EVIDENCE": 0.0108,
+     "SOURCE": 0.0054,
+     "TEMPORAL": 0.0135,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0216,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "lexical_coverage": 0.3333333333333333,
+    "lexical_wrong": 0,
+    "object_identity_accuracy": 1.0,
+    "seconds": 1.7290008849995502
+   },
+   "callex": {
+    "success_orig": 0.6199460916442049,
+    "false_confident_orig": 0.016172506738544475,
+    "abstention_orig": 0.6846361185983828,
+    "coverage_orig": 0.6894409937888198,
+    "success_ideal": 0.5741239892183289,
+    "false_confident_ideal": 0.04582210242587601,
+    "abstention_ideal": 0.6846361185983828,
+    "coverage_ideal": 0.6369426751592356,
+    "alignment": {
+     "precision": 0.875,
+     "recall": 0.6242038216560509,
+     "f1": 0.7286245353159851,
+     "by_entitlement": {
+      "ASSERTED": {
+       "n": 112,
+       "raw_correct_vs_ideal": 0.875
+      },
+      "QUALIFIED": {
+       "n": 3,
+       "raw_correct_vs_ideal": 0.3333
+      },
+      "ASKED": {
+       "n": 28,
+       "raw_correct_vs_ideal": 0.9643
+      },
+      "WITHHELD": {
+       "n": 228,
+       "raw_correct_vs_ideal": 0.3816
+      }
+     }
+    },
+    "audit": {
+     "oracle_too_strict": 0,
+     "logical_elimination": 0,
+     "hidden_information": 0,
+     "real_ambiguity": 1,
+     "bad_propagation": 4,
+     "bad_lexical_hypothesis": 0,
+     "temporal_error": 1
+    },
+    "attribution_ideal": {
+     "LEXICAL": 0.0809,
+     "REFERENCE": 0.0485,
+     "EVIDENCE": 0.0431,
+     "SOURCE": 0.0081,
+     "TEMPORAL": 0.0189,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_secondary": {
+     "LEXICAL": 0.0,
+     "REFERENCE": 0.0108,
+     "EVIDENCE": 0.0,
+     "SOURCE": 0.0,
+     "TEMPORAL": 0.0,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_orig": {
+     "LEXICAL": 0.0701,
+     "REFERENCE": 0.0216,
+     "EVIDENCE": 0.0189,
+     "SOURCE": 0.0081,
+     "TEMPORAL": 0.0108,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0216,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "lexical_coverage": 0.5,
+    "lexical_wrong": 0,
+    "object_identity_accuracy": 1.0,
+    "seconds": 5.777417918001447,
+    "conversion": {
+     "correct_asserted": 4,
+     "wrong_asserted": 2
+    }
+   },
+   "entitled": {
+    "success_orig": 0.6145552560646901,
+    "false_confident_orig": 0.01078167115902965,
+    "abstention_orig": 0.6981132075471698,
+    "coverage_orig": 0.6708074534161491,
+    "success_ideal": 0.5741239892183289,
+    "false_confident_ideal": 0.03773584905660377,
+    "abstention_ideal": 0.6981132075471698,
+    "coverage_ideal": 0.6242038216560509,
+    "alignment": {
+     "precision": 0.875,
+     "recall": 0.6242038216560509,
+     "f1": 0.7286245353159851,
+     "by_entitlement": {
+      "ASSERTED": {
+       "n": 112,
+       "raw_correct_vs_ideal": 0.875
+      },
+      "QUALIFIED": {
+       "n": 3,
+       "raw_correct_vs_ideal": 0.3333
+      },
+      "ASKED": {
+       "n": 28,
+       "raw_correct_vs_ideal": 0.9643
+      },
+      "WITHHELD": {
+       "n": 228,
+       "raw_correct_vs_ideal": 0.3816
+      }
+     }
+    },
+    "audit": {
+     "oracle_too_strict": 0,
+     "logical_elimination": 0,
+     "hidden_information": 0,
+     "real_ambiguity": 1,
+     "bad_propagation": 4,
+     "bad_lexical_hypothesis": 0,
+     "temporal_error": 1
+    },
+    "attribution_ideal": {
+     "LEXICAL": 0.0809,
+     "REFERENCE": 0.0485,
+     "EVIDENCE": 0.0404,
+     "SOURCE": 0.0081,
+     "TEMPORAL": 0.0189,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_secondary": {
+     "LEXICAL": 0.0,
+     "REFERENCE": 0.0108,
+     "EVIDENCE": 0.0,
+     "SOURCE": 0.0,
+     "TEMPORAL": 0.0,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_orig": {
+     "LEXICAL": 0.0728,
+     "REFERENCE": 0.0216,
+     "EVIDENCE": 0.0162,
+     "SOURCE": 0.0081,
+     "TEMPORAL": 0.0108,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0243,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "lexical_coverage": 0.5,
+    "lexical_wrong": 0,
+    "object_identity_accuracy": 1.0,
+    "seconds": 6.1598691799990775,
+    "conversion": {
+     "correct_asserted": 4,
+     "wrong_asserted": 2
+    }
+   },
+   "unified": {
+    "success_orig": 0.5444743935309974,
+    "false_confident_orig": 0.08355795148247978,
+    "abstention_orig": 0.6388140161725068,
+    "coverage_orig": 0.639751552795031,
+    "success_ideal": 0.49595687331536387,
+    "false_confident_ideal": 0.10512129380053908,
+    "abstention_ideal": 0.6388140161725068,
+    "coverage_ideal": 0.6050955414012739,
+    "alignment": {
+     "precision": 0.9104477611940298,
+     "recall": 0.3885350318471338,
+     "f1": 0.5446428571428572,
+     "by_entitlement": {
+      "ASSERTED": {
+       "n": 67,
+       "raw_correct_vs_ideal": 0.9104
+      },
+      "QUALIFIED": {
+       "n": 59,
+       "raw_correct_vs_ideal": 0.4576
+      },
+      "ASKED": {
+       "n": 24,
+       "raw_correct_vs_ideal": 1.0
+      },
+      "WITHHELD": {
+       "n": 221,
+       "raw_correct_vs_ideal": 0.3258
+      }
+     }
+    },
+    "audit": {
+     "oracle_too_strict": 5,
+     "logical_elimination": 0,
+     "hidden_information": 2,
+     "real_ambiguity": 21,
+     "bad_propagation": 1,
+     "bad_lexical_hypothesis": 1,
+     "temporal_error": 1
+    },
+    "attribution_ideal": {
+     "LEXICAL": 0.1132,
+     "REFERENCE": 0.124,
+     "EVIDENCE": 0.0135,
+     "SOURCE": 0.0,
+     "TEMPORAL": 0.0216,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_secondary": {
+     "LEXICAL": 0.0,
+     "REFERENCE": 0.0216,
+     "EVIDENCE": 0.0,
+     "SOURCE": 0.0081,
+     "TEMPORAL": 0.0,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_orig": {
+     "LEXICAL": 0.1213,
+     "REFERENCE": 0.0889,
+     "EVIDENCE": 0.0054,
+     "SOURCE": 0.0,
+     "TEMPORAL": 0.0108,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0135,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "lexical_coverage": 0.16666666666666666,
+    "lexical_wrong": 0,
+    "object_identity_accuracy": 0.891566265060241,
+    "seconds": 2.209746624001127,
+    "conversion": {
+     "wrong_qualified": 30,
+     "correct_qualified": 8,
+     "correct_asserted": 2,
+     "wrong_asserted": 2
+    }
+   },
+   "unified_entitled": {
+    "success_orig": 0.477088948787062,
+    "false_confident_orig": 0.013477088948787063,
+    "abstention_orig": 0.8032345013477089,
+    "coverage_orig": 0.422360248447205,
+    "success_ideal": 0.4609164420485175,
+    "false_confident_ideal": 0.0215633423180593,
+    "abstention_ideal": 0.8032345013477089,
+    "coverage_ideal": 0.4140127388535032,
+    "alignment": {
+     "precision": 0.8904109589041096,
+     "recall": 0.4140127388535032,
+     "f1": 0.5652173913043478,
+     "by_entitlement": {
+      "ASSERTED": {
+       "n": 73,
+       "raw_correct_vs_ideal": 0.8904
+      },
+      "QUALIFIED": {
+       "n": 61,
+       "raw_correct_vs_ideal": 0.4754
+      },
+      "ASKED": {
+       "n": 24,
+       "raw_correct_vs_ideal": 1.0
+      },
+      "WITHHELD": {
+       "n": 213,
+       "raw_correct_vs_ideal": 0.3333
+      }
+     }
+    },
+    "audit": {
+     "oracle_too_strict": 5,
+     "logical_elimination": 0,
+     "hidden_information": 2,
+     "real_ambiguity": 21,
+     "bad_propagation": 1,
+     "bad_lexical_hypothesis": 1,
+     "temporal_error": 2
+    },
+    "attribution_ideal": {
+     "LEXICAL": 0.1132,
+     "REFERENCE": 0.1105,
+     "EVIDENCE": 0.0162,
+     "SOURCE": 0.0027,
+     "TEMPORAL": 0.027,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_secondary": {
+     "LEXICAL": 0.0,
+     "REFERENCE": 0.027,
+     "EVIDENCE": 0.0,
+     "SOURCE": 0.0054,
+     "TEMPORAL": 0.0,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_orig": {
+     "LEXICAL": 0.1159,
+     "REFERENCE": 0.0889,
+     "EVIDENCE": 0.0054,
+     "SOURCE": 0.0027,
+     "TEMPORAL": 0.0189,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0323,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "lexical_coverage": 0.5,
+    "lexical_wrong": 0,
+    "object_identity_accuracy": 0.8953488372093024,
+    "seconds": 7.087747004999983,
+    "conversion": {
+     "wrong_qualified": 30,
+     "correct_qualified": 8,
+     "correct_asserted": 3,
+     "wrong_asserted": 3
+    }
+   }
+  },
+  {
+   "no_elimination": {
+    "success_orig": 0.6987951807228916,
+    "false_confident_orig": 0.060240963855421686,
+    "abstention_orig": 0.5602409638554217,
+    "coverage_orig": 0.7,
+    "success_ideal": 0.677710843373494,
+    "false_confident_ideal": 0.08132530120481928,
+    "abstention_ideal": 0.5602409638554217,
+    "coverage_ideal": 0.6761363636363636,
+    "alignment": {
+     "precision": 0.8062015503875969,
+     "recall": 0.5909090909090909,
+     "f1": 0.6819672131147542,
+     "by_entitlement": {
+      "ASSERTED": {
+       "n": 129,
+       "raw_correct_vs_ideal": 0.7907
+      },
+      "QUALIFIED": {
+       "n": 1,
+       "raw_correct_vs_ideal": 1.0
+      },
+      "ASKED": {
+       "n": 34,
+       "raw_correct_vs_ideal": 0.9412
+      },
+      "WITHHELD": {
+       "n": 168,
+       "raw_correct_vs_ideal": 0.5357
+      }
+     }
+    },
+    "audit": {
+     "oracle_too_strict": 0,
+     "logical_elimination": 0,
+     "hidden_information": 0,
+     "real_ambiguity": 12,
+     "bad_propagation": 6,
+     "bad_lexical_hypothesis": 1,
+     "temporal_error": 1
+    },
+    "attribution_ideal": {
+     "LEXICAL": 0.1084,
+     "REFERENCE": 0.0392,
+     "EVIDENCE": 0.0873,
+     "SOURCE": 0.0,
+     "TEMPORAL": 0.009,
+     "GRAMMAR": 0.003,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_secondary": {
+     "LEXICAL": 0.0,
+     "REFERENCE": 0.006,
+     "EVIDENCE": 0.0,
+     "SOURCE": 0.0,
+     "TEMPORAL": 0.0,
+     "GRAMMAR": 0.006,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_orig": {
+     "LEXICAL": 0.0994,
+     "REFERENCE": 0.0392,
+     "EVIDENCE": 0.0693,
+     "SOURCE": 0.0,
+     "TEMPORAL": 0.006,
+     "GRAMMAR": 0.003,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "lexical_coverage": 0.3333333333333333,
+    "lexical_wrong": 0,
+    "object_identity_accuracy": 0.9509803921568627,
+    "seconds": 1.891623626001092
+   },
+   "callex": {
+    "success_orig": 0.7018072289156626,
+    "false_confident_orig": 0.07530120481927711,
+    "abstention_orig": 0.5421686746987951,
+    "coverage_orig": 0.7055555555555556,
+    "success_ideal": 0.6807228915662651,
+    "false_confident_ideal": 0.0963855421686747,
+    "abstention_ideal": 0.5421686746987951,
+    "coverage_ideal": 0.6818181818181818,
+    "alignment": {
+     "precision": 0.8,
+     "recall": 0.6818181818181818,
+     "f1": 0.7361963190184048,
+     "by_entitlement": {
+      "ASSERTED": {
+       "n": 150,
+       "raw_correct_vs_ideal": 0.7867
+      },
+      "QUALIFIED": {
+       "n": 2,
+       "raw_correct_vs_ideal": 1.0
+      },
+      "ASKED": {
+       "n": 34,
+       "raw_correct_vs_ideal": 0.9412
+      },
+      "WITHHELD": {
+       "n": 146,
+       "raw_correct_vs_ideal": 0.5068
+      }
+     }
+    },
+    "audit": {
+     "oracle_too_strict": 0,
+     "logical_elimination": 0,
+     "hidden_information": 0,
+     "real_ambiguity": 12,
+     "bad_propagation": 10,
+     "bad_lexical_hypothesis": 1,
+     "temporal_error": 2
+    },
+    "attribution_ideal": {
+     "LEXICAL": 0.0964,
+     "REFERENCE": 0.0422,
+     "EVIDENCE": 0.0994,
+     "SOURCE": 0.0,
+     "TEMPORAL": 0.012,
+     "GRAMMAR": 0.009,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_secondary": {
+     "LEXICAL": 0.0,
+     "REFERENCE": 0.003,
+     "EVIDENCE": 0.0,
+     "SOURCE": 0.0,
+     "TEMPORAL": 0.0,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_orig": {
+     "LEXICAL": 0.0873,
+     "REFERENCE": 0.0422,
+     "EVIDENCE": 0.0813,
+     "SOURCE": 0.0,
+     "TEMPORAL": 0.009,
+     "GRAMMAR": 0.009,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "lexical_coverage": 0.3333333333333333,
+    "lexical_wrong": 0,
+    "object_identity_accuracy": 0.9532710280373832,
+    "seconds": 9.847346308997658,
+    "conversion": {
+     "wrong_asserted": 5,
+     "correct_asserted": 1
+    }
+   },
+   "entitled": {
+    "success_orig": 0.6957831325301205,
+    "false_confident_orig": 0.07530120481927711,
+    "abstention_orig": 0.5481927710843374,
+    "coverage_orig": 0.6944444444444444,
+    "success_ideal": 0.6746987951807228,
+    "false_confident_ideal": 0.0963855421686747,
+    "abstention_ideal": 0.5481927710843374,
+    "coverage_ideal": 0.6704545454545454,
+    "alignment": {
+     "precision": 0.8,
+     "recall": 0.6818181818181818,
+     "f1": 0.7361963190184048,
+     "by_entitlement": {
+      "ASSERTED": {
+       "n": 150,
+       "raw_correct_vs_ideal": 0.7867
+      },
+      "QUALIFIED": {
+       "n": 2,
+       "raw_correct_vs_ideal": 1.0
+      },
+      "ASKED": {
+       "n": 34,
+       "raw_correct_vs_ideal": 0.9412
+      },
+      "WITHHELD": {
+       "n": 146,
+       "raw_correct_vs_ideal": 0.5068
+      }
+     }
+    },
+    "audit": {
+     "oracle_too_strict": 0,
+     "logical_elimination": 0,
+     "hidden_information": 0,
+     "real_ambiguity": 12,
+     "bad_propagation": 10,
+     "bad_lexical_hypothesis": 1,
+     "temporal_error": 2
+    },
+    "attribution_ideal": {
+     "LEXICAL": 0.0964,
+     "REFERENCE": 0.0422,
+     "EVIDENCE": 0.0994,
+     "SOURCE": 0.006,
+     "TEMPORAL": 0.012,
+     "GRAMMAR": 0.009,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_secondary": {
+     "LEXICAL": 0.0,
+     "REFERENCE": 0.003,
+     "EVIDENCE": 0.0,
+     "SOURCE": 0.0,
+     "TEMPORAL": 0.0,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_orig": {
+     "LEXICAL": 0.0873,
+     "REFERENCE": 0.0422,
+     "EVIDENCE": 0.0813,
+     "SOURCE": 0.006,
+     "TEMPORAL": 0.009,
+     "GRAMMAR": 0.009,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "lexical_coverage": 0.3333333333333333,
+    "lexical_wrong": 0,
+    "object_identity_accuracy": 0.9532710280373832,
+    "seconds": 9.415594888003398,
+    "conversion": {
+     "wrong_asserted": 5,
+     "correct_asserted": 1
+    }
+   },
+   "unified": {
+    "success_orig": 0.7228915662650602,
+    "false_confident_orig": 0.060240963855421686,
+    "abstention_orig": 0.536144578313253,
+    "coverage_orig": 0.7444444444444445,
+    "success_ideal": 0.7018072289156626,
+    "false_confident_ideal": 0.08132530120481928,
+    "abstention_ideal": 0.536144578313253,
+    "coverage_ideal": 0.7215909090909091,
+    "alignment": {
+     "precision": 0.8120300751879699,
+     "recall": 0.6136363636363636,
+     "f1": 0.6990291262135923,
+     "by_entitlement": {
+      "ASSERTED": {
+       "n": 133,
+       "raw_correct_vs_ideal": 0.797
+      },
+      "QUALIFIED": {
+       "n": 5,
+       "raw_correct_vs_ideal": 1.0
+      },
+      "ASKED": {
+       "n": 34,
+       "raw_correct_vs_ideal": 0.9412
+      },
+      "WITHHELD": {
+       "n": 160,
+       "raw_correct_vs_ideal": 0.5625
+      }
+     }
+    },
+    "audit": {
+     "oracle_too_strict": 0,
+     "logical_elimination": 0,
+     "hidden_information": 0,
+     "real_ambiguity": 12,
+     "bad_propagation": 6,
+     "bad_lexical_hypothesis": 1,
+     "temporal_error": 1
+    },
+    "attribution_ideal": {
+     "LEXICAL": 0.1084,
+     "REFERENCE": 0.0211,
+     "EVIDENCE": 0.0813,
+     "SOURCE": 0.0,
+     "TEMPORAL": 0.009,
+     "GRAMMAR": 0.003,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_secondary": {
+     "LEXICAL": 0.0,
+     "REFERENCE": 0.006,
+     "EVIDENCE": 0.0,
+     "SOURCE": 0.0,
+     "TEMPORAL": 0.0,
+     "GRAMMAR": 0.006,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_orig": {
+     "LEXICAL": 0.0994,
+     "REFERENCE": 0.0211,
+     "EVIDENCE": 0.0633,
+     "SOURCE": 0.0,
+     "TEMPORAL": 0.006,
+     "GRAMMAR": 0.003,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "lexical_coverage": 0.3333333333333333,
+    "lexical_wrong": 0,
+    "object_identity_accuracy": 0.9528301886792453,
+    "seconds": 1.9651348859988502,
+    "conversion": {
+     "correct_qualified": 4,
+     "correct_asserted": 4
+    }
+   },
+   "unified_entitled": {
+    "success_orig": 0.7259036144578314,
+    "false_confident_orig": 0.07530120481927711,
+    "abstention_orig": 0.536144578313253,
+    "coverage_orig": 0.7166666666666667,
+    "success_ideal": 0.6927710843373494,
+    "false_confident_ideal": 0.0963855421686747,
+    "abstention_ideal": 0.536144578313253,
+    "coverage_ideal": 0.6931818181818182,
+    "alignment": {
+     "precision": 0.8051948051948052,
+     "recall": 0.7045454545454546,
+     "f1": 0.7515151515151516,
+     "by_entitlement": {
+      "ASSERTED": {
+       "n": 154,
+       "raw_correct_vs_ideal": 0.7922
+      },
+      "QUALIFIED": {
+       "n": 7,
+       "raw_correct_vs_ideal": 1.0
+      },
+      "ASKED": {
+       "n": 34,
+       "raw_correct_vs_ideal": 0.9412
+      },
+      "WITHHELD": {
+       "n": 137,
+       "raw_correct_vs_ideal": 0.5547
+      }
+     }
+    },
+    "audit": {
+     "oracle_too_strict": 1,
+     "logical_elimination": 0,
+     "hidden_information": 0,
+     "real_ambiguity": 12,
+     "bad_propagation": 10,
+     "bad_lexical_hypothesis": 1,
+     "temporal_error": 2
+    },
+    "attribution_ideal": {
+     "LEXICAL": 0.0843,
+     "REFERENCE": 0.0482,
+     "EVIDENCE": 0.0934,
+     "SOURCE": 0.006,
+     "TEMPORAL": 0.012,
+     "GRAMMAR": 0.009,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_secondary": {
+     "LEXICAL": 0.0,
+     "REFERENCE": 0.003,
+     "EVIDENCE": 0.0,
+     "SOURCE": 0.0,
+     "TEMPORAL": 0.0,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_orig": {
+     "LEXICAL": 0.0873,
+     "REFERENCE": 0.0361,
+     "EVIDENCE": 0.0753,
+     "SOURCE": 0.006,
+     "TEMPORAL": 0.009,
+     "GRAMMAR": 0.009,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "lexical_coverage": 0.5,
+    "lexical_wrong": 0,
+    "object_identity_accuracy": 0.954954954954955,
+    "seconds": 10.369365525999456,
+    "conversion": {
+     "correct_qualified": 5,
+     "wrong_asserted": 5,
+     "correct_asserted": 5
+    }
+   }
+  },
+  {
+   "no_elimination": {
+    "success_orig": 0.5109289617486339,
+    "false_confident_orig": 0.01639344262295082,
+    "abstention_orig": 0.8114754098360656,
+    "coverage_orig": 0.45,
+    "success_ideal": 0.48360655737704916,
+    "false_confident_ideal": 0.02459016393442623,
+    "abstention_ideal": 0.8114754098360656,
+    "coverage_ideal": 0.410958904109589,
+    "alignment": {
+     "precision": 0.8688524590163934,
+     "recall": 0.363013698630137,
+     "f1": 0.5120772946859904,
+     "by_entitlement": {
+      "ASSERTED": {
+       "n": 61,
+       "raw_correct_vs_ideal": 0.8689
+      },
+      "QUALIFIED": {
+       "n": 0,
+       "raw_correct_vs_ideal": 0.0
+      },
+      "ASKED": {
+       "n": 29,
+       "raw_correct_vs_ideal": 0.9655
+      },
+      "WITHHELD": {
+       "n": 276,
+       "raw_correct_vs_ideal": 0.3478
+      }
+     }
+    },
+    "audit": {
+     "oracle_too_strict": 0,
+     "logical_elimination": 0,
+     "hidden_information": 0,
+     "real_ambiguity": 3,
+     "bad_propagation": 1,
+     "bad_lexical_hypothesis": 1,
+     "temporal_error": 1
+    },
+    "attribution_ideal": {
+     "LEXICAL": 0.1257,
+     "REFERENCE": 0.0683,
+     "EVIDENCE": 0.0383,
+     "SOURCE": 0.0055,
+     "TEMPORAL": 0.0219,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_secondary": {
+     "LEXICAL": 0.0055,
+     "REFERENCE": 0.0137,
+     "EVIDENCE": 0.0,
+     "SOURCE": 0.0,
+     "TEMPORAL": 0.0,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_orig": {
+     "LEXICAL": 0.1202,
+     "REFERENCE": 0.0519,
+     "EVIDENCE": 0.0301,
+     "SOURCE": 0.0055,
+     "TEMPORAL": 0.0191,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "lexical_coverage": 0.16666666666666666,
+    "lexical_wrong": 0,
+    "object_identity_accuracy": 1.0,
+    "seconds": 2.022740955999325
+   },
+   "callex": {
+    "success_orig": 0.5245901639344263,
+    "false_confident_orig": 0.01639344262295082,
+    "abstention_orig": 0.8060109289617486,
+    "coverage_orig": 0.4642857142857143,
+    "success_ideal": 0.4972677595628415,
+    "false_confident_ideal": 0.02459016393442623,
+    "abstention_ideal": 0.8060109289617486,
+    "coverage_ideal": 0.4246575342465753,
+    "alignment": {
+     "precision": 0.8732394366197183,
+     "recall": 0.4246575342465753,
+     "f1": 0.5714285714285714,
+     "by_entitlement": {
+      "ASSERTED": {
+       "n": 71,
+       "raw_correct_vs_ideal": 0.8732
+      },
+      "QUALIFIED": {
+       "n": 0,
+       "raw_correct_vs_ideal": 0.0
+      },
+      "ASKED": {
+       "n": 29,
+       "raw_correct_vs_ideal": 0.9655
+      },
+      "WITHHELD": {
+       "n": 266,
+       "raw_correct_vs_ideal": 0.3459
+      }
+     }
+    },
+    "audit": {
+     "oracle_too_strict": 0,
+     "logical_elimination": 0,
+     "hidden_information": 0,
+     "real_ambiguity": 3,
+     "bad_propagation": 2,
+     "bad_lexical_hypothesis": 0,
+     "temporal_error": 1
+    },
+    "attribution_ideal": {
+     "LEXICAL": 0.112,
+     "REFERENCE": 0.071,
+     "EVIDENCE": 0.0464,
+     "SOURCE": 0.0055,
+     "TEMPORAL": 0.0191,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_secondary": {
+     "LEXICAL": 0.0055,
+     "REFERENCE": 0.0137,
+     "EVIDENCE": 0.0,
+     "SOURCE": 0.0,
+     "TEMPORAL": 0.0,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_orig": {
+     "LEXICAL": 0.1066,
+     "REFERENCE": 0.0546,
+     "EVIDENCE": 0.0383,
+     "SOURCE": 0.0055,
+     "TEMPORAL": 0.0164,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "lexical_coverage": 0.3333333333333333,
+    "lexical_wrong": 0,
+    "object_identity_accuracy": 1.0,
+    "seconds": 10.94883572300023,
+    "conversion": {
+     "correct_asserted": 2
+    }
+   },
+   "entitled": {
+    "success_orig": 0.5245901639344263,
+    "false_confident_orig": 0.01639344262295082,
+    "abstention_orig": 0.8060109289617486,
+    "coverage_orig": 0.4642857142857143,
+    "success_ideal": 0.4972677595628415,
+    "false_confident_ideal": 0.02459016393442623,
+    "abstention_ideal": 0.8060109289617486,
+    "coverage_ideal": 0.4246575342465753,
+    "alignment": {
+     "precision": 0.8732394366197183,
+     "recall": 0.4246575342465753,
+     "f1": 0.5714285714285714,
+     "by_entitlement": {
+      "ASSERTED": {
+       "n": 71,
+       "raw_correct_vs_ideal": 0.8732
+      },
+      "QUALIFIED": {
+       "n": 0,
+       "raw_correct_vs_ideal": 0.0
+      },
+      "ASKED": {
+       "n": 29,
+       "raw_correct_vs_ideal": 0.9655
+      },
+      "WITHHELD": {
+       "n": 266,
+       "raw_correct_vs_ideal": 0.3459
+      }
+     }
+    },
+    "audit": {
+     "oracle_too_strict": 0,
+     "logical_elimination": 0,
+     "hidden_information": 0,
+     "real_ambiguity": 3,
+     "bad_propagation": 2,
+     "bad_lexical_hypothesis": 0,
+     "temporal_error": 1
+    },
+    "attribution_ideal": {
+     "LEXICAL": 0.112,
+     "REFERENCE": 0.071,
+     "EVIDENCE": 0.0464,
+     "SOURCE": 0.0055,
+     "TEMPORAL": 0.0191,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_secondary": {
+     "LEXICAL": 0.0055,
+     "REFERENCE": 0.0137,
+     "EVIDENCE": 0.0,
+     "SOURCE": 0.0,
+     "TEMPORAL": 0.0,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_orig": {
+     "LEXICAL": 0.1066,
+     "REFERENCE": 0.0546,
+     "EVIDENCE": 0.0383,
+     "SOURCE": 0.0055,
+     "TEMPORAL": 0.0164,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "lexical_coverage": 0.3333333333333333,
+    "lexical_wrong": 0,
+    "object_identity_accuracy": 1.0,
+    "seconds": 10.657113905999722,
+    "conversion": {
+     "correct_asserted": 2
+    }
+   },
+   "unified": {
+    "success_orig": 0.5628415300546448,
+    "false_confident_orig": 0.02459016393442623,
+    "abstention_orig": 0.7431693989071039,
+    "coverage_orig": 0.6071428571428571,
+    "success_ideal": 0.546448087431694,
+    "false_confident_ideal": 0.0273224043715847,
+    "abstention_ideal": 0.7431693989071039,
+    "coverage_ideal": 0.5753424657534246,
+    "alignment": {
+     "precision": 0.8939393939393939,
+     "recall": 0.4041095890410959,
+     "f1": 0.5566037735849058,
+     "by_entitlement": {
+      "ASSERTED": {
+       "n": 66,
+       "raw_correct_vs_ideal": 0.8939
+      },
+      "QUALIFIED": {
+       "n": 19,
+       "raw_correct_vs_ideal": 0.8947
+      },
+      "ASKED": {
+       "n": 28,
+       "raw_correct_vs_ideal": 1.0
+      },
+      "WITHHELD": {
+       "n": 253,
+       "raw_correct_vs_ideal": 0.3794
+      }
+     }
+    },
+    "audit": {
+     "oracle_too_strict": 2,
+     "logical_elimination": 0,
+     "hidden_information": 2,
+     "real_ambiguity": 3,
+     "bad_propagation": 2,
+     "bad_lexical_hypothesis": 0,
+     "temporal_error": 0
+    },
+    "attribution_ideal": {
+     "LEXICAL": 0.1175,
+     "REFERENCE": 0.0219,
+     "EVIDENCE": 0.041,
+     "SOURCE": 0.0055,
+     "TEMPORAL": 0.0109,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_secondary": {
+     "LEXICAL": 0.0055,
+     "REFERENCE": 0.0,
+     "EVIDENCE": 0.0,
+     "SOURCE": 0.0,
+     "TEMPORAL": 0.0,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_orig": {
+     "LEXICAL": 0.112,
+     "REFERENCE": 0.0082,
+     "EVIDENCE": 0.0328,
+     "SOURCE": 0.0055,
+     "TEMPORAL": 0.0109,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0055,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "lexical_coverage": 0.16666666666666666,
+    "lexical_wrong": 0,
+    "object_identity_accuracy": 1.0,
+    "seconds": 2.0746171150021837,
+    "conversion": {
+     "wrong_qualified": 2,
+     "correct_asserted": 11,
+     "correct_qualified": 12,
+     "withheld_but_correct": 1
+    }
+   },
+   "unified_entitled": {
+    "success_orig": 0.5218579234972678,
+    "false_confident_orig": 0.01092896174863388,
+    "abstention_orig": 0.8169398907103825,
+    "coverage_orig": 0.45,
+    "success_ideal": 0.5,
+    "false_confident_ideal": 0.01639344262295082,
+    "abstention_ideal": 0.8169398907103825,
+    "coverage_ideal": 0.4178082191780822,
+    "alignment": {
+     "precision": 0.9104477611940298,
+     "recall": 0.4178082191780822,
+     "f1": 0.5727699530516432,
+     "by_entitlement": {
+      "ASSERTED": {
+       "n": 67,
+       "raw_correct_vs_ideal": 0.9104
+      },
+      "QUALIFIED": {
+       "n": 27,
+       "raw_correct_vs_ideal": 0.8519
+      },
+      "ASKED": {
+       "n": 28,
+       "raw_correct_vs_ideal": 1.0
+      },
+      "WITHHELD": {
+       "n": 244,
+       "raw_correct_vs_ideal": 0.3689
+      }
+     }
+    },
+    "audit": {
+     "oracle_too_strict": 2,
+     "logical_elimination": 0,
+     "hidden_information": 4,
+     "real_ambiguity": 3,
+     "bad_propagation": 0,
+     "bad_lexical_hypothesis": 0,
+     "temporal_error": 0
+    },
+    "attribution_ideal": {
+     "LEXICAL": 0.1175,
+     "REFERENCE": 0.0683,
+     "EVIDENCE": 0.0355,
+     "SOURCE": 0.0055,
+     "TEMPORAL": 0.0219,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_secondary": {
+     "LEXICAL": 0.0055,
+     "REFERENCE": 0.0109,
+     "EVIDENCE": 0.0,
+     "SOURCE": 0.0,
+     "TEMPORAL": 0.0,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_orig": {
+     "LEXICAL": 0.112,
+     "REFERENCE": 0.0546,
+     "EVIDENCE": 0.0273,
+     "SOURCE": 0.0055,
+     "TEMPORAL": 0.0191,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0027,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "lexical_coverage": 0.3333333333333333,
+    "lexical_wrong": 0,
+    "object_identity_accuracy": 1.0,
+    "seconds": 10.81071781799983,
+    "conversion": {
+     "wrong_qualified": 2,
+     "correct_asserted": 12,
+     "correct_qualified": 12
+    }
+   }
+  },
+  {
+   "no_elimination": {
+    "success_orig": 0.543859649122807,
+    "false_confident_orig": 0.05513784461152882,
+    "abstention_orig": 0.7092731829573935,
+    "coverage_orig": 0.562874251497006,
+    "success_ideal": 0.5639097744360902,
+    "false_confident_ideal": 0.047619047619047616,
+    "abstention_ideal": 0.7092731829573935,
+    "coverage_ideal": 0.5843373493975904,
+    "alignment": {
+     "precision": 0.8082191780821918,
+     "recall": 0.35542168674698793,
+     "f1": 0.4937238493723849,
+     "by_entitlement": {
+      "ASSERTED": {
+       "n": 73,
+       "raw_correct_vs_ideal": 0.7808
+      },
+      "QUALIFIED": {
+       "n": 0,
+       "raw_correct_vs_ideal": 0.0
+      },
+      "ASKED": {
+       "n": 23,
+       "raw_correct_vs_ideal": 0.9565
+      },
+      "WITHHELD": {
+       "n": 303,
+       "raw_correct_vs_ideal": 0.4818
+      }
+     }
+    },
+    "audit": {
+     "oracle_too_strict": 3,
+     "logical_elimination": 0,
+     "hidden_information": 0,
+     "real_ambiguity": 2,
+     "bad_propagation": 11,
+     "bad_lexical_hypothesis": 2,
+     "temporal_error": 4
+    },
+    "attribution_ideal": {
+     "LEXICAL": 0.0802,
+     "REFERENCE": 0.0702,
+     "EVIDENCE": 0.0376,
+     "SOURCE": 0.0075,
+     "TEMPORAL": 0.0125,
+     "GRAMMAR": 0.0075,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_secondary": {
+     "LEXICAL": 0.0,
+     "REFERENCE": 0.0025,
+     "EVIDENCE": 0.0,
+     "SOURCE": 0.0,
+     "TEMPORAL": 0.0,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_orig": {
+     "LEXICAL": 0.0777,
+     "REFERENCE": 0.0576,
+     "EVIDENCE": 0.0376,
+     "SOURCE": 0.0075,
+     "TEMPORAL": 0.0125,
+     "GRAMMAR": 0.0075,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0326,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "lexical_coverage": 0.5,
+    "lexical_wrong": 0,
+    "object_identity_accuracy": 1.0,
+    "seconds": 1.9806060000009893
+   },
+   "callex": {
+    "success_orig": 0.6340852130325815,
+    "false_confident_orig": 0.07017543859649122,
+    "abstention_orig": 0.6365914786967418,
+    "coverage_orig": 0.7005988023952096,
+    "success_ideal": 0.6666666666666666,
+    "false_confident_ideal": 0.06265664160401002,
+    "abstention_ideal": 0.6365914786967418,
+    "coverage_ideal": 0.7228915662650602,
+    "alignment": {
+     "precision": 0.8368794326241135,
+     "recall": 0.7108433734939759,
+     "f1": 0.7687296416938111,
+     "by_entitlement": {
+      "ASSERTED": {
+       "n": 141,
+       "raw_correct_vs_ideal": 0.8227
+      },
+      "QUALIFIED": {
+       "n": 2,
+       "raw_correct_vs_ideal": 1.0
+      },
+      "ASKED": {
+       "n": 25,
+       "raw_correct_vs_ideal": 0.96
+      },
+      "WITHHELD": {
+       "n": 231,
+       "raw_correct_vs_ideal": 0.5368
+      }
+     }
+    },
+    "audit": {
+     "oracle_too_strict": 3,
+     "logical_elimination": 0,
+     "hidden_information": 0,
+     "real_ambiguity": 1,
+     "bad_propagation": 22,
+     "bad_lexical_hypothesis": 0,
+     "temporal_error": 2
+    },
+    "attribution_ideal": {
+     "LEXICAL": 0.0251,
+     "REFERENCE": 0.0627,
+     "EVIDENCE": 0.0652,
+     "SOURCE": 0.005,
+     "TEMPORAL": 0.0075,
+     "GRAMMAR": 0.0075,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_secondary": {
+     "LEXICAL": 0.0,
+     "REFERENCE": 0.0025,
+     "EVIDENCE": 0.0,
+     "SOURCE": 0.0,
+     "TEMPORAL": 0.0,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_orig": {
+     "LEXICAL": 0.01,
+     "REFERENCE": 0.0426,
+     "EVIDENCE": 0.0652,
+     "SOURCE": 0.005,
+     "TEMPORAL": 0.0075,
+     "GRAMMAR": 0.0075,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0526,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "lexical_coverage": 0.8333333333333334,
+    "lexical_wrong": 0,
+    "object_identity_accuracy": 1.0,
+    "seconds": 7.14577080899835,
+    "conversion": {
+     "correct_asserted": 21,
+     "wrong_asserted": 9,
+     "correct_qualified": 2
+    }
+   },
+   "entitled": {
+    "success_orig": 0.6240601503759399,
+    "false_confident_orig": 0.07017543859649122,
+    "abstention_orig": 0.6466165413533834,
+    "coverage_orig": 0.6766467065868264,
+    "success_ideal": 0.656641604010025,
+    "false_confident_ideal": 0.06265664160401002,
+    "abstention_ideal": 0.6466165413533834,
+    "coverage_ideal": 0.6987951807228916,
+    "alignment": {
+     "precision": 0.8368794326241135,
+     "recall": 0.7108433734939759,
+     "f1": 0.7687296416938111,
+     "by_entitlement": {
+      "ASSERTED": {
+       "n": 141,
+       "raw_correct_vs_ideal": 0.8227
+      },
+      "QUALIFIED": {
+       "n": 2,
+       "raw_correct_vs_ideal": 1.0
+      },
+      "ASKED": {
+       "n": 25,
+       "raw_correct_vs_ideal": 0.96
+      },
+      "WITHHELD": {
+       "n": 231,
+       "raw_correct_vs_ideal": 0.5368
+      }
+     }
+    },
+    "audit": {
+     "oracle_too_strict": 3,
+     "logical_elimination": 0,
+     "hidden_information": 0,
+     "real_ambiguity": 1,
+     "bad_propagation": 22,
+     "bad_lexical_hypothesis": 0,
+     "temporal_error": 2
+    },
+    "attribution_ideal": {
+     "LEXICAL": 0.0251,
+     "REFERENCE": 0.0677,
+     "EVIDENCE": 0.0702,
+     "SOURCE": 0.005,
+     "TEMPORAL": 0.0075,
+     "GRAMMAR": 0.0075,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_secondary": {
+     "LEXICAL": 0.0,
+     "REFERENCE": 0.0025,
+     "EVIDENCE": 0.0,
+     "SOURCE": 0.0,
+     "TEMPORAL": 0.0,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_orig": {
+     "LEXICAL": 0.01,
+     "REFERENCE": 0.0476,
+     "EVIDENCE": 0.0702,
+     "SOURCE": 0.005,
+     "TEMPORAL": 0.0075,
+     "GRAMMAR": 0.0075,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0526,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "lexical_coverage": 0.8333333333333334,
+    "lexical_wrong": 0,
+    "object_identity_accuracy": 1.0,
+    "seconds": 7.447521877998952,
+    "conversion": {
+     "correct_asserted": 21,
+     "wrong_asserted": 9,
+     "correct_qualified": 2
+    }
+   },
+   "unified": {
+    "success_orig": 0.49874686716791977,
+    "false_confident_orig": 0.12030075187969924,
+    "abstention_orig": 0.6491228070175439,
+    "coverage_orig": 0.5508982035928144,
+    "success_ideal": 0.5238095238095238,
+    "false_confident_ideal": 0.11027568922305764,
+    "abstention_ideal": 0.6491228070175439,
+    "coverage_ideal": 0.5783132530120482,
+    "alignment": {
+     "precision": 0.7887323943661971,
+     "recall": 0.3373493975903614,
+     "f1": 0.47257383966244715,
+     "by_entitlement": {
+      "ASSERTED": {
+       "n": 71,
+       "raw_correct_vs_ideal": 0.7606
+      },
+      "QUALIFIED": {
+       "n": 43,
+       "raw_correct_vs_ideal": 0.5116
+      },
+      "ASKED": {
+       "n": 20,
+       "raw_correct_vs_ideal": 0.95
+      },
+      "WITHHELD": {
+       "n": 265,
+       "raw_correct_vs_ideal": 0.4302
+      }
+     }
+    },
+    "audit": {
+     "oracle_too_strict": 5,
+     "logical_elimination": 0,
+     "hidden_information": 8,
+     "real_ambiguity": 18,
+     "bad_propagation": 10,
+     "bad_lexical_hypothesis": 3,
+     "temporal_error": 4
+    },
+    "attribution_ideal": {
+     "LEXICAL": 0.1353,
+     "REFERENCE": 0.0852,
+     "EVIDENCE": 0.0326,
+     "SOURCE": 0.005,
+     "TEMPORAL": 0.015,
+     "GRAMMAR": 0.0075,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_secondary": {
+     "LEXICAL": 0.0025,
+     "REFERENCE": 0.0125,
+     "EVIDENCE": 0.0,
+     "SOURCE": 0.0075,
+     "TEMPORAL": 0.0,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_orig": {
+     "LEXICAL": 0.1328,
+     "REFERENCE": 0.0777,
+     "EVIDENCE": 0.0301,
+     "SOURCE": 0.005,
+     "TEMPORAL": 0.015,
+     "GRAMMAR": 0.0075,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0351,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "lexical_coverage": 0.16666666666666666,
+    "lexical_wrong": 0,
+    "object_identity_accuracy": 0.9591836734693877,
+    "seconds": 2.2420444050003425,
+    "conversion": {
+     "correct_qualified": 10,
+     "correct_asserted": 9,
+     "wrong_asserted": 3,
+     "wrong_qualified": 19,
+     "correctly_withheld": 3
+    }
+   },
+   "unified_entitled": {
+    "success_orig": 0.5463659147869674,
+    "false_confident_orig": 0.06265664160401002,
+    "abstention_orig": 0.7243107769423559,
+    "coverage_orig": 0.5089820359281437,
+    "success_ideal": 0.5664160401002506,
+    "false_confident_ideal": 0.06015037593984962,
+    "abstention_ideal": 0.7243107769423559,
+    "coverage_ideal": 0.5180722891566265,
+    "alignment": {
+     "precision": 0.8,
+     "recall": 0.5301204819277109,
+     "f1": 0.6376811594202898,
+     "by_entitlement": {
+      "ASSERTED": {
+       "n": 110,
+       "raw_correct_vs_ideal": 0.7818
+      },
+      "QUALIFIED": {
+       "n": 66,
+       "raw_correct_vs_ideal": 0.6212
+      },
+      "ASKED": {
+       "n": 22,
+       "raw_correct_vs_ideal": 0.9545
+      },
+      "WITHHELD": {
+       "n": 201,
+       "raw_correct_vs_ideal": 0.5522
+      }
+     }
+    },
+    "audit": {
+     "oracle_too_strict": 5,
+     "logical_elimination": 0,
+     "hidden_information": 7,
+     "real_ambiguity": 17,
+     "bad_propagation": 19,
+     "bad_lexical_hypothesis": 0,
+     "temporal_error": 4
+    },
+    "attribution_ideal": {
+     "LEXICAL": 0.0426,
+     "REFERENCE": 0.1053,
+     "EVIDENCE": 0.0727,
+     "SOURCE": 0.005,
+     "TEMPORAL": 0.0226,
+     "GRAMMAR": 0.0075,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_secondary": {
+     "LEXICAL": 0.0,
+     "REFERENCE": 0.0125,
+     "EVIDENCE": 0.0,
+     "SOURCE": 0.01,
+     "TEMPORAL": 0.0,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_orig": {
+     "LEXICAL": 0.0301,
+     "REFERENCE": 0.0827,
+     "EVIDENCE": 0.0702,
+     "SOURCE": 0.005,
+     "TEMPORAL": 0.0226,
+     "GRAMMAR": 0.0075,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0451,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "lexical_coverage": 0.6666666666666666,
+    "lexical_wrong": 0,
+    "object_identity_accuracy": 0.9682539682539683,
+    "seconds": 9.694106585000554,
+    "conversion": {
+     "correct_qualified": 13,
+     "correct_asserted": 20,
+     "wrong_qualified": 22,
+     "wrong_asserted": 8,
+     "correctly_withheld": 2
+    }
+   }
+  },
+  {
+   "no_elimination": {
+    "success_orig": 0.5658682634730539,
+    "false_confident_orig": 0.023952095808383235,
+    "abstention_orig": 0.7514970059880239,
+    "coverage_orig": 0.5067567567567568,
+    "success_ideal": 0.5089820359281437,
+    "false_confident_ideal": 0.0718562874251497,
+    "abstention_ideal": 0.7514970059880239,
+    "coverage_ideal": 0.43703703703703706,
+    "alignment": {
+     "precision": 0.717948717948718,
+     "recall": 0.4148148148148148,
+     "f1": 0.5258215962441314,
+     "by_entitlement": {
+      "ASSERTED": {
+       "n": 78,
+       "raw_correct_vs_ideal": 0.7179
+      },
+      "QUALIFIED": {
+       "n": 0,
+       "raw_correct_vs_ideal": 0.0
+      },
+      "ASKED": {
+       "n": 44,
+       "raw_correct_vs_ideal": 1.0
+      },
+      "WITHHELD": {
+       "n": 212,
+       "raw_correct_vs_ideal": 0.3302
+      }
+     }
+    },
+    "audit": {
+     "oracle_too_strict": 0,
+     "logical_elimination": 0,
+     "hidden_information": 0,
+     "real_ambiguity": 2,
+     "bad_propagation": 6,
+     "bad_lexical_hypothesis": 0,
+     "temporal_error": 0
+    },
+    "attribution_ideal": {
+     "LEXICAL": 0.1018,
+     "REFERENCE": 0.0988,
+     "EVIDENCE": 0.0719,
+     "SOURCE": 0.0,
+     "TEMPORAL": 0.0269,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_secondary": {
+     "LEXICAL": 0.006,
+     "REFERENCE": 0.024,
+     "EVIDENCE": 0.0,
+     "SOURCE": 0.0,
+     "TEMPORAL": 0.0,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_orig": {
+     "LEXICAL": 0.1018,
+     "REFERENCE": 0.0838,
+     "EVIDENCE": 0.0329,
+     "SOURCE": 0.0,
+     "TEMPORAL": 0.018,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.006,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "lexical_coverage": 0.16666666666666666,
+    "lexical_wrong": 0,
+    "object_identity_accuracy": 1.0,
+    "seconds": 2.731190735998098
+   },
+   "callex": {
+    "success_orig": 0.6796407185628742,
+    "false_confident_orig": 0.02694610778443114,
+    "abstention_orig": 0.7125748502994012,
+    "coverage_orig": 0.5878378378378378,
+    "success_ideal": 0.6197604790419161,
+    "false_confident_ideal": 0.0748502994011976,
+    "abstention_ideal": 0.7125748502994012,
+    "coverage_ideal": 0.5259259259259259,
+    "alignment": {
+     "precision": 0.7472527472527473,
+     "recall": 0.5037037037037037,
+     "f1": 0.6017699115044248,
+     "by_entitlement": {
+      "ASSERTED": {
+       "n": 91,
+       "raw_correct_vs_ideal": 0.7473
+      },
+      "QUALIFIED": {
+       "n": 0,
+       "raw_correct_vs_ideal": 0.0
+      },
+      "ASKED": {
+       "n": 52,
+       "raw_correct_vs_ideal": 1.0
+      },
+      "WITHHELD": {
+       "n": 191,
+       "raw_correct_vs_ideal": 0.4555
+      }
+     }
+    },
+    "audit": {
+     "oracle_too_strict": 0,
+     "logical_elimination": 0,
+     "hidden_information": 0,
+     "real_ambiguity": 3,
+     "bad_propagation": 6,
+     "bad_lexical_hypothesis": 0,
+     "temporal_error": 0
+    },
+    "attribution_ideal": {
+     "LEXICAL": 0.0449,
+     "REFERENCE": 0.1198,
+     "EVIDENCE": 0.0778,
+     "SOURCE": 0.0,
+     "TEMPORAL": 0.024,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_secondary": {
+     "LEXICAL": 0.0,
+     "REFERENCE": 0.0269,
+     "EVIDENCE": 0.0,
+     "SOURCE": 0.0,
+     "TEMPORAL": 0.0,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.003
+    },
+    "attribution_orig": {
+     "LEXICAL": 0.0449,
+     "REFERENCE": 0.1048,
+     "EVIDENCE": 0.0389,
+     "SOURCE": 0.0,
+     "TEMPORAL": 0.015,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.006,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "lexical_coverage": 0.8333333333333334,
+    "lexical_wrong": 0,
+    "object_identity_accuracy": 1.0,
+    "seconds": 3.854178134999529,
+    "conversion": {
+     "correct_asserted": 10,
+     "withheld_but_correct": 2,
+     "wrong_asserted": 1
+    }
+   },
+   "entitled": {
+    "success_orig": 0.6706586826347305,
+    "false_confident_orig": 0.020958083832335328,
+    "abstention_orig": 0.7275449101796407,
+    "coverage_orig": 0.5675675675675675,
+    "success_ideal": 0.6107784431137725,
+    "false_confident_ideal": 0.0688622754491018,
+    "abstention_ideal": 0.7275449101796407,
+    "coverage_ideal": 0.5037037037037037,
+    "alignment": {
+     "precision": 0.7472527472527473,
+     "recall": 0.5037037037037037,
+     "f1": 0.6017699115044248,
+     "by_entitlement": {
+      "ASSERTED": {
+       "n": 91,
+       "raw_correct_vs_ideal": 0.7473
+      },
+      "QUALIFIED": {
+       "n": 0,
+       "raw_correct_vs_ideal": 0.0
+      },
+      "ASKED": {
+       "n": 52,
+       "raw_correct_vs_ideal": 1.0
+      },
+      "WITHHELD": {
+       "n": 191,
+       "raw_correct_vs_ideal": 0.4555
+      }
+     }
+    },
+    "audit": {
+     "oracle_too_strict": 0,
+     "logical_elimination": 0,
+     "hidden_information": 0,
+     "real_ambiguity": 3,
+     "bad_propagation": 6,
+     "bad_lexical_hypothesis": 0,
+     "temporal_error": 0
+    },
+    "attribution_ideal": {
+     "LEXICAL": 0.0479,
+     "REFERENCE": 0.1257,
+     "EVIDENCE": 0.0719,
+     "SOURCE": 0.0,
+     "TEMPORAL": 0.024,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_secondary": {
+     "LEXICAL": 0.0,
+     "REFERENCE": 0.0269,
+     "EVIDENCE": 0.0,
+     "SOURCE": 0.0,
+     "TEMPORAL": 0.0,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.003
+    },
+    "attribution_orig": {
+     "LEXICAL": 0.0479,
+     "REFERENCE": 0.1108,
+     "EVIDENCE": 0.0329,
+     "SOURCE": 0.0,
+     "TEMPORAL": 0.015,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.006,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "lexical_coverage": 0.8333333333333334,
+    "lexical_wrong": 0,
+    "object_identity_accuracy": 1.0,
+    "seconds": 3.8554682889989635,
+    "conversion": {
+     "correct_asserted": 10,
+     "withheld_but_correct": 2,
+     "wrong_asserted": 1
+    }
+   },
+   "unified": {
+    "success_orig": 0.6437125748502994,
+    "false_confident_orig": 0.05089820359281437,
+    "abstention_orig": 0.6287425149700598,
+    "coverage_orig": 0.722972972972973,
+    "success_ideal": 0.5808383233532934,
+    "false_confident_ideal": 0.10179640718562874,
+    "abstention_ideal": 0.6287425149700598,
+    "coverage_ideal": 0.6666666666666666,
+    "alignment": {
+     "precision": 0.7333333333333333,
+     "recall": 0.4888888888888889,
+     "f1": 0.5866666666666667,
+     "by_entitlement": {
+      "ASSERTED": {
+       "n": 90,
+       "raw_correct_vs_ideal": 0.7333
+      },
+      "QUALIFIED": {
+       "n": 25,
+       "raw_correct_vs_ideal": 0.72
+      },
+      "ASKED": {
+       "n": 44,
+       "raw_correct_vs_ideal": 1.0
+      },
+      "WITHHELD": {
+       "n": 175,
+       "raw_correct_vs_ideal": 0.3771
+      }
+     }
+    },
+    "audit": {
+     "oracle_too_strict": 0,
+     "logical_elimination": 0,
+     "hidden_information": 5,
+     "real_ambiguity": 2,
+     "bad_propagation": 9,
+     "bad_lexical_hypothesis": 1,
+     "temporal_error": 0
+    },
+    "attribution_ideal": {
+     "LEXICAL": 0.0898,
+     "REFERENCE": 0.0479,
+     "EVIDENCE": 0.0749,
+     "SOURCE": 0.006,
+     "TEMPORAL": 0.018,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_secondary": {
+     "LEXICAL": 0.006,
+     "REFERENCE": 0.012,
+     "EVIDENCE": 0.0,
+     "SOURCE": 0.006,
+     "TEMPORAL": 0.0,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_orig": {
+     "LEXICAL": 0.0898,
+     "REFERENCE": 0.0329,
+     "EVIDENCE": 0.0329,
+     "SOURCE": 0.006,
+     "TEMPORAL": 0.009,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.003,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "lexical_coverage": 0.3333333333333333,
+    "lexical_wrong": 0,
+    "object_identity_accuracy": 1.0,
+    "seconds": 1.9654661519998626,
+    "conversion": {
+     "correct_qualified": 18,
+     "correct_asserted": 12,
+     "wrong_qualified": 7,
+     "wrong_asserted": 2,
+     "correctly_withheld": 1,
+     "withheld_but_correct": 3
+    }
+   },
+   "unified_entitled": {
+    "success_orig": 0.7035928143712575,
+    "false_confident_orig": 0.023952095808383235,
+    "abstention_orig": 0.6826347305389222,
+    "coverage_orig": 0.6621621621621622,
+    "success_ideal": 0.6377245508982036,
+    "false_confident_ideal": 0.0748502994011976,
+    "abstention_ideal": 0.6826347305389222,
+    "coverage_ideal": 0.6,
+    "alignment": {
+     "precision": 0.7641509433962265,
+     "recall": 0.6,
+     "f1": 0.6721991701244813,
+     "by_entitlement": {
+      "ASSERTED": {
+       "n": 106,
+       "raw_correct_vs_ideal": 0.7642
+      },
+      "QUALIFIED": {
+       "n": 29,
+       "raw_correct_vs_ideal": 0.7586
+      },
+      "ASKED": {
+       "n": 51,
+       "raw_correct_vs_ideal": 1.0
+      },
+      "WITHHELD": {
+       "n": 148,
+       "raw_correct_vs_ideal": 0.5068
+      }
+     }
+    },
+    "audit": {
+     "oracle_too_strict": 0,
+     "logical_elimination": 0,
+     "hidden_information": 5,
+     "real_ambiguity": 2,
+     "bad_propagation": 10,
+     "bad_lexical_hypothesis": 0,
+     "temporal_error": 0
+    },
+    "attribution_ideal": {
+     "LEXICAL": 0.0449,
+     "REFERENCE": 0.0958,
+     "EVIDENCE": 0.0689,
+     "SOURCE": 0.006,
+     "TEMPORAL": 0.021,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_secondary": {
+     "LEXICAL": 0.0,
+     "REFERENCE": 0.018,
+     "EVIDENCE": 0.0,
+     "SOURCE": 0.006,
+     "TEMPORAL": 0.0,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.003
+    },
+    "attribution_orig": {
+     "LEXICAL": 0.0449,
+     "REFERENCE": 0.0808,
+     "EVIDENCE": 0.0269,
+     "SOURCE": 0.006,
+     "TEMPORAL": 0.012,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.003,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "lexical_coverage": 0.6666666666666666,
+    "lexical_wrong": 0,
+    "object_identity_accuracy": 1.0,
+    "seconds": 4.477859845002968,
+    "conversion": {
+     "correct_qualified": 22,
+     "correct_asserted": 25,
+     "wrong_qualified": 7,
+     "wrong_asserted": 3
+    }
+   }
+  },
+  {
+   "no_elimination": {
+    "success_orig": 0.5470085470085471,
+    "false_confident_orig": 0.011396011396011397,
+    "abstention_orig": 0.8376068376068376,
+    "coverage_orig": 0.41732283464566927,
+    "success_ideal": 0.49572649572649574,
+    "false_confident_ideal": 0.014245014245014245,
+    "abstention_ideal": 0.8376068376068376,
+    "coverage_ideal": 0.35135135135135137,
+    "alignment": {
+     "precision": 0.9454545454545454,
+     "recall": 0.35135135135135137,
+     "f1": 0.5123152709359606,
+     "by_entitlement": {
+      "ASSERTED": {
+       "n": 55,
+       "raw_correct_vs_ideal": 0.9091
+      },
+      "QUALIFIED": {
+       "n": 0,
+       "raw_correct_vs_ideal": 0.0
+      },
+      "ASKED": {
+       "n": 24,
+       "raw_correct_vs_ideal": 0.9167
+      },
+      "WITHHELD": {
+       "n": 272,
+       "raw_correct_vs_ideal": 0.375
+      }
+     }
+    },
+    "audit": {
+     "oracle_too_strict": 0,
+     "logical_elimination": 0,
+     "hidden_information": 0,
+     "real_ambiguity": 0,
+     "bad_propagation": 4,
+     "bad_lexical_hypothesis": 0,
+     "temporal_error": 0
+    },
+    "attribution_ideal": {
+     "LEXICAL": 0.1168,
+     "REFERENCE": 0.0883,
+     "EVIDENCE": 0.0456,
+     "SOURCE": 0.0028,
+     "TEMPORAL": 0.0256,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0028
+    },
+    "attribution_secondary": {
+     "LEXICAL": 0.0057,
+     "REFERENCE": 0.0456,
+     "EVIDENCE": 0.0,
+     "SOURCE": 0.0,
+     "TEMPORAL": 0.0,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_orig": {
+     "LEXICAL": 0.0855,
+     "REFERENCE": 0.0484,
+     "EVIDENCE": 0.0427,
+     "SOURCE": 0.0028,
+     "TEMPORAL": 0.0171,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0171,
+     "UNSUPPORTED_INFERENCE": 0.0028
+    },
+    "lexical_coverage": 0.16666666666666666,
+    "lexical_wrong": 0,
+    "object_identity_accuracy": 1.0,
+    "seconds": 1.9650775080008316
+   },
+   "callex": {
+    "success_orig": 0.5527065527065527,
+    "false_confident_orig": 0.011396011396011397,
+    "abstention_orig": 0.8376068376068376,
+    "coverage_orig": 0.41732283464566927,
+    "success_ideal": 0.5014245014245015,
+    "false_confident_ideal": 0.014245014245014245,
+    "abstention_ideal": 0.8376068376068376,
+    "coverage_ideal": 0.35135135135135137,
+    "alignment": {
+     "precision": 0.9473684210526315,
+     "recall": 0.36486486486486486,
+     "f1": 0.526829268292683,
+     "by_entitlement": {
+      "ASSERTED": {
+       "n": 57,
+       "raw_correct_vs_ideal": 0.9123
+      },
+      "QUALIFIED": {
+       "n": 0,
+       "raw_correct_vs_ideal": 0.0
+      },
+      "ASKED": {
+       "n": 24,
+       "raw_correct_vs_ideal": 0.9167
+      },
+      "WITHHELD": {
+       "n": 270,
+       "raw_correct_vs_ideal": 0.3778
+      }
+     }
+    },
+    "audit": {
+     "oracle_too_strict": 0,
+     "logical_elimination": 0,
+     "hidden_information": 0,
+     "real_ambiguity": 0,
+     "bad_propagation": 4,
+     "bad_lexical_hypothesis": 0,
+     "temporal_error": 0
+    },
+    "attribution_ideal": {
+     "LEXICAL": 0.0883,
+     "REFERENCE": 0.1168,
+     "EVIDENCE": 0.0456,
+     "SOURCE": 0.0028,
+     "TEMPORAL": 0.0256,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0028
+    },
+    "attribution_secondary": {
+     "LEXICAL": 0.0057,
+     "REFERENCE": 0.0199,
+     "EVIDENCE": 0.0,
+     "SOURCE": 0.0,
+     "TEMPORAL": 0.0,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_orig": {
+     "LEXICAL": 0.0741,
+     "REFERENCE": 0.0598,
+     "EVIDENCE": 0.0427,
+     "SOURCE": 0.0028,
+     "TEMPORAL": 0.0171,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0171,
+     "UNSUPPORTED_INFERENCE": 0.0028
+    },
+    "lexical_coverage": 0.3333333333333333,
+    "lexical_wrong": 0,
+    "object_identity_accuracy": 1.0,
+    "seconds": 9.930597325997951,
+    "conversion": {}
+   },
+   "entitled": {
+    "success_orig": 0.5527065527065527,
+    "false_confident_orig": 0.011396011396011397,
+    "abstention_orig": 0.8376068376068376,
+    "coverage_orig": 0.41732283464566927,
+    "success_ideal": 0.5014245014245015,
+    "false_confident_ideal": 0.014245014245014245,
+    "abstention_ideal": 0.8376068376068376,
+    "coverage_ideal": 0.35135135135135137,
+    "alignment": {
+     "precision": 0.9473684210526315,
+     "recall": 0.36486486486486486,
+     "f1": 0.526829268292683,
+     "by_entitlement": {
+      "ASSERTED": {
+       "n": 57,
+       "raw_correct_vs_ideal": 0.9123
+      },
+      "QUALIFIED": {
+       "n": 0,
+       "raw_correct_vs_ideal": 0.0
+      },
+      "ASKED": {
+       "n": 24,
+       "raw_correct_vs_ideal": 0.9167
+      },
+      "WITHHELD": {
+       "n": 270,
+       "raw_correct_vs_ideal": 0.3778
+      }
+     }
+    },
+    "audit": {
+     "oracle_too_strict": 0,
+     "logical_elimination": 0,
+     "hidden_information": 0,
+     "real_ambiguity": 0,
+     "bad_propagation": 4,
+     "bad_lexical_hypothesis": 0,
+     "temporal_error": 0
+    },
+    "attribution_ideal": {
+     "LEXICAL": 0.0883,
+     "REFERENCE": 0.1168,
+     "EVIDENCE": 0.0456,
+     "SOURCE": 0.0028,
+     "TEMPORAL": 0.0256,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0028
+    },
+    "attribution_secondary": {
+     "LEXICAL": 0.0057,
+     "REFERENCE": 0.0199,
+     "EVIDENCE": 0.0,
+     "SOURCE": 0.0,
+     "TEMPORAL": 0.0,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_orig": {
+     "LEXICAL": 0.0741,
+     "REFERENCE": 0.0598,
+     "EVIDENCE": 0.0427,
+     "SOURCE": 0.0028,
+     "TEMPORAL": 0.0171,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0171,
+     "UNSUPPORTED_INFERENCE": 0.0028
+    },
+    "lexical_coverage": 0.3333333333333333,
+    "lexical_wrong": 0,
+    "object_identity_accuracy": 1.0,
+    "seconds": 9.852200847999484,
+    "conversion": {}
+   },
+   "unified": {
+    "success_orig": 0.4444444444444444,
+    "false_confident_orig": 0.1794871794871795,
+    "abstention_orig": 0.603988603988604,
+    "coverage_orig": 0.5984251968503937,
+    "success_ideal": 0.45014245014245013,
+    "false_confident_ideal": 0.1623931623931624,
+    "abstention_ideal": 0.603988603988604,
+    "coverage_ideal": 0.5540540540540541,
+    "alignment": {
+     "precision": 0.8484848484848485,
+     "recall": 0.3783783783783784,
+     "f1": 0.5233644859813085,
+     "by_entitlement": {
+      "ASSERTED": {
+       "n": 66,
+       "raw_correct_vs_ideal": 0.8182
+      },
+      "QUALIFIED": {
+       "n": 72,
+       "raw_correct_vs_ideal": 0.375
+      },
+      "ASKED": {
+       "n": 17,
+       "raw_correct_vs_ideal": 1.0
+      },
+      "WITHHELD": {
+       "n": 196,
+       "raw_correct_vs_ideal": 0.3061
+      }
+     }
+    },
+    "audit": {
+     "oracle_too_strict": 11,
+     "logical_elimination": 0,
+     "hidden_information": 18,
+     "real_ambiguity": 17,
+     "bad_propagation": 12,
+     "bad_lexical_hypothesis": 1,
+     "temporal_error": 4
+    },
+    "attribution_ideal": {
+     "LEXICAL": 0.1282,
+     "REFERENCE": 0.1311,
+     "EVIDENCE": 0.0541,
+     "SOURCE": 0.0028,
+     "TEMPORAL": 0.0256,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0028
+    },
+    "attribution_secondary": {
+     "LEXICAL": 0.0057,
+     "REFERENCE": 0.0228,
+     "EVIDENCE": 0.0,
+     "SOURCE": 0.0057,
+     "TEMPORAL": 0.0,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_orig": {
+     "LEXICAL": 0.0969,
+     "REFERENCE": 0.1026,
+     "EVIDENCE": 0.0513,
+     "SOURCE": 0.0028,
+     "TEMPORAL": 0.0256,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.037,
+     "UNSUPPORTED_INFERENCE": 0.0028
+    },
+    "lexical_coverage": 0.0,
+    "lexical_wrong": 0,
+    "object_identity_accuracy": 0.9565217391304348,
+    "seconds": 2.28442383500078,
+    "conversion": {
+     "correct_qualified": 21,
+     "correct_asserted": 11,
+     "wrong_qualified": 45,
+     "wrong_asserted": 7
+    }
+   },
+   "unified_entitled": {
+    "success_orig": 0.48148148148148145,
+    "false_confident_orig": 0.045584045584045586,
+    "abstention_orig": 0.8034188034188035,
+    "coverage_orig": 0.41732283464566927,
+    "success_ideal": 0.46438746438746437,
+    "false_confident_ideal": 0.039886039886039885,
+    "abstention_ideal": 0.8034188034188035,
+    "coverage_ideal": 0.3716216216216216,
+    "alignment": {
+     "precision": 0.8260869565217391,
+     "recall": 0.38513513513513514,
+     "f1": 0.5253456221198156,
+     "by_entitlement": {
+      "ASSERTED": {
+       "n": 69,
+       "raw_correct_vs_ideal": 0.7971
+      },
+      "QUALIFIED": {
+       "n": 73,
+       "raw_correct_vs_ideal": 0.3699
+      },
+      "ASKED": {
+       "n": 17,
+       "raw_correct_vs_ideal": 1.0
+      },
+      "WITHHELD": {
+       "n": 192,
+       "raw_correct_vs_ideal": 0.3229
+      }
+     }
+    },
+    "audit": {
+     "oracle_too_strict": 11,
+     "logical_elimination": 0,
+     "hidden_information": 18,
+     "real_ambiguity": 17,
+     "bad_propagation": 15,
+     "bad_lexical_hypothesis": 1,
+     "temporal_error": 4
+    },
+    "attribution_ideal": {
+     "LEXICAL": 0.1225,
+     "REFERENCE": 0.0826,
+     "EVIDENCE": 0.0598,
+     "SOURCE": 0.0028,
+     "TEMPORAL": 0.0285,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0028
+    },
+    "attribution_secondary": {
+     "LEXICAL": 0.0057,
+     "REFERENCE": 0.0228,
+     "EVIDENCE": 0.0,
+     "SOURCE": 0.0057,
+     "TEMPORAL": 0.0,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_orig": {
+     "LEXICAL": 0.0912,
+     "REFERENCE": 0.0513,
+     "EVIDENCE": 0.057,
+     "SOURCE": 0.0028,
+     "TEMPORAL": 0.0199,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0256,
+     "UNSUPPORTED_INFERENCE": 0.0028
+    },
+    "lexical_coverage": 0.3333333333333333,
+    "lexical_wrong": 0,
+    "object_identity_accuracy": 0.9565217391304348,
+    "seconds": 10.298978173999785,
+    "conversion": {
+     "correct_qualified": 21,
+     "correct_asserted": 12,
+     "wrong_qualified": 46,
+     "wrong_asserted": 9
+    }
+   }
+  },
+  {
+   "no_elimination": {
+    "success_orig": 0.4891640866873065,
+    "false_confident_orig": 0.04024767801857585,
+    "abstention_orig": 0.7585139318885449,
+    "coverage_orig": 0.4166666666666667,
+    "success_ideal": 0.46439628482972134,
+    "false_confident_ideal": 0.04024767801857585,
+    "abstention_ideal": 0.7585139318885449,
+    "coverage_ideal": 0.40625,
+    "alignment": {
+     "precision": 0.8939393939393939,
+     "recall": 0.36875,
+     "f1": 0.5221238938053098,
+     "by_entitlement": {
+      "ASSERTED": {
+       "n": 66,
+       "raw_correct_vs_ideal": 0.8182
+      },
+      "QUALIFIED": {
+       "n": 0,
+       "raw_correct_vs_ideal": 0.0
+      },
+      "ASKED": {
+       "n": 27,
+       "raw_correct_vs_ideal": 0.963
+      },
+      "WITHHELD": {
+       "n": 230,
+       "raw_correct_vs_ideal": 0.3043
+      }
+     }
+    },
+    "audit": {
+     "oracle_too_strict": 0,
+     "logical_elimination": 0,
+     "hidden_information": 0,
+     "real_ambiguity": 1,
+     "bad_propagation": 11,
+     "bad_lexical_hypothesis": 1,
+     "temporal_error": 0
+    },
+    "attribution_ideal": {
+     "LEXICAL": 0.1548,
+     "REFERENCE": 0.0588,
+     "EVIDENCE": 0.065,
+     "SOURCE": 0.0093,
+     "TEMPORAL": 0.0248,
+     "GRAMMAR": 0.0031,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_secondary": {
+     "LEXICAL": 0.0031,
+     "REFERENCE": 0.0186,
+     "EVIDENCE": 0.0,
+     "SOURCE": 0.0062,
+     "TEMPORAL": 0.0,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_orig": {
+     "LEXICAL": 0.161,
+     "REFERENCE": 0.0402,
+     "EVIDENCE": 0.065,
+     "SOURCE": 0.0093,
+     "TEMPORAL": 0.0155,
+     "GRAMMAR": 0.0031,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0093,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "lexical_coverage": 0.3333333333333333,
+    "lexical_wrong": 0,
+    "object_identity_accuracy": 1.0,
+    "seconds": 2.513179661000322
+   },
+   "callex": {
+    "success_orig": 0.4953560371517028,
+    "false_confident_orig": 0.043343653250773995,
+    "abstention_orig": 0.7492260061919505,
+    "coverage_orig": 0.42948717948717946,
+    "success_ideal": 0.46439628482972134,
+    "false_confident_ideal": 0.04953560371517028,
+    "abstention_ideal": 0.7492260061919505,
+    "coverage_ideal": 0.40625,
+    "alignment": {
+     "precision": 0.8734177215189873,
+     "recall": 0.43125,
+     "f1": 0.5774058577405857,
+     "by_entitlement": {
+      "ASSERTED": {
+       "n": 79,
+       "raw_correct_vs_ideal": 0.7975
+      },
+      "QUALIFIED": {
+       "n": 0,
+       "raw_correct_vs_ideal": 0.0
+      },
+      "ASKED": {
+       "n": 27,
+       "raw_correct_vs_ideal": 0.963
+      },
+      "WITHHELD": {
+       "n": 217,
+       "raw_correct_vs_ideal": 0.2811
+      }
+     }
+    },
+    "audit": {
+     "oracle_too_strict": 0,
+     "logical_elimination": 0,
+     "hidden_information": 0,
+     "real_ambiguity": 1,
+     "bad_propagation": 13,
+     "bad_lexical_hypothesis": 0,
+     "temporal_error": 0
+    },
+    "attribution_ideal": {
+     "LEXICAL": 0.1362,
+     "REFERENCE": 0.0619,
+     "EVIDENCE": 0.0836,
+     "SOURCE": 0.0155,
+     "TEMPORAL": 0.0248,
+     "GRAMMAR": 0.0031,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_secondary": {
+     "LEXICAL": 0.0031,
+     "REFERENCE": 0.0155,
+     "EVIDENCE": 0.0,
+     "SOURCE": 0.0,
+     "TEMPORAL": 0.0,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_orig": {
+     "LEXICAL": 0.1362,
+     "REFERENCE": 0.0402,
+     "EVIDENCE": 0.0774,
+     "SOURCE": 0.0155,
+     "TEMPORAL": 0.0155,
+     "GRAMMAR": 0.0031,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0093,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "lexical_coverage": 0.3333333333333333,
+    "lexical_wrong": 0,
+    "object_identity_accuracy": 1.0,
+    "seconds": 7.60618256700036,
+    "conversion": {
+     "wrong_asserted": 3
+    }
+   },
+   "entitled": {
+    "success_orig": 0.4891640866873065,
+    "false_confident_orig": 0.043343653250773995,
+    "abstention_orig": 0.7554179566563467,
+    "coverage_orig": 0.4166666666666667,
+    "success_ideal": 0.4582043343653251,
+    "false_confident_ideal": 0.04953560371517028,
+    "abstention_ideal": 0.7554179566563467,
+    "coverage_ideal": 0.39375,
+    "alignment": {
+     "precision": 0.8734177215189873,
+     "recall": 0.43125,
+     "f1": 0.5774058577405857,
+     "by_entitlement": {
+      "ASSERTED": {
+       "n": 79,
+       "raw_correct_vs_ideal": 0.7975
+      },
+      "QUALIFIED": {
+       "n": 0,
+       "raw_correct_vs_ideal": 0.0
+      },
+      "ASKED": {
+       "n": 27,
+       "raw_correct_vs_ideal": 0.963
+      },
+      "WITHHELD": {
+       "n": 217,
+       "raw_correct_vs_ideal": 0.2811
+      }
+     }
+    },
+    "audit": {
+     "oracle_too_strict": 0,
+     "logical_elimination": 0,
+     "hidden_information": 0,
+     "real_ambiguity": 1,
+     "bad_propagation": 13,
+     "bad_lexical_hypothesis": 0,
+     "temporal_error": 0
+    },
+    "attribution_ideal": {
+     "LEXICAL": 0.1393,
+     "REFERENCE": 0.065,
+     "EVIDENCE": 0.0836,
+     "SOURCE": 0.0155,
+     "TEMPORAL": 0.0248,
+     "GRAMMAR": 0.0031,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_secondary": {
+     "LEXICAL": 0.0031,
+     "REFERENCE": 0.0155,
+     "EVIDENCE": 0.0,
+     "SOURCE": 0.0,
+     "TEMPORAL": 0.0,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_orig": {
+     "LEXICAL": 0.1393,
+     "REFERENCE": 0.0433,
+     "EVIDENCE": 0.0774,
+     "SOURCE": 0.0155,
+     "TEMPORAL": 0.0155,
+     "GRAMMAR": 0.0031,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0093,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "lexical_coverage": 0.3333333333333333,
+    "lexical_wrong": 0,
+    "object_identity_accuracy": 1.0,
+    "seconds": 7.233831043999089,
+    "conversion": {
+     "wrong_asserted": 3
+    }
+   },
+   "unified": {
+    "success_orig": 0.47368421052631576,
+    "false_confident_orig": 0.11145510835913312,
+    "abstention_orig": 0.6842105263157895,
+    "coverage_orig": 0.4230769230769231,
+    "success_ideal": 0.47368421052631576,
+    "false_confident_ideal": 0.09907120743034056,
+    "abstention_ideal": 0.6842105263157895,
+    "coverage_ideal": 0.4375,
+    "alignment": {
+     "precision": 0.8392857142857143,
+     "recall": 0.29375,
+     "f1": 0.4351851851851852,
+     "by_entitlement": {
+      "ASSERTED": {
+       "n": 56,
+       "raw_correct_vs_ideal": 0.75
+      },
+      "QUALIFIED": {
+       "n": 31,
+       "raw_correct_vs_ideal": 0.5484
+      },
+      "ASKED": {
+       "n": 25,
+       "raw_correct_vs_ideal": 0.96
+      },
+      "WITHHELD": {
+       "n": 211,
+       "raw_correct_vs_ideal": 0.3318
+      }
+     }
+    },
+    "audit": {
+     "oracle_too_strict": 4,
+     "logical_elimination": 0,
+     "hidden_information": 0,
+     "real_ambiguity": 20,
+     "bad_propagation": 11,
+     "bad_lexical_hypothesis": 1,
+     "temporal_error": 0
+    },
+    "attribution_ideal": {
+     "LEXICAL": 0.161,
+     "REFERENCE": 0.1084,
+     "EVIDENCE": 0.0526,
+     "SOURCE": 0.0093,
+     "TEMPORAL": 0.0217,
+     "GRAMMAR": 0.0062,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_secondary": {
+     "LEXICAL": 0.0031,
+     "REFERENCE": 0.0372,
+     "EVIDENCE": 0.0,
+     "SOURCE": 0.0124,
+     "TEMPORAL": 0.0,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_orig": {
+     "LEXICAL": 0.1703,
+     "REFERENCE": 0.096,
+     "EVIDENCE": 0.0526,
+     "SOURCE": 0.0093,
+     "TEMPORAL": 0.0155,
+     "GRAMMAR": 0.0062,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0217,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "lexical_coverage": 0.3333333333333333,
+    "lexical_wrong": 0,
+    "object_identity_accuracy": 0.8970588235294118,
+    "seconds": 1.819075730003533,
+    "conversion": {
+     "correct_qualified": 4,
+     "wrong_qualified": 14,
+     "correctly_withheld": 3,
+     "wrong_asserted": 2,
+     "correct_asserted": 1
+    }
+   },
+   "unified_entitled": {
+    "success_orig": 0.4458204334365325,
+    "false_confident_orig": 0.05263157894736842,
+    "abstention_orig": 0.7925696594427245,
+    "coverage_orig": 0.32051282051282054,
+    "success_ideal": 0.4148606811145511,
+    "false_confident_ideal": 0.058823529411764705,
+    "abstention_ideal": 0.7925696594427245,
+    "coverage_ideal": 0.3,
+    "alignment": {
+     "precision": 0.8059701492537313,
+     "recall": 0.3375,
+     "f1": 0.47577092511013214,
+     "by_entitlement": {
+      "ASSERTED": {
+       "n": 67,
+       "raw_correct_vs_ideal": 0.7164
+      },
+      "QUALIFIED": {
+       "n": 36,
+       "raw_correct_vs_ideal": 0.5833
+      },
+      "ASKED": {
+       "n": 25,
+       "raw_correct_vs_ideal": 0.96
+      },
+      "WITHHELD": {
+       "n": 195,
+       "raw_correct_vs_ideal": 0.3282
+      }
+     }
+    },
+    "audit": {
+     "oracle_too_strict": 4,
+     "logical_elimination": 0,
+     "hidden_information": 0,
+     "real_ambiguity": 20,
+     "bad_propagation": 13,
+     "bad_lexical_hypothesis": 0,
+     "temporal_error": 0
+    },
+    "attribution_ideal": {
+     "LEXICAL": 0.13,
+     "REFERENCE": 0.1486,
+     "EVIDENCE": 0.0681,
+     "SOURCE": 0.0093,
+     "TEMPORAL": 0.0248,
+     "GRAMMAR": 0.0062,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_secondary": {
+     "LEXICAL": 0.0031,
+     "REFERENCE": 0.0248,
+     "EVIDENCE": 0.0,
+     "SOURCE": 0.0124,
+     "TEMPORAL": 0.0,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_orig": {
+     "LEXICAL": 0.13,
+     "REFERENCE": 0.1269,
+     "EVIDENCE": 0.0619,
+     "SOURCE": 0.0093,
+     "TEMPORAL": 0.0155,
+     "GRAMMAR": 0.0062,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0093,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "lexical_coverage": 0.5,
+    "lexical_wrong": 0,
+    "object_identity_accuracy": 0.9,
+    "seconds": 8.942002046998823,
+    "conversion": {
+     "correct_qualified": 4,
+     "wrong_asserted": 6,
+     "wrong_qualified": 15,
+     "correctly_withheld": 1,
+     "correct_asserted": 2
+    }
+   }
+  },
+  {
+   "no_elimination": {
+    "success_orig": 0.5426136363636364,
+    "false_confident_orig": 0.011363636363636364,
+    "abstention_orig": 0.7272727272727273,
+    "coverage_orig": 0.5411764705882353,
+    "success_ideal": 0.5340909090909091,
+    "false_confident_ideal": 0.017045454545454544,
+    "abstention_ideal": 0.7272727272727273,
+    "coverage_ideal": 0.5357142857142857,
+    "alignment": {
+     "precision": 0.9634146341463414,
+     "recall": 0.47023809523809523,
+     "f1": 0.6319999999999999,
+     "by_entitlement": {
+      "ASSERTED": {
+       "n": 82,
+       "raw_correct_vs_ideal": 0.9634
+      },
+      "QUALIFIED": {
+       "n": 0,
+       "raw_correct_vs_ideal": 0.0
+      },
+      "ASKED": {
+       "n": 20,
+       "raw_correct_vs_ideal": 1.0
+      },
+      "WITHHELD": {
+       "n": 250,
+       "raw_correct_vs_ideal": 0.356
+      }
+     }
+    },
+    "audit": {
+     "oracle_too_strict": 0,
+     "logical_elimination": 0,
+     "hidden_information": 0,
+     "real_ambiguity": 2,
+     "bad_propagation": 1,
+     "bad_lexical_hypothesis": 0,
+     "temporal_error": 1
+    },
+    "attribution_ideal": {
+     "LEXICAL": 0.1222,
+     "REFERENCE": 0.071,
+     "EVIDENCE": 0.017,
+     "SOURCE": 0.0,
+     "TEMPORAL": 0.0284,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_secondary": {
+     "LEXICAL": 0.0142,
+     "REFERENCE": 0.0085,
+     "EVIDENCE": 0.0,
+     "SOURCE": 0.0028,
+     "TEMPORAL": 0.0,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_orig": {
+     "LEXICAL": 0.1222,
+     "REFERENCE": 0.0568,
+     "EVIDENCE": 0.0142,
+     "SOURCE": 0.0,
+     "TEMPORAL": 0.0256,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0142,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "lexical_coverage": 0.3333333333333333,
+    "lexical_wrong": 0,
+    "object_identity_accuracy": 1.0,
+    "seconds": 2.092292160999932
+   },
+   "callex": {
+    "success_orig": 0.5681818181818182,
+    "false_confident_orig": 0.014204545454545454,
+    "abstention_orig": 0.7045454545454546,
+    "coverage_orig": 0.5823529411764706,
+    "success_ideal": 0.5596590909090909,
+    "false_confident_ideal": 0.022727272727272728,
+    "abstention_ideal": 0.7045454545454546,
+    "coverage_ideal": 0.5714285714285714,
+    "alignment": {
+     "precision": 0.9393939393939394,
+     "recall": 0.5535714285714286,
+     "f1": 0.6966292134831461,
+     "by_entitlement": {
+      "ASSERTED": {
+       "n": 99,
+       "raw_correct_vs_ideal": 0.9394
+      },
+      "QUALIFIED": {
+       "n": 1,
+       "raw_correct_vs_ideal": 1.0
+      },
+      "ASKED": {
+       "n": 20,
+       "raw_correct_vs_ideal": 1.0
+      },
+      "WITHHELD": {
+       "n": 232,
+       "raw_correct_vs_ideal": 0.3578
+      }
+     }
+    },
+    "audit": {
+     "oracle_too_strict": 0,
+     "logical_elimination": 0,
+     "hidden_information": 0,
+     "real_ambiguity": 2,
+     "bad_propagation": 1,
+     "bad_lexical_hypothesis": 0,
+     "temporal_error": 2
+    },
+    "attribution_ideal": {
+     "LEXICAL": 0.0682,
+     "REFERENCE": 0.0994,
+     "EVIDENCE": 0.0284,
+     "SOURCE": 0.0,
+     "TEMPORAL": 0.0312,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_secondary": {
+     "LEXICAL": 0.0057,
+     "REFERENCE": 0.0085,
+     "EVIDENCE": 0.0,
+     "SOURCE": 0.0028,
+     "TEMPORAL": 0.0,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_orig": {
+     "LEXICAL": 0.0653,
+     "REFERENCE": 0.0852,
+     "EVIDENCE": 0.0199,
+     "SOURCE": 0.0,
+     "TEMPORAL": 0.0284,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.017,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "lexical_coverage": 0.6666666666666666,
+    "lexical_wrong": 0,
+    "object_identity_accuracy": 1.0,
+    "seconds": 12.395829008000874,
+    "conversion": {
+     "wrong_asserted": 2,
+     "correct_asserted": 5,
+     "correct_qualified": 1
+    }
+   },
+   "entitled": {
+    "success_orig": 0.5596590909090909,
+    "false_confident_orig": 0.008522727272727272,
+    "abstention_orig": 0.71875,
+    "coverage_orig": 0.5647058823529412,
+    "success_ideal": 0.5511363636363636,
+    "false_confident_ideal": 0.017045454545454544,
+    "abstention_ideal": 0.71875,
+    "coverage_ideal": 0.5535714285714286,
+    "alignment": {
+     "precision": 0.9393939393939394,
+     "recall": 0.5535714285714286,
+     "f1": 0.6966292134831461,
+     "by_entitlement": {
+      "ASSERTED": {
+       "n": 99,
+       "raw_correct_vs_ideal": 0.9394
+      },
+      "QUALIFIED": {
+       "n": 1,
+       "raw_correct_vs_ideal": 1.0
+      },
+      "ASKED": {
+       "n": 20,
+       "raw_correct_vs_ideal": 1.0
+      },
+      "WITHHELD": {
+       "n": 232,
+       "raw_correct_vs_ideal": 0.3578
+      }
+     }
+    },
+    "audit": {
+     "oracle_too_strict": 0,
+     "logical_elimination": 0,
+     "hidden_information": 0,
+     "real_ambiguity": 2,
+     "bad_propagation": 1,
+     "bad_lexical_hypothesis": 0,
+     "temporal_error": 2
+    },
+    "attribution_ideal": {
+     "LEXICAL": 0.0767,
+     "REFERENCE": 0.0938,
+     "EVIDENCE": 0.0284,
+     "SOURCE": 0.0,
+     "TEMPORAL": 0.0312,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_secondary": {
+     "LEXICAL": 0.0057,
+     "REFERENCE": 0.0085,
+     "EVIDENCE": 0.0,
+     "SOURCE": 0.0028,
+     "TEMPORAL": 0.0,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_orig": {
+     "LEXICAL": 0.0739,
+     "REFERENCE": 0.0795,
+     "EVIDENCE": 0.0199,
+     "SOURCE": 0.0,
+     "TEMPORAL": 0.0284,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.017,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "lexical_coverage": 0.6666666666666666,
+    "lexical_wrong": 0,
+    "object_identity_accuracy": 1.0,
+    "seconds": 12.181708926000283,
+    "conversion": {
+     "wrong_asserted": 2,
+     "correct_asserted": 5,
+     "correct_qualified": 1
+    }
+   },
+   "unified": {
+    "success_orig": 0.6136363636363636,
+    "false_confident_orig": 0.03977272727272727,
+    "abstention_orig": 0.6278409090909091,
+    "coverage_orig": 0.6882352941176471,
+    "success_ideal": 0.5880681818181818,
+    "false_confident_ideal": 0.05397727272727273,
+    "abstention_ideal": 0.6278409090909091,
+    "coverage_ideal": 0.6666666666666666,
+    "alignment": {
+     "precision": 0.9285714285714286,
+     "recall": 0.3869047619047619,
+     "f1": 0.546218487394958,
+     "by_entitlement": {
+      "ASSERTED": {
+       "n": 70,
+       "raw_correct_vs_ideal": 0.9286
+      },
+      "QUALIFIED": {
+       "n": 36,
+       "raw_correct_vs_ideal": 0.6944
+      },
+      "ASKED": {
+       "n": 20,
+       "raw_correct_vs_ideal": 1.0
+      },
+      "WITHHELD": {
+       "n": 226,
+       "raw_correct_vs_ideal": 0.4292
+      }
+     }
+    },
+    "audit": {
+     "oracle_too_strict": 0,
+     "logical_elimination": 0,
+     "hidden_information": 0,
+     "real_ambiguity": 11,
+     "bad_propagation": 3,
+     "bad_lexical_hypothesis": 0,
+     "temporal_error": 0
+    },
+    "attribution_ideal": {
+     "LEXICAL": 0.0966,
+     "REFERENCE": 0.0795,
+     "EVIDENCE": 0.017,
+     "SOURCE": 0.0,
+     "TEMPORAL": 0.0199,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_secondary": {
+     "LEXICAL": 0.0114,
+     "REFERENCE": 0.0028,
+     "EVIDENCE": 0.0,
+     "SOURCE": 0.0057,
+     "TEMPORAL": 0.0,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_orig": {
+     "LEXICAL": 0.0966,
+     "REFERENCE": 0.0597,
+     "EVIDENCE": 0.0114,
+     "SOURCE": 0.0,
+     "TEMPORAL": 0.017,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0057,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "lexical_coverage": 0.5,
+    "lexical_wrong": 0,
+    "object_identity_accuracy": 0.9555555555555556,
+    "seconds": 2.129315284000768,
+    "conversion": {
+     "correct_qualified": 9,
+     "correct_asserted": 5,
+     "withheld_but_correct": 10,
+     "wrong_asserted": 4,
+     "wrong_qualified": 11
+    }
+   },
+   "unified_entitled": {
+    "success_orig": 0.5227272727272727,
+    "false_confident_orig": 0.011363636363636364,
+    "abstention_orig": 0.75,
+    "coverage_orig": 0.49411764705882355,
+    "success_ideal": 0.5085227272727273,
+    "false_confident_ideal": 0.022727272727272728,
+    "abstention_ideal": 0.75,
+    "coverage_ideal": 0.47619047619047616,
+    "alignment": {
+     "precision": 0.9090909090909091,
+     "recall": 0.47619047619047616,
+     "f1": 0.6249999999999999,
+     "by_entitlement": {
+      "ASSERTED": {
+       "n": 88,
+       "raw_correct_vs_ideal": 0.9091
+      },
+      "QUALIFIED": {
+       "n": 45,
+       "raw_correct_vs_ideal": 0.7556
+      },
+      "ASKED": {
+       "n": 20,
+       "raw_correct_vs_ideal": 1.0
+      },
+      "WITHHELD": {
+       "n": 199,
+       "raw_correct_vs_ideal": 0.402
+      }
+     }
+    },
+    "audit": {
+     "oracle_too_strict": 0,
+     "logical_elimination": 0,
+     "hidden_information": 0,
+     "real_ambiguity": 11,
+     "bad_propagation": 3,
+     "bad_lexical_hypothesis": 0,
+     "temporal_error": 1
+    },
+    "attribution_ideal": {
+     "LEXICAL": 0.0852,
+     "REFERENCE": 0.125,
+     "EVIDENCE": 0.0256,
+     "SOURCE": 0.0,
+     "TEMPORAL": 0.0369,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_secondary": {
+     "LEXICAL": 0.0057,
+     "REFERENCE": 0.017,
+     "EVIDENCE": 0.0,
+     "SOURCE": 0.0057,
+     "TEMPORAL": 0.0,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "attribution_orig": {
+     "LEXICAL": 0.0824,
+     "REFERENCE": 0.1108,
+     "EVIDENCE": 0.0142,
+     "SOURCE": 0.0,
+     "TEMPORAL": 0.0341,
+     "GRAMMAR": 0.0,
+     "PLANNER": 0.0,
+     "KNOWABILITY_REFERENCE": 0.0142,
+     "UNSUPPORTED_INFERENCE": 0.0
+    },
+    "lexical_coverage": 0.5,
+    "lexical_wrong": 0,
+    "object_identity_accuracy": 0.956989247311828,
+    "seconds": 12.867491332999634,
+    "conversion": {
+     "correct_qualified": 18,
+     "correct_asserted": 11,
+     "wrong_asserted": 6,
+     "wrong_qualified": 11
+    }
+   }
+  }
+ ],
+ "seconds": 267.0
+}

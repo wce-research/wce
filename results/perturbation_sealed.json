@@ -1,0 +1,89 @@
+{
+ "items": {
+  "small": {
+   "duality": 0.9375,
+   "always_preserved": 0.575,
+   "surface": 0.6125,
+   "truth_rate": 0.575,
+   "n": 80
+  },
+  "composed": {
+   "duality": 0.9,
+   "always_preserved": 0.3625,
+   "surface": 0.675,
+   "truth_rate": 0.3625,
+   "n": 80
+  },
+  "ood": {
+   "duality": 1.0,
+   "always_preserved": 0.5417,
+   "surface": 0.4583,
+   "truth_rate": 0.5417,
+   "n": 48
+  },
+  "interaction": {
+   "abs_interaction": 0.796,
+   "relative_interaction": 0.5982,
+   "resonance_candidate(>25%)": 0.6875,
+   "n": 16
+  },
+  "transition": {
+   "abs_error": 0.0627,
+   "detected(<0.1)": 0.875,
+   "n": 16
+  }
+ },
+ "credit": {
+  "generalized": 0.975,
+  "gradient_only": 0.225,
+  "random": 0.05,
+  "repaired": 1.0,
+  "neural": {
+   "generalized": 1.0,
+   "gradient_only": 1.0
+  },
+  "symbolic": {
+   "generalized": 0.968,
+   "gradient_only": 0.0
+  },
+  "n": 40,
+  "silent": 20
+ },
+ "continual": {
+  "vanilla": {
+   "new_task": 1.0,
+   "retention": 0.5171,
+   "forgetting": 0.4829,
+   "parameters_changed": 2833,
+   "rollbacks": 0
+  },
+  "fast_weights": {
+   "new_task": 0.9829,
+   "retention": 0.5976,
+   "forgetting": 0.4024,
+   "parameters_changed": 2768,
+   "rollbacks": 0
+  },
+  "replay": {
+   "new_task": 0.9927,
+   "retention": 0.6793,
+   "forgetting": 0.3207,
+   "parameters_changed": 3038,
+   "rollbacks": 0
+  },
+  "invariant_constrained": {
+   "new_task": 0.9683,
+   "retention": 1.0,
+   "forgetting": 0.0,
+   "parameters_changed": 3036,
+   "rollbacks": 0
+  },
+  "perturbation_guided": {
+   "new_task": 0.9512,
+   "retention": 1.0,
+   "forgetting": 0.0,
+   "parameters_changed": 1195,
+   "rollbacks": 0
+  }
+ }
+}

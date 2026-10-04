@@ -1,0 +1,3764 @@
+{
+ "summary": {
+  "bench": {
+   "small": {
+    "duality": {
+     "mean": 0.9521,
+     "sd": 0.0257,
+     "ci95": [
+      0.9395,
+      0.9647
+     ],
+     "n": 16
+    },
+    "always_preserved": {
+     "mean": 0.5229,
+     "sd": 0.0455,
+     "ci95": [
+      0.5006,
+      0.5452
+     ],
+     "n": 16
+    },
+    "surface": {
+     "mean": 0.6135,
+     "sd": 0.0558,
+     "ci95": [
+      0.5862,
+      0.6409
+     ],
+     "n": 16
+    },
+    "truth_rate": {
+     "mean": 0.5229,
+     "sd": 0.0455,
+     "ci95": [
+      0.5006,
+      0.5452
+     ],
+     "n": 16
+    }
+   },
+   "composed": {
+    "duality": {
+     "mean": 0.9323,
+     "sd": 0.0275,
+     "ci95": [
+      0.9188,
+      0.9458
+     ],
+     "n": 16
+    },
+    "always_preserved": {
+     "mean": 0.3719,
+     "sd": 0.0757,
+     "ci95": [
+      0.3348,
+      0.409
+     ],
+     "n": 16
+    },
+    "surface": {
+     "mean": 0.6771,
+     "sd": 0.0691,
+     "ci95": [
+      0.6432,
+      0.7109
+     ],
+     "n": 16
+    },
+    "truth_rate": {
+     "mean": 0.3719,
+     "sd": 0.0757,
+     "ci95": [
+      0.3348,
+      0.409
+     ],
+     "n": 16
+    }
+   },
+   "ood": {
+    "duality": {
+     "mean": 1.0,
+     "sd": 0.0,
+     "ci95": [
+      1.0,
+      1.0
+     ],
+     "n": 16
+    },
+    "always_preserved": {
+     "mean": 0.5087,
+     "sd": 0.0693,
+     "ci95": [
+      0.4747,
+      0.5427
+     ],
+     "n": 16
+    },
+    "surface": {
+     "mean": 0.4913,
+     "sd": 0.0693,
+     "ci95": [
+      0.4573,
+      0.5253
+     ],
+     "n": 16
+    },
+    "truth_rate": {
+     "mean": 0.5087,
+     "sd": 0.0693,
+     "ci95": [
+      0.4747,
+      0.5427
+     ],
+     "n": 16
+    }
+   },
+   "interaction": {
+    "abs_interaction": {
+     "mean": 1.4509,
+     "sd": 0.8285,
+     "ci95": [
+      1.045,
+      1.8569
+     ],
+     "n": 16
+    },
+    "relative_interaction": {
+     "mean": 0.5013,
+     "sd": 0.094,
+     "ci95": [
+      0.4552,
+      0.5474
+     ],
+     "n": 16
+    },
+    "resonance_candidate(>25%)": {
+     "mean": 0.5573,
+     "sd": 0.1351,
+     "ci95": [
+      0.4911,
+      0.6235
+     ],
+     "n": 16
+    }
+   },
+   "transition": {
+    "abs_error": {
+     "mean": 0.051,
+     "sd": 0.0094,
+     "ci95": [
+      0.0465,
+      0.0556
+     ],
+     "n": 16
+    },
+    "detected(<0.1)": {
+     "mean": 0.9479,
+     "sd": 0.0599,
+     "ci95": [
+      0.9186,
+      0.9773
+     ],
+     "n": 16
+    }
+   }
+  },
+  "credit": {
+   "generalized": {
+    "mean": 0.9979,
+    "sd": 0.0083,
+    "ci95": [
+     0.9939,
+     1.002
+    ],
+    "n": 16
+   },
+   "gradient_only": {
+    "mean": 0.2415,
+    "sd": 0.0364,
+    "ci95": [
+     0.2237,
+     0.2593
+    ],
+    "n": 16
+   },
+   "random": {
+    "mean": 0.0828,
+    "sd": 0.0623,
+    "ci95": [
+     0.0522,
+     0.1133
+    ],
+    "n": 16
+   },
+   "repaired": {
+    "mean": 0.9976,
+    "sd": 0.0095,
+    "ci95": [
+     0.993,
+     1.0023
+    ],
+    "n": 16
+   }
+  },
+  "credit_symbolic": {
+   "generalized": {
+    "mean": 1.0,
+    "sd": 0.0,
+    "ci95": [
+     1.0,
+     1.0
+    ],
+    "n": 16
+   },
+   "gradient_only": {
+    "mean": 0.0,
+    "sd": 0.0,
+    "ci95": [
+     0.0,
+     0.0
+    ],
+    "n": 16
+   }
+  },
+  "credit_neural": {
+   "generalized": {
+    "mean": 0.9931,
+    "sd": 0.0277,
+    "ci95": [
+     0.9795,
+     1.0067
+    ],
+    "n": 16
+   },
+   "gradient_only": {
+    "mean": 0.8722,
+    "sd": 0.1064,
+    "ci95": [
+     0.82,
+     0.9243
+    ],
+    "n": 16
+   }
+  },
+  "continual": {
+   "vanilla": {
+    "new_task": {
+     "mean": 0.8994,
+     "sd": 0.2088,
+     "ci95": [
+      0.7971,
+      1.0017
+     ],
+     "n": 16
+    },
+    "retention": {
+     "mean": 0.5013,
+     "sd": 0.0711,
+     "ci95": [
+      0.4665,
+      0.5361
+     ],
+     "n": 16
+    },
+    "forgetting": {
+     "mean": 0.4889,
+     "sd": 0.0967,
+     "ci95": [
+      0.4415,
+      0.5362
+     ],
+     "n": 16
+    },
+    "parameters_changed": {
+     "mean": 2304.375,
+     "sd": 345.534,
+     "ci95": [
+      2135.0634,
+      2473.6866
+     ],
+     "n": 16
+    },
+    "rollbacks": {
+     "mean": 0.0,
+     "sd": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "adaptation_cost": {
+     "mean": 600.0,
+     "sd": 0.0,
+     "ci95": [
+      600.0,
+      600.0
+     ],
+     "n": 16
+    }
+   },
+   "fast_weights": {
+    "new_task": {
+     "mean": 0.9625,
+     "sd": 0.1256,
+     "ci95": [
+      0.901,
+      1.024
+     ],
+     "n": 16
+    },
+    "retention": {
+     "mean": 0.547,
+     "sd": 0.0783,
+     "ci95": [
+      0.5087,
+      0.5854
+     ],
+     "n": 16
+    },
+    "forgetting": {
+     "mean": 0.4431,
+     "sd": 0.0973,
+     "ci95": [
+      0.3955,
+      0.4908
+     ],
+     "n": 16
+    },
+    "parameters_changed": {
+     "mean": 2257.375,
+     "sd": 324.8842,
+     "ci95": [
+      2098.1818,
+      2416.5682
+     ],
+     "n": 16
+    },
+    "rollbacks": {
+     "mean": 0.0,
+     "sd": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "adaptation_cost": {
+     "mean": 600.0,
+     "sd": 0.0,
+     "ci95": [
+      600.0,
+      600.0
+     ],
+     "n": 16
+    }
+   },
+   "replay": {
+    "new_task": {
+     "mean": 0.9523,
+     "sd": 0.1243,
+     "ci95": [
+      0.8914,
+      1.0132
+     ],
+     "n": 16
+    },
+    "retention": {
+     "mean": 0.8167,
+     "sd": 0.082,
+     "ci95": [
+      0.7765,
+      0.8569
+     ],
+     "n": 16
+    },
+    "forgetting": {
+     "mean": 0.1735,
+     "sd": 0.0666,
+     "ci95": [
+      0.1408,
+      0.2061
+     ],
+     "n": 16
+    },
+    "parameters_changed": {
+     "mean": 2577.75,
+     "sd": 309.5393,
+     "ci95": [
+      2426.0757,
+      2729.4243
+     ],
+     "n": 16
+    },
+    "rollbacks": {
+     "mean": 0.0,
+     "sd": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "adaptation_cost": {
+     "mean": 600.0,
+     "sd": 0.0,
+     "ci95": [
+      600.0,
+      600.0
+     ],
+     "n": 16
+    }
+   },
+   "invariant_constrained": {
+    "new_task": {
+     "mean": 0.8829,
+     "sd": 0.1293,
+     "ci95": [
+      0.8196,
+      0.9463
+     ],
+     "n": 16
+    },
+    "retention": {
+     "mean": 0.9889,
+     "sd": 0.0394,
+     "ci95": [
+      0.9697,
+      1.0082
+     ],
+     "n": 16
+    },
+    "forgetting": {
+     "mean": 0.0012,
+     "sd": 0.0017,
+     "ci95": [
+      0.0004,
+      0.0021
+     ],
+     "n": 16
+    },
+    "parameters_changed": {
+     "mean": 2592.3125,
+     "sd": 368.8061,
+     "ci95": [
+      2411.5975,
+      2773.0275
+     ],
+     "n": 16
+    },
+    "rollbacks": {
+     "mean": 0.0625,
+     "sd": 0.25,
+     "ci95": [
+      -0.06,
+      0.185
+     ],
+     "n": 16
+    },
+    "adaptation_cost": {
+     "mean": 637.5,
+     "sd": 150.0,
+     "ci95": [
+      564.0,
+      711.0
+     ],
+     "n": 16
+    }
+   },
+   "perturbation_guided": {
+    "new_task": {
+     "mean": 0.7364,
+     "sd": 0.1799,
+     "ci95": [
+      0.6483,
+      0.8246
+     ],
+     "n": 16
+    },
+    "retention": {
+     "mean": 0.9884,
+     "sd": 0.0383,
+     "ci95": [
+      0.9697,
+      1.0072
+     ],
+     "n": 16
+    },
+    "forgetting": {
+     "mean": 0.0018,
+     "sd": 0.0026,
+     "ci95": [
+      0.0005,
+      0.003
+     ],
+     "n": 16
+    },
+    "parameters_changed": {
+     "mean": 649.9375,
+     "sd": 388.2682,
+     "ci95": [
+      459.6861,
+      840.1889
+     ],
+     "n": 16
+    },
+    "rollbacks": {
+     "mean": 0.1875,
+     "sd": 0.4031,
+     "ci95": [
+      -0.01,
+      0.385
+     ],
+     "n": 16
+    },
+    "adaptation_cost": {
+     "mean": 600.0,
+     "sd": 0.0,
+     "ci95": [
+      600.0,
+      600.0
+     ],
+     "n": 16
+    }
+   }
+  },
+  "diagnosis": {
+   "planner_only": {
+    "cause_accuracy": {
+     "mean": 1.0,
+     "sd": 0.0,
+     "ci95": [
+      1.0,
+      1.0
+     ],
+     "n": 16
+    },
+    "measurements": {
+     "mean": 3.33,
+     "sd": 0.0,
+     "ci95": [
+      3.33,
+      3.33
+     ],
+     "n": 16
+    },
+    "cost": {
+     "mean": 0.117,
+     "sd": 0.0,
+     "ci95": [
+      0.117,
+      0.117
+     ],
+     "n": 16
+    },
+    "repaired": {
+     "mean": 1.0,
+     "sd": 0.0,
+     "ci95": [
+      1.0,
+      1.0
+     ],
+     "n": 16
+    }
+   },
+   "perturbation_guided": {
+    "cause_accuracy": {
+     "mean": 1.0,
+     "sd": 0.0,
+     "ci95": [
+      1.0,
+      1.0
+     ],
+     "n": 16
+    },
+    "measurements": {
+     "mean": 2.9463,
+     "sd": 0.2305,
+     "ci95": [
+      2.8333,
+      3.0592
+     ],
+     "n": 16
+    },
+    "cost": {
+     "mean": 0.1573,
+     "sd": 0.0081,
+     "ci95": [
+      0.1534,
+      0.1613
+     ],
+     "n": 16
+    },
+    "repaired": {
+     "mean": 1.0,
+     "sd": 0.0,
+     "ci95": [
+      1.0,
+      1.0
+     ],
+     "n": 16
+    }
+   }
+  },
+  "compression": {
+   "algebra": {
+    "ratio": {
+     "mean": 5.5154,
+     "sd": 0.1345,
+     "ci95": [
+      5.4495,
+      5.5813
+     ],
+     "n": 16
+    },
+    "faithful": {
+     "mean": 1.0,
+     "sd": 0.0,
+     "ci95": [
+      1.0,
+      1.0
+     ],
+     "n": 16
+    },
+    "classes": {
+     "mean": 7.625,
+     "sd": 0.6191,
+     "ci95": [
+      7.3216,
+      7.9284
+     ],
+     "n": 16
+    }
+   },
+   "language": {
+    "ratio": {
+     "mean": 3.5406,
+     "sd": 0.1881,
+     "ci95": [
+      3.4484,
+      3.6327
+     ],
+     "n": 16
+    },
+    "faithful": {
+     "mean": 1.0,
+     "sd": 0.0,
+     "ci95": [
+      1.0,
+      1.0
+     ],
+     "n": 16
+    },
+    "classes": {
+     "mean": 4.6875,
+     "sd": 1.1955,
+     "ci95": [
+      4.1017,
+      5.2733
+     ],
+     "n": 16
+    }
+   },
+   "code": {
+    "ratio": {
+     "mean": 8.3199,
+     "sd": 0.744,
+     "ci95": [
+      7.9554,
+      8.6845
+     ],
+     "n": 16
+    },
+    "faithful": {
+     "mean": 1.0,
+     "sd": 0.0,
+     "ci95": [
+      1.0,
+      1.0
+     ],
+     "n": 16
+    },
+    "classes": {
+     "mean": 17.5625,
+     "sd": 2.0646,
+     "ci95": [
+      16.5509,
+      18.5741
+     ],
+     "n": 16
+    }
+   },
+   "geometry": {
+    "ratio": {
+     "mean": 14.1319,
+     "sd": 0.2168,
+     "ci95": [
+      14.0256,
+      14.2381
+     ],
+     "n": 16
+    },
+    "faithful": {
+     "mean": 1.0,
+     "sd": 0.0,
+     "ci95": [
+      1.0,
+      1.0
+     ],
+     "n": 16
+    },
+    "classes": {
+     "mean": 8.0,
+     "sd": 0.0,
+     "ci95": [
+      8.0,
+      8.0
+     ],
+     "n": 16
+    }
+   },
+   "sequence": {
+    "ratio": {
+     "mean": 3.1525,
+     "sd": 0.2658,
+     "ci95": [
+      3.0223,
+      3.2827
+     ],
+     "n": 16
+    },
+    "faithful": {
+     "mean": 1.0,
+     "sd": 0.0,
+     "ci95": [
+      1.0,
+      1.0
+     ],
+     "n": 16
+    },
+    "classes": {
+     "mean": 8.0,
+     "sd": 0.0,
+     "ci95": [
+      8.0,
+      8.0
+     ],
+     "n": 16
+    }
+   }
+  }
+ },
+ "comparisons": {
+  "invariant_constrained_vs_vanilla": {
+   "new_task": {
+    "mean": -0.0165,
+    "sd": 0.2799,
+    "ci95": [
+     -0.1536,
+     0.1207
+    ],
+    "n": 16,
+    "seeds_positive": 3,
+    "seeds_negative": 13
+   },
+   "retention": {
+    "mean": 0.4877,
+    "sd": 0.0969,
+    "ci95": [
+     0.4402,
+     0.5351
+    ],
+    "n": 16,
+    "seeds_positive": 16,
+    "seeds_negative": 0
+   }
+  },
+  "perturbation_guided_vs_vanilla": {
+   "new_task": {
+    "mean": -0.163,
+    "sd": 0.2991,
+    "ci95": [
+     -0.3095,
+     -0.0164
+    ],
+    "n": 16,
+    "seeds_positive": 2,
+    "seeds_negative": 14
+   },
+   "retention": {
+    "mean": 0.4871,
+    "sd": 0.0959,
+    "ci95": [
+     0.4401,
+     0.5341
+    ],
+    "n": 16,
+    "seeds_positive": 16,
+    "seeds_negative": 0
+   }
+  },
+  "invariant_constrained_vs_replay": {
+   "new_task": {
+    "mean": -0.0694,
+    "sd": 0.1988,
+    "ci95": [
+     -0.1668,
+     0.028
+    ],
+    "n": 16,
+    "seeds_positive": 2,
+    "seeds_negative": 14
+   },
+   "retention": {
+    "mean": 0.1723,
+    "sd": 0.0665,
+    "ci95": [
+     0.1397,
+     0.2048
+    ],
+    "n": 16,
+    "seeds_positive": 16,
+    "seeds_negative": 0
+   }
+  },
+  "perturbation_guided_vs_invariant_constrained": {
+   "new_task": {
+    "mean": -0.1465,
+    "sd": 0.2262,
+    "ci95": [
+     -0.2573,
+     -0.0357
+    ],
+    "n": 16,
+    "seeds_positive": 4,
+    "seeds_negative": 12
+   },
+   "retention": {
+    "mean": -0.0005,
+    "sd": 0.0033,
+    "ci95": [
+     -0.0021,
+     0.0011
+    ],
+    "n": 16,
+    "seeds_positive": 5,
+    "seeds_negative": 8
+   }
+  },
+  "fast_weights_vs_vanilla": {
+   "new_task": {
+    "mean": 0.0631,
+    "sd": 0.1805,
+    "ci95": [
+     -0.0253,
+     0.1515
+    ],
+    "n": 16,
+    "seeds_positive": 5,
+    "seeds_negative": 7
+   },
+   "retention": {
+    "mean": 0.0457,
+    "sd": 0.0809,
+    "ci95": [
+     0.0061,
+     0.0854
+    ],
+    "n": 16,
+    "seeds_positive": 9,
+    "seeds_negative": 6
+   }
+  },
+  "credit_generalized_vs_gradient": {
+   "mean": 0.7564,
+   "sd": 0.0368,
+   "ci95": [
+    0.7384,
+    0.7745
+   ],
+   "n": 16,
+   "seeds_positive": 16,
+   "seeds_negative": 0
+  },
+  "diagnosis_cost_guided_vs_planner": {
+   "mean": 0.0403,
+   "sd": 0.0081,
+   "ci95": [
+    0.0364,
+    0.0443
+   ],
+   "n": 16,
+   "seeds_positive": 16,
+   "seeds_negative": 0
+  }
+ },
+ "per_seed": [
+  {
+   "bench": {
+    "small": {
+     "duality": 0.9333,
+     "always_preserved": 0.4667,
+     "surface": 0.6,
+     "truth_rate": 0.4667,
+     "n": 60
+    },
+    "composed": {
+     "duality": 0.9167,
+     "always_preserved": 0.3667,
+     "surface": 0.7,
+     "truth_rate": 0.3667,
+     "n": 60
+    },
+    "ood": {
+     "duality": 1.0,
+     "always_preserved": 0.5278,
+     "surface": 0.4722,
+     "truth_rate": 0.5278,
+     "n": 36
+    },
+    "interaction": {
+     "abs_interaction": 0.7948,
+     "relative_interaction": 0.4547,
+     "resonance_candidate(>25%)": 0.5833,
+     "n": 12
+    },
+    "transition": {
+     "abs_error": 0.0534,
+     "detected(<0.1)": 0.9167,
+     "n": 12
+    }
+   },
+   "credit": {
+    "generalized": 1.0,
+    "gradient_only": 0.233,
+    "random": 0.067,
+    "repaired": 1.0,
+    "neural": {
+     "generalized": 1.0,
+     "gradient_only": 0.7
+    },
+    "symbolic": {
+     "generalized": 1.0,
+     "gradient_only": 0.0
+    },
+    "n": 30,
+    "silent": 10
+   },
+   "continual": {
+    "vanilla": {
+     "method": "vanilla",
+     "new_task": 1.0,
+     "old_A": 0.4537,
+     "old_C": 0.5,
+     "retention": 0.4768,
+     "forgetting": 0.5232,
+     "parameters_changed": 2280,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "commit",
+     "reasons": []
+    },
+    "fast_weights": {
+     "method": "fast_weights",
+     "new_task": 0.9756,
+     "old_A": 0.3049,
+     "old_C": 0.5659,
+     "retention": 0.4354,
+     "forgetting": 0.5646,
+     "parameters_changed": 2361,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "commit",
+     "reasons": []
+    },
+    "replay": {
+     "method": "replay",
+     "new_task": 0.9512,
+     "old_A": 0.761,
+     "old_C": 0.822,
+     "retention": 0.7915,
+     "forgetting": 0.2085,
+     "parameters_changed": 2656,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "commit",
+     "reasons": []
+    },
+    "invariant_constrained": {
+     "method": "invariant_constrained",
+     "new_task": 0.9976,
+     "old_A": 1.0,
+     "old_C": 1.0,
+     "retention": 1.0,
+     "forgetting": 0.0,
+     "parameters_changed": 2918,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "consolidate",
+     "reasons": [
+      "acceptable"
+     ]
+    },
+    "perturbation_guided": {
+     "method": "perturbation_guided",
+     "new_task": 0.722,
+     "old_A": 1.0,
+     "old_C": 0.9976,
+     "retention": 0.9988,
+     "forgetting": 0.0012,
+     "parameters_changed": 878,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "consolidate",
+     "reasons": [
+      "acceptable"
+     ]
+    }
+   },
+   "diagnosis": {
+    "planner_only": {
+     "cause_accuracy": 1.0,
+     "measurements": 3.33,
+     "cost": 0.117,
+     "repaired": 1.0
+    },
+    "perturbation_guided": {
+     "cause_accuracy": 1.0,
+     "measurements": 2.89,
+     "cost": 0.154,
+     "repaired": 1.0
+    }
+   },
+   "compression": {
+    "algebra": {
+     "items": 200,
+     "classes": 7,
+     "raw_bytes": 4534,
+     "compressed_bytes": 836,
+     "ratio": 5.423,
+     "faithful": 1.0
+    },
+    "language": {
+     "items": 200,
+     "classes": 6,
+     "raw_bytes": 3085,
+     "compressed_bytes": 857,
+     "ratio": 3.6,
+     "faithful": 1.0
+    },
+    "code": {
+     "items": 200,
+     "classes": 19,
+     "raw_bytes": 23806,
+     "compressed_bytes": 2933,
+     "ratio": 8.117,
+     "faithful": 1.0
+    },
+    "geometry": {
+     "items": 200,
+     "classes": 8,
+     "raw_bytes": 26216,
+     "compressed_bytes": 1908,
+     "ratio": 13.74,
+     "faithful": 1.0
+    },
+    "sequence": {
+     "items": 200,
+     "classes": 8,
+     "raw_bytes": 3279,
+     "compressed_bytes": 914,
+     "ratio": 3.588,
+     "faithful": 1.0
+    }
+   }
+  },
+  {
+   "bench": {
+    "small": {
+     "duality": 0.8833,
+     "always_preserved": 0.55,
+     "surface": 0.65,
+     "truth_rate": 0.55,
+     "n": 60
+    },
+    "composed": {
+     "duality": 0.9,
+     "always_preserved": 0.5,
+     "surface": 0.55,
+     "truth_rate": 0.5,
+     "n": 60
+    },
+    "ood": {
+     "duality": 1.0,
+     "always_preserved": 0.5556,
+     "surface": 0.4444,
+     "truth_rate": 0.5556,
+     "n": 36
+    },
+    "interaction": {
+     "abs_interaction": 2.0242,
+     "relative_interaction": 0.4274,
+     "resonance_candidate(>25%)": 0.5,
+     "n": 12
+    },
+    "transition": {
+     "abs_error": 0.0488,
+     "detected(<0.1)": 1.0,
+     "n": 12
+    }
+   },
+   "credit": {
+    "generalized": 1.0,
+    "gradient_only": 0.269,
+    "random": 0.038,
+    "repaired": 1.0,
+    "neural": {
+     "generalized": 1.0,
+     "gradient_only": 0.875
+    },
+    "symbolic": {
+     "generalized": 1.0,
+     "gradient_only": 0.0
+    },
+    "n": 26,
+    "silent": 14
+   },
+   "continual": {
+    "vanilla": {
+     "method": "vanilla",
+     "new_task": 1.0,
+     "old_A": 0.4341,
+     "old_C": 0.5,
+     "retention": 0.4671,
+     "forgetting": 0.5329,
+     "parameters_changed": 1966,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "commit",
+     "reasons": []
+    },
+    "fast_weights": {
+     "method": "fast_weights",
+     "new_task": 0.9976,
+     "old_A": 0.7683,
+     "old_C": 0.6244,
+     "retention": 0.6963,
+     "forgetting": 0.3037,
+     "parameters_changed": 1883,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "commit",
+     "reasons": []
+    },
+    "replay": {
+     "method": "replay",
+     "new_task": 0.9902,
+     "old_A": 0.8659,
+     "old_C": 0.7829,
+     "retention": 0.8244,
+     "forgetting": 0.1756,
+     "parameters_changed": 2454,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "commit",
+     "reasons": []
+    },
+    "invariant_constrained": {
+     "method": "invariant_constrained",
+     "new_task": 0.9756,
+     "old_A": 1.0,
+     "old_C": 1.0,
+     "retention": 1.0,
+     "forgetting": 0.0,
+     "parameters_changed": 2119,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "consolidate",
+     "reasons": [
+      "acceptable"
+     ]
+    },
+    "perturbation_guided": {
+     "method": "perturbation_guided",
+     "new_task": 0.5659,
+     "old_A": 1.0,
+     "old_C": 0.9927,
+     "retention": 0.9963,
+     "forgetting": 0.0037,
+     "parameters_changed": 298,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "consolidate",
+     "reasons": [
+      "acceptable"
+     ]
+    }
+   },
+   "diagnosis": {
+    "planner_only": {
+     "cause_accuracy": 1.0,
+     "measurements": 3.33,
+     "cost": 0.117,
+     "repaired": 1.0
+    },
+    "perturbation_guided": {
+     "cause_accuracy": 1.0,
+     "measurements": 2.83,
+     "cost": 0.155,
+     "repaired": 1.0
+    }
+   },
+   "compression": {
+    "algebra": {
+     "items": 200,
+     "classes": 8,
+     "raw_bytes": 4759,
+     "compressed_bytes": 842,
+     "ratio": 5.652,
+     "faithful": 1.0
+    },
+    "language": {
+     "items": 200,
+     "classes": 4,
+     "raw_bytes": 3112,
+     "compressed_bytes": 862,
+     "ratio": 3.61,
+     "faithful": 1.0
+    },
+    "code": {
+     "items": 200,
+     "classes": 20,
+     "raw_bytes": 24588,
+     "compressed_bytes": 3277,
+     "ratio": 7.503,
+     "faithful": 1.0
+    },
+    "geometry": {
+     "items": 200,
+     "classes": 8,
+     "raw_bytes": 26312,
+     "compressed_bytes": 1858,
+     "ratio": 14.161,
+     "faithful": 1.0
+    },
+    "sequence": {
+     "items": 200,
+     "classes": 8,
+     "raw_bytes": 2625,
+     "compressed_bytes": 886,
+     "ratio": 2.963,
+     "faithful": 1.0
+    }
+   }
+  },
+  {
+   "bench": {
+    "small": {
+     "duality": 0.9667,
+     "always_preserved": 0.6,
+     "surface": 0.5,
+     "truth_rate": 0.6,
+     "n": 60
+    },
+    "composed": {
+     "duality": 0.9333,
+     "always_preserved": 0.3,
+     "surface": 0.7333,
+     "truth_rate": 0.3,
+     "n": 60
+    },
+    "ood": {
+     "duality": 1.0,
+     "always_preserved": 0.5556,
+     "surface": 0.4444,
+     "truth_rate": 0.5556,
+     "n": 36
+    },
+    "interaction": {
+     "abs_interaction": 1.2864,
+     "relative_interaction": 0.4088,
+     "resonance_candidate(>25%)": 0.3333,
+     "n": 12
+    },
+    "transition": {
+     "abs_error": 0.0489,
+     "detected(<0.1)": 0.9167,
+     "n": 12
+    }
+   },
+   "credit": {
+    "generalized": 1.0,
+    "gradient_only": 0.222,
+    "random": 0.0,
+    "repaired": 1.0,
+    "neural": {
+     "generalized": 1.0,
+     "gradient_only": 0.75
+    },
+    "symbolic": {
+     "generalized": 1.0,
+     "gradient_only": 0.0
+    },
+    "n": 27,
+    "silent": 13
+   },
+   "continual": {
+    "vanilla": {
+     "method": "vanilla",
+     "new_task": 1.0,
+     "old_A": 0.4902,
+     "old_C": 0.4707,
+     "retention": 0.4805,
+     "forgetting": 0.5195,
+     "parameters_changed": 2248,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "commit",
+     "reasons": []
+    },
+    "fast_weights": {
+     "method": "fast_weights",
+     "new_task": 1.0,
+     "old_A": 0.6902,
+     "old_C": 0.5122,
+     "retention": 0.6012,
+     "forgetting": 0.3988,
+     "parameters_changed": 2185,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "commit",
+     "reasons": []
+    },
+    "replay": {
+     "method": "replay",
+     "new_task": 1.0,
+     "old_A": 0.9,
+     "old_C": 0.9073,
+     "retention": 0.9037,
+     "forgetting": 0.0963,
+     "parameters_changed": 2687,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "commit",
+     "reasons": []
+    },
+    "invariant_constrained": {
+     "method": "invariant_constrained",
+     "new_task": 0.9317,
+     "old_A": 1.0,
+     "old_C": 1.0,
+     "retention": 1.0,
+     "forgetting": 0.0,
+     "parameters_changed": 2614,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "consolidate",
+     "reasons": [
+      "acceptable"
+     ]
+    },
+    "perturbation_guided": {
+     "method": "perturbation_guided",
+     "new_task": 0.8585,
+     "old_A": 1.0,
+     "old_C": 1.0,
+     "retention": 1.0,
+     "forgetting": 0.0,
+     "parameters_changed": 693,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "consolidate",
+     "reasons": [
+      "acceptable"
+     ]
+    }
+   },
+   "diagnosis": {
+    "planner_only": {
+     "cause_accuracy": 1.0,
+     "measurements": 3.33,
+     "cost": 0.117,
+     "repaired": 1.0
+    },
+    "perturbation_guided": {
+     "cause_accuracy": 1.0,
+     "measurements": 3.11,
+     "cost": 0.168,
+     "repaired": 1.0
+    }
+   },
+   "compression": {
+    "algebra": {
+     "items": 200,
+     "classes": 8,
+     "raw_bytes": 4980,
+     "compressed_bytes": 885,
+     "ratio": 5.627,
+     "faithful": 1.0
+    },
+    "language": {
+     "items": 200,
+     "classes": 3,
+     "raw_bytes": 3239,
+     "compressed_bytes": 831,
+     "ratio": 3.898,
+     "faithful": 1.0
+    },
+    "code": {
+     "items": 200,
+     "classes": 17,
+     "raw_bytes": 23020,
+     "compressed_bytes": 2711,
+     "ratio": 8.491,
+     "faithful": 1.0
+    },
+    "geometry": {
+     "items": 200,
+     "classes": 8,
+     "raw_bytes": 26232,
+     "compressed_bytes": 1898,
+     "ratio": 13.821,
+     "faithful": 1.0
+    },
+    "sequence": {
+     "items": 200,
+     "classes": 8,
+     "raw_bytes": 3381,
+     "compressed_bytes": 964,
+     "ratio": 3.507,
+     "faithful": 1.0
+    }
+   }
+  },
+  {
+   "bench": {
+    "small": {
+     "duality": 0.95,
+     "always_preserved": 0.45,
+     "surface": 0.7333,
+     "truth_rate": 0.45,
+     "n": 60
+    },
+    "composed": {
+     "duality": 0.9667,
+     "always_preserved": 0.4667,
+     "surface": 0.5667,
+     "truth_rate": 0.4667,
+     "n": 60
+    },
+    "ood": {
+     "duality": 1.0,
+     "always_preserved": 0.3611,
+     "surface": 0.6389,
+     "truth_rate": 0.3611,
+     "n": 36
+    },
+    "interaction": {
+     "abs_interaction": 0.7705,
+     "relative_interaction": 0.4761,
+     "resonance_candidate(>25%)": 0.4167,
+     "n": 12
+    },
+    "transition": {
+     "abs_error": 0.0706,
+     "detected(<0.1)": 0.8333,
+     "n": 12
+    }
+   },
+   "credit": {
+    "generalized": 1.0,
+    "gradient_only": 0.208,
+    "random": 0.0,
+    "repaired": 1.0,
+    "neural": {
+     "generalized": 1.0,
+     "gradient_only": 0.833
+    },
+    "symbolic": {
+     "generalized": 1.0,
+     "gradient_only": 0.0
+    },
+    "n": 24,
+    "silent": 16
+   },
+   "continual": {
+    "vanilla": {
+     "method": "vanilla",
+     "new_task": 1.0,
+     "old_A": 0.2732,
+     "old_C": 0.5,
+     "retention": 0.3866,
+     "forgetting": 0.6134,
+     "parameters_changed": 1944,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "commit",
+     "reasons": []
+    },
+    "fast_weights": {
+     "method": "fast_weights",
+     "new_task": 0.9976,
+     "old_A": 0.3878,
+     "old_C": 0.4585,
+     "retention": 0.4232,
+     "forgetting": 0.5768,
+     "parameters_changed": 1910,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "commit",
+     "reasons": []
+    },
+    "replay": {
+     "method": "replay",
+     "new_task": 0.9927,
+     "old_A": 0.9049,
+     "old_C": 0.8293,
+     "retention": 0.8671,
+     "forgetting": 0.1329,
+     "parameters_changed": 2207,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "commit",
+     "reasons": []
+    },
+    "invariant_constrained": {
+     "method": "invariant_constrained",
+     "new_task": 0.9463,
+     "old_A": 1.0,
+     "old_C": 0.9927,
+     "retention": 0.9963,
+     "forgetting": 0.0037,
+     "parameters_changed": 2145,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "consolidate",
+     "reasons": [
+      "acceptable"
+     ]
+    },
+    "perturbation_guided": {
+     "method": "perturbation_guided",
+     "new_task": 0.5244,
+     "old_A": 1.0,
+     "old_C": 0.9976,
+     "retention": 0.9988,
+     "forgetting": 0.0012,
+     "parameters_changed": 397,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "consolidate",
+     "reasons": [
+      "acceptable"
+     ]
+    }
+   },
+   "diagnosis": {
+    "planner_only": {
+     "cause_accuracy": 1.0,
+     "measurements": 3.33,
+     "cost": 0.117,
+     "repaired": 1.0
+    },
+    "perturbation_guided": {
+     "cause_accuracy": 1.0,
+     "measurements": 2.75,
+     "cost": 0.155,
+     "repaired": 1.0
+    }
+   },
+   "compression": {
+    "algebra": {
+     "items": 200,
+     "classes": 7,
+     "raw_bytes": 4789,
+     "compressed_bytes": 858,
+     "ratio": 5.582,
+     "faithful": 1.0
+    },
+    "language": {
+     "items": 200,
+     "classes": 4,
+     "raw_bytes": 3168,
+     "compressed_bytes": 878,
+     "ratio": 3.608,
+     "faithful": 1.0
+    },
+    "code": {
+     "items": 200,
+     "classes": 19,
+     "raw_bytes": 23294,
+     "compressed_bytes": 3117,
+     "ratio": 7.473,
+     "faithful": 1.0
+    },
+    "geometry": {
+     "items": 200,
+     "classes": 8,
+     "raw_bytes": 26328,
+     "compressed_bytes": 1868,
+     "ratio": 14.094,
+     "faithful": 1.0
+    },
+    "sequence": {
+     "items": 200,
+     "classes": 8,
+     "raw_bytes": 2931,
+     "compressed_bytes": 939,
+     "ratio": 3.121,
+     "faithful": 1.0
+    }
+   }
+  },
+  {
+   "bench": {
+    "small": {
+     "duality": 0.9667,
+     "always_preserved": 0.5667,
+     "surface": 0.6,
+     "truth_rate": 0.5667,
+     "n": 60
+    },
+    "composed": {
+     "duality": 0.9833,
+     "always_preserved": 0.3667,
+     "surface": 0.6833,
+     "truth_rate": 0.3667,
+     "n": 60
+    },
+    "ood": {
+     "duality": 1.0,
+     "always_preserved": 0.6389,
+     "surface": 0.3611,
+     "truth_rate": 0.6389,
+     "n": 36
+    },
+    "interaction": {
+     "abs_interaction": 1.2807,
+     "relative_interaction": 0.5886,
+     "resonance_candidate(>25%)": 0.5,
+     "n": 12
+    },
+    "transition": {
+     "abs_error": 0.0488,
+     "detected(<0.1)": 0.9167,
+     "n": 12
+    }
+   },
+   "credit": {
+    "generalized": 0.967,
+    "gradient_only": 0.233,
+    "random": 0.167,
+    "repaired": 1.0,
+    "neural": {
+     "generalized": 0.889,
+     "gradient_only": 0.778
+    },
+    "symbolic": {
+     "generalized": 1.0,
+     "gradient_only": 0.0
+    },
+    "n": 30,
+    "silent": 10
+   },
+   "continual": {
+    "vanilla": {
+     "method": "vanilla",
+     "new_task": 1.0,
+     "old_A": 0.5415,
+     "old_C": 0.4902,
+     "retention": 0.5159,
+     "forgetting": 0.4829,
+     "parameters_changed": 2708,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "commit",
+     "reasons": []
+    },
+    "fast_weights": {
+     "method": "fast_weights",
+     "new_task": 0.9951,
+     "old_A": 0.5024,
+     "old_C": 0.6195,
+     "retention": 0.561,
+     "forgetting": 0.4378,
+     "parameters_changed": 2512,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "commit",
+     "reasons": []
+    },
+    "replay": {
+     "method": "replay",
+     "new_task": 1.0,
+     "old_A": 0.6976,
+     "old_C": 0.6976,
+     "retention": 0.6976,
+     "forgetting": 0.3012,
+     "parameters_changed": 2860,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "commit",
+     "reasons": []
+    },
+    "invariant_constrained": {
+     "method": "invariant_constrained",
+     "new_task": 0.6415,
+     "old_A": 1.0,
+     "old_C": 1.0,
+     "retention": 1.0,
+     "forgetting": -0.0012,
+     "parameters_changed": 2926,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "consolidate",
+     "reasons": [
+      "acceptable"
+     ]
+    },
+    "perturbation_guided": {
+     "method": "perturbation_guided",
+     "new_task": 0.6341,
+     "old_A": 0.9976,
+     "old_C": 1.0,
+     "retention": 0.9988,
+     "forgetting": 0.0,
+     "parameters_changed": 961,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "consolidate",
+     "reasons": [
+      "acceptable"
+     ]
+    }
+   },
+   "diagnosis": {
+    "planner_only": {
+     "cause_accuracy": 1.0,
+     "measurements": 3.33,
+     "cost": 0.117,
+     "repaired": 1.0
+    },
+    "perturbation_guided": {
+     "cause_accuracy": 1.0,
+     "measurements": 3.19,
+     "cost": 0.163,
+     "repaired": 1.0
+    }
+   },
+   "compression": {
+    "algebra": {
+     "items": 200,
+     "classes": 8,
+     "raw_bytes": 4753,
+     "compressed_bytes": 821,
+     "ratio": 5.789,
+     "faithful": 1.0
+    },
+    "language": {
+     "items": 200,
+     "classes": 3,
+     "raw_bytes": 3150,
+     "compressed_bytes": 883,
+     "ratio": 3.567,
+     "faithful": 1.0
+    },
+    "code": {
+     "items": 200,
+     "classes": 17,
+     "raw_bytes": 23424,
+     "compressed_bytes": 2761,
+     "ratio": 8.484,
+     "faithful": 1.0
+    },
+    "geometry": {
+     "items": 200,
+     "classes": 8,
+     "raw_bytes": 26144,
+     "compressed_bytes": 1820,
+     "ratio": 14.365,
+     "faithful": 1.0
+    },
+    "sequence": {
+     "items": 200,
+     "classes": 8,
+     "raw_bytes": 2523,
+     "compressed_bytes": 914,
+     "ratio": 2.76,
+     "faithful": 1.0
+    }
+   }
+  },
+  {
+   "bench": {
+    "small": {
+     "duality": 0.9333,
+     "always_preserved": 0.5333,
+     "surface": 0.65,
+     "truth_rate": 0.5333,
+     "n": 60
+    },
+    "composed": {
+     "duality": 0.9333,
+     "always_preserved": 0.3333,
+     "surface": 0.7167,
+     "truth_rate": 0.3333,
+     "n": 60
+    },
+    "ood": {
+     "duality": 1.0,
+     "always_preserved": 0.4722,
+     "surface": 0.5278,
+     "truth_rate": 0.4722,
+     "n": 36
+    },
+    "interaction": {
+     "abs_interaction": 0.9628,
+     "relative_interaction": 0.4542,
+     "resonance_candidate(>25%)": 0.5833,
+     "n": 12
+    },
+    "transition": {
+     "abs_error": 0.0447,
+     "detected(<0.1)": 1.0,
+     "n": 12
+    }
+   },
+   "credit": {
+    "generalized": 1.0,
+    "gradient_only": 0.233,
+    "random": 0.167,
+    "repaired": 1.0,
+    "neural": {
+     "generalized": 1.0,
+     "gradient_only": 0.875
+    },
+    "symbolic": {
+     "generalized": 1.0,
+     "gradient_only": 0.0
+    },
+    "n": 30,
+    "silent": 10
+   },
+   "continual": {
+    "vanilla": {
+     "method": "vanilla",
+     "new_task": 1.0,
+     "old_A": 0.3244,
+     "old_C": 0.5024,
+     "retention": 0.4134,
+     "forgetting": 0.5866,
+     "parameters_changed": 2623,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "commit",
+     "reasons": []
+    },
+    "fast_weights": {
+     "method": "fast_weights",
+     "new_task": 1.0,
+     "old_A": 0.7122,
+     "old_C": 0.4756,
+     "retention": 0.5939,
+     "forgetting": 0.4061,
+     "parameters_changed": 2575,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "commit",
+     "reasons": []
+    },
+    "replay": {
+     "method": "replay",
+     "new_task": 0.9976,
+     "old_A": 0.8634,
+     "old_C": 0.7073,
+     "retention": 0.7854,
+     "forgetting": 0.2146,
+     "parameters_changed": 2778,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "commit",
+     "reasons": []
+    },
+    "invariant_constrained": {
+     "method": "invariant_constrained",
+     "new_task": 0.9756,
+     "old_A": 1.0,
+     "old_C": 1.0,
+     "retention": 1.0,
+     "forgetting": 0.0,
+     "parameters_changed": 2937,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "consolidate",
+     "reasons": [
+      "acceptable"
+     ]
+    },
+    "perturbation_guided": {
+     "method": "perturbation_guided",
+     "new_task": 0.9634,
+     "old_A": 1.0,
+     "old_C": 1.0,
+     "retention": 1.0,
+     "forgetting": 0.0,
+     "parameters_changed": 943,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "consolidate",
+     "reasons": [
+      "acceptable"
+     ]
+    }
+   },
+   "diagnosis": {
+    "planner_only": {
+     "cause_accuracy": 1.0,
+     "measurements": 3.33,
+     "cost": 0.117,
+     "repaired": 1.0
+    },
+    "perturbation_guided": {
+     "cause_accuracy": 1.0,
+     "measurements": 2.58,
+     "cost": 0.151,
+     "repaired": 1.0
+    }
+   },
+   "compression": {
+    "algebra": {
+     "items": 200,
+     "classes": 6,
+     "raw_bytes": 4654,
+     "compressed_bytes": 841,
+     "ratio": 5.534,
+     "faithful": 1.0
+    },
+    "language": {
+     "items": 200,
+     "classes": 5,
+     "raw_bytes": 3090,
+     "compressed_bytes": 897,
+     "ratio": 3.445,
+     "faithful": 1.0
+    },
+    "code": {
+     "items": 200,
+     "classes": 16,
+     "raw_bytes": 24458,
+     "compressed_bytes": 2739,
+     "ratio": 8.93,
+     "faithful": 1.0
+    },
+    "geometry": {
+     "items": 200,
+     "classes": 8,
+     "raw_bytes": 26296,
+     "compressed_bytes": 1840,
+     "ratio": 14.291,
+     "faithful": 1.0
+    },
+    "sequence": {
+     "items": 200,
+     "classes": 8,
+     "raw_bytes": 2892,
+     "compressed_bytes": 918,
+     "ratio": 3.15,
+     "faithful": 1.0
+    }
+   }
+  },
+  {
+   "bench": {
+    "small": {
+     "duality": 0.9667,
+     "always_preserved": 0.5167,
+     "surface": 0.6333,
+     "truth_rate": 0.5167,
+     "n": 60
+    },
+    "composed": {
+     "duality": 0.95,
+     "always_preserved": 0.3,
+     "surface": 0.75,
+     "truth_rate": 0.3,
+     "n": 60
+    },
+    "ood": {
+     "duality": 1.0,
+     "always_preserved": 0.4722,
+     "surface": 0.5278,
+     "truth_rate": 0.4722,
+     "n": 36
+    },
+    "interaction": {
+     "abs_interaction": 0.4012,
+     "relative_interaction": 0.3229,
+     "resonance_candidate(>25%)": 0.4167,
+     "n": 12
+    },
+    "transition": {
+     "abs_error": 0.0493,
+     "detected(<0.1)": 1.0,
+     "n": 12
+    }
+   },
+   "credit": {
+    "generalized": 1.0,
+    "gradient_only": 0.267,
+    "random": 0.033,
+    "repaired": 1.0,
+    "neural": {
+     "generalized": 1.0,
+     "gradient_only": 0.889
+    },
+    "symbolic": {
+     "generalized": 1.0,
+     "gradient_only": 0.0
+    },
+    "n": 30,
+    "silent": 10
+   },
+   "continual": {
+    "vanilla": {
+     "method": "vanilla",
+     "new_task": 0.9927,
+     "old_A": 0.6805,
+     "old_C": 0.4683,
+     "retention": 0.5744,
+     "forgetting": 0.4256,
+     "parameters_changed": 2677,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "commit",
+     "reasons": []
+    },
+    "fast_weights": {
+     "method": "fast_weights",
+     "new_task": 0.9951,
+     "old_A": 0.639,
+     "old_C": 0.4756,
+     "retention": 0.5573,
+     "forgetting": 0.4427,
+     "parameters_changed": 2663,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "commit",
+     "reasons": []
+    },
+    "replay": {
+     "method": "replay",
+     "new_task": 0.9902,
+     "old_A": 0.9073,
+     "old_C": 0.8537,
+     "retention": 0.8805,
+     "forgetting": 0.1195,
+     "parameters_changed": 2871,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "commit",
+     "reasons": []
+    },
+    "invariant_constrained": {
+     "method": "invariant_constrained",
+     "new_task": 0.7098,
+     "old_A": 1.0,
+     "old_C": 0.9976,
+     "retention": 0.9988,
+     "forgetting": 0.0012,
+     "parameters_changed": 2970,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "consolidate",
+     "reasons": [
+      "acceptable"
+     ]
+    },
+    "perturbation_guided": {
+     "method": "perturbation_guided",
+     "new_task": 0.861,
+     "old_A": 0.9976,
+     "old_C": 0.9902,
+     "retention": 0.9939,
+     "forgetting": 0.0061,
+     "parameters_changed": 1229,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "consolidate",
+     "reasons": [
+      "acceptable"
+     ]
+    }
+   },
+   "diagnosis": {
+    "planner_only": {
+     "cause_accuracy": 1.0,
+     "measurements": 3.33,
+     "cost": 0.117,
+     "repaired": 1.0
+    },
+    "perturbation_guided": {
+     "cause_accuracy": 1.0,
+     "measurements": 2.86,
+     "cost": 0.151,
+     "repaired": 1.0
+    }
+   },
+   "compression": {
+    "algebra": {
+     "items": 200,
+     "classes": 8,
+     "raw_bytes": 4831,
+     "compressed_bytes": 901,
+     "ratio": 5.362,
+     "faithful": 1.0
+    },
+    "language": {
+     "items": 200,
+     "classes": 6,
+     "raw_bytes": 2960,
+     "compressed_bytes": 836,
+     "ratio": 3.541,
+     "faithful": 1.0
+    },
+    "code": {
+     "items": 200,
+     "classes": 18,
+     "raw_bytes": 25940,
+     "compressed_bytes": 3084,
+     "ratio": 8.411,
+     "faithful": 1.0
+    },
+    "geometry": {
+     "items": 200,
+     "classes": 8,
+     "raw_bytes": 26432,
+     "compressed_bytes": 1870,
+     "ratio": 14.135,
+     "faithful": 1.0
+    },
+    "sequence": {
+     "items": 200,
+     "classes": 8,
+     "raw_bytes": 2736,
+     "compressed_bytes": 948,
+     "ratio": 2.886,
+     "faithful": 1.0
+    }
+   }
+  },
+  {
+   "bench": {
+    "small": {
+     "duality": 0.9833,
+     "always_preserved": 0.5,
+     "surface": 0.55,
+     "truth_rate": 0.5,
+     "n": 60
+    },
+    "composed": {
+     "duality": 0.9667,
+     "always_preserved": 0.2833,
+     "surface": 0.7333,
+     "truth_rate": 0.2833,
+     "n": 60
+    },
+    "ood": {
+     "duality": 1.0,
+     "always_preserved": 0.5,
+     "surface": 0.5,
+     "truth_rate": 0.5,
+     "n": 36
+    },
+    "interaction": {
+     "abs_interaction": 2.4807,
+     "relative_interaction": 0.5719,
+     "resonance_candidate(>25%)": 0.75,
+     "n": 12
+    },
+    "transition": {
+     "abs_error": 0.0593,
+     "detected(<0.1)": 1.0,
+     "n": 12
+    }
+   },
+   "credit": {
+    "generalized": 1.0,
+    "gradient_only": 0.192,
+    "random": 0.154,
+    "repaired": 1.0,
+    "neural": {
+     "generalized": 1.0,
+     "gradient_only": 0.833
+    },
+    "symbolic": {
+     "generalized": 1.0,
+     "gradient_only": 0.0
+    },
+    "n": 26,
+    "silent": 14
+   },
+   "continual": {
+    "vanilla": {
+     "method": "vanilla",
+     "new_task": 1.0,
+     "old_A": 0.5244,
+     "old_C": 0.5366,
+     "retention": 0.5305,
+     "forgetting": 0.4695,
+     "parameters_changed": 2554,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "commit",
+     "reasons": []
+    },
+    "fast_weights": {
+     "method": "fast_weights",
+     "new_task": 0.9951,
+     "old_A": 0.6829,
+     "old_C": 0.5878,
+     "retention": 0.6354,
+     "forgetting": 0.3646,
+     "parameters_changed": 2265,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "commit",
+     "reasons": []
+    },
+    "replay": {
+     "method": "replay",
+     "new_task": 0.9854,
+     "old_A": 0.9024,
+     "old_C": 0.9195,
+     "retention": 0.911,
+     "forgetting": 0.089,
+     "parameters_changed": 2666,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "commit",
+     "reasons": []
+    },
+    "invariant_constrained": {
+     "method": "invariant_constrained",
+     "new_task": 0.8024,
+     "old_A": 1.0,
+     "old_C": 1.0,
+     "retention": 1.0,
+     "forgetting": 0.0,
+     "parameters_changed": 2717,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "consolidate",
+     "reasons": [
+      "acceptable"
+     ]
+    },
+    "perturbation_guided": {
+     "method": "perturbation_guided",
+     "new_task": 0.8098,
+     "old_A": 1.0,
+     "old_C": 0.9976,
+     "retention": 0.9988,
+     "forgetting": 0.0012,
+     "parameters_changed": 764,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "consolidate",
+     "reasons": [
+      "acceptable"
+     ]
+    }
+   },
+   "diagnosis": {
+    "planner_only": {
+     "cause_accuracy": 1.0,
+     "measurements": 3.33,
+     "cost": 0.117,
+     "repaired": 1.0
+    },
+    "perturbation_guided": {
+     "cause_accuracy": 1.0,
+     "measurements": 3.19,
+     "cost": 0.164,
+     "repaired": 1.0
+    }
+   },
+   "compression": {
+    "algebra": {
+     "items": 200,
+     "classes": 8,
+     "raw_bytes": 4838,
+     "compressed_bytes": 887,
+     "ratio": 5.454,
+     "faithful": 1.0
+    },
+    "language": {
+     "items": 200,
+     "classes": 5,
+     "raw_bytes": 2996,
+     "compressed_bytes": 882,
+     "ratio": 3.397,
+     "faithful": 1.0
+    },
+    "code": {
+     "items": 200,
+     "classes": 22,
+     "raw_bytes": 23174,
+     "compressed_bytes": 3333,
+     "ratio": 6.953,
+     "faithful": 1.0
+    },
+    "geometry": {
+     "items": 200,
+     "classes": 8,
+     "raw_bytes": 26584,
+     "compressed_bytes": 1846,
+     "ratio": 14.401,
+     "faithful": 1.0
+    },
+    "sequence": {
+     "items": 200,
+     "classes": 8,
+     "raw_bytes": 2826,
+     "compressed_bytes": 892,
+     "ratio": 3.168,
+     "faithful": 1.0
+    }
+   }
+  },
+  {
+   "bench": {
+    "small": {
+     "duality": 0.9667,
+     "always_preserved": 0.5333,
+     "surface": 0.6,
+     "truth_rate": 0.5333,
+     "n": 60
+    },
+    "composed": {
+     "duality": 0.9,
+     "always_preserved": 0.3833,
+     "surface": 0.65,
+     "truth_rate": 0.3833,
+     "n": 60
+    },
+    "ood": {
+     "duality": 1.0,
+     "always_preserved": 0.4167,
+     "surface": 0.5833,
+     "truth_rate": 0.4167,
+     "n": 36
+    },
+    "interaction": {
+     "abs_interaction": 0.5823,
+     "relative_interaction": 0.4486,
+     "resonance_candidate(>25%)": 0.4167,
+     "n": 12
+    },
+    "transition": {
+     "abs_error": 0.0547,
+     "detected(<0.1)": 1.0,
+     "n": 12
+    }
+   },
+   "credit": {
+    "generalized": 1.0,
+    "gradient_only": 0.25,
+    "random": 0.167,
+    "repaired": 1.0,
+    "neural": {
+     "generalized": 1.0,
+     "gradient_only": 1.0
+    },
+    "symbolic": {
+     "generalized": 1.0,
+     "gradient_only": 0.0
+    },
+    "n": 24,
+    "silent": 16
+   },
+   "continual": {
+    "vanilla": {
+     "method": "vanilla",
+     "new_task": 0.4927,
+     "old_A": 0.7659,
+     "old_C": 0.5024,
+     "retention": 0.6341,
+     "forgetting": 0.2098,
+     "parameters_changed": 2416,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "commit",
+     "reasons": []
+    },
+    "fast_weights": {
+     "method": "fast_weights",
+     "new_task": 0.4927,
+     "old_A": 0.7659,
+     "old_C": 0.5024,
+     "retention": 0.6341,
+     "forgetting": 0.2098,
+     "parameters_changed": 2476,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "commit",
+     "reasons": []
+    },
+    "replay": {
+     "method": "replay",
+     "new_task": 0.4927,
+     "old_A": 0.7659,
+     "old_C": 0.5024,
+     "retention": 0.6341,
+     "forgetting": 0.2098,
+     "parameters_changed": 2555,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "commit",
+     "reasons": []
+    },
+    "invariant_constrained": {
+     "method": "invariant_constrained",
+     "new_task": 0.9902,
+     "old_A": 1.0,
+     "old_C": 0.6829,
+     "retention": 0.8415,
+     "forgetting": 0.0024,
+     "parameters_changed": 2825,
+     "rollbacks": 1,
+     "adaptation_cost": 1200,
+     "consolidation": "consolidate",
+     "reasons": [
+      "acceptable"
+     ]
+    },
+    "perturbation_guided": {
+     "method": "perturbation_guided",
+     "new_task": 1.0,
+     "old_A": 1.0,
+     "old_C": 0.6902,
+     "retention": 0.8451,
+     "forgetting": -0.0012,
+     "parameters_changed": 844,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "consolidate",
+     "reasons": [
+      "acceptable"
+     ]
+    }
+   },
+   "diagnosis": {
+    "planner_only": {
+     "cause_accuracy": 1.0,
+     "measurements": 3.33,
+     "cost": 0.117,
+     "repaired": 1.0
+    },
+    "perturbation_guided": {
+     "cause_accuracy": 1.0,
+     "measurements": 2.89,
+     "cost": 0.152,
+     "repaired": 1.0
+    }
+   },
+   "compression": {
+    "algebra": {
+     "items": 200,
+     "classes": 8,
+     "raw_bytes": 4743,
+     "compressed_bytes": 840,
+     "ratio": 5.646,
+     "faithful": 1.0
+    },
+    "language": {
+     "items": 200,
+     "classes": 6,
+     "raw_bytes": 2840,
+     "compressed_bytes": 866,
+     "ratio": 3.279,
+     "faithful": 1.0
+    },
+    "code": {
+     "items": 200,
+     "classes": 18,
+     "raw_bytes": 25338,
+     "compressed_bytes": 3145,
+     "ratio": 8.057,
+     "faithful": 1.0
+    },
+    "geometry": {
+     "items": 200,
+     "classes": 8,
+     "raw_bytes": 26280,
+     "compressed_bytes": 1814,
+     "ratio": 14.487,
+     "faithful": 1.0
+    },
+    "sequence": {
+     "items": 200,
+     "classes": 8,
+     "raw_bytes": 2868,
+     "compressed_bytes": 904,
+     "ratio": 3.173,
+     "faithful": 1.0
+    }
+   }
+  },
+  {
+   "bench": {
+    "small": {
+     "duality": 0.9833,
+     "always_preserved": 0.45,
+     "surface": 0.6167,
+     "truth_rate": 0.45,
+     "n": 60
+    },
+    "composed": {
+     "duality": 0.9167,
+     "always_preserved": 0.3333,
+     "surface": 0.7333,
+     "truth_rate": 0.3333,
+     "n": 60
+    },
+    "ood": {
+     "duality": 1.0,
+     "always_preserved": 0.5833,
+     "surface": 0.4167,
+     "truth_rate": 0.5833,
+     "n": 36
+    },
+    "interaction": {
+     "abs_interaction": 3.1694,
+     "relative_interaction": 0.6828,
+     "resonance_candidate(>25%)": 0.8333,
+     "n": 12
+    },
+    "transition": {
+     "abs_error": 0.0648,
+     "detected(<0.1)": 0.8333,
+     "n": 12
+    }
+   },
+   "credit": {
+    "generalized": 1.0,
+    "gradient_only": 0.231,
+    "random": 0.038,
+    "repaired": 0.962,
+    "neural": {
+     "generalized": 1.0,
+     "gradient_only": 1.0
+    },
+    "symbolic": {
+     "generalized": 1.0,
+     "gradient_only": 0.0
+    },
+    "n": 26,
+    "silent": 14
+   },
+   "continual": {
+    "vanilla": {
+     "method": "vanilla",
+     "new_task": 0.9732,
+     "old_A": 0.5195,
+     "old_C": 0.4707,
+     "retention": 0.4951,
+     "forgetting": 0.5049,
+     "parameters_changed": 2596,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "commit",
+     "reasons": []
+    },
+    "fast_weights": {
+     "method": "fast_weights",
+     "new_task": 1.0,
+     "old_A": 0.6171,
+     "old_C": 0.5293,
+     "retention": 0.5732,
+     "forgetting": 0.4268,
+     "parameters_changed": 2558,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "commit",
+     "reasons": []
+    },
+    "replay": {
+     "method": "replay",
+     "new_task": 0.9293,
+     "old_A": 0.8317,
+     "old_C": 0.7585,
+     "retention": 0.7951,
+     "forgetting": 0.2049,
+     "parameters_changed": 2842,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "commit",
+     "reasons": []
+    },
+    "invariant_constrained": {
+     "method": "invariant_constrained",
+     "new_task": 0.9171,
+     "old_A": 0.9976,
+     "old_C": 1.0,
+     "retention": 0.9988,
+     "forgetting": 0.0012,
+     "parameters_changed": 2787,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "consolidate",
+     "reasons": [
+      "acceptable"
+     ]
+    },
+    "perturbation_guided": {
+     "method": "perturbation_guided",
+     "new_task": 0.8073,
+     "old_A": 1.0,
+     "old_C": 1.0,
+     "retention": 1.0,
+     "forgetting": 0.0,
+     "parameters_changed": 948,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "consolidate",
+     "reasons": [
+      "acceptable"
+     ]
+    }
+   },
+   "diagnosis": {
+    "planner_only": {
+     "cause_accuracy": 1.0,
+     "measurements": 3.33,
+     "cost": 0.117,
+     "repaired": 1.0
+    },
+    "perturbation_guided": {
+     "cause_accuracy": 1.0,
+     "measurements": 3.06,
+     "cost": 0.159,
+     "repaired": 1.0
+    }
+   },
+   "compression": {
+    "algebra": {
+     "items": 200,
+     "classes": 7,
+     "raw_bytes": 4661,
+     "compressed_bytes": 827,
+     "ratio": 5.636,
+     "faithful": 1.0
+    },
+    "language": {
+     "items": 200,
+     "classes": 4,
+     "raw_bytes": 2880,
+     "compressed_bytes": 765,
+     "ratio": 3.765,
+     "faithful": 1.0
+    },
+    "code": {
+     "items": 200,
+     "classes": 19,
+     "raw_bytes": 23828,
+     "compressed_bytes": 3125,
+     "ratio": 7.625,
+     "faithful": 1.0
+    },
+    "geometry": {
+     "items": 200,
+     "classes": 8,
+     "raw_bytes": 26328,
+     "compressed_bytes": 1844,
+     "ratio": 14.278,
+     "faithful": 1.0
+    },
+    "sequence": {
+     "items": 200,
+     "classes": 8,
+     "raw_bytes": 2850,
+     "compressed_bytes": 940,
+     "ratio": 3.032,
+     "faithful": 1.0
+    }
+   }
+  },
+  {
+   "bench": {
+    "small": {
+     "duality": 0.9167,
+     "always_preserved": 0.5167,
+     "surface": 0.65,
+     "truth_rate": 0.5167,
+     "n": 60
+    },
+    "composed": {
+     "duality": 0.8833,
+     "always_preserved": 0.5333,
+     "surface": 0.5667,
+     "truth_rate": 0.5333,
+     "n": 60
+    },
+    "ood": {
+     "duality": 1.0,
+     "always_preserved": 0.5556,
+     "surface": 0.4444,
+     "truth_rate": 0.5556,
+     "n": 36
+    },
+    "interaction": {
+     "abs_interaction": 1.9009,
+     "relative_interaction": 0.5349,
+     "resonance_candidate(>25%)": 0.6667,
+     "n": 12
+    },
+    "transition": {
+     "abs_error": 0.0394,
+     "detected(<0.1)": 0.9167,
+     "n": 12
+    }
+   },
+   "credit": {
+    "generalized": 1.0,
+    "gradient_only": 0.259,
+    "random": 0.111,
+    "repaired": 1.0,
+    "neural": {
+     "generalized": 1.0,
+     "gradient_only": 1.0
+    },
+    "symbolic": {
+     "generalized": 1.0,
+     "gradient_only": 0.0
+    },
+    "n": 27,
+    "silent": 13
+   },
+   "continual": {
+    "vanilla": {
+     "method": "vanilla",
+     "new_task": 0.4732,
+     "old_A": 0.2585,
+     "old_C": 0.5268,
+     "retention": 0.3927,
+     "forgetting": 0.6073,
+     "parameters_changed": 2377,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "commit",
+     "reasons": []
+    },
+    "fast_weights": {
+     "method": "fast_weights",
+     "new_task": 1.0,
+     "old_A": 0.339,
+     "old_C": 0.522,
+     "retention": 0.4305,
+     "forgetting": 0.5695,
+     "parameters_changed": 2339,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "commit",
+     "reasons": []
+    },
+    "replay": {
+     "method": "replay",
+     "new_task": 0.9878,
+     "old_A": 0.8561,
+     "old_C": 0.8854,
+     "retention": 0.8707,
+     "forgetting": 0.1293,
+     "parameters_changed": 2814,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "commit",
+     "reasons": []
+    },
+    "invariant_constrained": {
+     "method": "invariant_constrained",
+     "new_task": 0.9707,
+     "old_A": 0.9951,
+     "old_C": 1.0,
+     "retention": 0.9976,
+     "forgetting": 0.0024,
+     "parameters_changed": 2809,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "consolidate",
+     "reasons": [
+      "acceptable"
+     ]
+    },
+    "perturbation_guided": {
+     "method": "perturbation_guided",
+     "new_task": 0.9415,
+     "old_A": 0.9854,
+     "old_C": 1.0,
+     "retention": 0.9927,
+     "forgetting": 0.0073,
+     "parameters_changed": 881,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "consolidate",
+     "reasons": [
+      "acceptable"
+     ]
+    }
+   },
+   "diagnosis": {
+    "planner_only": {
+     "cause_accuracy": 1.0,
+     "measurements": 3.33,
+     "cost": 0.117,
+     "repaired": 1.0
+    },
+    "perturbation_guided": {
+     "cause_accuracy": 1.0,
+     "measurements": 3.39,
+     "cost": 0.174,
+     "repaired": 1.0
+    }
+   },
+   "compression": {
+    "algebra": {
+     "items": 200,
+     "classes": 8,
+     "raw_bytes": 4774,
+     "compressed_bytes": 894,
+     "ratio": 5.34,
+     "faithful": 1.0
+    },
+    "language": {
+     "items": 200,
+     "classes": 5,
+     "raw_bytes": 2999,
+     "compressed_bytes": 857,
+     "ratio": 3.499,
+     "faithful": 1.0
+    },
+    "code": {
+     "items": 200,
+     "classes": 15,
+     "raw_bytes": 23358,
+     "compressed_bytes": 2624,
+     "ratio": 8.902,
+     "faithful": 1.0
+    },
+    "geometry": {
+     "items": 200,
+     "classes": 8,
+     "raw_bytes": 26208,
+     "compressed_bytes": 1876,
+     "ratio": 13.97,
+     "faithful": 1.0
+    },
+    "sequence": {
+     "items": 200,
+     "classes": 8,
+     "raw_bytes": 2787,
+     "compressed_bytes": 941,
+     "ratio": 2.962,
+     "faithful": 1.0
+    }
+   }
+  },
+  {
+   "bench": {
+    "small": {
+     "duality": 0.95,
+     "always_preserved": 0.6,
+     "surface": 0.5667,
+     "truth_rate": 0.6,
+     "n": 60
+    },
+    "composed": {
+     "duality": 0.9167,
+     "always_preserved": 0.3167,
+     "surface": 0.75,
+     "truth_rate": 0.3167,
+     "n": 60
+    },
+    "ood": {
+     "duality": 1.0,
+     "always_preserved": 0.5,
+     "surface": 0.5,
+     "truth_rate": 0.5,
+     "n": 36
+    },
+    "interaction": {
+     "abs_interaction": 0.5663,
+     "relative_interaction": 0.3892,
+     "resonance_candidate(>25%)": 0.5,
+     "n": 12
+    },
+    "transition": {
+     "abs_error": 0.0498,
+     "detected(<0.1)": 1.0,
+     "n": 12
+    }
+   },
+   "credit": {
+    "generalized": 1.0,
+    "gradient_only": 0.212,
+    "random": 0.091,
+    "repaired": 1.0,
+    "neural": {
+     "generalized": 1.0,
+     "gradient_only": 0.7
+    },
+    "symbolic": {
+     "generalized": 1.0,
+     "gradient_only": 0.0
+    },
+    "n": 33,
+    "silent": 7
+   },
+   "continual": {
+    "vanilla": {
+     "method": "vanilla",
+     "new_task": 1.0,
+     "old_A": 0.4732,
+     "old_C": 0.5195,
+     "retention": 0.4963,
+     "forgetting": 0.5037,
+     "parameters_changed": 2542,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "commit",
+     "reasons": []
+    },
+    "fast_weights": {
+     "method": "fast_weights",
+     "new_task": 0.9707,
+     "old_A": 0.4854,
+     "old_C": 0.4976,
+     "retention": 0.4915,
+     "forgetting": 0.5085,
+     "parameters_changed": 2516,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "commit",
+     "reasons": []
+    },
+    "replay": {
+     "method": "replay",
+     "new_task": 0.9756,
+     "old_A": 0.8098,
+     "old_C": 0.8634,
+     "retention": 0.8366,
+     "forgetting": 0.1634,
+     "parameters_changed": 2695,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "commit",
+     "reasons": []
+    },
+    "invariant_constrained": {
+     "method": "invariant_constrained",
+     "new_task": 0.5878,
+     "old_A": 1.0,
+     "old_C": 1.0,
+     "retention": 1.0,
+     "forgetting": 0.0,
+     "parameters_changed": 2811,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "consolidate",
+     "reasons": [
+      "acceptable"
+     ]
+    },
+    "perturbation_guided": {
+     "method": "perturbation_guided",
+     "new_task": 0.8073,
+     "old_A": 0.9927,
+     "old_C": 0.9951,
+     "retention": 0.9939,
+     "forgetting": 0.0061,
+     "parameters_changed": 840,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "consolidate",
+     "reasons": [
+      "acceptable"
+     ]
+    }
+   },
+   "diagnosis": {
+    "planner_only": {
+     "cause_accuracy": 1.0,
+     "measurements": 3.33,
+     "cost": 0.117,
+     "repaired": 1.0
+    },
+    "perturbation_guided": {
+     "cause_accuracy": 1.0,
+     "measurements": 2.92,
+     "cost": 0.155,
+     "repaired": 1.0
+    }
+   },
+   "compression": {
+    "algebra": {
+     "items": 200,
+     "classes": 7,
+     "raw_bytes": 4551,
+     "compressed_bytes": 847,
+     "ratio": 5.373,
+     "faithful": 1.0
+    },
+    "language": {
+     "items": 200,
+     "classes": 5,
+     "raw_bytes": 3036,
+     "compressed_bytes": 926,
+     "ratio": 3.279,
+     "faithful": 1.0
+    },
+    "code": {
+     "items": 200,
+     "classes": 15,
+     "raw_bytes": 25246,
+     "compressed_bytes": 2574,
+     "ratio": 9.808,
+     "faithful": 1.0
+    },
+    "geometry": {
+     "items": 200,
+     "classes": 8,
+     "raw_bytes": 26200,
+     "compressed_bytes": 1890,
+     "ratio": 13.862,
+     "faithful": 1.0
+    },
+    "sequence": {
+     "items": 200,
+     "classes": 8,
+     "raw_bytes": 2796,
+     "compressed_bytes": 928,
+     "ratio": 3.013,
+     "faithful": 1.0
+    }
+   }
+  },
+  {
+   "bench": {
+    "small": {
+     "duality": 0.9667,
+     "always_preserved": 0.5,
+     "surface": 0.5833,
+     "truth_rate": 0.5,
+     "n": 60
+    },
+    "composed": {
+     "duality": 0.95,
+     "always_preserved": 0.3167,
+     "surface": 0.7,
+     "truth_rate": 0.3167,
+     "n": 60
+    },
+    "ood": {
+     "duality": 1.0,
+     "always_preserved": 0.4722,
+     "surface": 0.5278,
+     "truth_rate": 0.4722,
+     "n": 36
+    },
+    "interaction": {
+     "abs_interaction": 1.172,
+     "relative_interaction": 0.5362,
+     "resonance_candidate(>25%)": 0.5833,
+     "n": 12
+    },
+    "transition": {
+     "abs_error": 0.0514,
+     "detected(<0.1)": 1.0,
+     "n": 12
+    }
+   },
+   "credit": {
+    "generalized": 1.0,
+    "gradient_only": 0.321,
+    "random": 0.143,
+    "repaired": 1.0,
+    "neural": {
+     "generalized": 1.0,
+     "gradient_only": 1.0
+    },
+    "symbolic": {
+     "generalized": 1.0,
+     "gradient_only": 0.0
+    },
+    "n": 28,
+    "silent": 12
+   },
+   "continual": {
+    "vanilla": {
+     "method": "vanilla",
+     "new_task": 1.0,
+     "old_A": 0.5756,
+     "old_C": 0.4902,
+     "retention": 0.5329,
+     "forgetting": 0.4671,
+     "parameters_changed": 1474,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "commit",
+     "reasons": []
+    },
+    "fast_weights": {
+     "method": "fast_weights",
+     "new_task": 1.0,
+     "old_A": 0.3878,
+     "old_C": 0.6049,
+     "retention": 0.4963,
+     "forgetting": 0.5037,
+     "parameters_changed": 1513,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "commit",
+     "reasons": []
+    },
+    "replay": {
+     "method": "replay",
+     "new_task": 0.9976,
+     "old_A": 0.9024,
+     "old_C": 0.9732,
+     "retention": 0.9378,
+     "forgetting": 0.0622,
+     "parameters_changed": 1760,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "commit",
+     "reasons": []
+    },
+    "invariant_constrained": {
+     "method": "invariant_constrained",
+     "new_task": 0.9683,
+     "old_A": 1.0,
+     "old_C": 1.0,
+     "retention": 1.0,
+     "forgetting": 0.0,
+     "parameters_changed": 1909,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "consolidate",
+     "reasons": [
+      "acceptable"
+     ]
+    },
+    "perturbation_guided": {
+     "method": "perturbation_guided",
+     "new_task": 0.5268,
+     "old_A": 1.0,
+     "old_C": 1.0,
+     "retention": 1.0,
+     "forgetting": 0.0,
+     "parameters_changed": 0,
+     "rollbacks": 1,
+     "adaptation_cost": 600,
+     "consolidation": "rollback",
+     "reasons": [
+      "gain insuffisant (0.000)"
+     ]
+    }
+   },
+   "diagnosis": {
+    "planner_only": {
+     "cause_accuracy": 1.0,
+     "measurements": 3.33,
+     "cost": 0.117,
+     "repaired": 1.0
+    },
+    "perturbation_guided": {
+     "cause_accuracy": 1.0,
+     "measurements": 2.75,
+     "cost": 0.148,
+     "repaired": 1.0
+    }
+   },
+   "compression": {
+    "algebra": {
+     "items": 200,
+     "classes": 8,
+     "raw_bytes": 4910,
+     "compressed_bytes": 908,
+     "ratio": 5.407,
+     "faithful": 1.0
+    },
+    "language": {
+     "items": 200,
+     "classes": 3,
+     "raw_bytes": 3121,
+     "compressed_bytes": 801,
+     "ratio": 3.896,
+     "faithful": 1.0
+    },
+    "code": {
+     "items": 200,
+     "classes": 15,
+     "raw_bytes": 21192,
+     "compressed_bytes": 2310,
+     "ratio": 9.174,
+     "faithful": 1.0
+    },
+    "geometry": {
+     "items": 200,
+     "classes": 8,
+     "raw_bytes": 26176,
+     "compressed_bytes": 1868,
+     "ratio": 14.013,
+     "faithful": 1.0
+    },
+    "sequence": {
+     "items": 200,
+     "classes": 8,
+     "raw_bytes": 2556,
+     "compressed_bytes": 911,
+     "ratio": 2.806,
+     "faithful": 1.0
+    }
+   }
+  },
+  {
+   "bench": {
+    "small": {
+     "duality": 0.95,
+     "always_preserved": 0.5,
+     "surface": 0.6833,
+     "truth_rate": 0.5,
+     "n": 60
+    },
+    "composed": {
+     "duality": 0.95,
+     "always_preserved": 0.35,
+     "surface": 0.6833,
+     "truth_rate": 0.35,
+     "n": 60
+    },
+    "ood": {
+     "duality": 1.0,
+     "always_preserved": 0.4722,
+     "surface": 0.5278,
+     "truth_rate": 0.4722,
+     "n": 36
+    },
+    "interaction": {
+     "abs_interaction": 1.6009,
+     "relative_interaction": 0.5558,
+     "resonance_candidate(>25%)": 0.6667,
+     "n": 12
+    },
+    "transition": {
+     "abs_error": 0.0322,
+     "detected(<0.1)": 1.0,
+     "n": 12
+    }
+   },
+   "credit": {
+    "generalized": 1.0,
+    "gradient_only": 0.269,
+    "random": 0.077,
+    "repaired": 1.0,
+    "neural": {
+     "generalized": 1.0,
+     "gradient_only": 1.0
+    },
+    "symbolic": {
+     "generalized": 1.0,
+     "gradient_only": 0.0
+    },
+    "n": 26,
+    "silent": 14
+   },
+   "continual": {
+    "vanilla": {
+     "method": "vanilla",
+     "new_task": 0.9951,
+     "old_A": 0.578,
+     "old_C": 0.522,
+     "retention": 0.55,
+     "forgetting": 0.45,
+     "parameters_changed": 2464,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "commit",
+     "reasons": []
+    },
+    "fast_weights": {
+     "method": "fast_weights",
+     "new_task": 0.9927,
+     "old_A": 0.5317,
+     "old_C": 0.5244,
+     "retention": 0.528,
+     "forgetting": 0.472,
+     "parameters_changed": 2438,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "commit",
+     "reasons": []
+    },
+    "replay": {
+     "method": "replay",
+     "new_task": 0.9512,
+     "old_A": 0.8488,
+     "old_C": 0.6561,
+     "retention": 0.7524,
+     "forgetting": 0.2476,
+     "parameters_changed": 2827,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "commit",
+     "reasons": []
+    },
+    "invariant_constrained": {
+     "method": "invariant_constrained",
+     "new_task": 0.878,
+     "old_A": 0.9976,
+     "old_C": 1.0,
+     "retention": 0.9988,
+     "forgetting": 0.0012,
+     "parameters_changed": 2747,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "consolidate",
+     "reasons": [
+      "acceptable"
+     ]
+    },
+    "perturbation_guided": {
+     "method": "perturbation_guided",
+     "new_task": 0.8195,
+     "old_A": 1.0,
+     "old_C": 0.9951,
+     "retention": 0.9976,
+     "forgetting": 0.0024,
+     "parameters_changed": 723,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "consolidate",
+     "reasons": [
+      "acceptable"
+     ]
+    }
+   },
+   "diagnosis": {
+    "planner_only": {
+     "cause_accuracy": 1.0,
+     "measurements": 3.33,
+     "cost": 0.117,
+     "repaired": 1.0
+    },
+    "perturbation_guided": {
+     "cause_accuracy": 1.0,
+     "measurements": 2.56,
+     "cost": 0.143,
+     "repaired": 1.0
+    }
+   },
+   "compression": {
+    "algebra": {
+     "items": 200,
+     "classes": 8,
+     "raw_bytes": 4617,
+     "compressed_bytes": 824,
+     "ratio": 5.603,
+     "faithful": 1.0
+    },
+    "language": {
+     "items": 200,
+     "classes": 4,
+     "raw_bytes": 3040,
+     "compressed_bytes": 879,
+     "ratio": 3.458,
+     "faithful": 1.0
+    },
+    "code": {
+     "items": 200,
+     "classes": 19,
+     "raw_bytes": 23624,
+     "compressed_bytes": 3058,
+     "ratio": 7.725,
+     "faithful": 1.0
+    },
+    "geometry": {
+     "items": 200,
+     "classes": 8,
+     "raw_bytes": 26256,
+     "compressed_bytes": 1838,
+     "ratio": 14.285,
+     "faithful": 1.0
+    },
+    "sequence": {
+     "items": 200,
+     "classes": 8,
+     "raw_bytes": 3258,
+     "compressed_bytes": 901,
+     "ratio": 3.616,
+     "faithful": 1.0
+    }
+   }
+  },
+  {
+   "bench": {
+    "small": {
+     "duality": 0.9667,
+     "always_preserved": 0.5333,
+     "surface": 0.6333,
+     "truth_rate": 0.5333,
+     "n": 60
+    },
+    "composed": {
+     "duality": 0.9333,
+     "always_preserved": 0.45,
+     "surface": 0.6,
+     "truth_rate": 0.45,
+     "n": 60
+    },
+    "ood": {
+     "duality": 1.0,
+     "always_preserved": 0.5833,
+     "surface": 0.4167,
+     "truth_rate": 0.5833,
+     "n": 36
+    },
+    "interaction": {
+     "abs_interaction": 2.8016,
+     "relative_interaction": 0.5546,
+     "resonance_candidate(>25%)": 0.5,
+     "n": 12
+    },
+    "transition": {
+     "abs_error": 0.0575,
+     "detected(<0.1)": 0.9167,
+     "n": 12
+    }
+   },
+   "credit": {
+    "generalized": 1.0,
+    "gradient_only": 0.179,
+    "random": 0.0,
+    "repaired": 1.0,
+    "neural": {
+     "generalized": 1.0,
+     "gradient_only": 0.833
+    },
+    "symbolic": {
+     "generalized": 1.0,
+     "gradient_only": 0.0
+    },
+    "n": 28,
+    "silent": 12
+   },
+   "continual": {
+    "vanilla": {
+     "method": "vanilla",
+     "new_task": 0.4707,
+     "old_A": 0.7463,
+     "old_C": 0.4756,
+     "retention": 0.611,
+     "forgetting": 0.389,
+     "parameters_changed": 1905,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "commit",
+     "reasons": []
+    },
+    "fast_weights": {
+     "method": "fast_weights",
+     "new_task": 0.9927,
+     "old_A": 0.7122,
+     "old_C": 0.422,
+     "retention": 0.5671,
+     "forgetting": 0.4329,
+     "parameters_changed": 1922,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "commit",
+     "reasons": []
+    },
+    "replay": {
+     "method": "replay",
+     "new_task": 0.9976,
+     "old_A": 0.8732,
+     "old_C": 0.6098,
+     "retention": 0.7415,
+     "forgetting": 0.2585,
+     "parameters_changed": 2209,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "commit",
+     "reasons": []
+    },
+    "invariant_constrained": {
+     "method": "invariant_constrained",
+     "new_task": 0.9488,
+     "old_A": 1.0,
+     "old_C": 0.9902,
+     "retention": 0.9951,
+     "forgetting": 0.0049,
+     "parameters_changed": 2133,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "consolidate",
+     "reasons": [
+      "acceptable"
+     ]
+    },
+    "perturbation_guided": {
+     "method": "perturbation_guided",
+     "new_task": 0.4683,
+     "old_A": 1.0,
+     "old_C": 1.0,
+     "retention": 1.0,
+     "forgetting": 0.0,
+     "parameters_changed": 0,
+     "rollbacks": 1,
+     "adaptation_cost": 600,
+     "consolidation": "rollback",
+     "reasons": [
+      "gain insuffisant (0.022)"
+     ]
+    }
+   },
+   "diagnosis": {
+    "planner_only": {
+     "cause_accuracy": 1.0,
+     "measurements": 3.33,
+     "cost": 0.117,
+     "repaired": 1.0
+    },
+    "perturbation_guided": {
+     "cause_accuracy": 1.0,
+     "measurements": 3.0,
+     "cost": 0.159,
+     "repaired": 1.0
+    }
+   },
+   "compression": {
+    "algebra": {
+     "items": 200,
+     "classes": 8,
+     "raw_bytes": 4613,
+     "compressed_bytes": 852,
+     "ratio": 5.414,
+     "faithful": 1.0
+    },
+    "language": {
+     "items": 200,
+     "classes": 7,
+     "raw_bytes": 2991,
+     "compressed_bytes": 878,
+     "ratio": 3.407,
+     "faithful": 1.0
+    },
+    "code": {
+     "items": 200,
+     "classes": 17,
+     "raw_bytes": 21170,
+     "compressed_bytes": 2465,
+     "ratio": 8.588,
+     "faithful": 1.0
+    },
+    "geometry": {
+     "items": 200,
+     "classes": 8,
+     "raw_bytes": 26280,
+     "compressed_bytes": 1852,
+     "ratio": 14.19,
+     "faithful": 1.0
+    },
+    "sequence": {
+     "items": 200,
+     "classes": 8,
+     "raw_bytes": 3063,
+     "compressed_bytes": 912,
+     "ratio": 3.359,
+     "faithful": 1.0
+    }
+   }
+  },
+  {
+   "bench": {
+    "small": {
+     "duality": 0.95,
+     "always_preserved": 0.55,
+     "surface": 0.5667,
+     "truth_rate": 0.55,
+     "n": 60
+    },
+    "composed": {
+     "duality": 0.9167,
+     "always_preserved": 0.35,
+     "surface": 0.7167,
+     "truth_rate": 0.35,
+     "n": 60
+    },
+    "ood": {
+     "duality": 1.0,
+     "always_preserved": 0.4722,
+     "surface": 0.5278,
+     "truth_rate": 0.4722,
+     "n": 36
+    },
+    "interaction": {
+     "abs_interaction": 1.4205,
+     "relative_interaction": 0.6142,
+     "resonance_candidate(>25%)": 0.6667,
+     "n": 12
+    },
+    "transition": {
+     "abs_error": 0.0432,
+     "detected(<0.1)": 0.9167,
+     "n": 12
+    }
+   },
+   "credit": {
+    "generalized": 1.0,
+    "gradient_only": 0.286,
+    "random": 0.071,
+    "repaired": 1.0,
+    "neural": {
+     "generalized": 1.0,
+     "gradient_only": 0.889
+    },
+    "symbolic": {
+     "generalized": 1.0,
+     "gradient_only": 0.0
+    },
+    "n": 28,
+    "silent": 12
+   },
+   "continual": {
+    "vanilla": {
+     "method": "vanilla",
+     "new_task": 0.9927,
+     "old_A": 0.4146,
+     "old_C": 0.5122,
+     "retention": 0.4634,
+     "forgetting": 0.5366,
+     "parameters_changed": 2096,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "commit",
+     "reasons": []
+    },
+    "fast_weights": {
+     "method": "fast_weights",
+     "new_task": 0.9951,
+     "old_A": 0.5244,
+     "old_C": 0.5317,
+     "retention": 0.528,
+     "forgetting": 0.472,
+     "parameters_changed": 2002,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "commit",
+     "reasons": []
+    },
+    "replay": {
+     "method": "replay",
+     "new_task": 0.9976,
+     "old_A": 0.8317,
+     "old_C": 0.8439,
+     "retention": 0.8378,
+     "forgetting": 0.1622,
+     "parameters_changed": 2363,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "commit",
+     "reasons": []
+    },
+    "invariant_constrained": {
+     "method": "invariant_constrained",
+     "new_task": 0.8854,
+     "old_A": 0.9976,
+     "old_C": 0.9951,
+     "retention": 0.9963,
+     "forgetting": 0.0037,
+     "parameters_changed": 2110,
+     "rollbacks": 0,
+     "adaptation_cost": 600,
+     "consolidation": "consolidate",
+     "reasons": [
+      "acceptable"
+     ]
+    },
+    "perturbation_guided": {
+     "method": "perturbation_guided",
+     "new_task": 0.4732,
+     "old_A": 1.0,
+     "old_C": 1.0,
+     "retention": 1.0,
+     "forgetting": 0.0,
+     "parameters_changed": 0,
+     "rollbacks": 1,
+     "adaptation_cost": 600,
+     "consolidation": "rollback",
+     "reasons": [
+      "gain insuffisant (-0.007)"
+     ]
+    }
+   },
+   "diagnosis": {
+    "planner_only": {
+     "cause_accuracy": 1.0,
+     "measurements": 3.33,
+     "cost": 0.117,
+     "repaired": 1.0
+    },
+    "perturbation_guided": {
+     "cause_accuracy": 1.0,
+     "measurements": 3.17,
+     "cost": 0.166,
+     "repaired": 1.0
+    }
+   },
+   "compression": {
+    "algebra": {
+     "items": 200,
+     "classes": 8,
+     "raw_bytes": 4972,
+     "compressed_bytes": 920,
+     "ratio": 5.404,
+     "faithful": 1.0
+    },
+    "language": {
+     "items": 200,
+     "classes": 5,
+     "raw_bytes": 3006,
+     "compressed_bytes": 884,
+     "ratio": 3.4,
+     "faithful": 1.0
+    },
+    "code": {
+     "items": 200,
+     "classes": 15,
+     "raw_bytes": 23730,
+     "compressed_bytes": 2673,
+     "ratio": 8.878,
+     "faithful": 1.0
+    },
+    "geometry": {
+     "items": 200,
+     "classes": 8,
+     "raw_bytes": 26240,
+     "compressed_bytes": 1872,
+     "ratio": 14.017,
+     "faithful": 1.0
+    },
+    "sequence": {
+     "items": 200,
+     "classes": 8,
+     "raw_bytes": 2982,
+     "compressed_bytes": 894,
+     "ratio": 3.336,
+     "faithful": 1.0
+    }
+   }
+  }
+ ]
+}

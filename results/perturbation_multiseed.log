@@ -1,0 +1,16 @@
+0 {'vanilla': (1.0, 0.4768), 'fast_weights': (0.9756, 0.4354), 'replay': (0.9512, 0.7915), 'invariant_constrained': (0.9976, 1.0), 'perturbation_guided': (0.722, 0.9988)} 1.0 0.233
+1 {'vanilla': (1.0, 0.4671), 'fast_weights': (0.9976, 0.6963), 'replay': (0.9902, 0.8244), 'invariant_constrained': (0.9756, 1.0), 'perturbation_guided': (0.5659, 0.9963)} 1.0 0.269
+2 {'vanilla': (1.0, 0.4805), 'fast_weights': (1.0, 0.6012), 'replay': (1.0, 0.9037), 'invariant_constrained': (0.9317, 1.0), 'perturbation_guided': (0.8585, 1.0)} 1.0 0.222
+3 {'vanilla': (1.0, 0.3866), 'fast_weights': (0.9976, 0.4232), 'replay': (0.9927, 0.8671), 'invariant_constrained': (0.9463, 0.9963), 'perturbation_guided': (0.5244, 0.9988)} 1.0 0.208
+4 {'vanilla': (1.0, 0.5159), 'fast_weights': (0.9951, 0.561), 'replay': (1.0, 0.6976), 'invariant_constrained': (0.6415, 1.0), 'perturbation_guided': (0.6341, 0.9988)} 0.967 0.233
+5 {'vanilla': (1.0, 0.4134), 'fast_weights': (1.0, 0.5939), 'replay': (0.9976, 0.7854), 'invariant_constrained': (0.9756, 1.0), 'perturbation_guided': (0.9634, 1.0)} 1.0 0.233
+6 {'vanilla': (0.9927, 0.5744), 'fast_weights': (0.9951, 0.5573), 'replay': (0.9902, 0.8805), 'invariant_constrained': (0.7098, 0.9988), 'perturbation_guided': (0.861, 0.9939)} 1.0 0.267
+7 {'vanilla': (1.0, 0.5305), 'fast_weights': (0.9951, 0.6354), 'replay': (0.9854, 0.911), 'invariant_constrained': (0.8024, 1.0), 'perturbation_guided': (0.8098, 0.9988)} 1.0 0.192
+8 {'vanilla': (0.4927, 0.6341), 'fast_weights': (0.4927, 0.6341), 'replay': (0.4927, 0.6341), 'invariant_constrained': (0.9902, 0.8415), 'perturbation_guided': (1.0, 0.8451)} 1.0 0.25
+9 {'vanilla': (0.9732, 0.4951), 'fast_weights': (1.0, 0.5732), 'replay': (0.9293, 0.7951), 'invariant_constrained': (0.9171, 0.9988), 'perturbation_guided': (0.8073, 1.0)} 1.0 0.231
+10 {'vanilla': (0.4732, 0.3927), 'fast_weights': (1.0, 0.4305), 'replay': (0.9878, 0.8707), 'invariant_constrained': (0.9707, 0.9976), 'perturbation_guided': (0.9415, 0.9927)} 1.0 0.259
+11 {'vanilla': (1.0, 0.4963), 'fast_weights': (0.9707, 0.4915), 'replay': (0.9756, 0.8366), 'invariant_constrained': (0.5878, 1.0), 'perturbation_guided': (0.8073, 0.9939)} 1.0 0.212
+12 {'vanilla': (1.0, 0.5329), 'fast_weights': (1.0, 0.4963), 'replay': (0.9976, 0.9378), 'invariant_constrained': (0.9683, 1.0), 'perturbation_guided': (0.5268, 1.0)} 1.0 0.321
+13 {'vanilla': (0.9951, 0.55), 'fast_weights': (0.9927, 0.528), 'replay': (0.9512, 0.7524), 'invariant_constrained': (0.878, 0.9988), 'perturbation_guided': (0.8195, 0.9976)} 1.0 0.269
+14 {'vanilla': (0.4707, 0.611), 'fast_weights': (0.9927, 0.5671), 'replay': (0.9976, 0.7415), 'invariant_constrained': (0.9488, 0.9951), 'perturbation_guided': (0.4683, 1.0)} 1.0 0.179
+15 {'vanilla': (0.9927, 0.4634), 'fast_weights': (0.9951, 0.528), 'replay': (0.9976, 0.8378), 'invariant_constrained': (0.8854, 0.9963), 'perturbation_guided': (0.4732, 1.0)} 1.0 0.286

@@ -1,0 +1,1 @@
+[6, "capacity", {"experts_only": {"retained_ok": 4, "retained": 4, "rejected": 8, "used": 328, "violated": false, "mean_acc": 0.9323, "operations": {}}, "full": {"retained_ok": 8, "retained": 8, "rejected": 4, "used": 365, "violated": false, "mean_acc": 0.911, "operations": {"gated_residual": 11, "rejected_low_value": 4, "shared_head": 1}}, "budget": 400}]

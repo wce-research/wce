@@ -1,0 +1,1 @@
+{"kind": "smoke", "key": "0", "status": "ok", "runtime_s": 0.0, "result": {"python": "3.11.16", "torch": "2.14.1+cpu", "cpu": 2}}

@@ -1,0 +1,2 @@
+python3 scripts/boundary_sealed_eval.py
+écrit results/boundary_sealed.json

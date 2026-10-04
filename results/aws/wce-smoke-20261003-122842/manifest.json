@@ -1,0 +1,30 @@
+{
+ "run_id": "wce-smoke-20261003-122842",
+ "git_commit": "no-git",
+ "code_hash": "fdff32e55c95b22d",
+ "config_hash": "b540d8951b9e",
+ "timestamp": "20261003-122842",
+ "region": "eu-north-1",
+ "identity": "AWSReservedSSO_WCE-Research-Runner_251aca5f63af0b9d",
+ "instance_type": "t3.large",
+ "image": "763104351884.dkr.ecr.eu-north-1.amazonaws.com/pytorch-training:2.5.1-cpu-py311-ubuntu22.04-sagemaker",
+ "backend": "ec2",
+ "kind": "smoke",
+ "keys": [
+  "0"
+ ],
+ "jobs": [
+  {
+   "name": "wce-smoke-20261003-122842-s0",
+   "units": 1,
+   "output": "s3://wce-research/robust/runs/wce-smoke-20261003-122842/wce-smoke-20261003-122842-s0/",
+   "instance_id": "i-0f2561178e7465367",
+   "command_id": "45712f50-4387-4350-b0e1-f45faf7411d6",
+   "instance_state": "terminated",
+   "status": "Completed",
+   "runtime_s": 63.0,
+   "failure": ""
+  }
+ ],
+ "status": "Completed"
+}

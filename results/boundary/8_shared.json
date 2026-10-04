@@ -1,0 +1,1 @@
+[8, "shared", {"separate_params": 492, "shared_params": 372, "separate_acc": 0.839, "shared_acc": 0.8471, "old_acc_frozen": 0.898, "old_acc_after_basis_finetune": 0.7373, "head_regenerated_acc": 0.9475, "head_original_acc": 0.948}]

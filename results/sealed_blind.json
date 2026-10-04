@@ -1,0 +1,468 @@
+{
+ "sha256": "82490dcd725b0fc9fbbe5d52a2fb5afe6b9323941606632507b80a92979e6d67",
+ "questions": 36,
+ "systems": {
+  "unified_calibrated": {
+   "metrics": {
+    "n": 36,
+    "success": 0.8611,
+    "false_confident": 0.0278,
+    "abstention": 0.5833,
+    "clarification": 0.1389,
+    "likely": 0.0,
+    "exact_class": 0.8611,
+    "coverage": 0.7778,
+    "identity_accuracy": 0.9333
+   },
+   "by_category": {
+    "ambiguïté_lexicale": {
+     "success": 0.5,
+     "false_confident": 0.0,
+     "n": 2
+    },
+    "chaîne_longue": {
+     "success": 1.0,
+     "false_confident": 0.0,
+     "n": 5
+    },
+    "connaissance_partielle": {
+     "success": 1.0,
+     "false_confident": 0.0,
+     "n": 5
+    },
+    "expression_nouvelle": {
+     "success": 0.0,
+     "false_confident": 0.0,
+     "n": 2
+    },
+    "polysémie": {
+     "success": 1.0,
+     "false_confident": 0.0,
+     "n": 3
+    },
+    "présupposition": {
+     "success": 1.0,
+     "false_confident": 0.0,
+     "n": 4
+    },
+    "similaires": {
+     "success": 0.0,
+     "false_confident": 1.0,
+     "n": 1
+    },
+    "source_trompeuse": {
+     "success": 0.75,
+     "false_confident": 0.0,
+     "n": 4
+    },
+    "temporalité": {
+     "success": 1.0,
+     "false_confident": 0.0,
+     "n": 4
+    },
+    "vocabulaire_non_vu": {
+     "success": 1.0,
+     "false_confident": 0.0,
+     "n": 3
+    },
+    "élimination": {
+     "success": 1.0,
+     "false_confident": 0.0,
+     "n": 3
+    }
+   },
+   "errors": [
+    [
+     "s03",
+     "Où est la clé ?",
+     "table",
+     "?"
+    ],
+    [
+     "s04",
+     "Où est le livre ?",
+     "sol",
+     "?"
+    ],
+    [
+     "s05",
+     "Où est la balle verte ?",
+     "table",
+     "?"
+    ],
+    [
+     "s21",
+     "Où est le cube rouge ?",
+     "?",
+     "table"
+    ],
+    [
+     "s22",
+     "Où est la clé ?",
+     "table",
+     "conflit"
+    ]
+   ]
+  },
+  "unified_uncalibrated": {
+   "metrics": {
+    "n": 36,
+    "success": 0.6111,
+    "false_confident": 0.0,
+    "abstention": 0.8889,
+    "clarification": 0.1389,
+    "likely": 0.3056,
+    "exact_class": 0.6111,
+    "coverage": 0.2222,
+    "identity_accuracy": 0.9333
+   },
+   "by_category": {
+    "ambiguïté_lexicale": {
+     "success": 0.5,
+     "false_confident": 0.0,
+     "n": 2
+    },
+    "chaîne_longue": {
+     "success": 0.0,
+     "false_confident": 0.0,
+     "n": 5
+    },
+    "connaissance_partielle": {
+     "success": 0.8,
+     "false_confident": 0.0,
+     "n": 5
+    },
+    "expression_nouvelle": {
+     "success": 0.0,
+     "false_confident": 0.0,
+     "n": 2
+    },
+    "polysémie": {
+     "success": 1.0,
+     "false_confident": 0.0,
+     "n": 3
+    },
+    "présupposition": {
+     "success": 1.0,
+     "false_confident": 0.0,
+     "n": 4
+    },
+    "similaires": {
+     "success": 1.0,
+     "false_confident": 0.0,
+     "n": 1
+    },
+    "source_trompeuse": {
+     "success": 0.5,
+     "false_confident": 0.0,
+     "n": 4
+    },
+    "temporalité": {
+     "success": 0.5,
+     "false_confident": 0.0,
+     "n": 4
+    },
+    "vocabulaire_non_vu": {
+     "success": 1.0,
+     "false_confident": 0.0,
+     "n": 3
+    },
+    "élimination": {
+     "success": 0.6667,
+     "false_confident": 0.0,
+     "n": 3
+    }
+   },
+   "errors": [
+    [
+     "s03",
+     "Où est la clé ?",
+     "table",
+     "?"
+    ],
+    [
+     "s04",
+     "Où est le livre ?",
+     "sol",
+     "?"
+    ],
+    [
+     "s05",
+     "Où est la balle verte ?",
+     "table",
+     "?"
+    ],
+    [
+     "s06",
+     "Où est le cube rouge ?",
+     "étagère",
+     "?"
+    ],
+    [
+     "s08",
+     "Où est la balle bleue ?",
+     "table",
+     "?"
+    ],
+    [
+     "s10",
+     "Où est le livre ?",
+     "table",
+     "?"
+    ],
+    [
+     "s14",
+     "Où est la balle rouge ?",
+     "sol",
+     "?"
+    ],
+    [
+     "s14",
+     "La balle rouge est-elle sur la table ?",
+     "non",
+     "?"
+    ],
+    [
+     "s17",
+     "De quelle couleur est la clé ?",
+     "jaune",
+     "?"
+    ],
+    [
+     "s17",
+     "Où est la balle verte ?",
+     "sol",
+     "?"
+    ],
+    [
+     "s17",
+     "Où est le cube rouge ?",
+     "table",
+     "?"
+    ],
+    [
+     "s18",
+     "Où est le livre vert ?",
+     "sol",
+     "?"
+    ],
+    [
+     "s18",
+     "Où est le livre bleu ?",
+     "sol",
+     "?"
+    ],
+    [
+     "s22",
+     "Où est la clé ?",
+     "table",
+     "conflit"
+    ]
+   ]
+  },
+  "unified_no_source": {
+   "metrics": {
+    "n": 36,
+    "success": 0.8611,
+    "false_confident": 0.0556,
+    "abstention": 0.5556,
+    "clarification": 0.1389,
+    "likely": 0.0,
+    "exact_class": 0.8611,
+    "coverage": 0.7778,
+    "identity_accuracy": 0.9
+   },
+   "by_category": {
+    "ambiguïté_lexicale": {
+     "success": 0.5,
+     "false_confident": 0.0,
+     "n": 2
+    },
+    "chaîne_longue": {
+     "success": 1.0,
+     "false_confident": 0.0,
+     "n": 5
+    },
+    "connaissance_partielle": {
+     "success": 1.0,
+     "false_confident": 0.0,
+     "n": 5
+    },
+    "expression_nouvelle": {
+     "success": 0.0,
+     "false_confident": 0.0,
+     "n": 2
+    },
+    "polysémie": {
+     "success": 1.0,
+     "false_confident": 0.0,
+     "n": 3
+    },
+    "présupposition": {
+     "success": 1.0,
+     "false_confident": 0.0,
+     "n": 4
+    },
+    "similaires": {
+     "success": 0.0,
+     "false_confident": 1.0,
+     "n": 1
+    },
+    "source_trompeuse": {
+     "success": 0.75,
+     "false_confident": 0.25,
+     "n": 4
+    },
+    "temporalité": {
+     "success": 1.0,
+     "false_confident": 0.0,
+     "n": 4
+    },
+    "vocabulaire_non_vu": {
+     "success": 1.0,
+     "false_confident": 0.0,
+     "n": 3
+    },
+    "élimination": {
+     "success": 1.0,
+     "false_confident": 0.0,
+     "n": 3
+    }
+   },
+   "errors": [
+    [
+     "s03",
+     "Où est la clé ?",
+     "table",
+     "?"
+    ],
+    [
+     "s04",
+     "Où est le livre ?",
+     "sol",
+     "?"
+    ],
+    [
+     "s05",
+     "Où est la balle verte ?",
+     "table",
+     "?"
+    ],
+    [
+     "s21",
+     "Où est le cube rouge ?",
+     "?",
+     "table"
+    ],
+    [
+     "s22",
+     "Où est la clé ?",
+     "table",
+     "sol"
+    ]
+   ]
+  },
+  "fixed_threshold_0.9": {
+   "metrics": {
+    "n": 36,
+    "success": 0.8611,
+    "false_confident": 0.0278,
+    "abstention": 0.5833,
+    "clarification": 0.1389,
+    "likely": 0.0,
+    "exact_class": 0.8611,
+    "coverage": 0.7778,
+    "identity_accuracy": 0.9333
+   },
+   "by_category": {
+    "ambiguïté_lexicale": {
+     "success": 0.5,
+     "false_confident": 0.0,
+     "n": 2
+    },
+    "chaîne_longue": {
+     "success": 1.0,
+     "false_confident": 0.0,
+     "n": 5
+    },
+    "connaissance_partielle": {
+     "success": 1.0,
+     "false_confident": 0.0,
+     "n": 5
+    },
+    "expression_nouvelle": {
+     "success": 0.0,
+     "false_confident": 0.0,
+     "n": 2
+    },
+    "polysémie": {
+     "success": 1.0,
+     "false_confident": 0.0,
+     "n": 3
+    },
+    "présupposition": {
+     "success": 1.0,
+     "false_confident": 0.0,
+     "n": 4
+    },
+    "similaires": {
+     "success": 0.0,
+     "false_confident": 1.0,
+     "n": 1
+    },
+    "source_trompeuse": {
+     "success": 0.75,
+     "false_confident": 0.0,
+     "n": 4
+    },
+    "temporalité": {
+     "success": 1.0,
+     "false_confident": 0.0,
+     "n": 4
+    },
+    "vocabulaire_non_vu": {
+     "success": 1.0,
+     "false_confident": 0.0,
+     "n": 3
+    },
+    "élimination": {
+     "success": 1.0,
+     "false_confident": 0.0,
+     "n": 3
+    }
+   },
+   "errors": [
+    [
+     "s03",
+     "Où est la clé ?",
+     "table",
+     "?"
+    ],
+    [
+     "s04",
+     "Où est le livre ?",
+     "sol",
+     "?"
+    ],
+    [
+     "s05",
+     "Où est la balle verte ?",
+     "table",
+     "?"
+    ],
+    [
+     "s21",
+     "Où est le cube rouge ?",
+     "?",
+     "table"
+    ],
+    [
+     "s22",
+     "Où est la clé ?",
+     "table",
+     "conflit"
+    ]
+   ]
+  }
+ }
+}

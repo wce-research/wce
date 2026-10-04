@@ -1,0 +1,248 @@
+python3 scripts/active_multiseed.py 16 12
+ok results/active/0_main.json
+ok results/active/1_main.json
+ok results/active/3_main.json
+ok results/active/2_main.json
+ok results/active/7_main.json
+ok results/active/5_main.json
+ok results/active/4_main.json
+ok results/active/6_main.json
+ok results/active/9_main.json
+ok results/active/8_main.json
+ok results/active/11_main.json
+ok results/active/10_main.json
+ok results/active/3_family.json
+ok results/active/2_family.json
+ok results/active/6_family.json
+ok results/active/4_family.json
+ok results/active/0_family.json
+ok results/active/5_family.json
+ok results/active/1_family.json
+ok results/active/7_family.json
+ok results/active/8_family.json
+ok results/active/9_family.json
+ok results/active/11_family.json
+ok results/active/10_family.json
+ok results/active/12_family.json
+ok results/active/13_family.json
+ok results/active/14_family.json
+ok results/active/15_family.json
+ok results/active/13_main.json
+ok results/active/12_main.json
+ok results/active/14_main.json
+ok results/active/0_noise.json
+ok results/active/15_main.json
+ok results/active/1_noise.json
+ok results/active/3_noise.json
+ok results/active/4_noise.json
+ok results/active/6_noise.json
+ok results/active/2_noise.json
+ok results/active/5_noise.json
+ok results/active/0_qp.json
+ok results/active/1_qp.json
+ok results/active/2_qp.json
+ok results/active/3_qp.json
+ok results/active/5_qp.json
+ok results/active/4_qp.json
+ok results/active/6_qp.json
+ok results/active/8_qp.json
+ok results/active/7_qp.json
+ok results/active/10_qp.json
+ok results/active/9_qp.json
+ok results/active/11_qp.json
+ok results/active/14_qp.json
+ok results/active/12_qp.json
+ok results/active/13_qp.json
+ok results/active/7_noise.json
+ok results/active/0_residual.json
+ok results/active/15_qp.json
+ok results/active/0_ident.json
+ok results/active/0_cross.json
+ok results/active/0_capacity.json
+ok results/active/10_noise.json
+ok results/active/1_residual.json
+ok results/active/0_anchor.json
+ok results/active/1_ident.json
+ok results/active/1_cross.json
+ok results/active/1_capacity.json
+ok results/active/8_noise.json
+ok results/active/9_noise.json
+ok results/active/2_residual.json
+ok results/active/1_anchor.json
+ok results/active/2_cross.json
+ok results/active/2_ident.json
+ok results/active/12_noise.json
+ok results/active/2_capacity.json
+ok results/active/3_residual.json
+ok results/active/3_ident.json
+ok results/active/3_cross.json
+ok results/active/14_noise.json
+ok results/active/15_noise.json
+ok results/active/3_capacity.json
+ok results/active/4_residual.json
+ok results/active/2_anchor.json
+ok results/active/4_cross.json
+ok results/active/4_ident.json
+ok results/active/11_noise.json
+ok results/active/5_residual.json
+ok results/active/4_capacity.json
+ok results/active/5_ident.json
+ok results/active/5_cross.json
+ok results/active/3_anchor.json
+ok results/active/13_noise.json
+ok results/active/6_residual.json
+ok results/active/5_capacity.json
+ok results/active/6_ident.json
+ok results/active/6_cross.json
+ok results/active/4_anchor.json
+ok results/active/6_capacity.json
+ok results/active/7_residual.json
+ok results/active/5_anchor.json
+ok results/active/7_ident.json
+ok results/active/7_cross.json
+ok results/active/6_anchor.json
+ok results/active/7_capacity.json
+ok results/active/8_residual.json
+ok results/active/7_anchor.json
+ok results/active/8_ident.json
+ok results/active/8_cross.json
+ok results/active/8_capacity.json
+ok results/active/8_anchor.json
+ok results/active/9_residual.json
+ok results/active/9_capacity.json
+ok results/active/9_anchor.json
+ok results/active/0_stability.json
+ok results/active/9_cross.json
+ok results/active/9_ident.json
+ok results/active/10_residual.json
+ok results/active/10_capacity.json
+ok results/active/10_ident.json
+ok results/active/10_cross.json
+ok results/active/10_anchor.json
+ok results/active/2_stability.json
+ok results/active/11_residual.json
+ok results/active/1_stability.json
+ok results/active/11_ident.json
+ok results/active/11_capacity.json
+ok results/active/11_cross.json
+ok results/active/11_anchor.json
+ok results/active/3_stability.json
+ok results/active/12_residual.json
+ok results/active/12_ident.json
+ok results/active/12_cross.json
+ok results/active/12_capacity.json
+ok results/active/5_stability.json
+ok results/active/13_residual.json
+ok results/active/4_stability.json
+ok results/active/6_stability.json
+ok results/active/13_cross.json
+ok results/active/13_ident.json
+ok results/active/13_capacity.json
+ok results/active/12_anchor.json
+ok results/active/14_residual.json
+ok results/active/14_ident.json
+ok results/active/14_cross.json
+ok results/active/14_capacity.json
+ok results/active/7_stability.json
+ok results/active/13_anchor.json
+ok results/active/15_residual.json
+ok results/active/8_stability.json
+ok results/active/15_cross.json
+ok results/active/15_ident.json
+ok results/active/15_capacity.json
+ok results/active/14_anchor.json
+ok results/active/9_stability.json
+ok results/active/15_anchor.json
+ok results/active/10_stability.json
+ok results/active/11_stability.json
+ok results/active/12_stability.json
+ok results/active/14_stability.json
+ok results/active/13_stability.json
+ok results/active/15_stability.json
+{
+ "H1": {
+  "value": {
+   "mean": 0.0625,
+   "ci95": [
+    -0.0615,
+    0.1865
+   ],
+   "n": 16
+  },
+  "verdict": "NON CONCLUANTE"
+ },
+ "H2": {
+  "structure_ig": -8155.0587,
+  "random": -2.1659,
+  "seeds_better": 3,
+  "verdict": "RÉFUTÉE"
+ },
+ "H3": {
+  "ast": [
+   0.0156,
+   0.0625
+  ],
+  "functional": [
+   0.0156,
+   0.25
+  ],
+  "verdict": "RÉFUTÉE"
+ },
+ "H4": {
+  "false_rejection": 0.12121212121212122,
+  "detection": 0.7711864406779662,
+  "old": [
+   0.5757575757575758,
+   0.8700564971751412
+  ],
+  "verdict": "NON CONCLUANTE"
+ },
+ "H5": {
+  "value": {
+   "0.08": [
+    0.75,
+    0.0938
+   ],
+   "0.12": [
+    1.0,
+    0.0312
+   ]
+  },
+  "verdict": "SOUTENUE"
+ },
+ "H6": {
+  "evals_ratio": 0.6272,
+  "recovery_guided": 0.4219,
+  "recovery_unguided": 0.4688,
+  "verdict": "SOUTENUE"
+ },
+ "H7": {
+  "canonical": 0.3125,
+  "raw": 0.2768,
+  "verdict": "NON CONCLUANTE"
+ },
+ "H8": {
+  "value": {
+   "mean": -0.0068,
+   "ci95": [
+    -0.0223,
+    0.0088
+   ],
+   "n": 16
+  },
+  "verdict": "RÉFUTÉE"
+ },
+ "H9": {
+  "ood_degradation_gated": 0.0,
+  "ood_degradation_global": 0.0662,
+  "in_gated": 0.9549,
+  "in_global": 0.954,
+  "verdict": "SOUTENUE"
+ },
+ "H10": {
+  "full": 8.125,
+  "experts_only": 3.6875,
+  "violations": 0,
+  "verdict": "SOUTENUE"
+ }
+}

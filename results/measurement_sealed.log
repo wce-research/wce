@@ -1,0 +1,57 @@
+python3 scripts/measurement_sealed_eval.py
+{
+ "last_observation": {
+  "success": 0.2561,
+  "false_confident": 0.0245,
+  "abstention": 0.7194,
+  "measurements": 0.0,
+  "cost": 0.0,
+  "calibration_ece": 0.0786,
+  "ig_corr": null
+ },
+ "static": {
+  "success": 0.3853,
+  "false_confident": 0.2673,
+  "abstention": 0.3474,
+  "measurements": 0.0,
+  "cost": 0.0,
+  "calibration_ece": 0.3563,
+  "ig_corr": null
+ },
+ "temporal": {
+  "success": 0.539,
+  "false_confident": 0.0334,
+  "abstention": 0.4276,
+  "measurements": 0.0,
+  "cost": 0.0,
+  "calibration_ece": 0.0737,
+  "ig_corr": null
+ },
+ "temporal_passive": {
+  "success": 0.6281,
+  "false_confident": 0.029,
+  "abstention": 0.343,
+  "measurements": 0.396,
+  "cost": 0.087,
+  "calibration_ece": 0.0487,
+  "ig_corr": 0.872
+ },
+ "temporal_active": {
+  "success": 0.7595,
+  "false_confident": 0.0423,
+  "abstention": 0.1982,
+  "measurements": 0.414,
+  "cost": 0.144,
+  "calibration_ece": 0.0522,
+  "ig_corr": 0.786
+ },
+ "full_algebra": {
+  "success": 0.7082,
+  "false_confident": 0.029,
+  "abstention": 0.2628,
+  "measurements": 0.717,
+  "cost": 0.188,
+  "calibration_ece": 0.033,
+  "ig_corr": 0.84
+ }
+}

@@ -1,0 +1,1569 @@
+{
+  "study": "WCE identity 01",
+  "finalists": [
+    "a2",
+    "b2",
+    "c2",
+    "d2",
+    "f2"
+  ],
+  "files": [
+    {
+      "file": "index.html",
+      "bytes": 76307,
+      "sha256": "0b840861dc0cdd075dad6ab4ab77d06db220a2160dcb1903a4d1a68aaaa41e80"
+    },
+    {
+      "file": "README.md",
+      "bytes": 8372,
+      "sha256": "1bcc7848a6de53d19fcd692a8411e5375e977e4e01a9de5b772a99dd848147a0"
+    },
+    {
+      "file": "concepts.json",
+      "bytes": 8800,
+      "sha256": "c5457bfcecd5da0c73eeb2e9d278378a0307a4a406f32552a594760be4ec66b3"
+    },
+    {
+      "file": "assets/typeface-license.txt",
+      "bytes": 3859,
+      "sha256": "63d3ba759d12804c5b31a9d5940d855c1820d1f5999e6b0872eb1c7ff045fbc9"
+    },
+    {
+      "file": "concepts/a1.svg",
+      "bytes": 202,
+      "sha256": "572d7cdfbca27b8acfbc9c11f31970f0bc0b70c647d2ccf14f3c4371ce2853c0",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "file": "concepts/a2.svg",
+      "bytes": 231,
+      "sha256": "d7c11c6eb2f30c3703374e1d6591d493b5e0afd7baa21da84eaa6b7cb9df8a7a",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "file": "concepts/b1.svg",
+      "bytes": 248,
+      "sha256": "cec8907fc9a2659112908d9d9a5dde826f366b626a53f3dac9ea18fbf97a7431",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "file": "concepts/b2.svg",
+      "bytes": 291,
+      "sha256": "5cf02ff89d2b94b74b23632e2e3e16ddbe4669ed8fd48f053924767bc2e92f1f",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "file": "concepts/c1.svg",
+      "bytes": 267,
+      "sha256": "ac97f3a7d8292c62c37c99db183121a7b935aa533d94340a0099e9c9fb6efbdc",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "file": "concepts/c2.svg",
+      "bytes": 245,
+      "sha256": "b0ac44801ffd867803471f4f3116c8e5e6d2c194f88e3b7269da151563a846c7",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "file": "concepts/d1.svg",
+      "bytes": 219,
+      "sha256": "94454b3e44e6a60acab00559c9fa8d524af2b7e686e7394b4d679eb2c939316a",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "file": "concepts/d2.svg",
+      "bytes": 239,
+      "sha256": "f39d45d91067830e1105bc699c7e41084d7fe38c177a27c7043247bb9d1572f2",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "file": "concepts/e1.svg",
+      "bytes": 349,
+      "sha256": "d26d9787d9d77831ff2cb6cc0b68ef9165043fab0a0887afaff55e7bbeef130e",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "file": "concepts/e2.svg",
+      "bytes": 246,
+      "sha256": "7674ca088bf14f932b15233b03ae93530fdafd807ee1d0772451b75b46814b63",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "file": "concepts/f1.svg",
+      "bytes": 245,
+      "sha256": "0d1c2dd9299ffc836bb583c3045f57152115052e18e0835e73fe20fa138c087f",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "file": "concepts/f2.svg",
+      "bytes": 214,
+      "sha256": "8a197a01ede4407d9c36a008b485e64587c245cabed362d80726bcceb74bec09",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "file": "finalists/a2/avatar-1024.png",
+      "bytes": 5589,
+      "sha256": "ae1db909bd66a8c0aa8ee247dd936c8ece4cf1a7a16779311ca1af18140f1c06",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "file": "finalists/a2/avatar-1024.svg",
+      "bytes": 349,
+      "sha256": "8b89406082225834393c1ce08702596598b900535291d2f97e103e572cc984ba",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "file": "finalists/a2/avatar-dark-1024.png",
+      "bytes": 5591,
+      "sha256": "0a71d25de298764004b912698f703f48d202dfed80dcd76b15747ebe8501d07e",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "file": "finalists/a2/avatar-dark-1024.svg",
+      "bytes": 349,
+      "sha256": "159faafd5b1618fd9abee245d6bff732b8248309f86bad59d7624ebe9dac2b66",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "file": "finalists/a2/favicon-16.png",
+      "bytes": 156,
+      "sha256": "419e92b67b6360ae0ede3e79a93217e4d01eca2bc779919e6d106c196a1794ff",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "file": "finalists/a2/favicon-180.png",
+      "bytes": 664,
+      "sha256": "2b5151525f87b8d24da40c2eef6b9e61c2ae13cbe9336da03c8c64f190a4eeaf",
+      "width": 180,
+      "height": 180
+    },
+    {
+      "file": "finalists/a2/favicon-192.png",
+      "bytes": 623,
+      "sha256": "a9f4b64e84bb826df880af401f87844007b158835f7fa4ac8fabf08dc1618f52",
+      "width": 192,
+      "height": 192
+    },
+    {
+      "file": "finalists/a2/favicon-32.png",
+      "bytes": 177,
+      "sha256": "6c7d184dac212172d64c95f423157e5202aaaba0956301a9b0b259722878e22a",
+      "width": 32,
+      "height": 32
+    },
+    {
+      "file": "finalists/a2/favicon-48.png",
+      "bytes": 210,
+      "sha256": "4c9011dad9932c7b70d478837b7d5626ac55fe893c64e9a15021c78a0b3c3e58",
+      "width": 48,
+      "height": 48
+    },
+    {
+      "file": "finalists/a2/favicon-512.png",
+      "bytes": 1954,
+      "sha256": "a0bd6d96ef6037f0d316f7a249435db26ecadf0b2aea4485e061fceb8d5b78b3",
+      "width": 512,
+      "height": 512
+    },
+    {
+      "file": "finalists/a2/favicon.ico",
+      "bytes": 597,
+      "sha256": "e098435d651be5898007c0fa16999adf7448465bb80fcb657c59c3b80e8f9a26"
+    },
+    {
+      "file": "finalists/a2/favicon.png",
+      "bytes": 232,
+      "sha256": "80394cd95c64def619ec4e53ba240673b60a50b2148020644e1ffbafb8b7cc41",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "file": "finalists/a2/favicon.svg",
+      "bytes": 260,
+      "sha256": "579b320f53d93208e46e14ba76600ce3bf911edf4abb77b00a80cf3e88281949",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "file": "finalists/a2/github-preview-1280x640.png",
+      "bytes": 13559,
+      "sha256": "547b78c89fd90b984ee27d42b088439b9c4b4d25e1a152abb171cb907354cc7b",
+      "width": 1280,
+      "height": 640
+    },
+    {
+      "file": "finalists/a2/github-preview-1280x640.svg",
+      "bytes": 7103,
+      "sha256": "750ab148f5f31a4aed6c9fa2dd9567efbabdaaf7ee10ed30898164adb0fa5344",
+      "width": 1280,
+      "height": 640
+    },
+    {
+      "file": "finalists/a2/instagram-portrait-1080x1350.png",
+      "bytes": 22495,
+      "sha256": "325b30b4c676f77038c770a04788ece4a6b5d3e4dbbe805cd1bb40d0e240a5f1",
+      "width": 1080,
+      "height": 1350
+    },
+    {
+      "file": "finalists/a2/instagram-portrait-1080x1350.svg",
+      "bytes": 7000,
+      "sha256": "fe34fc853c547b8cd0c24ccb5e827c102933f0812178a582a01afd2c5bde3382",
+      "width": 1080,
+      "height": 1350
+    },
+    {
+      "file": "finalists/a2/instagram-square-1080.png",
+      "bytes": 21374,
+      "sha256": "5e96038d747833bd0a2e2cdced9ec7c3089265fe62fdeb4df60051e85b4c2cf4",
+      "width": 1080,
+      "height": 1080
+    },
+    {
+      "file": "finalists/a2/instagram-square-1080.svg",
+      "bytes": 7023,
+      "sha256": "66d5930f33ae297a434a2fa23e3fe28d26022d3c5896ef3bf0ed9dcbeac1f5c0",
+      "width": 1080,
+      "height": 1080
+    },
+    {
+      "file": "finalists/a2/instagram-story-1080x1920.png",
+      "bytes": 25793,
+      "sha256": "6ac0b1e7a56703fa7947cad127725149ff5cb23159a253e2c8a5726cb3dece0e",
+      "width": 1080,
+      "height": 1920
+    },
+    {
+      "file": "finalists/a2/instagram-story-1080x1920.svg",
+      "bytes": 7011,
+      "sha256": "33a4a4248020a6a41d029e0d7d4a0a837598abcff875abb0902b47110552533a",
+      "width": 1080,
+      "height": 1920
+    },
+    {
+      "file": "finalists/a2/linkedin-page-1512x256.png",
+      "bytes": 9652,
+      "sha256": "5b383ee79e4862b8d84ed2b646a44ba71215d0a17cfdd814ac06ba728aeb94fe",
+      "width": 1512,
+      "height": 256
+    },
+    {
+      "file": "finalists/a2/linkedin-page-1512x256.svg",
+      "bytes": 7097,
+      "sha256": "b7930832c6f6b30e39211b761c8a9a0171e5ce225966a7ccd8df49498a752a62",
+      "width": 1512,
+      "height": 256
+    },
+    {
+      "file": "finalists/a2/linkedin-profile-1584x396.png",
+      "bytes": 12860,
+      "sha256": "db167e6ee5b6eed7c728f3466f396cbd9d9d2ae524fdf5b3e8fa35f25ce92f7b",
+      "width": 1584,
+      "height": 396
+    },
+    {
+      "file": "finalists/a2/linkedin-profile-1584x396.svg",
+      "bytes": 7079,
+      "sha256": "43ab34a1d884d1c423394b04099bb0903f0f850ec200ec989c7af0e936394a3b",
+      "width": 1584,
+      "height": 396
+    },
+    {
+      "file": "finalists/a2/logo-full-name.png",
+      "bytes": 3923,
+      "sha256": "fcf1f40aca832479b0271f085ea105fa0b51c13085aa5cb37aee5ea3dc666ece",
+      "width": 258,
+      "height": 64
+    },
+    {
+      "file": "finalists/a2/logo-full-name.svg",
+      "bytes": 6861,
+      "sha256": "ec38083955523542dfcf33bb4942e59afc41457d81c2f4e7685d73f3a37fb797",
+      "width": 258,
+      "height": 64
+    },
+    {
+      "file": "finalists/a2/logo-horizontal-white.png",
+      "bytes": 1487,
+      "sha256": "54b8ec6cabb5d8e46be547c58fda2f8afa591ea52d161a900e17ca8c8710deef",
+      "width": 194,
+      "height": 64
+    },
+    {
+      "file": "finalists/a2/logo-horizontal-white.svg",
+      "bytes": 447,
+      "sha256": "3894b00880f8a11c4fa178302873e764b69e1f274916927aaeca4bbb21a433a0",
+      "width": 194,
+      "height": 64
+    },
+    {
+      "file": "finalists/a2/logo-horizontal.png",
+      "bytes": 1703,
+      "sha256": "a9decbd40a1d30afdccd98f84637ff325b7d19ed5d957956877e82c9e2231bb8",
+      "width": 194,
+      "height": 64
+    },
+    {
+      "file": "finalists/a2/logo-horizontal.svg",
+      "bytes": 450,
+      "sha256": "7c7f5951264ce27b0172cc84eebacbc77dc4549486cd3c9ccc746b37c7a8393a",
+      "width": 194,
+      "height": 64
+    },
+    {
+      "file": "finalists/a2/logo-stacked.png",
+      "bytes": 1881,
+      "sha256": "033b0e68ea559c0c86188f3a33489837f2657cdd04090716b2aa788cf7ede53f",
+      "width": 166,
+      "height": 124
+    },
+    {
+      "file": "finalists/a2/logo-stacked.svg",
+      "bytes": 495,
+      "sha256": "6915d1bf6330e84b5aca8a1e4ea8ec55cff0b20e46867bb345f05286526809b5",
+      "width": 166,
+      "height": 124
+    },
+    {
+      "file": "finalists/a2/symbol-black.png",
+      "bytes": 248,
+      "sha256": "2c5a0dd6fba3923e75d2b898cb8447a2cd0fe2b90380f6b0fc8f45b6083882d0",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "file": "finalists/a2/symbol-black.svg",
+      "bytes": 231,
+      "sha256": "d7c11c6eb2f30c3703374e1d6591d493b5e0afd7baa21da84eaa6b7cb9df8a7a",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "file": "finalists/a2/symbol-white.png",
+      "bytes": 241,
+      "sha256": "eeaa62ea266657337e0491df0eb40fd6ef382564a6607c9a8a4e9bea6573fc40",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "file": "finalists/a2/symbol-white.svg",
+      "bytes": 228,
+      "sha256": "9a021aa0c8d4af267b44ca05854d4d7e7433710e45fd29e2521ed1cd126842ea",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "file": "finalists/a2/x-avatar-400.png",
+      "bytes": 1465,
+      "sha256": "af8fc68a70d8571b9e901abc32b9bbfa9cdb326dc8e68c9b075feb8572513d88",
+      "width": 400,
+      "height": 400
+    },
+    {
+      "file": "finalists/a2/x-avatar-400.svg",
+      "bytes": 342,
+      "sha256": "9590ea8e550681bb56e5a55ed0a5b984217a7d3c3346b8d604df4edbc230fd36",
+      "width": 400,
+      "height": 400
+    },
+    {
+      "file": "finalists/a2/x-header-1500x500.png",
+      "bytes": 14185,
+      "sha256": "cbde94df4d8da72e42eccde54cdba79c6085ca0b013102efd74713728a2913c5",
+      "width": 1500,
+      "height": 500
+    },
+    {
+      "file": "finalists/a2/x-header-1500x500.svg",
+      "bytes": 7089,
+      "sha256": "8a2368605fe34ca6354ffc17f5cc31164eb3b3ed3fa38b5d06b5ec2949722ab5",
+      "width": 1500,
+      "height": 500
+    },
+    {
+      "file": "finalists/b2/avatar-1024.png",
+      "bytes": 12637,
+      "sha256": "cb6771b73b77f95ca04687fa47b6157bd1da6306614f3d343c8b8f5eb44532a2",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "file": "finalists/b2/avatar-1024.svg",
+      "bytes": 409,
+      "sha256": "7a81b2c895356ff37f6bf6de95546ded1eddfdeb53c06d0350be952f08f060b4",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "file": "finalists/b2/avatar-dark-1024.png",
+      "bytes": 12608,
+      "sha256": "0fe16c76073e52ee08113151c2c7d95af201dce131b6c234e55889afd1863a78",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "file": "finalists/b2/avatar-dark-1024.svg",
+      "bytes": 409,
+      "sha256": "f0e942c447d5651ec4d785ec1c906941cadec63eb36105e1080e0224112efa71",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "file": "finalists/b2/favicon-16.png",
+      "bytes": 270,
+      "sha256": "a8c6f480daff6cd77781085f31269140d09247e8eb32e81ddabde69e5f0779e9",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "file": "finalists/b2/favicon-180.png",
+      "bytes": 2533,
+      "sha256": "df7ab32cb96baedac6c5d581ba110829d88194b36dae8c98a559409f0058c415",
+      "width": 180,
+      "height": 180
+    },
+    {
+      "file": "finalists/b2/favicon-192.png",
+      "bytes": 2525,
+      "sha256": "b748d0fb11714ecf84ce52c73a728782ea517120a19d5fcaf012178cedbb4708",
+      "width": 192,
+      "height": 192
+    },
+    {
+      "file": "finalists/b2/favicon-32.png",
+      "bytes": 476,
+      "sha256": "1e6f97ee260243036c785eb40d74a4528d49209b3e6e870a0bcf009e04c8ce56",
+      "width": 32,
+      "height": 32
+    },
+    {
+      "file": "finalists/b2/favicon-48.png",
+      "bytes": 676,
+      "sha256": "6f14c97735dca62c680eb81541680a10b9cfb5a97a6594b5a6f58e4088f5507a",
+      "width": 48,
+      "height": 48
+    },
+    {
+      "file": "finalists/b2/favicon-512.png",
+      "bytes": 7378,
+      "sha256": "4c868bb7db2486c7a540a7e6ddf5725f05bf1659299bd1219ba92d3b56767df2",
+      "width": 512,
+      "height": 512
+    },
+    {
+      "file": "finalists/b2/favicon.ico",
+      "bytes": 1476,
+      "sha256": "29495a2e200ee9e710079661d847a4fe8c9a2b12e28d78f3c6cd6466229f0b24"
+    },
+    {
+      "file": "finalists/b2/favicon.png",
+      "bytes": 907,
+      "sha256": "36c978986d79022745f3bc361edc62f0ed990edd893bf241b485bb0bb31b7ee5",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "file": "finalists/b2/favicon.svg",
+      "bytes": 320,
+      "sha256": "5e80f1f691d134e106db4e31880c4924ca2d0572a523a1d3a9ce3e1bfae80564",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "file": "finalists/b2/github-preview-1280x640.png",
+      "bytes": 15893,
+      "sha256": "6d3bb674fece95b765a630edbe66b84aa6492be88138eb4eb67a52ae37544b43",
+      "width": 1280,
+      "height": 640
+    },
+    {
+      "file": "finalists/b2/github-preview-1280x640.svg",
+      "bytes": 7163,
+      "sha256": "365e60306a7cb84d163747f9e8f7f9133e24b27f197b5d1d33172f9aaee7b259",
+      "width": 1280,
+      "height": 640
+    },
+    {
+      "file": "finalists/b2/instagram-portrait-1080x1350.png",
+      "bytes": 27201,
+      "sha256": "7d67b3f7e5b721d2d772896b0c278a5807ef4add71015509e0ecd6e1a5fcc9df",
+      "width": 1080,
+      "height": 1350
+    },
+    {
+      "file": "finalists/b2/instagram-portrait-1080x1350.svg",
+      "bytes": 7060,
+      "sha256": "e5cbce789baecd2aa589ad20a479be69be39db98ca4285334766cb151f2ac110",
+      "width": 1080,
+      "height": 1350
+    },
+    {
+      "file": "finalists/b2/instagram-square-1080.png",
+      "bytes": 26079,
+      "sha256": "5a4ea725509925c49219aa3caca9fdf3780175cb8d48c16b1d0343a0a18706e7",
+      "width": 1080,
+      "height": 1080
+    },
+    {
+      "file": "finalists/b2/instagram-square-1080.svg",
+      "bytes": 7083,
+      "sha256": "4bde4864295f15ae8916963a7f99fdc3c6adc7c00e6370305a2a229c54f35592",
+      "width": 1080,
+      "height": 1080
+    },
+    {
+      "file": "finalists/b2/instagram-story-1080x1920.png",
+      "bytes": 30335,
+      "sha256": "595e3d5a694adb8feafd268afcb2b159b6d6d76bfcb46674ca9a1c967219e898",
+      "width": 1080,
+      "height": 1920
+    },
+    {
+      "file": "finalists/b2/instagram-story-1080x1920.svg",
+      "bytes": 7071,
+      "sha256": "c58466f733d256d9d5b0a3aaf4c6c9e3520b775d3b2abad9344037c0de499a55",
+      "width": 1080,
+      "height": 1920
+    },
+    {
+      "file": "finalists/b2/linkedin-page-1512x256.png",
+      "bytes": 10765,
+      "sha256": "b695aaa9f3ea9094b89e540dc572af8ed6e2b49c882637ac17396de549ae6cb8",
+      "width": 1512,
+      "height": 256
+    },
+    {
+      "file": "finalists/b2/linkedin-page-1512x256.svg",
+      "bytes": 7157,
+      "sha256": "f222d238a3ad18718631edc85c497ab12dd27c8ed66a1e4d6adaa60a1f281a94",
+      "width": 1512,
+      "height": 256
+    },
+    {
+      "file": "finalists/b2/linkedin-profile-1584x396.png",
+      "bytes": 14629,
+      "sha256": "81b3b67ff32d7099a50a81f5da3c4cd67d93d324563c566fb95679f248f40875",
+      "width": 1584,
+      "height": 396
+    },
+    {
+      "file": "finalists/b2/linkedin-profile-1584x396.svg",
+      "bytes": 7139,
+      "sha256": "a3ee52aabbc9480e32f66a52d0343598320a54ae814459698ec0c03568426c0a",
+      "width": 1584,
+      "height": 396
+    },
+    {
+      "file": "finalists/b2/logo-full-name.png",
+      "bytes": 4588,
+      "sha256": "f583b49d4e133b920cc87b2854a9f5f44d7d234595c80a2fc536cdf8ee07c41a",
+      "width": 258,
+      "height": 64
+    },
+    {
+      "file": "finalists/b2/logo-full-name.svg",
+      "bytes": 6921,
+      "sha256": "8ad0314fcdc6a272ec72c46bad33f96fd1f4b4d7590a6f67b634a2ee4d7f0872",
+      "width": 258,
+      "height": 64
+    },
+    {
+      "file": "finalists/b2/logo-horizontal-white.png",
+      "bytes": 1902,
+      "sha256": "9f2f91931c0dbc9d648bdc13c23097b881046940830e12cc93579edf2904d843",
+      "width": 194,
+      "height": 64
+    },
+    {
+      "file": "finalists/b2/logo-horizontal-white.svg",
+      "bytes": 507,
+      "sha256": "e326baeb10323af639e65bd4411a1b2a5b650e3b6000deb2ad5d23f1df03c860",
+      "width": 194,
+      "height": 64
+    },
+    {
+      "file": "finalists/b2/logo-horizontal.png",
+      "bytes": 2312,
+      "sha256": "2843bf2adee5dd0a7ab71e0aec9a5b5164e81ca1d6b13a0aacdf92ce5eed8120",
+      "width": 194,
+      "height": 64
+    },
+    {
+      "file": "finalists/b2/logo-horizontal.svg",
+      "bytes": 510,
+      "sha256": "439c30a4268d3a206f86e86f3f3b102ef7220189fd6be345c3136d400aa4bc0b",
+      "width": 194,
+      "height": 64
+    },
+    {
+      "file": "finalists/b2/logo-stacked.png",
+      "bytes": 2529,
+      "sha256": "3ddd0f28a7fbab01cb617f82404d0ee13ae9d584c4b512ed8fa61a79f1318940",
+      "width": 166,
+      "height": 124
+    },
+    {
+      "file": "finalists/b2/logo-stacked.svg",
+      "bytes": 555,
+      "sha256": "74edd8a18f456a9136df5aad350eb01d1582434a6e0036f91cdecc27d3a673ae",
+      "width": 166,
+      "height": 124
+    },
+    {
+      "file": "finalists/b2/symbol-black.png",
+      "bytes": 961,
+      "sha256": "3847fee1bbe3437f492eb6c7b4134735122cb2c7f1255ff1664ed1550c8afc92",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "file": "finalists/b2/symbol-black.svg",
+      "bytes": 291,
+      "sha256": "5cf02ff89d2b94b74b23632e2e3e16ddbe4669ed8fd48f053924767bc2e92f1f",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "file": "finalists/b2/symbol-white.png",
+      "bytes": 789,
+      "sha256": "4263e025df9c7f5e4d1732066deb7a53d697bc7e97349939051863e3b13d3389",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "file": "finalists/b2/symbol-white.svg",
+      "bytes": 288,
+      "sha256": "aa10f30269b061c3fb32953c98a1271b12cf5665650050fa627a680079f0ade6",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "file": "finalists/b2/x-avatar-400.png",
+      "bytes": 4216,
+      "sha256": "9e1a6eb4aa75ac379fd054bd0f98d6e3545c2bd29e8585121350058facb5d234",
+      "width": 400,
+      "height": 400
+    },
+    {
+      "file": "finalists/b2/x-avatar-400.svg",
+      "bytes": 402,
+      "sha256": "ef5203d36d8eeaf0d2446ced70079de5e65d812aa338bd5d64e63626430e5403",
+      "width": 400,
+      "height": 400
+    },
+    {
+      "file": "finalists/b2/x-header-1500x500.png",
+      "bytes": 16373,
+      "sha256": "b591cec0591a954a397d9a8c881df23c6f19b4bd3e093ae1da10b4628da64160",
+      "width": 1500,
+      "height": 500
+    },
+    {
+      "file": "finalists/b2/x-header-1500x500.svg",
+      "bytes": 7149,
+      "sha256": "e277d18b18e862cb89ccf3fc397934b6fc9249eb65407b145ba36e3cc9678730",
+      "width": 1500,
+      "height": 500
+    },
+    {
+      "file": "finalists/c2/avatar-1024.png",
+      "bytes": 5588,
+      "sha256": "f7b98cf4d76d48abbb9c866f078aed56f9a3a982cc17f1bae96f561943772efb",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "file": "finalists/c2/avatar-1024.svg",
+      "bytes": 363,
+      "sha256": "3bbc0e5f227bc709a41a9398d09f15004caf582b250e9db3b22d59f8303d3ee7",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "file": "finalists/c2/avatar-dark-1024.png",
+      "bytes": 5585,
+      "sha256": "c340d5f15201a35e70e994815fa015429f1a8702870a7b0045cd7916e00973f7",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "file": "finalists/c2/avatar-dark-1024.svg",
+      "bytes": 363,
+      "sha256": "050e8f71152a17a2e120ff3126ca97c37d9c62a6308bb5b925219cf0a30c838e",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "file": "finalists/c2/favicon-16.png",
+      "bytes": 153,
+      "sha256": "48bdfa41b5ccede1cca03bbf4c9470e1238f88c4ebdee3b38ab4bc1b990a9bd0",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "file": "finalists/c2/favicon-180.png",
+      "bytes": 676,
+      "sha256": "a7daa7294550050f4b0d061843954fed376af0af23c86115ad6b0d90125ca6f4",
+      "width": 180,
+      "height": 180
+    },
+    {
+      "file": "finalists/c2/favicon-192.png",
+      "bytes": 620,
+      "sha256": "a877a0f8781c3300d13691d924ec7ed4fd4fc659356a8faed6698548848dfd82",
+      "width": 192,
+      "height": 192
+    },
+    {
+      "file": "finalists/c2/favicon-32.png",
+      "bytes": 177,
+      "sha256": "a1d28e587b8a18748452b11df0cc058fcb400f271cd7aabaefcda89ce2cc372b",
+      "width": 32,
+      "height": 32
+    },
+    {
+      "file": "finalists/c2/favicon-48.png",
+      "bytes": 203,
+      "sha256": "6375269108dd6469cbf1a0cc71ecf0d006c8a743dc853eb57ee14cdf7f8296ca",
+      "width": 48,
+      "height": 48
+    },
+    {
+      "file": "finalists/c2/favicon-512.png",
+      "bytes": 1942,
+      "sha256": "57749961ec258654bc3fccdcd5c31765afce156c613ad493a387ad15085feef8",
+      "width": 512,
+      "height": 512
+    },
+    {
+      "file": "finalists/c2/favicon.ico",
+      "bytes": 587,
+      "sha256": "edb2404d960ad92e17f2c68c8ce8c94646f73d1573ae23093125d1691808bab1"
+    },
+    {
+      "file": "finalists/c2/favicon.png",
+      "bytes": 229,
+      "sha256": "cd1212aefc64f16e74eecd6a3797c93d76107d42bc8e225e62f982229638f900",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "file": "finalists/c2/favicon.svg",
+      "bytes": 272,
+      "sha256": "787b2b810e25ecf679cfe04133261303054c5149f803264a30cd90c9e0a2efba",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "file": "finalists/c2/github-preview-1280x640.png",
+      "bytes": 13600,
+      "sha256": "6bfd2e7eee55cc8c3f46d064e78fdd5acff6afb3ddd3ab690e5830b7e2cffb88",
+      "width": 1280,
+      "height": 640
+    },
+    {
+      "file": "finalists/c2/github-preview-1280x640.svg",
+      "bytes": 7117,
+      "sha256": "27e9b593986769799f40ef0a16276ae37d5d5971a41de228397023fc01e0706b",
+      "width": 1280,
+      "height": 640
+    },
+    {
+      "file": "finalists/c2/instagram-portrait-1080x1350.png",
+      "bytes": 22472,
+      "sha256": "9da8341779fcc3abcf77fc62bc3bdfc3eb5fa41a9cd7cc2ff48e9f67005fe105",
+      "width": 1080,
+      "height": 1350
+    },
+    {
+      "file": "finalists/c2/instagram-portrait-1080x1350.svg",
+      "bytes": 7014,
+      "sha256": "c0eeacde5d971eedbc39a8f4a32996b06863d510481047849f090a48415a7da9",
+      "width": 1080,
+      "height": 1350
+    },
+    {
+      "file": "finalists/c2/instagram-square-1080.png",
+      "bytes": 21345,
+      "sha256": "5f578f1cbf6e810239c897bf9a9662f794787b9a42709d466eed2e7f72df7919",
+      "width": 1080,
+      "height": 1080
+    },
+    {
+      "file": "finalists/c2/instagram-square-1080.svg",
+      "bytes": 7037,
+      "sha256": "8012c62a5af821587ab99f38d2dbe7a79ad821def5fdf64495059c6f82f73cfb",
+      "width": 1080,
+      "height": 1080
+    },
+    {
+      "file": "finalists/c2/instagram-story-1080x1920.png",
+      "bytes": 25762,
+      "sha256": "14c83e97a46d3aa0629c7bddf0a3f4773696785acc3320f47cb0eb6c298405b3",
+      "width": 1080,
+      "height": 1920
+    },
+    {
+      "file": "finalists/c2/instagram-story-1080x1920.svg",
+      "bytes": 7025,
+      "sha256": "26328e6d3fbe29ee9d34695460754add8b259546b5f9e019a617477209ed158b",
+      "width": 1080,
+      "height": 1920
+    },
+    {
+      "file": "finalists/c2/linkedin-page-1512x256.png",
+      "bytes": 9652,
+      "sha256": "80f44419e31adc58ce028723977c78f401242acdfddddca01434a6c89c21f596",
+      "width": 1512,
+      "height": 256
+    },
+    {
+      "file": "finalists/c2/linkedin-page-1512x256.svg",
+      "bytes": 7111,
+      "sha256": "d78997ac437368b82aac4cd76e050fc700eeaa5c96c71071e3e6875aa7ac8a6d",
+      "width": 1512,
+      "height": 256
+    },
+    {
+      "file": "finalists/c2/linkedin-profile-1584x396.png",
+      "bytes": 12868,
+      "sha256": "4a0f0eadb8909c1ccf56c92de92ddd3a92849bff4236ce06cfc223af5489264b",
+      "width": 1584,
+      "height": 396
+    },
+    {
+      "file": "finalists/c2/linkedin-profile-1584x396.svg",
+      "bytes": 7093,
+      "sha256": "7f40c2d05d1bd60441ac5f5027ef3581b562ade8e00593a0a205793097f1367c",
+      "width": 1584,
+      "height": 396
+    },
+    {
+      "file": "finalists/c2/logo-full-name.png",
+      "bytes": 3944,
+      "sha256": "8e6ae70d337d946e1306d57156a0108c03928833593e7879f474130f0a4244d2",
+      "width": 258,
+      "height": 64
+    },
+    {
+      "file": "finalists/c2/logo-full-name.svg",
+      "bytes": 6875,
+      "sha256": "3b6c82d8c02436b99aecd6ba1de62f387a12e55d384807cca3f758aa6a65928e",
+      "width": 258,
+      "height": 64
+    },
+    {
+      "file": "finalists/c2/logo-horizontal-white.png",
+      "bytes": 1469,
+      "sha256": "fc50c39fd3c3ec7ce93ee2cb708c924b3dd76101f56a715e043a7dd67493f879",
+      "width": 194,
+      "height": 64
+    },
+    {
+      "file": "finalists/c2/logo-horizontal-white.svg",
+      "bytes": 461,
+      "sha256": "1500de963975dfaff36d6389d2263bedc261d41a5bba383e8210a95911394f26",
+      "width": 194,
+      "height": 64
+    },
+    {
+      "file": "finalists/c2/logo-horizontal.png",
+      "bytes": 1684,
+      "sha256": "b91edbb06dbe7fc4ff982c8c3afd30e9007b7682b96f11912729e183a2a244db",
+      "width": 194,
+      "height": 64
+    },
+    {
+      "file": "finalists/c2/logo-horizontal.svg",
+      "bytes": 464,
+      "sha256": "eff4ade1928e1fc5962850abb452a3494e5882c685f40233b01e56a89a0b14ea",
+      "width": 194,
+      "height": 64
+    },
+    {
+      "file": "finalists/c2/logo-stacked.png",
+      "bytes": 1878,
+      "sha256": "9e5abcf321116bd35bd437c4bd2c864adad3e54c91cd92f25050c833261f3bf0",
+      "width": 166,
+      "height": 124
+    },
+    {
+      "file": "finalists/c2/logo-stacked.svg",
+      "bytes": 509,
+      "sha256": "b93ac781d1514d7a9ead2317e2d31361a272567a6970a0ff48c0d2ff8dbf578b",
+      "width": 166,
+      "height": 124
+    },
+    {
+      "file": "finalists/c2/symbol-black.png",
+      "bytes": 245,
+      "sha256": "d540360294278f20e3da964f5deb01da810957441f976ef4335e8467e5e98f6d",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "file": "finalists/c2/symbol-black.svg",
+      "bytes": 245,
+      "sha256": "b0ac44801ffd867803471f4f3116c8e5e6d2c194f88e3b7269da151563a846c7",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "file": "finalists/c2/symbol-white.png",
+      "bytes": 238,
+      "sha256": "66849265b8435fc511dec295f7b625e4e951d5d72682db75e6c7ad3b32d45924",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "file": "finalists/c2/symbol-white.svg",
+      "bytes": 242,
+      "sha256": "f88caad96824e4c0deef62eee9a1662454fb4c9fb30c6918a0433ec2099640b1",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "file": "finalists/c2/x-avatar-400.png",
+      "bytes": 1451,
+      "sha256": "e520cde12e91b4342a1ca3a8e17ef544552afbadb40a0883b77c67404af6a3df",
+      "width": 400,
+      "height": 400
+    },
+    {
+      "file": "finalists/c2/x-avatar-400.svg",
+      "bytes": 356,
+      "sha256": "40c62b7c62c8003866af40d9e2c1edd3f5b0df7e8c96aa0fe51a85bbcbb3e629",
+      "width": 400,
+      "height": 400
+    },
+    {
+      "file": "finalists/c2/x-header-1500x500.png",
+      "bytes": 14144,
+      "sha256": "0f5aab59e3bf56718085cbe4cd9059d9a2131110da7445b0e3e3bbe11288cf2b",
+      "width": 1500,
+      "height": 500
+    },
+    {
+      "file": "finalists/c2/x-header-1500x500.svg",
+      "bytes": 7103,
+      "sha256": "d6f00b075cc7980cd6f47598d1253552cdfe541a29f42598f53f948031e77034",
+      "width": 1500,
+      "height": 500
+    },
+    {
+      "file": "finalists/d2/avatar-1024.png",
+      "bytes": 5585,
+      "sha256": "9b15c8b3858af40402c97cac9bf639dfcebacfeb36c1926d979b68eae360fab4",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "file": "finalists/d2/avatar-1024.svg",
+      "bytes": 357,
+      "sha256": "f9b4e9f377e20db37b6dd467dbf45f54d1e75a1c844d10b085bfb97cbe1a5e90",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "file": "finalists/d2/avatar-dark-1024.png",
+      "bytes": 5586,
+      "sha256": "b3b85aca87eb94b18439961cc810ca8849b1f7de0fafb1c858fc5efb2769126d",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "file": "finalists/d2/avatar-dark-1024.svg",
+      "bytes": 357,
+      "sha256": "f7386464a94a2e2eeb8e9054d5e6ec0390933da358f295b4a3d9b504fc61634f",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "file": "finalists/d2/favicon-16.png",
+      "bytes": 152,
+      "sha256": "234905554755973118fc53790ed9e0b9670571a3b654a1ee4bb2de8c13fdd156",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "file": "finalists/d2/favicon-180.png",
+      "bytes": 640,
+      "sha256": "bfd7b365da314a4dffb088fd935a998981846af29fe3abb02d2d35608bf5c0ae",
+      "width": 180,
+      "height": 180
+    },
+    {
+      "file": "finalists/d2/favicon-192.png",
+      "bytes": 617,
+      "sha256": "f561ede72a397fb52f166940de71f02a4abf68b8dcac57b0eebaa0b097ac631a",
+      "width": 192,
+      "height": 192
+    },
+    {
+      "file": "finalists/d2/favicon-32.png",
+      "bytes": 169,
+      "sha256": "6b0a182cd34f6be3114a3a0e5b488004a6aa302afea8bc1cb92ecf4c34b85e66",
+      "width": 32,
+      "height": 32
+    },
+    {
+      "file": "finalists/d2/favicon-48.png",
+      "bytes": 197,
+      "sha256": "1345a0efd1045ffe42cc02c33a032aa886b723903952a864c2962b87a6fbdcac",
+      "width": 48,
+      "height": 48
+    },
+    {
+      "file": "finalists/d2/favicon-512.png",
+      "bytes": 1945,
+      "sha256": "9a956243d3c4ebc261f3e35c5b8d892252caf22a8b19c09a406a0493a7f74160",
+      "width": 512,
+      "height": 512
+    },
+    {
+      "file": "finalists/d2/favicon.ico",
+      "bytes": 572,
+      "sha256": "07a8c9a45d8a7fe8c50bf95a9d4948cd7bfc204c79fef4e6fb149f2875485d7f"
+    },
+    {
+      "file": "finalists/d2/favicon.png",
+      "bytes": 224,
+      "sha256": "4ac4432fe24aca1e850a7673d285f64d20f09dcb03d73102089e0aad8d56d5a8",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "file": "finalists/d2/favicon.svg",
+      "bytes": 272,
+      "sha256": "aac70a5c78fcd5bebd589b157cf4c8d7de448d435a23dd138c97ed37fb345012",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "file": "finalists/d2/github-preview-1280x640.png",
+      "bytes": 13583,
+      "sha256": "4c352c328aca45690c81a2a1ecf315bd23ed3556ddb7438b77b23971a8ed3f61",
+      "width": 1280,
+      "height": 640
+    },
+    {
+      "file": "finalists/d2/github-preview-1280x640.svg",
+      "bytes": 7111,
+      "sha256": "7b3daee6dedd8c21d9d488f8db861f0210bb366fc89959adf56f0e01d4834950",
+      "width": 1280,
+      "height": 640
+    },
+    {
+      "file": "finalists/d2/instagram-portrait-1080x1350.png",
+      "bytes": 22482,
+      "sha256": "1f4ede03f935602adb79c393fa43888cea709a9b47d106de5b0128afb933b1a7",
+      "width": 1080,
+      "height": 1350
+    },
+    {
+      "file": "finalists/d2/instagram-portrait-1080x1350.svg",
+      "bytes": 7008,
+      "sha256": "1323526b46a2143c6b375582f7fdc193bfa00c33bc2aa4504c45a9e48b9e2a2d",
+      "width": 1080,
+      "height": 1350
+    },
+    {
+      "file": "finalists/d2/instagram-square-1080.png",
+      "bytes": 21364,
+      "sha256": "f98574f1a45e72145380561b33b44de346f49cacf88bd03cbdc8f0725ebe33a5",
+      "width": 1080,
+      "height": 1080
+    },
+    {
+      "file": "finalists/d2/instagram-square-1080.svg",
+      "bytes": 7031,
+      "sha256": "b264f7bc069cf4995c38bbf5a989f1ad07572f732755c611385b271a664cd10a",
+      "width": 1080,
+      "height": 1080
+    },
+    {
+      "file": "finalists/d2/instagram-story-1080x1920.png",
+      "bytes": 25781,
+      "sha256": "28a3a77010b99b7ddf9799465b6840e4e3badbcc6491bb0cd3a3f00a94f3dbab",
+      "width": 1080,
+      "height": 1920
+    },
+    {
+      "file": "finalists/d2/instagram-story-1080x1920.svg",
+      "bytes": 7019,
+      "sha256": "5e76b65fa25a2f298892f4c12057667c9c640c9ea9b73cb528038534414a8061",
+      "width": 1080,
+      "height": 1920
+    },
+    {
+      "file": "finalists/d2/linkedin-page-1512x256.png",
+      "bytes": 9660,
+      "sha256": "a8d7f5687d7b2b52ed42c5560225423f27f2aa45664a4f03bdff656dc7ce925e",
+      "width": 1512,
+      "height": 256
+    },
+    {
+      "file": "finalists/d2/linkedin-page-1512x256.svg",
+      "bytes": 7105,
+      "sha256": "61f684cce54c93c1182bd52f27778e4b3036a9130238a663c0ccb1bcca61df42",
+      "width": 1512,
+      "height": 256
+    },
+    {
+      "file": "finalists/d2/linkedin-profile-1584x396.png",
+      "bytes": 12866,
+      "sha256": "3282291fec425dd9e4e44edaef8f7b19f5a5ea7d0bdc189afa0836e7876c8024",
+      "width": 1584,
+      "height": 396
+    },
+    {
+      "file": "finalists/d2/linkedin-profile-1584x396.svg",
+      "bytes": 7087,
+      "sha256": "648825d8c67ae219b9575291fc1b1cb1e5b4d2defa99bcb8af5b34383aefe468",
+      "width": 1584,
+      "height": 396
+    },
+    {
+      "file": "finalists/d2/logo-full-name.png",
+      "bytes": 3938,
+      "sha256": "279a5a86ac07c1c55c8eccb3fd2a698cc4a8fa64ea0cbae7d622c182b2afc9db",
+      "width": 258,
+      "height": 64
+    },
+    {
+      "file": "finalists/d2/logo-full-name.svg",
+      "bytes": 6869,
+      "sha256": "a8f54dfaa4ffb3d2ca74d8bdd2a657bd58b828a247d38185073319ff3fa2e137",
+      "width": 258,
+      "height": 64
+    },
+    {
+      "file": "finalists/d2/logo-horizontal-white.png",
+      "bytes": 1469,
+      "sha256": "fa395bff16f41f3be77c32c7f96b428f0d13a93585283e0e94472f4e12993982",
+      "width": 194,
+      "height": 64
+    },
+    {
+      "file": "finalists/d2/logo-horizontal-white.svg",
+      "bytes": 455,
+      "sha256": "f320db9937ff80fae114a34a1780a7048fbaa895c8491c941fbc32565bec5e24",
+      "width": 194,
+      "height": 64
+    },
+    {
+      "file": "finalists/d2/logo-horizontal.png",
+      "bytes": 1680,
+      "sha256": "d6130e10b9529607f20b86dca08084ef342f58ee9535618bab6fa663be586478",
+      "width": 194,
+      "height": 64
+    },
+    {
+      "file": "finalists/d2/logo-horizontal.svg",
+      "bytes": 458,
+      "sha256": "9595611c56c8bc16f4826d7819b00d2b2370d3904822464bc002fabef5a64a3a",
+      "width": 194,
+      "height": 64
+    },
+    {
+      "file": "finalists/d2/logo-stacked.png",
+      "bytes": 1877,
+      "sha256": "685fc6490f953d8bbb905b28f824613f5b5e7a7c8dadc1b1b1b188c6a31da40c",
+      "width": 166,
+      "height": 124
+    },
+    {
+      "file": "finalists/d2/logo-stacked.svg",
+      "bytes": 503,
+      "sha256": "25c1a42c3994b50b02d0b72746dfd8400eabd1f7e94f1c6501b7111aa240227f",
+      "width": 166,
+      "height": 124
+    },
+    {
+      "file": "finalists/d2/symbol-black.png",
+      "bytes": 241,
+      "sha256": "8e0e9c937817d3ecf12099fe40e80bd6d7a83fe36171f53290688d1528665cd1",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "file": "finalists/d2/symbol-black.svg",
+      "bytes": 239,
+      "sha256": "f39d45d91067830e1105bc699c7e41084d7fe38c177a27c7043247bb9d1572f2",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "file": "finalists/d2/symbol-white.png",
+      "bytes": 235,
+      "sha256": "3d8d458b031c639e2709d33e352379b5033371d2d203f6a4fe4fa4bfa4b700ed",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "file": "finalists/d2/symbol-white.svg",
+      "bytes": 236,
+      "sha256": "685efd8f164e79495d8e9d82d29d90470824ec9d1845f5e5eee8c0e265fa8526",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "file": "finalists/d2/x-avatar-400.png",
+      "bytes": 1455,
+      "sha256": "c68a2dd8c674f983891f4dc9303725022079e5cac1046b8fc27a0b5cd62a11f0",
+      "width": 400,
+      "height": 400
+    },
+    {
+      "file": "finalists/d2/x-avatar-400.svg",
+      "bytes": 350,
+      "sha256": "c5a7cad801a10d50bcf11799575ee55faac6d94d1442f93e8b85fd4f4add4a15",
+      "width": 400,
+      "height": 400
+    },
+    {
+      "file": "finalists/d2/x-header-1500x500.png",
+      "bytes": 14137,
+      "sha256": "04e2487246205f5649f9d22356ee813748c51edc4fa012e8d3dea2233bbd3256",
+      "width": 1500,
+      "height": 500
+    },
+    {
+      "file": "finalists/d2/x-header-1500x500.svg",
+      "bytes": 7097,
+      "sha256": "ffdec023e8df12c966adc15099addc9538478421668aa39040673f8badab8d46",
+      "width": 1500,
+      "height": 500
+    },
+    {
+      "file": "finalists/f2/avatar-1024.png",
+      "bytes": 6123,
+      "sha256": "1f63027d5e13b0de45af2adb0a89a5e5501c0ce24605482cf5f77963441b19af",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "file": "finalists/f2/avatar-1024.svg",
+      "bytes": 332,
+      "sha256": "b58d50dd199a28ca904b07c8b13ca4b5b449d37a10249056deb79787f0113825",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "file": "finalists/f2/avatar-dark-1024.png",
+      "bytes": 6122,
+      "sha256": "0ceb895cee5bf699e1424d91d44fd5f3d290dd20ed5bb1ae6907d0409c8b58e3",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "file": "finalists/f2/avatar-dark-1024.svg",
+      "bytes": 332,
+      "sha256": "5b14a05d91cc012215f648185e14f4bb4f9455edb16fa7b14a79e895000af389",
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "file": "finalists/f2/favicon-16.png",
+      "bytes": 167,
+      "sha256": "b13eae4ed4cd078f310cd221a06065822e278f0dd5d6b129104ac5896adea1d0",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "file": "finalists/f2/favicon-180.png",
+      "bytes": 785,
+      "sha256": "5bb84a58cdd6493172b28d49964768bee56f06ae114323a0ad7ba146096ec6fc",
+      "width": 180,
+      "height": 180
+    },
+    {
+      "file": "finalists/f2/favicon-192.png",
+      "bytes": 779,
+      "sha256": "e56165a0fec1b5fe15d1a7c3a208000e8e802c5aa895b6421e43fb3891a55b5b",
+      "width": 192,
+      "height": 192
+    },
+    {
+      "file": "finalists/f2/favicon-32.png",
+      "bytes": 203,
+      "sha256": "84405f719b4d5ac313fdf42980d2dee2b6714c9695b8a3f23fa5b1d1cf37757e",
+      "width": 32,
+      "height": 32
+    },
+    {
+      "file": "finalists/f2/favicon-48.png",
+      "bytes": 255,
+      "sha256": "04b1282f4591fea480e0cbde851c60a3fa0d0fac0b0ea715023a0ab408b0e54d",
+      "width": 48,
+      "height": 48
+    },
+    {
+      "file": "finalists/f2/favicon-512.png",
+      "bytes": 2360,
+      "sha256": "2cf4a5577b4a171c80ad6d5dfc189973d39c7feb124bfe44fb45720524bd27c7",
+      "width": 512,
+      "height": 512
+    },
+    {
+      "file": "finalists/f2/favicon.ico",
+      "bytes": 679,
+      "sha256": "99da8665a4f809f082c8e7fdbd0383ec89d30c1e92f20a0cd3b8bdee4060a0ce"
+    },
+    {
+      "file": "finalists/f2/favicon.png",
+      "bytes": 290,
+      "sha256": "44d9a8fc65ce7c11a87e4d9de6c9e3b1453db97ad6985d2a4831106749bbf177",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "file": "finalists/f2/favicon.svg",
+      "bytes": 251,
+      "sha256": "cc9a3488e7878def64c9dbfa97ab54c28b76deaab006f4789c0517f1deaa0491",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "file": "finalists/f2/github-preview-1280x640.png",
+      "bytes": 13653,
+      "sha256": "f6a7ee51eac9d433a2704b6b9655b6a3c5cd6e88cbb80e330e4efa1579696983",
+      "width": 1280,
+      "height": 640
+    },
+    {
+      "file": "finalists/f2/github-preview-1280x640.svg",
+      "bytes": 7086,
+      "sha256": "96ea78e0deec0c1d6378c5423221df9f347781daa471ab086a0e083547f147d2",
+      "width": 1280,
+      "height": 640
+    },
+    {
+      "file": "finalists/f2/instagram-portrait-1080x1350.png",
+      "bytes": 22824,
+      "sha256": "303206b7600dcef38492c38058e93ed353ad787b4637cccff88b9184983bc74e",
+      "width": 1080,
+      "height": 1350
+    },
+    {
+      "file": "finalists/f2/instagram-portrait-1080x1350.svg",
+      "bytes": 6983,
+      "sha256": "496eddc3618c62278a7f0beb5e28e0ba245a4f38fe2f09f7139f9757286edbee",
+      "width": 1080,
+      "height": 1350
+    },
+    {
+      "file": "finalists/f2/instagram-square-1080.png",
+      "bytes": 21669,
+      "sha256": "19cb4e7f87408cb7c735f1db2951ac065cac5b9d11d231b8c27f779efeabca79",
+      "width": 1080,
+      "height": 1080
+    },
+    {
+      "file": "finalists/f2/instagram-square-1080.svg",
+      "bytes": 7006,
+      "sha256": "c032cce11cac100de2a8fc4df722c559b93dce7514451e19fcf3ae7e626e81e6",
+      "width": 1080,
+      "height": 1080
+    },
+    {
+      "file": "finalists/f2/instagram-story-1080x1920.png",
+      "bytes": 26066,
+      "sha256": "aafabe5193385675feb9b80a9b9d948cdb839ebd198cdd5ff11471e8042d8b9b",
+      "width": 1080,
+      "height": 1920
+    },
+    {
+      "file": "finalists/f2/instagram-story-1080x1920.svg",
+      "bytes": 6994,
+      "sha256": "2606e9a6158610fe2bf796cf249e78c3e509801e03968d29aa5d854a2402ed8d",
+      "width": 1080,
+      "height": 1920
+    },
+    {
+      "file": "finalists/f2/linkedin-page-1512x256.png",
+      "bytes": 9738,
+      "sha256": "6f66bffa3e7631962f280335aede65bdaa507741d5678564b37503f8d9592604",
+      "width": 1512,
+      "height": 256
+    },
+    {
+      "file": "finalists/f2/linkedin-page-1512x256.svg",
+      "bytes": 7080,
+      "sha256": "d67a14b3cd460f209404de9e0950810f3ef8ec780f96cd402543f7b0a80db29b",
+      "width": 1512,
+      "height": 256
+    },
+    {
+      "file": "finalists/f2/linkedin-profile-1584x396.png",
+      "bytes": 12970,
+      "sha256": "42b8d0372a5397719e23139d04900858cd575786164114848e455bade696a2e8",
+      "width": 1584,
+      "height": 396
+    },
+    {
+      "file": "finalists/f2/linkedin-profile-1584x396.svg",
+      "bytes": 7062,
+      "sha256": "78911fcc6d0be7d9a2cbb44da566a53577861343ac9de2d34daed5b32f2c2297",
+      "width": 1584,
+      "height": 396
+    },
+    {
+      "file": "finalists/f2/logo-full-name.png",
+      "bytes": 3982,
+      "sha256": "80aea663d4f1ef6a481452b0f4169ef510e7f55f32d82d4ce4c46801b2bf9b26",
+      "width": 258,
+      "height": 64
+    },
+    {
+      "file": "finalists/f2/logo-full-name.svg",
+      "bytes": 6844,
+      "sha256": "ff99dd437c8ae37fd167f59230ace6b518c91d501d7e4b48b88f62da8cf117b5",
+      "width": 258,
+      "height": 64
+    },
+    {
+      "file": "finalists/f2/logo-horizontal-white.png",
+      "bytes": 1522,
+      "sha256": "67cfc8f326c4f478994792577bcee53392e758f895c0e9a263463246dacf50ed",
+      "width": 194,
+      "height": 64
+    },
+    {
+      "file": "finalists/f2/logo-horizontal-white.svg",
+      "bytes": 430,
+      "sha256": "8dd90e2f1de39b376b4a50476743591c13dab96005c3f00566bd99dadd71c21b",
+      "width": 194,
+      "height": 64
+    },
+    {
+      "file": "finalists/f2/logo-horizontal.png",
+      "bytes": 1748,
+      "sha256": "6b8918357030c24f910b4232a97f208bf1f4a379a71aee6e05559feb1d3625e4",
+      "width": 194,
+      "height": 64
+    },
+    {
+      "file": "finalists/f2/logo-horizontal.svg",
+      "bytes": 433,
+      "sha256": "cd5d276ed60402e19c6b5a8b83f893fff715da8446d05098a75d8a6498cdeaf1",
+      "width": 194,
+      "height": 64
+    },
+    {
+      "file": "finalists/f2/logo-stacked.png",
+      "bytes": 1926,
+      "sha256": "15da7a2769312cfbb5a807bb5b2a0419cf415b48f53f15788377fc438d2f57ee",
+      "width": 166,
+      "height": 124
+    },
+    {
+      "file": "finalists/f2/logo-stacked.svg",
+      "bytes": 478,
+      "sha256": "a6d4ee040fa5d0b6ed398832dbf06e18fdf02686877435f8684f2a38cd62cdf4",
+      "width": 166,
+      "height": 124
+    },
+    {
+      "file": "finalists/f2/symbol-black.png",
+      "bytes": 309,
+      "sha256": "9f239ed7abc6fbae4c403055ee6803a6a6e90457d7e7e04c35a36c671dd0a692",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "file": "finalists/f2/symbol-black.svg",
+      "bytes": 214,
+      "sha256": "8a197a01ede4407d9c36a008b485e64587c245cabed362d80726bcceb74bec09",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "file": "finalists/f2/symbol-white.png",
+      "bytes": 311,
+      "sha256": "f086be3ae0aab46602160b12b3f8e09cf4618c2573c33a11516cdb410c477f02",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "file": "finalists/f2/symbol-white.svg",
+      "bytes": 211,
+      "sha256": "ae53c76c92d6c10d0fc651a758f9201bc4d8fd1d22997fd81786fea834e17999",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "file": "finalists/f2/x-avatar-400.png",
+      "bytes": 1644,
+      "sha256": "acede14c0f04df3efb0a98e269c2f35aa4b6b7bf05b1d98f91ce936ddbf467f8",
+      "width": 400,
+      "height": 400
+    },
+    {
+      "file": "finalists/f2/x-avatar-400.svg",
+      "bytes": 325,
+      "sha256": "2efb8cfc567e6d108a9afd02b1140095cf6e74827199f1e87a1d373a5fe0bfdf",
+      "width": 400,
+      "height": 400
+    },
+    {
+      "file": "finalists/f2/x-header-1500x500.png",
+      "bytes": 14368,
+      "sha256": "94fe85df3740c22185cc2b47f3f67058a69560b491c1711634834c0c352c11c9",
+      "width": 1500,
+      "height": 500
+    },
+    {
+      "file": "finalists/f2/x-header-1500x500.svg",
+      "bytes": 7072,
+      "sha256": "8c5860d31b16c997633263f6f4acb70c4ae31ae4e2728a845685d090684471d6",
+      "width": 1500,
+      "height": 500
+    },
+    {
+      "file": "boards/initial-12.svg",
+      "bytes": 5910,
+      "sha256": "f9e2e59173e0169f2bebe039e07370e90b42256f6f57f40f0560124699abe0ec",
+      "width": 1248,
+      "height": 950
+    },
+    {
+      "file": "boards/initial-12.png",
+      "bytes": 51453,
+      "sha256": "a037f3cd770c6eb3bbfde58110bf4eafed535e00d2a17a6ba63690e49c8311c7",
+      "width": 1248,
+      "height": 950
+    },
+    {
+      "file": "boards/finalists-5.svg",
+      "bytes": 10322,
+      "sha256": "c9f1e0741f3ee43ab1d12a644f1c60cacd3b8ab2e70ddf0b9ba758391b6d4545",
+      "width": 1248,
+      "height": 1320
+    },
+    {
+      "file": "boards/finalists-5.png",
+      "bytes": 77074,
+      "sha256": "c30a1667f6b5180162eac880b16899fdf650be93f49dea2003a726987e1524de",
+      "width": 1248,
+      "height": 1320
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+0 {'beta_mean': (0.6307, 0.0216), 'l1_mean': (0.6334, 0.0377), 'temporal_mean': (0.6388, 0.0323), 'l1_temporal': (0.6415, 0.0485)}
+1 {'beta_mean': (0.6145, 0.0542), 'l1_mean': (0.6205, 0.0542), 'temporal_mean': (0.6145, 0.0602), 'l1_temporal': (0.6265, 0.0602)}
+2 {'beta_mean': (0.5437, 0.0219), 'l1_mean': (0.5519, 0.0301), 'temporal_mean': (0.5519, 0.0219), 'l1_temporal': (0.5656, 0.0246)}
+3 {'beta_mean': (0.6341, 0.0351), 'l1_mean': (0.6316, 0.0476), 'temporal_mean': (0.609, 0.0652), 'l1_temporal': (0.6065, 0.0777)}
+4 {'beta_mean': (0.6766, 0.006), 'l1_mean': (0.6856, 0.009), 'temporal_mean': (0.6737, 0.009), 'l1_temporal': (0.6826, 0.012)}
+5 {'beta_mean': (0.5812, 0.0228), 'l1_mean': (0.5783, 0.0228), 'temporal_mean': (0.5869, 0.0313), 'l1_temporal': (0.584, 0.0313)}
+6 {'beta_mean': (0.5728, 0.0464), 'l1_mean': (0.5666, 0.0464), 'temporal_mean': (0.5759, 0.0464), 'l1_temporal': (0.5697, 0.0464)}
+7 {'beta_mean': (0.625, 0.0114), 'l1_mean': (0.6222, 0.0114), 'temporal_mean': (0.6222, 0.017), 'l1_temporal': (0.625, 0.017)}
+8 {'beta_mean': (0.6366, 0.0137), 'l1_mean': (0.6448, 0.0164), 'temporal_mean': (0.6202, 0.0273), 'l1_temporal': (0.6284, 0.0301)}
+9 {'beta_mean': (0.5907, 0.0247), 'l1_mean': (0.5907, 0.0247), 'temporal_mean': (0.5824, 0.033), 'l1_temporal': (0.5824, 0.033)}
+10 {'beta_mean': (0.5693, 0.0236), 'l1_mean': (0.5723, 0.0236), 'temporal_mean': (0.587, 0.0324), 'l1_temporal': (0.59, 0.0324)}
+11 {'beta_mean': (0.5745, 0.0456), 'l1_mean': (0.5653, 0.0456), 'temporal_mean': (0.6049, 0.0395), 'l1_temporal': (0.5957, 0.0395)}
+12 {'beta_mean': (0.5615, 0.0399), 'l1_mean': (0.5748, 0.0399), 'temporal_mean': (0.5615, 0.0365), 'l1_temporal': (0.5748, 0.0365)}
+13 {'beta_mean': (0.6028, 0.0113), 'l1_mean': (0.6028, 0.0113), 'temporal_mean': (0.5915, 0.0225), 'l1_temporal': (0.5915, 0.0225)}
+14 {'beta_mean': (0.6806, 0.0418), 'l1_mean': (0.6687, 0.0358), 'temporal_mean': (0.6776, 0.0478), 'l1_temporal': (0.6657, 0.0418)}
+15 {'beta_mean': (0.5743, 0.0229), 'l1_mean': (0.5714, 0.0371), 'temporal_mean': (0.5743, 0.0229), 'l1_temporal': (0.5714, 0.0371)}
+beta_mean {'success_orig': (0.6043, (0.5845, 0.6241)), 'false_confident_orig': (0.0277, (0.0206, 0.0347)), 'abstention_orig': (0.6981, (0.6748, 0.7213)), 'coverage_orig': (0.5877, (0.5556, 0.6198)), 'success_ideal': (0.5724, (0.5508, 0.5939)), 'false_confident_ideal': (0.0448, (0.0364, 0.0533)), 'alignment_true': (0.6771, (0.6468, 0.7074)), 'alignment_same_model': (0.6806, (0.6459, 0.7153)), 'reference_errors': (0.0508, (0.0381, 0.0635))}
+l1_mean {'success_orig': (0.6051, (0.5854, 0.6247)), 'false_confident_orig': (0.0309, (0.0238, 0.0379)), 'abstention_orig': (0.6913, (0.67, 0.7126)), 'coverage_orig': (0.5963, (0.5639, 0.6288)), 'success_ideal': (0.576, (0.5558, 0.5962)), 'false_confident_ideal': (0.0464, (0.0381, 0.0547)), 'alignment_true': (0.686, (0.6572, 0.7148)), 'alignment_same_model': (0.6906, (0.6577, 0.7234)), 'reference_errors': (0.0469, (0.0341, 0.0597))}
+temporal_mean {'success_orig': (0.6045, (0.5868, 0.6222)), 'false_confident_orig': (0.0341, (0.0267, 0.0415)), 'abstention_orig': (0.685, (0.6602, 0.7097)), 'coverage_orig': (0.602, (0.5702, 0.6339)), 'success_ideal': (0.5711, (0.5516, 0.5906)), 'false_confident_ideal': (0.0522, (0.0431, 0.0613)), 'alignment_true': (0.6804, (0.6535, 0.7072)), 'alignment_same_model': (0.682, (0.6491, 0.715)), 'reference_errors': (0.051, (0.0382, 0.0638))}
+l1_temporal {'success_orig': (0.6063, (0.589, 0.6236)), 'false_confident_orig': (0.0369, (0.029, 0.0449)), 'abstention_orig': (0.6778, (0.6542, 0.7014)), 'coverage_orig': (0.6121, (0.5803, 0.6439)), 'success_ideal': (0.5751, (0.5566, 0.5935)), 'false_confident_ideal': (0.0538, (0.0448, 0.0628)), 'alignment_true': (0.6895, (0.664, 0.7149)), 'alignment_same_model': (0.6921, (0.6605, 0.7238)), 'reference_errors': (0.0474, (0.0345, 0.0603))}

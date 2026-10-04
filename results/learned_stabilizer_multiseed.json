@@ -1,0 +1,334 @@
+[
+ {
+  "train": {
+   "hand_written": {
+    "accuracy": 0.8985,
+    "brier": 0.1015,
+    "false_safe": 0.0019,
+    "n": 5200
+   },
+   "learned": {
+    "accuracy": 0.9302,
+    "brier": 0.0459,
+    "false_safe": 0.0698,
+    "n": 5200
+   },
+   "hybrid": {
+    "accuracy": 0.9302,
+    "brier": 0.0406,
+    "false_safe": 0.0698,
+    "n": 5200
+   }
+  },
+  "n_train": 5200,
+  "unseen_magnitudes": {
+   "hand_written": {
+    "accuracy": 0.9515,
+    "brier": 0.0485,
+    "false_safe": 0.0023,
+    "n": 2600
+   },
+   "learned": {
+    "accuracy": 0.8635,
+    "brier": 0.0935,
+    "false_safe": 0.1358,
+    "n": 2600
+   },
+   "hybrid": {
+    "accuracy": 0.8635,
+    "brier": 0.0882,
+    "false_safe": 0.1358,
+    "n": 2600
+   }
+  },
+  "unseen_modules_params": {
+   "hand_written": {
+    "accuracy": 0.8847,
+    "brier": 0.1153,
+    "false_safe": 0.0021,
+    "n": 3400
+   },
+   "learned": {
+    "accuracy": 0.9326,
+    "brier": 0.0435,
+    "false_safe": 0.0668,
+    "n": 3400
+   },
+   "hybrid": {
+    "accuracy": 0.9326,
+    "brier": 0.0369,
+    "false_safe": 0.0668,
+    "n": 3400
+   }
+  },
+  "unseen_compositions": {
+   "learned": {
+    "accuracy": 0.937,
+    "brier": 0.0689,
+    "false_safe": 0.0616,
+    "n": 1460
+   },
+   "hand_written": {
+    "accuracy": 0.7041,
+    "brier": 0.2959,
+    "false_safe": 0.0021,
+    "n": 1460
+   },
+   "hybrid": {
+    "accuracy": 0.8795,
+    "brier": 0.0582,
+    "false_safe": 0.1205,
+    "n": 1460
+   }
+  }
+ },
+ {
+  "train": {
+   "hand_written": {
+    "accuracy": 0.9509,
+    "brier": 0.0491,
+    "false_safe": 0.0036,
+    "n": 4400
+   },
+   "learned": {
+    "accuracy": 0.9161,
+    "brier": 0.0597,
+    "false_safe": 0.083,
+    "n": 4400
+   },
+   "hybrid": {
+    "accuracy": 0.9161,
+    "brier": 0.0526,
+    "false_safe": 0.083,
+    "n": 4400
+   }
+  },
+  "n_train": 4400,
+  "unseen_magnitudes": {
+   "hand_written": {
+    "accuracy": 0.9591,
+    "brier": 0.0409,
+    "false_safe": 0.0009,
+    "n": 2200
+   },
+   "learned": {
+    "accuracy": 0.8882,
+    "brier": 0.0807,
+    "false_safe": 0.1114,
+    "n": 2200
+   },
+   "hybrid": {
+    "accuracy": 0.8882,
+    "brier": 0.0735,
+    "false_safe": 0.1114,
+    "n": 2200
+   }
+  },
+  "unseen_modules_params": {
+   "hand_written": {
+    "accuracy": 0.94,
+    "brier": 0.06,
+    "false_safe": 0.0046,
+    "n": 2600
+   },
+   "learned": {
+    "accuracy": 0.9308,
+    "brier": 0.0546,
+    "false_safe": 0.0681,
+    "n": 2600
+   },
+   "hybrid": {
+    "accuracy": 0.9308,
+    "brier": 0.0438,
+    "false_safe": 0.0681,
+    "n": 2600
+   }
+  },
+  "unseen_compositions": {
+   "learned": {
+    "accuracy": 0.8434,
+    "brier": 0.1169,
+    "false_safe": 0.104,
+    "n": 894
+   },
+   "hand_written": {
+    "accuracy": 0.8591,
+    "brier": 0.1409,
+    "false_safe": 0.0078,
+    "n": 894
+   },
+   "hybrid": {
+    "accuracy": 0.8647,
+    "brier": 0.0911,
+    "false_safe": 0.1309,
+    "n": 894
+   }
+  }
+ },
+ {
+  "train": {
+   "hand_written": {
+    "accuracy": 0.8414,
+    "brier": 0.1586,
+    "false_safe": 0.0012,
+    "n": 4200
+   },
+   "learned": {
+    "accuracy": 0.9467,
+    "brier": 0.0396,
+    "false_safe": 0.0533,
+    "n": 4200
+   },
+   "hybrid": {
+    "accuracy": 0.9467,
+    "brier": 0.035,
+    "false_safe": 0.0533,
+    "n": 4200
+   }
+  },
+  "n_train": 4200,
+  "unseen_magnitudes": {
+   "hand_written": {
+    "accuracy": 0.9386,
+    "brier": 0.0614,
+    "false_safe": 0.0019,
+    "n": 2100
+   },
+   "learned": {
+    "accuracy": 0.8467,
+    "brier": 0.1139,
+    "false_safe": 0.1533,
+    "n": 2100
+   },
+   "hybrid": {
+    "accuracy": 0.8467,
+    "brier": 0.1102,
+    "false_safe": 0.1533,
+    "n": 2100
+   }
+  },
+  "unseen_modules_params": {
+   "hand_written": {
+    "accuracy": 0.925,
+    "brier": 0.075,
+    "false_safe": 0.0028,
+    "n": 3200
+   },
+   "learned": {
+    "accuracy": 0.9466,
+    "brier": 0.0408,
+    "false_safe": 0.0534,
+    "n": 3200
+   },
+   "hybrid": {
+    "accuracy": 0.9466,
+    "brier": 0.0359,
+    "false_safe": 0.0534,
+    "n": 3200
+   }
+  },
+  "unseen_compositions": {
+   "learned": {
+    "accuracy": 0.9086,
+    "brier": 0.0639,
+    "false_safe": 0.0906,
+    "n": 1192
+   },
+   "hand_written": {
+    "accuracy": 0.8549,
+    "brier": 0.1451,
+    "false_safe": 0.0034,
+    "n": 1192
+   },
+   "hybrid": {
+    "accuracy": 0.9069,
+    "brier": 0.0551,
+    "false_safe": 0.0931,
+    "n": 1192
+   }
+  }
+ },
+ {
+  "train": {
+   "hand_written": {
+    "accuracy": 0.8667,
+    "brier": 0.1333,
+    "false_safe": 0.0019,
+    "n": 4800
+   },
+   "learned": {
+    "accuracy": 0.941,
+    "brier": 0.0519,
+    "false_safe": 0.059,
+    "n": 4800
+   },
+   "hybrid": {
+    "accuracy": 0.941,
+    "brier": 0.0466,
+    "false_safe": 0.059,
+    "n": 4800
+   }
+  },
+  "n_train": 4800,
+  "unseen_magnitudes": {
+   "hand_written": {
+    "accuracy": 0.9408,
+    "brier": 0.0592,
+    "false_safe": 0.0033,
+    "n": 2400
+   },
+   "learned": {
+    "accuracy": 0.9058,
+    "brier": 0.0753,
+    "false_safe": 0.0942,
+    "n": 2400
+   },
+   "hybrid": {
+    "accuracy": 0.9058,
+    "brier": 0.0702,
+    "false_safe": 0.0942,
+    "n": 2400
+   }
+  },
+  "unseen_modules_params": {
+   "hand_written": {
+    "accuracy": 0.8938,
+    "brier": 0.1062,
+    "false_safe": 0.0,
+    "n": 3400
+   },
+   "learned": {
+    "accuracy": 0.9512,
+    "brier": 0.0406,
+    "false_safe": 0.0488,
+    "n": 3400
+   },
+   "hybrid": {
+    "accuracy": 0.9512,
+    "brier": 0.0366,
+    "false_safe": 0.0488,
+    "n": 3400
+   }
+  },
+  "unseen_compositions": {
+   "learned": {
+    "accuracy": 0.9025,
+    "brier": 0.082,
+    "false_safe": 0.0975,
+    "n": 1323
+   },
+   "hand_written": {
+    "accuracy": 0.8035,
+    "brier": 0.1965,
+    "false_safe": 0.0,
+    "n": 1323
+   },
+   "hybrid": {
+    "accuracy": 0.9017,
+    "brier": 0.0762,
+    "false_safe": 0.0983,
+    "n": 1323
+   }
+  }
+ }
+]

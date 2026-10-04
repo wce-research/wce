@@ -1,0 +1,3397 @@
+{
+ "seeds": [
+  0,
+  1,
+  2,
+  3,
+  4,
+  5,
+  6,
+  7
+ ],
+ "summary": {
+  "anchored_old": {
+   "success": {
+    "mean": 0.5429,
+    "sd": 0.0768,
+    "ci95": [
+     0.4787,
+     0.6072
+    ],
+    "n": 8
+   },
+   "false_confident": {
+    "mean": 0.034,
+    "sd": 0.0233,
+    "ci95": [
+     0.0145,
+     0.0534
+    ],
+    "n": 8
+   },
+   "abstention": {
+    "mean": 0.7347,
+    "sd": 0.0944,
+    "ci95": [
+     0.6558,
+     0.8136
+    ],
+    "n": 8
+   },
+   "unnecessary_abstention": {
+    "mean": 0.207,
+    "sd": 0.0517,
+    "ci95": [
+     0.1638,
+     0.2503
+    ],
+    "n": 8
+   },
+   "clarification": {
+    "mean": 0.0771,
+    "sd": 0.0169,
+    "ci95": [
+     0.0629,
+     0.0913
+    ],
+    "n": 8
+   },
+   "parse_coverage": {
+    "mean": 0.3207,
+    "sd": 0.1023,
+    "ci95": [
+     0.2352,
+     0.4063
+    ],
+    "n": 8
+   },
+   "parse_coverage_resolvable": {
+    "mean": 0.5356,
+    "sd": 0.1028,
+    "ci95": [
+     0.4497,
+     0.6215
+    ],
+    "n": 8
+   },
+   "lexical_coverage": {
+    "mean": 0.25,
+    "sd": 0.0891,
+    "ci95": [
+     0.1755,
+     0.3245
+    ],
+    "n": 8
+   },
+   "identity_accuracy": null,
+   "belief_accuracy": {
+    "mean": 0.9799,
+    "sd": 0.0162,
+    "ci95": [
+     0.9664,
+     0.9935
+    ],
+    "n": 8
+   },
+   "verification_cost": {
+    "mean": 11.2738,
+    "sd": 0.9807,
+    "ci95": [
+     10.4538,
+     12.0939
+    ],
+    "n": 8
+   },
+   "correction_rate": {
+    "mean": 0.0028,
+    "sd": 0.0046,
+    "ci95": [
+     -0.001,
+     0.0067
+    ],
+    "n": 8
+   },
+   "seconds": {
+    "mean": 2.2977,
+    "sd": 0.2011,
+    "ci95": [
+     2.1295,
+     2.4659
+    ],
+    "n": 8
+   }
+  },
+  "no_elimination": {
+   "success": {
+    "mean": 0.5597,
+    "sd": 0.0631,
+    "ci95": [
+     0.507,
+     0.6124
+    ],
+    "n": 8
+   },
+   "false_confident": {
+    "mean": 0.0294,
+    "sd": 0.0198,
+    "ci95": [
+     0.0128,
+     0.0459
+    ],
+    "n": 8
+   },
+   "abstention": {
+    "mean": 0.7321,
+    "sd": 0.0841,
+    "ci95": [
+     0.6617,
+     0.8024
+    ],
+    "n": 8
+   },
+   "unnecessary_abstention": {
+    "mean": 0.2005,
+    "sd": 0.0372,
+    "ci95": [
+     0.1694,
+     0.2317
+    ],
+    "n": 8
+   },
+   "clarification": {
+    "mean": 0.0819,
+    "sd": 0.0249,
+    "ci95": [
+     0.0611,
+     0.1028
+    ],
+    "n": 8
+   },
+   "parse_coverage": {
+    "mean": 0.3054,
+    "sd": 0.0925,
+    "ci95": [
+     0.228,
+     0.3827
+    ],
+    "n": 8
+   },
+   "parse_coverage_resolvable": {
+    "mean": 0.5121,
+    "sd": 0.0831,
+    "ci95": [
+     0.4426,
+     0.5815
+    ],
+    "n": 8
+   },
+   "lexical_coverage": {
+    "mean": 0.2917,
+    "sd": 0.1179,
+    "ci95": [
+     0.1931,
+     0.3902
+    ],
+    "n": 8
+   },
+   "identity_accuracy": null,
+   "belief_accuracy": {
+    "mean": 0.9795,
+    "sd": 0.0205,
+    "ci95": [
+     0.9624,
+     0.9967
+    ],
+    "n": 8
+   },
+   "verification_cost": {
+    "mean": 11.0549,
+    "sd": 0.8312,
+    "ci95": [
+     10.3599,
+     11.75
+    ],
+    "n": 8
+   },
+   "correction_rate": {
+    "mean": 0.0035,
+    "sd": 0.0045,
+    "ci95": [
+     -0.0003,
+     0.0073
+    ],
+    "n": 8
+   },
+   "seconds": {
+    "mean": 2.2948,
+    "sd": 0.1924,
+    "ci95": [
+     2.1339,
+     2.4557
+    ],
+    "n": 8
+   }
+  },
+  "discourse_identity": {
+   "success": {
+    "mean": 0.5429,
+    "sd": 0.0671,
+    "ci95": [
+     0.4867,
+     0.599
+    ],
+    "n": 8
+   },
+   "false_confident": {
+    "mean": 0.0309,
+    "sd": 0.0232,
+    "ci95": [
+     0.0114,
+     0.0503
+    ],
+    "n": 8
+   },
+   "abstention": {
+    "mean": 0.7473,
+    "sd": 0.0795,
+    "ci95": [
+     0.6809,
+     0.8137
+    ],
+    "n": 8
+   },
+   "unnecessary_abstention": {
+    "mean": 0.2183,
+    "sd": 0.0365,
+    "ci95": [
+     0.1878,
+     0.2488
+    ],
+    "n": 8
+   },
+   "clarification": {
+    "mean": 0.0872,
+    "sd": 0.034,
+    "ci95": [
+     0.0589,
+     0.1156
+    ],
+    "n": 8
+   },
+   "parse_coverage": {
+    "mean": 0.4822,
+    "sd": 0.0716,
+    "ci95": [
+     0.4223,
+     0.5421
+    ],
+    "n": 8
+   },
+   "parse_coverage_resolvable": {
+    "mean": 0.6371,
+    "sd": 0.0364,
+    "ci95": [
+     0.6066,
+     0.6675
+    ],
+    "n": 8
+   },
+   "lexical_coverage": {
+    "mean": 0.2292,
+    "sd": 0.1527,
+    "ci95": [
+     0.1015,
+     0.3568
+    ],
+    "n": 8
+   },
+   "identity_accuracy": null,
+   "belief_accuracy": {
+    "mean": 0.9832,
+    "sd": 0.0122,
+    "ci95": [
+     0.9729,
+     0.9934
+    ],
+    "n": 8
+   },
+   "verification_cost": {
+    "mean": 11.4411,
+    "sd": 0.7302,
+    "ci95": [
+     10.8305,
+     12.0517
+    ],
+    "n": 8
+   },
+   "correction_rate": {
+    "mean": 0.0035,
+    "sd": 0.0045,
+    "ci95": [
+     -0.0003,
+     0.0073
+    ],
+    "n": 8
+   },
+   "seconds": {
+    "mean": 2.4713,
+    "sd": 0.2536,
+    "ci95": [
+     2.2592,
+     2.6833
+    ],
+    "n": 8
+   }
+  },
+  "unified_belief": {
+   "success": {
+    "mean": 0.5538,
+    "sd": 0.0914,
+    "ci95": [
+     0.4773,
+     0.6302
+    ],
+    "n": 8
+   },
+   "false_confident": {
+    "mean": 0.0844,
+    "sd": 0.0414,
+    "ci95": [
+     0.0498,
+     0.119
+    ],
+    "n": 8
+   },
+   "abstention": {
+    "mean": 0.641,
+    "sd": 0.0597,
+    "ci95": [
+     0.5911,
+     0.691
+    ],
+    "n": 8
+   },
+   "unnecessary_abstention": {
+    "mean": 0.1629,
+    "sd": 0.0483,
+    "ci95": [
+     0.1225,
+     0.2032
+    ],
+    "n": 8
+   },
+   "clarification": {
+    "mean": 0.0728,
+    "sd": 0.0194,
+    "ci95": [
+     0.0566,
+     0.0891
+    ],
+    "n": 8
+   },
+   "parse_coverage": {
+    "mean": 0.4792,
+    "sd": 0.0691,
+    "ci95": [
+     0.4214,
+     0.537
+    ],
+    "n": 8
+   },
+   "parse_coverage_resolvable": {
+    "mean": 0.6067,
+    "sd": 0.046,
+    "ci95": [
+     0.5682,
+     0.6451
+    ],
+    "n": 8
+   },
+   "lexical_coverage": {
+    "mean": 0.2292,
+    "sd": 0.1527,
+    "ci95": [
+     0.1015,
+     0.3568
+    ],
+    "n": 8
+   },
+   "identity_accuracy": {
+    "mean": 0.9892,
+    "sd": 0.0209,
+    "ci95": [
+     0.9717,
+     1.0066
+    ],
+    "n": 8
+   },
+   "belief_accuracy": {
+    "mean": 0.9661,
+    "sd": 0.0338,
+    "ci95": [
+     0.9379,
+     0.9944
+    ],
+    "n": 8
+   },
+   "verification_cost": {
+    "mean": 11.5165,
+    "sd": 0.7518,
+    "ci95": [
+     10.8879,
+     12.1451
+    ],
+    "n": 8
+   },
+   "correction_rate": {
+    "mean": 0.0049,
+    "sd": 0.0055,
+    "ci95": [
+     0.0003,
+     0.0095
+    ],
+    "n": 8
+   },
+   "seconds": {
+    "mean": 2.9343,
+    "sd": 0.367,
+    "ci95": [
+     2.6275,
+     3.2412
+    ],
+    "n": 8
+   }
+  },
+  "unified_calibrated": {
+   "success": {
+    "mean": 0.5487,
+    "sd": 0.0802,
+    "ci95": [
+     0.4817,
+     0.6158
+    ],
+    "n": 8
+   },
+   "false_confident": {
+    "mean": 0.0408,
+    "sd": 0.022,
+    "ci95": [
+     0.0224,
+     0.0591
+    ],
+    "n": 8
+   },
+   "abstention": {
+    "mean": 0.723,
+    "sd": 0.0816,
+    "ci95": [
+     0.6548,
+     0.7912
+    ],
+    "n": 8
+   },
+   "unnecessary_abstention": {
+    "mean": 0.2013,
+    "sd": 0.0501,
+    "ci95": [
+     0.1593,
+     0.2432
+    ],
+    "n": 8
+   },
+   "clarification": {
+    "mean": 0.0782,
+    "sd": 0.0162,
+    "ci95": [
+     0.0646,
+     0.0917
+    ],
+    "n": 8
+   },
+   "parse_coverage": {
+    "mean": 0.3195,
+    "sd": 0.083,
+    "ci95": [
+     0.2501,
+     0.3889
+    ],
+    "n": 8
+   },
+   "parse_coverage_resolvable": {
+    "mean": 0.5264,
+    "sd": 0.084,
+    "ci95": [
+     0.4562,
+     0.5966
+    ],
+    "n": 8
+   },
+   "lexical_coverage": {
+    "mean": 0.2917,
+    "sd": 0.1477,
+    "ci95": [
+     0.1681,
+     0.4152
+    ],
+    "n": 8
+   },
+   "identity_accuracy": {
+    "mean": 1.0,
+    "sd": 0.0,
+    "ci95": [
+     1.0,
+     1.0
+    ],
+    "n": 1
+   },
+   "belief_accuracy": {
+    "mean": 0.973,
+    "sd": 0.0262,
+    "ci95": [
+     0.9511,
+     0.9949
+    ],
+    "n": 8
+   },
+   "verification_cost": {
+    "mean": 11.1777,
+    "sd": 0.959,
+    "ci95": [
+     10.3758,
+     11.9795
+    ],
+    "n": 8
+   },
+   "correction_rate": {
+    "mean": 0.0072,
+    "sd": 0.0113,
+    "ci95": [
+     -0.0022,
+     0.0166
+    ],
+    "n": 8
+   },
+   "seconds": {
+    "mean": 8.7704,
+    "sd": 1.0679,
+    "ci95": [
+     7.8775,
+     9.6634
+    ],
+    "n": 8
+   }
+  }
+ },
+ "comparisons": {
+  "unified_vs_no_elimination": {
+   "success": {
+    "mean": -0.0059,
+    "sd": 0.0674,
+    "ci95": [
+     -0.0623,
+     0.0504
+    ],
+    "n": 8,
+    "seeds_positive": 2,
+    "seeds_negative": 5
+   },
+   "false_confident": {
+    "mean": 0.055,
+    "sd": 0.0455,
+    "ci95": [
+     0.0169,
+     0.0931
+    ],
+    "n": 8,
+    "seeds_positive": 8,
+    "seeds_negative": 0
+   },
+   "parse_coverage": {
+    "mean": 0.1738,
+    "sd": 0.0887,
+    "ci95": [
+     0.0997,
+     0.248
+    ],
+    "n": 8,
+    "seeds_positive": 8,
+    "seeds_negative": 0
+   },
+   "abstention": {
+    "mean": -0.091,
+    "sd": 0.0641,
+    "ci95": [
+     -0.1446,
+     -0.0375
+    ],
+    "n": 8,
+    "seeds_positive": 0,
+    "seeds_negative": 8
+   }
+  },
+  "calibrated_vs_no_elimination": {
+   "success": {
+    "mean": -0.011,
+    "sd": 0.0462,
+    "ci95": [
+     -0.0496,
+     0.0277
+    ],
+    "n": 8,
+    "seeds_positive": 3,
+    "seeds_negative": 5
+   },
+   "false_confident": {
+    "mean": 0.0114,
+    "sd": 0.0083,
+    "ci95": [
+     0.0045,
+     0.0183
+    ],
+    "n": 8,
+    "seeds_positive": 7,
+    "seeds_negative": 1
+   },
+   "parse_coverage": {
+    "mean": 0.0141,
+    "sd": 0.0301,
+    "ci95": [
+     -0.011,
+     0.0393
+    ],
+    "n": 8,
+    "seeds_positive": 3,
+    "seeds_negative": 3
+   },
+   "abstention": {
+    "mean": -0.0091,
+    "sd": 0.0295,
+    "ci95": [
+     -0.0338,
+     0.0155
+    ],
+    "n": 8,
+    "seeds_positive": 2,
+    "seeds_negative": 6
+   }
+  },
+  "calibrated_vs_discourse": {
+   "success": {
+    "mean": 0.0059,
+    "sd": 0.0515,
+    "ci95": [
+     -0.0372,
+     0.0489
+    ],
+    "n": 8,
+    "seeds_positive": 4,
+    "seeds_negative": 4
+   },
+   "false_confident": {
+    "mean": 0.0099,
+    "sd": 0.0122,
+    "ci95": [
+     -0.0003,
+     0.0201
+    ],
+    "n": 8,
+    "seeds_positive": 6,
+    "seeds_negative": 1
+   },
+   "parse_coverage": {
+    "mean": -0.1627,
+    "sd": 0.0595,
+    "ci95": [
+     -0.2124,
+     -0.113
+    ],
+    "n": 8,
+    "seeds_positive": 0,
+    "seeds_negative": 8
+   },
+   "abstention": {
+    "mean": -0.0243,
+    "sd": 0.0269,
+    "ci95": [
+     -0.0469,
+     -0.0018
+    ],
+    "n": 8,
+    "seeds_positive": 1,
+    "seeds_negative": 6
+   }
+  },
+  "calibrated_vs_unified": {
+   "success": {
+    "mean": -0.005,
+    "sd": 0.0677,
+    "ci95": [
+     -0.0617,
+     0.0516
+    ],
+    "n": 8,
+    "seeds_positive": 3,
+    "seeds_negative": 5
+   },
+   "false_confident": {
+    "mean": -0.0436,
+    "sd": 0.0489,
+    "ci95": [
+     -0.0845,
+     -0.0027
+    ],
+    "n": 8,
+    "seeds_positive": 0,
+    "seeds_negative": 8
+   },
+   "parse_coverage": {
+    "mean": -0.1597,
+    "sd": 0.0639,
+    "ci95": [
+     -0.2131,
+     -0.1063
+    ],
+    "n": 8,
+    "seeds_positive": 0,
+    "seeds_negative": 8
+   },
+   "abstention": {
+    "mean": 0.0819,
+    "sd": 0.0501,
+    "ci95": [
+     0.0401,
+     0.1238
+    ],
+    "n": 8,
+    "seeds_positive": 8,
+    "seeds_negative": 0
+   }
+  },
+  "calibrated_vs_anchored_old": {
+   "success": {
+    "mean": 0.0058,
+    "sd": 0.0616,
+    "ci95": [
+     -0.0457,
+     0.0573
+    ],
+    "n": 8,
+    "seeds_positive": 3,
+    "seeds_negative": 5
+   },
+   "false_confident": {
+    "mean": 0.0068,
+    "sd": 0.0112,
+    "ci95": [
+     -0.0026,
+     0.0162
+    ],
+    "n": 8,
+    "seeds_positive": 5,
+    "seeds_negative": 2
+   },
+   "parse_coverage": {
+    "mean": -0.0012,
+    "sd": 0.0328,
+    "ci95": [
+     -0.0286,
+     0.0262
+    ],
+    "n": 8,
+    "seeds_positive": 4,
+    "seeds_negative": 4
+   },
+   "abstention": {
+    "mean": -0.0117,
+    "sd": 0.0376,
+    "ci95": [
+     -0.0431,
+     0.0197
+    ],
+    "n": 8,
+    "seeds_positive": 4,
+    "seeds_negative": 4
+   }
+  }
+ },
+ "error_budget": {
+  "anchored_old": {
+   "lexical": {
+    "mean": 0.109,
+    "sd": 0.0291,
+    "ci95": [
+     0.0847,
+     0.1333
+    ],
+    "n": 8
+   },
+   "grammar": {
+    "mean": 0.0025,
+    "sd": 0.0038,
+    "ci95": [
+     -0.0007,
+     0.0056
+    ],
+    "n": 8
+   },
+   "reference": {
+    "mean": 0.0575,
+    "sd": 0.0174,
+    "ci95": [
+     0.0429,
+     0.072
+    ],
+    "n": 8
+   },
+   "source_reliability": {
+    "mean": 0.0064,
+    "sd": 0.0073,
+    "ci95": [
+     0.0003,
+     0.0125
+    ],
+    "n": 8
+   },
+   "belief_propagation": {
+    "mean": 0.0428,
+    "sd": 0.0197,
+    "ci95": [
+     0.0264,
+     0.0592
+    ],
+    "n": 8
+   },
+   "planner": {
+    "mean": 0.0041,
+    "sd": 0.0043,
+    "ci95": [
+     0.0005,
+     0.0077
+    ],
+    "n": 8
+   },
+   "temporal": {
+    "mean": 0.0184,
+    "sd": 0.0069,
+    "ci95": [
+     0.0127,
+     0.0242
+    ],
+    "n": 8
+   },
+   "unsupported_inference": {
+    "mean": 0.0004,
+    "sd": 0.001,
+    "ci95": [
+     -0.0005,
+     0.0012
+    ],
+    "n": 8
+   }
+  },
+  "no_elimination": {
+   "lexical": {
+    "mean": 0.0984,
+    "sd": 0.0243,
+    "ci95": [
+     0.0781,
+     0.1188
+    ],
+    "n": 8
+   },
+   "grammar": {
+    "mean": 0.0032,
+    "sd": 0.0038,
+    "ci95": [
+     0.0,
+     0.0064
+    ],
+    "n": 8
+   },
+   "reference": {
+    "mean": 0.061,
+    "sd": 0.0196,
+    "ci95": [
+     0.0446,
+     0.0774
+    ],
+    "n": 8
+   },
+   "source_reliability": {
+    "mean": 0.0064,
+    "sd": 0.0073,
+    "ci95": [
+     0.0003,
+     0.0125
+    ],
+    "n": 8
+   },
+   "belief_propagation": {
+    "mean": 0.0383,
+    "sd": 0.0193,
+    "ci95": [
+     0.0222,
+     0.0545
+    ],
+    "n": 8
+   },
+   "planner": {
+    "mean": 0.0038,
+    "sd": 0.0039,
+    "ci95": [
+     0.0006,
+     0.0071
+    ],
+    "n": 8
+   },
+   "temporal": {
+    "mean": 0.0184,
+    "sd": 0.0066,
+    "ci95": [
+     0.0129,
+     0.0239
+    ],
+    "n": 8
+   },
+   "unsupported_inference": {
+    "mean": 0.0004,
+    "sd": 0.001,
+    "ci95": [
+     -0.0005,
+     0.0012
+    ],
+    "n": 8
+   }
+  },
+  "discourse_identity": {
+   "lexical": {
+    "mean": 0.111,
+    "sd": 0.0215,
+    "ci95": [
+     0.093,
+     0.129
+    ],
+    "n": 8
+   },
+   "grammar": {
+    "mean": 0.0032,
+    "sd": 0.0038,
+    "ci95": [
+     0.0,
+     0.0064
+    ],
+    "n": 8
+   },
+   "reference": {
+    "mean": 0.0697,
+    "sd": 0.026,
+    "ci95": [
+     0.0479,
+     0.0914
+    ],
+    "n": 8
+   },
+   "source_reliability": {
+    "mean": 0.0089,
+    "sd": 0.0078,
+    "ci95": [
+     0.0024,
+     0.0154
+    ],
+    "n": 8
+   },
+   "belief_propagation": {
+    "mean": 0.0338,
+    "sd": 0.0218,
+    "ci95": [
+     0.0156,
+     0.052
+    ],
+    "n": 8
+   },
+   "planner": {
+    "mean": 0.0048,
+    "sd": 0.004,
+    "ci95": [
+     0.0015,
+     0.0081
+    ],
+    "n": 8
+   },
+   "temporal": {
+    "mean": 0.0175,
+    "sd": 0.0066,
+    "ci95": [
+     0.0119,
+     0.023
+    ],
+    "n": 8
+   },
+   "unsupported_inference": {
+    "mean": 0.0004,
+    "sd": 0.001,
+    "ci95": [
+     -0.0005,
+     0.0012
+    ],
+    "n": 8
+   }
+  },
+  "unified_belief": {
+   "lexical": {
+    "mean": 0.1045,
+    "sd": 0.0261,
+    "ci95": [
+     0.0827,
+     0.1263
+    ],
+    "n": 8
+   },
+   "grammar": {
+    "mean": 0.0025,
+    "sd": 0.0037,
+    "ci95": [
+     -0.0005,
+     0.0056
+    ],
+    "n": 8
+   },
+   "reference": {
+    "mean": 0.034,
+    "sd": 0.0223,
+    "ci95": [
+     0.0154,
+     0.0527
+    ],
+    "n": 8
+   },
+   "source_reliability": {
+    "mean": 0.0128,
+    "sd": 0.0089,
+    "ci95": [
+     0.0053,
+     0.0203
+    ],
+    "n": 8
+   },
+   "belief_propagation": {
+    "mean": 0.0621,
+    "sd": 0.034,
+    "ci95": [
+     0.0337,
+     0.0906
+    ],
+    "n": 8
+   },
+   "planner": {
+    "mean": 0.0109,
+    "sd": 0.0063,
+    "ci95": [
+     0.0057,
+     0.0162
+    ],
+    "n": 8
+   },
+   "temporal": {
+    "mean": 0.0196,
+    "sd": 0.0084,
+    "ci95": [
+     0.0126,
+     0.0267
+    ],
+    "n": 8
+   },
+   "unsupported_inference": {
+    "mean": 0.0007,
+    "sd": 0.0012,
+    "ci95": [
+     -0.0004,
+     0.0017
+    ],
+    "n": 8
+   }
+  },
+  "unified_calibrated": {
+   "lexical": {
+    "mean": 0.0997,
+    "sd": 0.0341,
+    "ci95": [
+     0.0711,
+     0.1282
+    ],
+    "n": 8
+   },
+   "grammar": {
+    "mean": 0.0021,
+    "sd": 0.0034,
+    "ci95": [
+     -0.0007,
+     0.005
+    ],
+    "n": 8
+   },
+   "reference": {
+    "mean": 0.0566,
+    "sd": 0.0176,
+    "ci95": [
+     0.0419,
+     0.0713
+    ],
+    "n": 8
+   },
+   "source_reliability": {
+    "mean": 0.0072,
+    "sd": 0.0071,
+    "ci95": [
+     0.0013,
+     0.0131
+    ],
+    "n": 8
+   },
+   "belief_propagation": {
+    "mean": 0.0484,
+    "sd": 0.0184,
+    "ci95": [
+     0.033,
+     0.0638
+    ],
+    "n": 8
+   },
+   "planner": {
+    "mean": 0.0049,
+    "sd": 0.0046,
+    "ci95": [
+     0.0011,
+     0.0087
+    ],
+    "n": 8
+   },
+   "temporal": {
+    "mean": 0.0225,
+    "sd": 0.0052,
+    "ci95": [
+     0.0181,
+     0.0269
+    ],
+    "n": 8
+   },
+   "unsupported_inference": {
+    "mean": 0.0007,
+    "sd": 0.0012,
+    "ci95": [
+     -0.0004,
+     0.0017
+    ],
+    "n": 8
+   }
+  }
+ },
+ "success_conversion": {
+  "anchored_old": {
+   "new_correct": 25,
+   "lost_correct": 75,
+   "new_false_confident": 14,
+   "removed_false_confident": 1,
+   "net_correct": -50,
+   "net_false_confident": 13,
+   "extra_parse_coverage": 0.12285564852612213
+  },
+  "discourse_identity": {
+   "new_correct": 59,
+   "lost_correct": 107,
+   "new_false_confident": 20,
+   "removed_false_confident": 17,
+   "net_correct": -48,
+   "net_false_confident": 3,
+   "extra_parse_coverage": 1.4147723132473504
+  },
+  "unified_belief": {
+   "new_correct": 195,
+   "lost_correct": 213,
+   "new_false_confident": 163,
+   "removed_false_confident": 8,
+   "net_correct": -18,
+   "net_false_confident": 155,
+   "extra_parse_coverage": 1.3907176138337494
+  },
+  "unified_calibrated": {
+   "new_correct": 97,
+   "lost_correct": 128,
+   "new_false_confident": 40,
+   "removed_false_confident": 7,
+   "net_correct": -31,
+   "net_false_confident": 33,
+   "extra_parse_coverage": 0.11318833178185544
+  }
+ },
+ "calibration": {
+  "anchored_old": {
+   "identity": {
+    "n": 0,
+    "ece": null,
+    "brier": null,
+    "bins": []
+   },
+   "belief": {
+    "n": 652,
+    "ece": 0.0002,
+    "brier": 0.0209,
+    "bins": [
+     {
+      "bin": "0.9-1.0",
+      "n": 652,
+      "confidence": 0.979,
+      "accuracy": 0.979
+     }
+    ]
+   },
+   "lexical": {
+    "n": 47,
+    "ece": 0.4184,
+    "brier": 0.292,
+    "bins": [
+     {
+      "bin": "0.0-0.1",
+      "n": 18,
+      "confidence": 0.052,
+      "accuracy": 0.167
+     },
+     {
+      "bin": "0.1-0.2",
+      "n": 2,
+      "confidence": 0.144,
+      "accuracy": 1.0
+     },
+     {
+      "bin": "0.2-0.3",
+      "n": 4,
+      "confidence": 0.232,
+      "accuracy": 1.0
+     },
+     {
+      "bin": "0.3-0.4",
+      "n": 9,
+      "confidence": 0.362,
+      "accuracy": 1.0
+     },
+     {
+      "bin": "0.4-0.5",
+      "n": 9,
+      "confidence": 0.447,
+      "accuracy": 1.0
+     },
+     {
+      "bin": "0.5-0.6",
+      "n": 4,
+      "confidence": 0.56,
+      "accuracy": 1.0
+     },
+     {
+      "bin": "0.6-0.7",
+      "n": 1,
+      "confidence": 0.66,
+      "accuracy": 1.0
+     }
+    ]
+   },
+   "answer": {
+    "n": 530,
+    "ece": 0.1339,
+    "brier": 0.1398,
+    "bins": [
+     {
+      "bin": "0.6-0.7",
+      "n": 2,
+      "confidence": 0.642,
+      "accuracy": 0.5
+     },
+     {
+      "bin": "0.7-0.8",
+      "n": 2,
+      "confidence": 0.79,
+      "accuracy": 1.0
+     },
+     {
+      "bin": "0.9-1.0",
+      "n": 526,
+      "confidence": 0.983,
+      "accuracy": 0.85
+     }
+    ]
+   }
+  },
+  "no_elimination": {
+   "identity": {
+    "n": 0,
+    "ece": null,
+    "brier": null,
+    "bins": []
+   },
+   "belief": {
+    "n": 679,
+    "ece": 0.0022,
+    "brier": 0.0203,
+    "bins": [
+     {
+      "bin": "0.9-1.0",
+      "n": 679,
+      "confidence": 0.977,
+      "accuracy": 0.979
+     }
+    ]
+   },
+   "lexical": {
+    "n": 47,
+    "ece": 0.4342,
+    "brier": 0.3017,
+    "bins": [
+     {
+      "bin": "0.0-0.1",
+      "n": 16,
+      "confidence": 0.048,
+      "accuracy": 0.125
+     },
+     {
+      "bin": "0.1-0.2",
+      "n": 4,
+      "confidence": 0.163,
+      "accuracy": 1.0
+     },
+     {
+      "bin": "0.2-0.3",
+      "n": 5,
+      "confidence": 0.247,
+      "accuracy": 1.0
+     },
+     {
+      "bin": "0.3-0.4",
+      "n": 7,
+      "confidence": 0.358,
+      "accuracy": 1.0
+     },
+     {
+      "bin": "0.4-0.5",
+      "n": 8,
+      "confidence": 0.433,
+      "accuracy": 1.0
+     },
+     {
+      "bin": "0.5-0.6",
+      "n": 6,
+      "confidence": 0.551,
+      "accuracy": 1.0
+     },
+     {
+      "bin": "0.6-0.7",
+      "n": 1,
+      "confidence": 0.668,
+      "accuracy": 1.0
+     }
+    ]
+   },
+   "answer": {
+    "n": 535,
+    "ece": 0.112,
+    "brier": 0.1191,
+    "bins": [
+     {
+      "bin": "0.5-0.6",
+      "n": 2,
+      "confidence": 0.568,
+      "accuracy": 0.5
+     },
+     {
+      "bin": "0.7-0.8",
+      "n": 2,
+      "confidence": 0.779,
+      "accuracy": 1.0
+     },
+     {
+      "bin": "0.9-1.0",
+      "n": 531,
+      "confidence": 0.986,
+      "accuracy": 0.874
+     }
+    ]
+   }
+  },
+  "discourse_identity": {
+   "identity": {
+    "n": 0,
+    "ece": null,
+    "brier": null,
+    "bins": []
+   },
+   "belief": {
+    "n": 768,
+    "ece": 0.0048,
+    "brier": 0.017,
+    "bins": [
+     {
+      "bin": "0.9-1.0",
+      "n": 768,
+      "confidence": 0.978,
+      "accuracy": 0.983
+     }
+    ]
+   },
+   "lexical": {
+    "n": 47,
+    "ece": 0.5071,
+    "brier": 0.3655,
+    "bins": [
+     {
+      "bin": "0.0-0.1",
+      "n": 10,
+      "confidence": 0.038,
+      "accuracy": 0.1
+     },
+     {
+      "bin": "0.1-0.2",
+      "n": 6,
+      "confidence": 0.169,
+      "accuracy": 1.0
+     },
+     {
+      "bin": "0.2-0.3",
+      "n": 10,
+      "confidence": 0.254,
+      "accuracy": 1.0
+     },
+     {
+      "bin": "0.3-0.4",
+      "n": 8,
+      "confidence": 0.336,
+      "accuracy": 1.0
+     },
+     {
+      "bin": "0.4-0.5",
+      "n": 6,
+      "confidence": 0.445,
+      "accuracy": 0.833
+     },
+     {
+      "bin": "0.5-0.6",
+      "n": 7,
+      "confidence": 0.552,
+      "accuracy": 1.0
+     }
+    ]
+   },
+   "answer": {
+    "n": 501,
+    "ece": 0.1205,
+    "brier": 0.1265,
+    "bins": [
+     {
+      "bin": "0.5-0.6",
+      "n": 2,
+      "confidence": 0.529,
+      "accuracy": 0.5
+     },
+     {
+      "bin": "0.8-0.9",
+      "n": 2,
+      "confidence": 0.822,
+      "accuracy": 1.0
+     },
+     {
+      "bin": "0.9-1.0",
+      "n": 497,
+      "confidence": 0.988,
+      "accuracy": 0.867
+     }
+    ]
+   }
+  },
+  "unified_belief": {
+   "identity": {
+    "n": 2695,
+    "ece": 0.0926,
+    "brier": 0.0173,
+    "bins": [
+     {
+      "bin": "0.6-0.7",
+      "n": 1,
+      "confidence": 0.698,
+      "accuracy": 1.0
+     },
+     {
+      "bin": "0.7-0.8",
+      "n": 13,
+      "confidence": 0.752,
+      "accuracy": 0.615
+     },
+     {
+      "bin": "0.8-0.9",
+      "n": 1231,
+      "confidence": 0.868,
+      "accuracy": 0.988
+     },
+     {
+      "bin": "0.9-1.0",
+      "n": 1450,
+      "confidence": 0.929,
+      "accuracy": 0.998
+     }
+    ]
+   },
+   "belief": {
+    "n": 789,
+    "ece": 0.0151,
+    "brier": 0.0312,
+    "bins": [
+     {
+      "bin": "0.9-1.0",
+      "n": 789,
+      "confidence": 0.981,
+      "accuracy": 0.966
+     }
+    ]
+   },
+   "lexical": {
+    "n": 46,
+    "ece": 0.487,
+    "brier": 0.3502,
+    "bins": [
+     {
+      "bin": "0.0-0.1",
+      "n": 10,
+      "confidence": 0.044,
+      "accuracy": 0.1
+     },
+     {
+      "bin": "0.1-0.2",
+      "n": 5,
+      "confidence": 0.155,
+      "accuracy": 1.0
+     },
+     {
+      "bin": "0.2-0.3",
+      "n": 9,
+      "confidence": 0.241,
+      "accuracy": 1.0
+     },
+     {
+      "bin": "0.3-0.4",
+      "n": 6,
+      "confidence": 0.351,
+      "accuracy": 1.0
+     },
+     {
+      "bin": "0.4-0.5",
+      "n": 10,
+      "confidence": 0.461,
+      "accuracy": 0.9
+     },
+     {
+      "bin": "0.5-0.6",
+      "n": 5,
+      "confidence": 0.571,
+      "accuracy": 1.0
+     },
+     {
+      "bin": "0.6-0.7",
+      "n": 1,
+      "confidence": 0.65,
+      "accuracy": 1.0
+     }
+    ]
+   },
+   "answer": {
+    "n": 712,
+    "ece": 0.2522,
+    "brier": 0.2528,
+    "bins": [
+     {
+      "bin": "0.0-0.1",
+      "n": 1,
+      "confidence": 0.0,
+      "accuracy": 1.0
+     },
+     {
+      "bin": "0.5-0.6",
+      "n": 2,
+      "confidence": 0.596,
+      "accuracy": 0.5
+     },
+     {
+      "bin": "0.7-0.8",
+      "n": 2,
+      "confidence": 0.792,
+      "accuracy": 1.0
+     },
+     {
+      "bin": "0.8-0.9",
+      "n": 2,
+      "confidence": 0.858,
+      "accuracy": 0.0
+     },
+     {
+      "bin": "0.9-1.0",
+      "n": 705,
+      "confidence": 0.986,
+      "accuracy": 0.736
+     }
+    ]
+   }
+  },
+  "unified_calibrated": {
+   "identity": {
+    "n": 10,
+    "ece": 0.0286,
+    "brier": 0.0008,
+    "bins": [
+     {
+      "bin": "0.9-1.0",
+      "n": 10,
+      "confidence": 0.971,
+      "accuracy": 1.0
+     }
+    ]
+   },
+   "belief": {
+    "n": 785,
+    "ece": 0.0028,
+    "brier": 0.0248,
+    "bins": [
+     {
+      "bin": "0.9-1.0",
+      "n": 785,
+      "confidence": 0.972,
+      "accuracy": 0.975
+     }
+    ]
+   },
+   "lexical": {
+    "n": 47,
+    "ece": 0.4426,
+    "brier": 0.3178,
+    "bins": [
+     {
+      "bin": "0.0-0.1",
+      "n": 17,
+      "confidence": 0.054,
+      "accuracy": 0.176
+     },
+     {
+      "bin": "0.1-0.2",
+      "n": 2,
+      "confidence": 0.149,
+      "accuracy": 1.0
+     },
+     {
+      "bin": "0.2-0.3",
+      "n": 8,
+      "confidence": 0.23,
+      "accuracy": 1.0
+     },
+     {
+      "bin": "0.3-0.4",
+      "n": 6,
+      "confidence": 0.346,
+      "accuracy": 1.0
+     },
+     {
+      "bin": "0.4-0.5",
+      "n": 8,
+      "confidence": 0.45,
+      "accuracy": 1.0
+     },
+     {
+      "bin": "0.5-0.6",
+      "n": 4,
+      "confidence": 0.546,
+      "accuracy": 1.0
+     },
+     {
+      "bin": "0.6-0.7",
+      "n": 2,
+      "confidence": 0.638,
+      "accuracy": 1.0
+     }
+    ]
+   },
+   "answer": {
+    "n": 531,
+    "ece": 0.1604,
+    "brier": 0.163,
+    "bins": [
+     {
+      "bin": "0.6-0.7",
+      "n": 2,
+      "confidence": 0.609,
+      "accuracy": 0.5
+     },
+     {
+      "bin": "0.7-0.8",
+      "n": 2,
+      "confidence": 0.793,
+      "accuracy": 1.0
+     },
+     {
+      "bin": "0.9-1.0",
+      "n": 527,
+      "confidence": 0.986,
+      "accuracy": 0.825
+     }
+    ]
+   }
+  }
+ },
+ "threshold_choices": [
+  {
+   "observation_threshold": 1.01,
+   "query_threshold": 1.01
+  },
+  {
+   "observation_threshold": 1.01,
+   "query_threshold": 1.01
+  },
+  {
+   "observation_threshold": 1.01,
+   "query_threshold": 1.01
+  },
+  {
+   "observation_threshold": 0.97,
+   "query_threshold": 1.01
+  },
+  {
+   "observation_threshold": 0.97,
+   "query_threshold": 1.01
+  },
+  {
+   "observation_threshold": 0.97,
+   "query_threshold": 1.01
+  },
+  {
+   "observation_threshold": 1.01,
+   "query_threshold": 1.01
+  },
+  {
+   "observation_threshold": 0.97,
+   "query_threshold": 0.97
+  }
+ ],
+ "bootstrap": {
+  "0": {
+   "diff": 0.062,
+   "ci95": [
+    0.0323,
+    0.0916
+   ],
+   "n_items": 371
+  },
+  "1": {
+   "diff": -0.0211,
+   "ci95": [
+    -0.0512,
+    0.006
+   ],
+   "n_items": 332
+  },
+  "2": {
+   "diff": -0.0246,
+   "ci95": [
+    -0.0519,
+    0.0
+   ],
+   "n_items": 366
+  },
+  "3": {
+   "diff": -0.0677,
+   "ci95": [
+    -0.1028,
+    -0.0376
+   ],
+   "n_items": 399
+  },
+  "4": {
+   "diff": -0.0629,
+   "ci95": [
+    -0.1018,
+    -0.024
+   ],
+   "n_items": 334
+  },
+  "5": {
+   "diff": 0.0085,
+   "ci95": [
+    -0.0171,
+    0.0342
+   ],
+   "n_items": 351
+  },
+  "6": {
+   "diff": -0.0248,
+   "ci95": [
+    -0.0433,
+    -0.0093
+   ],
+   "n_items": 323
+  },
+  "7": {
+   "diff": 0.0426,
+   "ci95": [
+    0.0142,
+    0.071
+   ],
+   "n_items": 352
+  }
+ },
+ "per_seed": [
+  {
+   "anchored_old": {
+    "success": 0.5768194070080862,
+    "false_confident": 0.03234501347708895,
+    "abstention": 0.6738544474393531,
+    "unnecessary_abstention": 0.14016172506738545,
+    "correct_abstention": 0.5336927223719676,
+    "parse_coverage": 0.42105263157894735,
+    "parse_coverage_resolvable": 0.704,
+    "resolvable_fraction": 0.5980861244019139,
+    "role_accuracy": 0.998,
+    "lexical_coverage": 0.3333333333333333,
+    "lexical_wrong": 0,
+    "verification_cost": 10.002695417789758,
+    "routing_accuracy": 1.0,
+    "correction_rate": 0.0,
+    "correction_to_gold": null,
+    "harmful_corrections": 0,
+    "polysemy_accuracy": null,
+    "parameters": 0,
+    "n_items": 371,
+    "clarification": 0.07547169811320754,
+    "identity_accuracy": null,
+    "identity_commitments": 0,
+    "belief_accuracy": 0.981651376146789,
+    "seconds": 2.120569727001566,
+    "neural_parameters": 0,
+    "error_budget": {
+     "lexical": 0.08355795148247978,
+     "grammar": 0.0,
+     "reference": 0.04043126684636118,
+     "source_reliability": 0.008086253369272238,
+     "belief_propagation": 0.02425876010781671,
+     "planner": 0.0026954177897574125,
+     "temporal": 0.013477088948787063,
+     "unsupported_inference": 0.0
+    }
+   },
+   "no_elimination": {
+    "success": 0.5795148247978437,
+    "false_confident": 0.016172506738544475,
+    "abstention": 0.7008086253369272,
+    "unnecessary_abstention": 0.1509433962264151,
+    "correct_abstention": 0.5498652291105122,
+    "parse_coverage": 0.37320574162679426,
+    "parse_coverage_resolvable": 0.6141732283464567,
+    "resolvable_fraction": 0.6076555023923444,
+    "role_accuracy": 0.998,
+    "lexical_coverage": 0.3333333333333333,
+    "lexical_wrong": 0,
+    "verification_cost": 10.167115902964959,
+    "routing_accuracy": 1.0,
+    "correction_rate": 0.005390835579514825,
+    "correction_to_gold": 1.0,
+    "harmful_corrections": 0,
+    "polysemy_accuracy": null,
+    "parameters": 0,
+    "n_items": 371,
+    "clarification": 0.07547169811320754,
+    "identity_accuracy": null,
+    "identity_commitments": 0,
+    "belief_accuracy": 0.9917355371900827,
+    "seconds": 2.05170125800214,
+    "neural_parameters": 0,
+    "error_budget": {
+     "lexical": 0.08355795148247978,
+     "grammar": 0.0,
+     "reference": 0.04043126684636118,
+     "source_reliability": 0.008086253369272238,
+     "belief_propagation": 0.016172506738544475,
+     "planner": 0.0026954177897574125,
+     "temporal": 0.016172506738544475,
+     "unsupported_inference": 0.0
+    }
+   },
+   "discourse_identity": {
+    "success": 0.6145552560646901,
+    "false_confident": 0.01078167115902965,
+    "abstention": 0.7304582210242587,
+    "unnecessary_abstention": 0.1752021563342318,
+    "correct_abstention": 0.555256064690027,
+    "parse_coverage": 0.5454545454545454,
+    "parse_coverage_resolvable": 0.6917293233082706,
+    "resolvable_fraction": 0.6363636363636364,
+    "role_accuracy": 0.998,
+    "lexical_coverage": 0.16666666666666666,
+    "lexical_wrong": 0,
+    "verification_cost": 10.719676549865229,
+    "routing_accuracy": 1.0,
+    "correction_rate": 0.0,
+    "correction_to_gold": null,
+    "harmful_corrections": 0,
+    "polysemy_accuracy": null,
+    "parameters": 0,
+    "n_items": 371,
+    "clarification": 0.1347708894878706,
+    "identity_accuracy": null,
+    "identity_commitments": 0,
+    "belief_accuracy": 0.9916666666666667,
+    "seconds": 2.297975649998989,
+    "neural_parameters": 0,
+    "error_budget": {
+     "lexical": 0.11590296495956873,
+     "grammar": 0.0,
+     "reference": 0.04043126684636118,
+     "source_reliability": 0.008086253369272238,
+     "belief_propagation": 0.0026954177897574125,
+     "planner": 0.005390835579514825,
+     "temporal": 0.013477088948787063,
+     "unsupported_inference": 0.0
+    }
+   },
+   "unified_belief": {
+    "success": 0.5579514824797843,
+    "false_confident": 0.0862533692722372,
+    "abstention": 0.6253369272237197,
+    "unnecessary_abstention": 0.14555256064690028,
+    "correct_abstention": 0.4797843665768194,
+    "parse_coverage": 0.5454545454545454,
+    "parse_coverage_resolvable": 0.6666666666666666,
+    "resolvable_fraction": 0.7320574162679426,
+    "role_accuracy": 0.998,
+    "lexical_coverage": 0.16666666666666666,
+    "lexical_wrong": 0,
+    "verification_cost": 10.935309973045822,
+    "routing_accuracy": 1.0,
+    "correction_rate": 0.01078167115902965,
+    "correction_to_gold": 0.75,
+    "harmful_corrections": 0,
+    "polysemy_accuracy": null,
+    "parameters": 0,
+    "n_items": 371,
+    "clarification": 0.0646900269541779,
+    "identity_accuracy": 1.0,
+    "identity_commitments": 311,
+    "belief_accuracy": 0.9841269841269841,
+    "seconds": 2.837380568998924,
+    "neural_parameters": 0,
+    "error_budget": {
+     "lexical": 0.1078167115902965,
+     "grammar": 0.0,
+     "reference": 0.07008086253369272,
+     "source_reliability": 0.008086253369272238,
+     "belief_propagation": 0.02425876010781671,
+     "planner": 0.01078167115902965,
+     "temporal": 0.01078167115902965,
+     "unsupported_inference": 0.0
+    },
+    "calibration_choice": {},
+    "rollbacks": 135
+   },
+   "unified_calibrated": {
+    "success": 0.6415094339622641,
+    "false_confident": 0.0215633423180593,
+    "abstention": 0.6657681940700808,
+    "unnecessary_abstention": 0.11590296495956873,
+    "correct_abstention": 0.5498652291105122,
+    "parse_coverage": 0.40669856459330145,
+    "parse_coverage_resolvable": 0.6390977443609023,
+    "resolvable_fraction": 0.6363636363636364,
+    "role_accuracy": 0.998,
+    "lexical_coverage": 0.5,
+    "lexical_wrong": 0,
+    "verification_cost": 9.611859838274933,
+    "routing_accuracy": 1.0,
+    "correction_rate": 0.03234501347708895,
+    "correction_to_gold": 0.6666666666666666,
+    "harmful_corrections": 0,
+    "polysemy_accuracy": null,
+    "parameters": 0,
+    "n_items": 371,
+    "clarification": 0.07547169811320754,
+    "identity_accuracy": null,
+    "identity_commitments": 0,
+    "belief_accuracy": 0.9917355371900827,
+    "seconds": 8.443873293999786,
+    "neural_parameters": 0,
+    "error_budget": {
+     "lexical": 0.04043126684636118,
+     "grammar": 0.0,
+     "reference": 0.04582210242587601,
+     "source_reliability": 0.008086253369272238,
+     "belief_propagation": 0.029649595687331536,
+     "planner": 0.0,
+     "temporal": 0.013477088948787063,
+     "unsupported_inference": 0.0
+    },
+    "calibration_choice": {
+     "observation_threshold": 1.01,
+     "query_threshold": 1.01
+    },
+    "rollbacks": 135
+   }
+  },
+  {
+   "anchored_old": {
+    "success": 0.7018072289156626,
+    "false_confident": 0.07530120481927711,
+    "abstention": 0.5421686746987951,
+    "unnecessary_abstention": 0.1536144578313253,
+    "correct_abstention": 0.3885542168674699,
+    "parse_coverage": 0.5246913580246914,
+    "parse_coverage_resolvable": 0.6287878787878788,
+    "resolvable_fraction": 0.8148148148148148,
+    "role_accuracy": 0.988,
+    "lexical_coverage": 0.3333333333333333,
+    "lexical_wrong": 0,
+    "verification_cost": 10.421686746987952,
+    "routing_accuracy": 1.0,
+    "correction_rate": 0.012048192771084338,
+    "correction_to_gold": 0.25,
+    "harmful_corrections": 2,
+    "polysemy_accuracy": null,
+    "parameters": 0,
+    "n_items": 332,
+    "clarification": 0.10240963855421686,
+    "identity_accuracy": null,
+    "identity_commitments": 0,
+    "belief_accuracy": 0.9767441860465116,
+    "seconds": 2.258267948000139,
+    "neural_parameters": 0,
+    "error_budget": {
+     "lexical": 0.08433734939759036,
+     "grammar": 0.009036144578313253,
+     "reference": 0.04216867469879518,
+     "source_reliability": 0.0,
+     "belief_propagation": 0.07530120481927711,
+     "planner": 0.009036144578313253,
+     "temporal": 0.009036144578313253,
+     "unsupported_inference": 0.0
+    }
+   },
+   "no_elimination": {
+    "success": 0.6987951807228916,
+    "false_confident": 0.060240963855421686,
+    "abstention": 0.5602409638554217,
+    "unnecessary_abstention": 0.1566265060240964,
+    "correct_abstention": 0.4036144578313253,
+    "parse_coverage": 0.4876543209876543,
+    "parse_coverage_resolvable": 0.5984848484848485,
+    "resolvable_fraction": 0.8148148148148148,
+    "role_accuracy": 0.988,
+    "lexical_coverage": 0.3333333333333333,
+    "lexical_wrong": 0,
+    "verification_cost": 10.864457831325302,
+    "routing_accuracy": 1.0,
+    "correction_rate": 0.012048192771084338,
+    "correction_to_gold": 0.25,
+    "harmful_corrections": 2,
+    "polysemy_accuracy": null,
+    "parameters": 0,
+    "n_items": 332,
+    "clarification": 0.10240963855421686,
+    "identity_accuracy": null,
+    "identity_commitments": 0,
+    "belief_accuracy": 0.9767441860465116,
+    "seconds": 2.2875067120003223,
+    "neural_parameters": 0,
+    "error_budget": {
+     "lexical": 0.08734939759036145,
+     "grammar": 0.009036144578313253,
+     "reference": 0.04216867469879518,
+     "source_reliability": 0.0,
+     "belief_propagation": 0.06325301204819277,
+     "planner": 0.009036144578313253,
+     "temporal": 0.006024096385542169,
+     "unsupported_inference": 0.0
+    }
+   },
+   "discourse_identity": {
+    "success": 0.6656626506024096,
+    "false_confident": 0.08132530120481928,
+    "abstention": 0.5662650602409639,
+    "unnecessary_abstention": 0.18373493975903615,
+    "correct_abstention": 0.3825301204819277,
+    "parse_coverage": 0.5555555555555556,
+    "parse_coverage_resolvable": 0.6666666666666666,
+    "resolvable_fraction": 0.8148148148148148,
+    "role_accuracy": 0.988,
+    "lexical_coverage": 0.3333333333333333,
+    "lexical_wrong": 0,
+    "verification_cost": 10.400602409638553,
+    "routing_accuracy": 1.0,
+    "correction_rate": 0.012048192771084338,
+    "correction_to_gold": 0.25,
+    "harmful_corrections": 2,
+    "polysemy_accuracy": null,
+    "parameters": 0,
+    "n_items": 332,
+    "clarification": 0.10240963855421686,
+    "identity_accuracy": null,
+    "identity_commitments": 0,
+    "belief_accuracy": 0.9789473684210527,
+    "seconds": 2.3562853090006683,
+    "neural_parameters": 0,
+    "error_budget": {
+     "lexical": 0.08433734939759036,
+     "grammar": 0.009036144578313253,
+     "reference": 0.07530120481927711,
+     "source_reliability": 0.009036144578313253,
+     "belief_propagation": 0.06927710843373494,
+     "planner": 0.009036144578313253,
+     "temporal": 0.009036144578313253,
+     "unsupported_inference": 0.0
+    }
+   },
+   "unified_belief": {
+    "success": 0.6987951807228916,
+    "false_confident": 0.0783132530120482,
+    "abstention": 0.5240963855421686,
+    "unnecessary_abstention": 0.13855421686746988,
+    "correct_abstention": 0.3855421686746988,
+    "parse_coverage": 0.5370370370370371,
+    "parse_coverage_resolvable": 0.6214285714285714,
+    "resolvable_fraction": 0.8641975308641975,
+    "role_accuracy": 0.988,
+    "lexical_coverage": 0.3333333333333333,
+    "lexical_wrong": 0,
+    "verification_cost": 10.88855421686747,
+    "routing_accuracy": 1.0,
+    "correction_rate": 0.012048192771084338,
+    "correction_to_gold": 0.25,
+    "harmful_corrections": 2,
+    "polysemy_accuracy": null,
+    "parameters": 0,
+    "n_items": 332,
+    "clarification": 0.10240963855421686,
+    "identity_accuracy": 1.0,
+    "identity_commitments": 439,
+    "belief_accuracy": 0.9701492537313433,
+    "seconds": 2.844212724998215,
+    "neural_parameters": 0,
+    "error_budget": {
+     "lexical": 0.08734939759036145,
+     "grammar": 0.009036144578313253,
+     "reference": 0.030120481927710843,
+     "source_reliability": 0.009036144578313253,
+     "belief_propagation": 0.0572289156626506,
+     "planner": 0.012048192771084338,
+     "temporal": 0.012048192771084338,
+     "unsupported_inference": 0.0
+    },
+    "calibration_choice": {},
+    "rollbacks": 290
+   },
+   "unified_calibrated": {
+    "success": 0.677710843373494,
+    "false_confident": 0.07530120481927711,
+    "abstention": 0.5512048192771084,
+    "unnecessary_abstention": 0.16265060240963855,
+    "correct_abstention": 0.3885542168674699,
+    "parse_coverage": 0.47530864197530864,
+    "parse_coverage_resolvable": 0.5877862595419847,
+    "resolvable_fraction": 0.808641975308642,
+    "role_accuracy": 0.988,
+    "lexical_coverage": 0.3333333333333333,
+    "lexical_wrong": 0,
+    "verification_cost": 10.870481927710843,
+    "routing_accuracy": 1.0,
+    "correction_rate": 0.012048192771084338,
+    "correction_to_gold": 0.25,
+    "harmful_corrections": 2,
+    "polysemy_accuracy": null,
+    "parameters": 0,
+    "n_items": 332,
+    "clarification": 0.10240963855421686,
+    "identity_accuracy": null,
+    "identity_commitments": 0,
+    "belief_accuracy": 0.9381443298969072,
+    "seconds": 7.575656412998796,
+    "neural_parameters": 0,
+    "error_budget": {
+     "lexical": 0.08734939759036145,
+     "grammar": 0.009036144578313253,
+     "reference": 0.03313253012048193,
+     "source_reliability": 0.006024096385542169,
+     "belief_propagation": 0.06626506024096386,
+     "planner": 0.012048192771084338,
+     "temporal": 0.024096385542168676,
+     "unsupported_inference": 0.0
+    },
+    "calibration_choice": {
+     "observation_threshold": 1.01,
+     "query_threshold": 1.01
+    },
+    "rollbacks": 113
+   }
+  },
+  {
+   "anchored_old": {
+    "success": 0.5109289617486339,
+    "false_confident": 0.01639344262295082,
+    "abstention": 0.8114754098360656,
+    "unnecessary_abstention": 0.2103825136612022,
+    "correct_abstention": 0.6010928961748634,
+    "parse_coverage": 0.24299065420560748,
+    "parse_coverage_resolvable": 0.5098039215686274,
+    "resolvable_fraction": 0.4766355140186916,
+    "role_accuracy": 0.998,
+    "lexical_coverage": 0.16666666666666666,
+    "lexical_wrong": 0,
+    "verification_cost": 12.581967213114755,
+    "routing_accuracy": 1.0,
+    "correction_rate": 0.0,
+    "correction_to_gold": null,
+    "harmful_corrections": 0,
+    "polysemy_accuracy": null,
+    "parameters": 0,
+    "n_items": 366,
+    "clarification": 0.07923497267759563,
+    "identity_accuracy": null,
+    "identity_commitments": 0,
+    "belief_accuracy": 0.98,
+    "seconds": 2.5246113809989765,
+    "neural_parameters": 0,
+    "error_budget": {
+     "lexical": 0.11475409836065574,
+     "grammar": 0.0,
+     "reference": 0.0546448087431694,
+     "source_reliability": 0.00546448087431694,
+     "belief_propagation": 0.02459016393442623,
+     "planner": 0.00819672131147541,
+     "temporal": 0.01912568306010929,
+     "unsupported_inference": 0.0
+    }
+   },
+   "no_elimination": {
+    "success": 0.5109289617486339,
+    "false_confident": 0.01639344262295082,
+    "abstention": 0.8114754098360656,
+    "unnecessary_abstention": 0.2103825136612022,
+    "correct_abstention": 0.6010928961748634,
+    "parse_coverage": 0.2102803738317757,
+    "parse_coverage_resolvable": 0.4411764705882353,
+    "resolvable_fraction": 0.4766355140186916,
+    "role_accuracy": 0.998,
+    "lexical_coverage": 0.16666666666666666,
+    "lexical_wrong": 0,
+    "verification_cost": 12.581967213114755,
+    "routing_accuracy": 1.0,
+    "correction_rate": 0.0,
+    "correction_to_gold": null,
+    "harmful_corrections": 0,
+    "polysemy_accuracy": null,
+    "parameters": 0,
+    "n_items": 366,
+    "clarification": 0.07923497267759563,
+    "identity_accuracy": null,
+    "identity_commitments": 0,
+    "belief_accuracy": 0.9775280898876404,
+    "seconds": 2.5761499120017106,
+    "neural_parameters": 0,
+    "error_budget": {
+     "lexical": 0.11475409836065574,
+     "grammar": 0.0,
+     "reference": 0.0546448087431694,
+     "source_reliability": 0.00546448087431694,
+     "belief_propagation": 0.02459016393442623,
+     "planner": 0.00819672131147541,
+     "temporal": 0.01912568306010929,
+     "unsupported_inference": 0.0
+    }
+   },
+   "discourse_identity": {
+    "success": 0.5136612021857924,
+    "false_confident": 0.01912568306010929,
+    "abstention": 0.8032786885245902,
+    "unnecessary_abstention": 0.20491803278688525,
+    "correct_abstention": 0.5983606557377049,
+    "parse_coverage": 0.34579439252336447,
+    "parse_coverage_resolvable": 0.5882352941176471,
+    "resolvable_fraction": 0.4766355140186916,
+    "role_accuracy": 0.998,
+    "lexical_coverage": 0.16666666666666666,
+    "lexical_wrong": 0,
+    "verification_cost": 12.8551912568306,
+    "routing_accuracy": 1.0,
+    "correction_rate": 0.00546448087431694,
+    "correction_to_gold": 0.5,
+    "harmful_corrections": 0,
+    "polysemy_accuracy": null,
+    "parameters": 0,
+    "n_items": 366,
+    "clarification": 0.07923497267759563,
+    "identity_accuracy": null,
+    "identity_commitments": 0,
+    "belief_accuracy": 0.9795918367346939,
+    "seconds": 2.758736203999433,
+    "neural_parameters": 0,
+    "error_budget": {
+     "lexical": 0.11475409836065574,
+     "grammar": 0.0,
+     "reference": 0.04918032786885246,
+     "source_reliability": 0.00546448087431694,
+     "belief_propagation": 0.030054644808743168,
+     "planner": 0.00819672131147541,
+     "temporal": 0.01639344262295082,
+     "unsupported_inference": 0.0
+    }
+   },
+   "unified_belief": {
+    "success": 0.5546448087431693,
+    "false_confident": 0.04644808743169399,
+    "abstention": 0.6967213114754098,
+    "unnecessary_abstention": 0.12568306010928962,
+    "correct_abstention": 0.5710382513661202,
+    "parse_coverage": 0.35046728971962615,
+    "parse_coverage_resolvable": 0.5648854961832062,
+    "resolvable_fraction": 0.6121495327102804,
+    "role_accuracy": 0.998,
+    "lexical_coverage": 0.3333333333333333,
+    "lexical_wrong": 0,
+    "verification_cost": 12.562841530054644,
+    "routing_accuracy": 1.0,
+    "correction_rate": 0.0,
+    "correction_to_gold": null,
+    "harmful_corrections": 0,
+    "polysemy_accuracy": null,
+    "parameters": 0,
+    "n_items": 366,
+    "clarification": 0.060109289617486336,
+    "identity_accuracy": 1.0,
+    "identity_commitments": 238,
+    "belief_accuracy": 0.9776119402985075,
+    "seconds": 3.397595571997954,
+    "neural_parameters": 0,
+    "error_budget": {
+     "lexical": 0.10655737704918032,
+     "grammar": 0.0,
+     "reference": 0.0,
+     "source_reliability": 0.0,
+     "belief_propagation": 0.040983606557377046,
+     "planner": 0.01092896174863388,
+     "temporal": 0.01366120218579235,
+     "unsupported_inference": 0.0
+    },
+    "calibration_choice": {},
+    "rollbacks": 129
+   },
+   "unified_calibrated": {
+    "success": 0.48633879781420764,
+    "false_confident": 0.040983606557377046,
+    "abstention": 0.7704918032786885,
+    "unnecessary_abstention": 0.19398907103825136,
+    "correct_abstention": 0.5765027322404371,
+    "parse_coverage": 0.2102803738317757,
+    "parse_coverage_resolvable": 0.40540540540540543,
+    "resolvable_fraction": 0.5186915887850467,
+    "role_accuracy": 0.998,
+    "lexical_coverage": 0.16666666666666666,
+    "lexical_wrong": 0,
+    "verification_cost": 12.598360655737705,
+    "routing_accuracy": 1.0,
+    "correction_rate": 0.0,
+    "correction_to_gold": null,
+    "harmful_corrections": 0,
+    "polysemy_accuracy": null,
+    "parameters": 0,
+    "n_items": 366,
+    "clarification": 0.06284153005464481,
+    "identity_accuracy": null,
+    "identity_commitments": 0,
+    "belief_accuracy": 0.968,
+    "seconds": 10.774913663000916,
+    "neural_parameters": 0,
+    "error_budget": {
+     "lexical": 0.11475409836065574,
+     "grammar": 0.0,
+     "reference": 0.0546448087431694,
+     "source_reliability": 0.0,
+     "belief_propagation": 0.03551912568306011,
+     "planner": 0.00819672131147541,
+     "temporal": 0.02185792349726776,
+     "unsupported_inference": 0.0
+    },
+    "calibration_choice": {
+     "observation_threshold": 1.01,
+     "query_threshold": 1.01
+    },
+    "rollbacks": 129
+   }
+  },
+  {
+   "anchored_old": {
+    "success": 0.48872180451127817,
+    "false_confident": 0.05764411027568922,
+    "abstention": 0.7518796992481203,
+    "unnecessary_abstention": 0.22305764411027568,
+    "correct_abstention": 0.5288220551378446,
+    "parse_coverage": 0.28512396694214875,
+    "parse_coverage_resolvable": 0.4423076923076923,
+    "resolvable_fraction": 0.6446280991735537,
+    "role_accuracy": 0.998,
+    "lexical_coverage": 0.3333333333333333,
+    "lexical_wrong": 0,
+    "verification_cost": 11.436090225563909,
+    "routing_accuracy": 1.0,
+    "correction_rate": 0.007518796992481203,
+    "correction_to_gold": 0.0,
+    "harmful_corrections": 0,
+    "polysemy_accuracy": null,
+    "parameters": 0,
+    "n_items": 399,
+    "clarification": 0.05513784461152882,
+    "identity_accuracy": null,
+    "identity_commitments": 0,
+    "belief_accuracy": 0.9528301886792453,
+    "seconds": 2.4931805030028045,
+    "neural_parameters": 0,
+    "error_budget": {
+     "lexical": 0.11779448621553884,
+     "grammar": 0.007518796992481203,
+     "reference": 0.07769423558897243,
+     "source_reliability": 0.010025062656641603,
+     "belief_propagation": 0.042606516290726815,
+     "planner": 0.010025062656641603,
+     "temporal": 0.015037593984962405,
+     "unsupported_inference": 0.0
+    }
+   },
+   "no_elimination": {
+    "success": 0.543859649122807,
+    "false_confident": 0.05513784461152882,
+    "abstention": 0.7092731829573935,
+    "unnecessary_abstention": 0.17794486215538846,
+    "correct_abstention": 0.531328320802005,
+    "parse_coverage": 0.2975206611570248,
+    "parse_coverage_resolvable": 0.46153846153846156,
+    "resolvable_fraction": 0.6446280991735537,
+    "role_accuracy": 0.998,
+    "lexical_coverage": 0.5,
+    "lexical_wrong": 0,
+    "verification_cost": 10.343358395989975,
+    "routing_accuracy": 1.0,
+    "correction_rate": 0.007518796992481203,
+    "correction_to_gold": 0.0,
+    "harmful_corrections": 0,
+    "polysemy_accuracy": null,
+    "parameters": 0,
+    "n_items": 399,
+    "clarification": 0.05764411027568922,
+    "identity_accuracy": null,
+    "identity_commitments": 0,
+    "belief_accuracy": 0.94,
+    "seconds": 2.4484151729993755,
+    "neural_parameters": 0,
+    "error_budget": {
+     "lexical": 0.07017543859649122,
+     "grammar": 0.007518796992481203,
+     "reference": 0.07769423558897243,
+     "source_reliability": 0.010025062656641603,
+     "belief_propagation": 0.045112781954887216,
+     "planner": 0.007518796992481203,
+     "temporal": 0.015037593984962405,
+     "unsupported_inference": 0.0
+    }
+   },
+   "discourse_identity": {
+    "success": 0.5012531328320802,
+    "false_confident": 0.040100250626566414,
+    "abstention": 0.7694235588972431,
+    "unnecessary_abstention": 0.22807017543859648,
+    "correct_abstention": 0.5413533834586466,
+    "parse_coverage": 0.4793388429752066,
+    "parse_coverage_resolvable": 0.6282051282051282,
+    "resolvable_fraction": 0.6446280991735537,
+    "role_accuracy": 0.998,
+    "lexical_coverage": 0.16666666666666666,
+    "lexical_wrong": 0,
+    "verification_cost": 11.423558897243108,
+    "routing_accuracy": 1.0,
+    "correction_rate": 0.007518796992481203,
+    "correction_to_gold": 0.0,
+    "harmful_corrections": 0,
+    "polysemy_accuracy": null,
+    "parameters": 0,
+    "n_items": 399,
+    "clarification": 0.05513784461152882,
+    "identity_accuracy": null,
+    "identity_commitments": 0,
+    "belief_accuracy": 0.981651376146789,
+    "seconds": 2.6678845659989747,
+    "neural_parameters": 0,
+    "error_budget": {
+     "lexical": 0.11779448621553884,
+     "grammar": 0.007518796992481203,
+     "reference": 0.08521303258145363,
+     "source_reliability": 0.015037593984962405,
+     "belief_propagation": 0.022556390977443608,
+     "planner": 0.010025062656641603,
+     "temporal": 0.010025062656641603,
+     "unsupported_inference": 0.0
+    }
+   },
+   "unified_belief": {
+    "success": 0.48621553884711777,
+    "false_confident": 0.08771929824561403,
+    "abstention": 0.7042606516290727,
+    "unnecessary_abstention": 0.19799498746867167,
+    "correct_abstention": 0.506265664160401,
+    "parse_coverage": 0.47520661157024796,
+    "parse_coverage_resolvable": 0.6158536585365854,
+    "resolvable_fraction": 0.6776859504132231,
+    "role_accuracy": 0.998,
+    "lexical_coverage": 0.16666666666666666,
+    "lexical_wrong": 0,
+    "verification_cost": 11.543859649122806,
+    "routing_accuracy": 1.0,
+    "correction_rate": 0.010025062656641603,
+    "correction_to_gold": 0.25,
+    "harmful_corrections": 0,
+    "polysemy_accuracy": null,
+    "parameters": 0,
+    "n_items": 399,
+    "clarification": 0.05513784461152882,
+    "identity_accuracy": 1.0,
+    "identity_commitments": 470,
+    "belief_accuracy": 0.896551724137931,
+    "seconds": 3.281742941002449,
+    "neural_parameters": 0,
+    "error_budget": {
+     "lexical": 0.11278195488721804,
+     "grammar": 0.005012531328320802,
+     "reference": 0.047619047619047616,
+     "source_reliability": 0.020050125313283207,
+     "belief_propagation": 0.06766917293233082,
+     "planner": 0.012531328320802004,
+     "temporal": 0.017543859649122806,
+     "unsupported_inference": 0.002506265664160401
+    },
+    "calibration_choice": {},
+    "rollbacks": 508
+   },
+   "unified_calibrated": {
+    "success": 0.47619047619047616,
+    "false_confident": 0.07268170426065163,
+    "abstention": 0.7543859649122807,
+    "unnecessary_abstention": 0.23308270676691728,
+    "correct_abstention": 0.5213032581453634,
+    "parse_coverage": 0.2892561983471074,
+    "parse_coverage_resolvable": 0.4605263157894737,
+    "resolvable_fraction": 0.628099173553719,
+    "role_accuracy": 0.998,
+    "lexical_coverage": 0.5,
+    "lexical_wrong": 0,
+    "verification_cost": 11.142857142857142,
+    "routing_accuracy": 1.0,
+    "correction_rate": 0.010025062656641603,
+    "correction_to_gold": 0.25,
+    "harmful_corrections": 0,
+    "polysemy_accuracy": null,
+    "parameters": 0,
+    "n_items": 399,
+    "clarification": 0.05513784461152882,
+    "identity_accuracy": null,
+    "identity_commitments": 0,
+    "belief_accuracy": 0.935064935064935,
+    "seconds": 9.060418447999837,
+    "neural_parameters": 0,
+    "error_budget": {
+     "lexical": 0.10776942355889724,
+     "grammar": 0.005012531328320802,
+     "reference": 0.07769423558897243,
+     "source_reliability": 0.007518796992481203,
+     "belief_propagation": 0.07769423558897243,
+     "planner": 0.010025062656641603,
+     "temporal": 0.017543859649122806,
+     "unsupported_inference": 0.002506265664160401
+    },
+    "calibration_choice": {
+     "observation_threshold": 0.97,
+     "query_threshold": 1.01
+    },
+    "rollbacks": 224
+   }
+  },
+  {
+   "anchored_old": {
+    "success": 0.5688622754491018,
+    "false_confident": 0.029940119760479042,
+    "abstention": 0.7065868263473054,
+    "unnecessary_abstention": 0.17365269461077845,
+    "correct_abstention": 0.5329341317365269,
+    "parse_coverage": 0.2864864864864865,
+    "parse_coverage_resolvable": 0.4344262295081967,
+    "resolvable_fraction": 0.6594594594594595,
+    "role_accuracy": 0.996,
+    "lexical_coverage": 0.16666666666666666,
+    "lexical_wrong": 0,
+    "verification_cost": 11.640718562874252,
+    "routing_accuracy": 1.0,
+    "correction_rate": 0.0,
+    "correction_to_gold": null,
+    "harmful_corrections": 0,
+    "polysemy_accuracy": null,
+    "parameters": 0,
+    "n_items": 334,
+    "clarification": 0.09580838323353294,
+    "identity_accuracy": null,
+    "identity_commitments": 0,
+    "belief_accuracy": 0.9846153846153847,
+    "seconds": 2.1391501639991475,
+    "neural_parameters": 0,
+    "error_budget": {
+     "lexical": 0.09580838323353294,
+     "grammar": 0.0,
+     "reference": 0.04790419161676647,
+     "source_reliability": 0.0,
+     "belief_propagation": 0.04491017964071856,
+     "planner": 0.0,
+     "temporal": 0.014970059880239521,
+     "unsupported_inference": 0.0
+    }
+   },
+   "no_elimination": {
+    "success": 0.5658682634730539,
+    "false_confident": 0.023952095808383235,
+    "abstention": 0.7514970059880239,
+    "unnecessary_abstention": 0.218562874251497,
+    "correct_abstention": 0.5329341317365269,
+    "parse_coverage": 0.24864864864864866,
+    "parse_coverage_resolvable": 0.41818181818181815,
+    "resolvable_fraction": 0.5945945945945946,
+    "role_accuracy": 0.996,
+    "lexical_coverage": 0.16666666666666666,
+    "lexical_wrong": 0,
+    "verification_cost": 11.613772455089821,
+    "routing_accuracy": 1.0,
+    "correction_rate": 0.0,
+    "correction_to_gold": null,
+    "harmful_corrections": 0,
+    "polysemy_accuracy": null,
+    "parameters": 0,
+    "n_items": 334,
+    "clarification": 0.1317365269461078,
+    "identity_accuracy": null,
+    "identity_commitments": 0,
+    "belief_accuracy": 0.9880952380952381,
+    "seconds": 2.220369638002012,
+    "neural_parameters": 0,
+    "error_budget": {
+     "lexical": 0.09580838323353294,
+     "grammar": 0.005988023952095809,
+     "reference": 0.09580838323353294,
+     "source_reliability": 0.0,
+     "belief_propagation": 0.02694610778443114,
+     "planner": 0.0,
+     "temporal": 0.017964071856287425,
+     "unsupported_inference": 0.0
+    }
+   },
+   "discourse_identity": {
+    "success": 0.5718562874251497,
+    "false_confident": 0.029940119760479042,
+    "abstention": 0.7395209580838323,
+    "unnecessary_abstention": 0.2125748502994012,
+    "correct_abstention": 0.5269461077844312,
+    "parse_coverage": 0.4756756756756757,
+    "parse_coverage_resolvable": 0.6545454545454545,
+    "resolvable_fraction": 0.5945945945945946,
+    "role_accuracy": 0.996,
+    "lexical_coverage": 0.3333333333333333,
+    "lexical_wrong": 0,
+    "verification_cost": 11.497005988023952,
+    "routing_accuracy": 1.0,
+    "correction_rate": 0.0,
+    "correction_to_gold": null,
+    "harmful_corrections": 0,
+    "polysemy_accuracy": null,
+    "parameters": 0,
+    "n_items": 334,
+    "clarification": 0.1347305389221557,
+    "identity_accuracy": null,
+    "identity_commitments": 0,
+    "belief_accuracy": 0.989247311827957,
+    "seconds": 2.332528816001286,
+    "neural_parameters": 0,
+    "error_budget": {
+     "lexical": 0.09281437125748503,
+     "grammar": 0.005988023952095809,
+     "reference": 0.09880239520958084,
+     "source_reliability": 0.0029940119760479044,
+     "belief_propagation": 0.023952095808383235,
+     "planner": 0.0,
+     "temporal": 0.017964071856287425,
+     "unsupported_inference": 0.0
+    }
+   },
+   "unified_belief": {
+    "success": 0.5508982035928144,
+    "false_confident": 0.05688622754491018,
+    "abstention": 0.655688622754491,
+    "unnecessary_abstention": 0.1497005988023952,
+    "correct_abstention": 0.5059880239520959,
+    "parse_coverage": 0.4864864864864865,
+    "parse_coverage_resolvable": 0.6587301587301587,
+    "resolvable_fraction": 0.6810810810810811,
+    "role_accuracy": 0.996,
+    "lexical_coverage": 0.16666666666666666,
+    "lexical_wrong": 0,
+    "verification_cost": 11.676646706586826,
+    "routing_accuracy": 1.0,
+    "correction_rate": 0.0,
+    "correction_to_gold": null,
+    "harmful_corrections": 0,
+    "polysemy_accuracy": null,
+    "parameters": 0,
+    "n_items": 334,
+    "clarification": 0.08083832335329341,
+    "identity_accuracy": 1.0,
+    "identity_commitments": 297,
+    "belief_accuracy": 1.0,
+    "seconds": 2.6874655620013073,
+    "neural_parameters": 0,
+    "error_budget": {
+     "lexical": 0.09580838323353294,
+     "grammar": 0.0,
+     "reference": 0.017964071856287425,
+     "source_reliability": 0.017964071856287425,
+     "belief_propagation": 0.05688622754491018,
+     "planner": 0.0029940119760479044,
+     "temporal": 0.014970059880239521,
+     "unsupported_inference": 0.0
+    },
+    "calibration_choice": {},
+    "rollbacks": 279
+   },
+   "unified_calibrated": {
+    "success": 0.5029940119760479,
+    "false_confident": 0.03592814371257485,
+    "abstention": 0.7395209580838323,
+    "unnecessary_abstention": 0.218562874251497,
+    "correct_abstention": 0.5209580838323353,
+    "parse_coverage": 0.2972972972972973,
+    "parse_coverage_resolvable": 0.5288461538461539,
+    "resolvable_fraction": 0.5621621621621622,
+    "role_accuracy": 0.996,
+    "lexical_coverage": 0.16666666666666666,
+    "lexical_wrong": 0,
+    "verification_cost": 11.622754491017965,
+    "routing_accuracy": 1.0,
+    "correction_rate": 0.0,
+    "correction_to_gold": null,
+    "harmful_corrections": 0,
+    "polysemy_accuracy": null,
+    "parameters": 0,
+    "n_items": 334,
+    "clarification": 0.08083832335329341,
+    "identity_accuracy": 1.0,
+    "identity_commitments": 10,
+    "belief_accuracy": 0.9880952380952381,
+    "seconds": 8.427677572002722,
+    "neural_parameters": 0,
+    "error_budget": {
+     "lexical": 0.09580838323353294,
+     "grammar": 0.0,
+     "reference": 0.08682634730538923,
+     "source_reliability": 0.0029940119760479044,
+     "belief_propagation": 0.041916167664670656,
+     "planner": 0.0029940119760479044,
+     "temporal": 0.023952095808383235,
+     "unsupported_inference": 0.0
+    },
+    "calibration_choice": {
+     "observation_threshold": 0.97,
+     "query_threshold": 1.01
+    },
+    "rollbacks": 114
+   }
+  },
+  {
+   "anchored_old": {
+    "success": 0.5498575498575499,
+    "false_confident": 0.011396011396011397,
+    "abstention": 0.8347578347578347,
+    "unnecessary_abstention": 0.2022792022792023,
+    "correct_abstention": 0.6324786324786325,
+    "parse_coverage": 0.2328767123287671,
+    "parse_coverage_resolvable": 0.5151515151515151,
+    "resolvable_fraction": 0.4520547945205479,
+    "role_accuracy": 0.998,
+    "lexical_coverage": 0.16666666666666666,
+    "lexical_wrong": 0,
+    "verification_cost": 10.222222222222221,
+    "routing_accuracy": 1.0,
+    "correction_rate": 0.0,
+    "correction_to_gold": null,
+    "harmful_corrections": 0,
+    "polysemy_accuracy": null,
+    "parameters": 0,
+    "n_items": 351,
+    "clarification": 0.06837606837606838,
+    "identity_accuracy": null,
+    "identity_commitments": 0,
+    "belief_accuracy": 0.9636363636363636,
+    "seconds": 2.4614075959980255,
+    "neural_parameters": 0,
+    "error_budget": {
+     "lexical": 0.07692307692307693,
+     "grammar": 0.0,
+     "reference": 0.06837606837606838,
+     "source_reliability": 0.005698005698005698,
+     "belief_propagation": 0.037037037037037035,
+     "planner": 0.0,
+     "temporal": 0.022792022792022793,
+     "unsupported_inference": 0.002849002849002849
+    }
+   },
+   "no_elimination": {
+    "success": 0.5470085470085471,
+    "false_confident": 0.011396011396011397,
+    "abstention": 0.8376068376068376,
+    "unnecessary_abstention": 0.20512820512820512,
+    "correct_abstention": 0.6324786324786325,
+    "parse_coverage": 0.2100456621004566,
+    "parse_coverage_resolvable": 0.46464646464646464,
+    "resolvable_fraction": 0.4520547945205479,
+    "role_accuracy": 0.998,
+    "lexical_coverage": 0.16666666666666666,
+    "lexical_wrong": 0,
+    "verification_cost": 10.222222222222221,
+    "routing_accuracy": 1.0,
+    "correction_rate": 0.0,
+    "correction_to_gold": null,
+    "harmful_corrections": 0,
+    "polysemy_accuracy": null,
+    "parameters": 0,
+    "n_items": 351,
+    "clarification": 0.06837606837606838,
+    "identity_accuracy": null,
+    "identity_commitments": 0,
+    "belief_accuracy": 0.9622641509433962,
+    "seconds": 2.4497810319990094,
+    "neural_parameters": 0,
+    "error_budget": {
+     "lexical": 0.07692307692307693,
+     "grammar": 0.0,
+     "reference": 0.06837606837606838,
+     "source_reliability": 0.005698005698005698,
+     "belief_propagation": 0.039886039886039885,
+     "planner": 0.0,
+     "temporal": 0.022792022792022793,
+     "unsupported_inference": 0.002849002849002849
+    }
+   },
+   "discourse_identity": {
+    "success": 0.4985754985754986,
+    "false_confident": 0.017094017094017096,
+    "abstention": 0.8262108262108262,
+    "unnecessary_abstention": 0.19943019943019943,
+    "correct_abstention": 0.6267806267806267,
+    "parse_coverage": 0.5570776255707762,
+    "parse_coverage_resolvable": 0.6565656565656566,
+    "resolvable_fraction": 0.4520547945205479,
+    "role_accuracy": 0.998,
+    "lexical_coverage": 0.0,
+    "lexical_wrong": 0,
+    "verification_cost": 11.757834757834758,
+    "routing_accuracy": 1.0,
+    "correction_rate": 0.0,
+    "correction_to_gold": null,
+    "harmful_corrections": 0,
+    "polysemy_accuracy": null,
+    "parameters": 0,
+    "n_items": 351,
+    "clarification": 0.05128205128205128,
+    "identity_accuracy": null,
+    "identity_commitments": 0,
+    "belief_accuracy": 0.9583333333333334,
+    "seconds": 2.8302837180017377,
+    "neural_parameters": 0,
+    "error_budget": {
+     "lexical": 0.09116809116809117,
+     "grammar": 0.0,
+     "reference": 0.05698005698005698,
+     "source_reliability": 0.005698005698005698,
+     "belief_propagation": 0.03418803418803419,
+     "planner": 0.002849002849002849,
+     "temporal": 0.022792022792022793,
+     "unsupported_inference": 0.002849002849002849
+    }
+   },
+   "unified_belief": {
+    "success": 0.452991452991453,
+    "false_confident": 0.16809116809116809,
+    "abstention": 0.6182336182336182,
+    "unnecessary_abstention": 0.14245014245014245,
+    "correct_abstention": 0.4757834757834758,
+    "parse_coverage": 0.5570776255707762,
+    "parse_coverage_resolvable": 0.6178010471204188,
+    "resolvable_fraction": 0.8721461187214612,
+    "role_accuracy": 0.998,
+    "lexical_coverage": 0.0,
+    "lexical_wrong": 0,
+    "verification_cost": 12.0,
+    "routing_accuracy": 1.0,
+    "correction_rate": 0.0,
+    "correction_to_gold": null,
+    "harmful_corrections": 0,
+    "polysemy_accuracy": null,
+    "parameters": 0,
+    "n_items": 351,
+    "clarification": 0.04843304843304843,
+    "identity_accuracy": 0.9837962962962963,
+    "identity_commitments": 432,
+    "belief_accuracy": 0.936,
+    "seconds": 3.3676440060007735,
+    "neural_parameters": 0,
+    "error_budget": {
+     "lexical": 0.09116809116809117,
+     "grammar": 0.0,
+     "reference": 0.017094017094017096,
+     "source_reliability": 0.022792022792022793,
+     "belief_propagation": 0.1225071225071225,
+     "planner": 0.022792022792022793,
+     "temporal": 0.03133903133903134,
+     "unsupported_inference": 0.002849002849002849
+    },
+    "calibration_choice": {},
+    "rollbacks": 124
+   },
+   "unified_calibrated": {
+    "success": 0.5555555555555556,
+    "false_confident": 0.022792022792022793,
+    "abstention": 0.8062678062678063,
+    "unnecessary_abstention": 0.18518518518518517,
+    "correct_abstention": 0.6210826210826211,
+    "parse_coverage": 0.273972602739726,
+    "parse_coverage_resolvable": 0.5607476635514018,
+    "resolvable_fraction": 0.4885844748858447,
+    "role_accuracy": 0.998,
+    "lexical_coverage": 0.16666666666666666,
+    "lexical_wrong": 0,
+    "verification_cost": 10.250712250712251,
+    "routing_accuracy": 1.0,
+    "correction_rate": 0.0,
+    "correction_to_gold": null,
+    "harmful_corrections": 0,
+    "polysemy_accuracy": null,
+    "parameters": 0,
+    "n_items": 351,
+    "clarification": 0.06837606837606838,
+    "identity_accuracy": null,
+    "identity_commitments": 0,
+    "belief_accuracy": 0.9629629629629629,
+    "seconds": 8.750820399000077,
+    "neural_parameters": 0,
+    "error_budget": {
+     "lexical": 0.07692307692307693,
+     "grammar": 0.0,
+     "reference": 0.05128205128205128,
+     "source_reliability": 0.011396011396011397,
+     "belief_propagation": 0.039886039886039885,
+     "planner": 0.002849002849002849,
+     "temporal": 0.022792022792022793,
+     "unsupported_inference": 0.002849002849002849
+    },
+    "calibration_choice": {
+     "observation_threshold": 0.97,
+     "query_threshold": 1.01
+    },
+    "rollbacks": 124
+   }
+  },
+  {
+   "anchored_old": {
+    "success": 0.4891640866873065,
+    "false_confident": 0.04024767801857585,
+    "abstention": 0.7585139318885449,
+    "unnecessary_abstention": 0.2631578947368421,
+    "correct_abstention": 0.4953560371517028,
+    "parse_coverage": 0.32515337423312884,
+    "parse_coverage_resolvable": 0.6162790697674418,
+    "resolvable_fraction": 0.5276073619631901,
+    "role_accuracy": 0.996,
+    "lexical_coverage": 0.3333333333333333,
+    "lexical_wrong": 0,
+    "verification_cost": 11.43343653250774,
+    "routing_accuracy": 1.0,
+    "correction_rate": 0.0030959752321981426,
+    "correction_to_gold": 0.0,
+    "harmful_corrections": 0,
+    "polysemy_accuracy": null,
+    "parameters": 0,
+    "n_items": 323,
+    "clarification": 0.08359133126934984,
+    "identity_accuracy": null,
+    "identity_commitments": 0,
+    "belief_accuracy": 1.0,
+    "seconds": 1.9844633050015545,
+    "neural_parameters": 0,
+    "error_budget": {
+     "lexical": 0.14241486068111456,
+     "grammar": 0.0030959752321981426,
+     "reference": 0.043343653250773995,
+     "source_reliability": 0.021671826625386997,
+     "belief_propagation": 0.06811145510835913,
+     "planner": 0.0030959752321981426,
+     "temporal": 0.021671826625386997,
+     "unsupported_inference": 0.0
+    }
+   },
+   "no_elimination": {
+    "success": 0.4891640866873065,
+    "false_confident": 0.04024767801857585,
+    "abstention": 0.7585139318885449,
+    "unnecessary_abstention": 0.2631578947368421,
+    "correct_abstention": 0.4953560371517028,
+    "parse_coverage": 0.32515337423312884,
+    "parse_coverage_resolvable": 0.6162790697674418,
+    "resolvable_fraction": 0.5276073619631901,
+    "role_accuracy": 0.996,
+    "lexical_coverage": 0.3333333333333333,
+    "lexical_wrong": 0,
+    "verification_cost": 11.43343653250774,
+    "routing_accuracy": 1.0,
+    "correction_rate": 0.0030959752321981426,
+    "correction_to_gold": 0.0,
+    "harmful_corrections": 0,
+    "polysemy_accuracy": null,
+    "parameters": 0,
+    "n_items": 323,
+    "clarification": 0.08359133126934984,
+    "identity_accuracy": null,
+    "identity_commitments": 0,
+    "belief_accuracy": 1.0,
+    "seconds": 2.0345557079999708,
+    "neural_parameters": 0,
+    "error_budget": {
+     "lexical": 0.14241486068111456,
+     "grammar": 0.0030959752321981426,
+     "reference": 0.043343653250773995,
+     "source_reliability": 0.021671826625386997,
+     "belief_propagation": 0.06811145510835913,
+     "planner": 0.0030959752321981426,
+     "temporal": 0.021671826625386997,
+     "unsupported_inference": 0.0
+    }
+   },
+   "discourse_identity": {
+    "success": 0.48297213622291024,
+    "false_confident": 0.03715170278637771,
+    "abstention": 0.7678018575851393,
+    "unnecessary_abstention": 0.2724458204334365,
+    "correct_abstention": 0.4953560371517028,
+    "parse_coverage": 0.44171779141104295,
+    "parse_coverage_resolvable": 0.6162790697674418,
+    "resolvable_fraction": 0.5276073619631901,
+    "role_accuracy": 0.996,
+    "lexical_coverage": 0.16666666666666666,
+    "lexical_wrong": 0,
+    "verification_cost": 11.551083591331269,
+    "routing_accuracy": 1.0,
+    "correction_rate": 0.0030959752321981426,
+    "correction_to_gold": 0.0,
+    "harmful_corrections": 0,
+    "polysemy_accuracy": null,
+    "parameters": 0,
+    "n_items": 323,
+    "clarification": 0.08359133126934984,
+    "identity_accuracy": null,
+    "identity_commitments": 0,
+    "belief_accuracy": 1.0,
+    "seconds": 2.103626903000986,
+    "neural_parameters": 0,
+    "error_budget": {
+     "lexical": 0.15170278637770898,
+     "grammar": 0.0030959752321981426,
+     "reference": 0.043343653250773995,
+     "source_reliability": 0.02476780185758514,
+     "belief_propagation": 0.06191950464396285,
+     "planner": 0.0030959752321981426,
+     "temporal": 0.021671826625386997,
+     "unsupported_inference": 0.0
+    }
+   },
+   "unified_belief": {
+    "success": 0.4582043343653251,
+    "false_confident": 0.11145510835913312,
+    "abstention": 0.6904024767801857,
+    "unnecessary_abstention": 0.2693498452012384,
+    "correct_abstention": 0.42105263157894735,
+    "parse_coverage": 0.43558282208588955,
+    "parse_coverage_resolvable": 0.5344827586206896,
+    "resolvable_fraction": 0.7116564417177914,
+    "role_accuracy": 0.996,
+    "lexical_coverage": 0.16666666666666666,
+    "lexical_wrong": 0,
+    "verification_cost": 12.195046439628483,
+    "routing_accuracy": 1.0,
+    "correction_rate": 0.006191950464396285,
+    "correction_to_gold": 0.0,
+    "harmful_corrections": 0,
+    "polysemy_accuracy": null,
+    "parameters": 0,
+    "n_items": 323,
+    "clarification": 0.07430340557275542,
+    "identity_accuracy": 0.9398148148148148,
+    "identity_commitments": 216,
+    "belief_accuracy": 0.989247311827957,
+    "seconds": 2.448688112999662,
+    "neural_parameters": 0,
+    "error_budget": {
+     "lexical": 0.1609907120743034,
+     "grammar": 0.006191950464396285,
+     "reference": 0.04953560371517028,
+     "source_reliability": 0.021671826625386997,
+     "belief_propagation": 0.09907120743034056,
+     "planner": 0.01238390092879257,
+     "temporal": 0.030959752321981424,
+     "unsupported_inference": 0.0
+    },
+    "calibration_choice": {},
+    "rollbacks": 125
+   },
+   "unified_calibrated": {
+    "success": 0.46439628482972134,
+    "false_confident": 0.03715170278637771,
+    "abstention": 0.7801857585139319,
+    "unnecessary_abstention": 0.2848297213622291,
+    "correct_abstention": 0.4953560371517028,
+    "parse_coverage": 0.3128834355828221,
+    "parse_coverage_resolvable": 0.5930232558139535,
+    "resolvable_fraction": 0.5276073619631901,
+    "role_accuracy": 0.996,
+    "lexical_coverage": 0.16666666666666666,
+    "lexical_wrong": 0,
+    "verification_cost": 12.077399380804954,
+    "routing_accuracy": 1.0,
+    "correction_rate": 0.0030959752321981426,
+    "correction_to_gold": 0.0,
+    "harmful_corrections": 0,
+    "polysemy_accuracy": null,
+    "parameters": 0,
+    "n_items": 323,
+    "clarification": 0.08359133126934984,
+    "identity_accuracy": null,
+    "identity_commitments": 0,
+    "belief_accuracy": 1.0,
+    "seconds": 7.529380880001554,
+    "neural_parameters": 0,
+    "error_budget": {
+     "lexical": 0.15789473684210525,
+     "grammar": 0.0030959752321981426,
+     "reference": 0.04643962848297214,
+     "source_reliability": 0.021671826625386997,
+     "belief_propagation": 0.06501547987616099,
+     "planner": 0.0030959752321981426,
+     "temporal": 0.02476780185758514,
+     "unsupported_inference": 0.0
+    },
+    "calibration_choice": {
+     "observation_threshold": 1.01,
+     "query_threshold": 1.01
+    },
+    "rollbacks": 125
+   }
+  },
+  {
+   "anchored_old": {
+    "success": 0.45738636363636365,
+    "false_confident": 0.008522727272727272,
+    "abstention": 0.7982954545454546,
+    "unnecessary_abstention": 0.2897727272727273,
+    "correct_abstention": 0.5085227272727273,
+    "parse_coverage": 0.24731182795698925,
+    "parse_coverage_resolvable": 0.4339622641509434,
+    "resolvable_fraction": 0.5698924731182796,
+    "role_accuracy": 0.996,
+    "lexical_coverage": 0.16666666666666666,
+    "lexical_wrong": 0,
+    "verification_cost": 12.451704545454545,
+    "routing_accuracy": 1.0,
+    "correction_rate": 0.0,
+    "correction_to_gold": null,
+    "harmful_corrections": 0,
+    "polysemy_accuracy": null,
+    "parameters": 0,
+    "n_items": 352,
+    "clarification": 0.056818181818181816,
+    "identity_accuracy": null,
+    "identity_commitments": 0,
+    "belief_accuracy": 1.0,
+    "seconds": 2.4000521279995155,
+    "neural_parameters": 0,
+    "error_budget": {
+     "lexical": 0.15625,
+     "grammar": 0.0,
+     "reference": 0.08522727272727272,
+     "source_reliability": 0.0,
+     "belief_propagation": 0.02556818181818182,
+     "planner": 0.0,
+     "temporal": 0.03125,
+     "unsupported_inference": 0.0
+    }
+   },
+   "no_elimination": {
+    "success": 0.5426136363636364,
+    "false_confident": 0.011363636363636364,
+    "abstention": 0.7272727272727273,
+    "unnecessary_abstention": 0.2215909090909091,
+    "correct_abstention": 0.5056818181818182,
+    "parse_coverage": 0.2903225806451613,
+    "parse_coverage_resolvable": 0.48214285714285715,
+    "resolvable_fraction": 0.6021505376344086,
+    "role_accuracy": 0.996,
+    "lexical_coverage": 0.3333333333333333,
+    "lexical_wrong": 0,
+    "verification_cost": 11.213068181818182,
+    "routing_accuracy": 1.0,
+    "correction_rate": 0.0,
+    "correction_to_gold": null,
+    "harmful_corrections": 0,
+    "polysemy_accuracy": null,
+    "parameters": 0,
+    "n_items": 352,
+    "clarification": 0.056818181818181816,
+    "identity_accuracy": null,
+    "identity_commitments": 0,
+    "belief_accuracy": 1.0,
+    "seconds": 2.289817127999413,
+    "neural_parameters": 0,
+    "error_budget": {
+     "lexical": 0.11647727272727272,
+     "grammar": 0.0,
+     "reference": 0.06534090909090909,
+     "source_reliability": 0.0,
+     "belief_propagation": 0.022727272727272728,
+     "planner": 0.0,
+     "temporal": 0.028409090909090908,
+     "unsupported_inference": 0.0
+    }
+   },
+   "discourse_identity": {
+    "success": 0.4943181818181818,
+    "false_confident": 0.011363636363636364,
+    "abstention": 0.7755681818181818,
+    "unnecessary_abstention": 0.26988636363636365,
+    "correct_abstention": 0.5056818181818182,
+    "parse_coverage": 0.45698924731182794,
+    "parse_coverage_resolvable": 0.5943396226415094,
+    "resolvable_fraction": 0.5698924731182796,
+    "role_accuracy": 0.996,
+    "lexical_coverage": 0.5,
+    "lexical_wrong": 0,
+    "verification_cost": 11.323863636363637,
+    "routing_accuracy": 1.0,
+    "correction_rate": 0.0,
+    "correction_to_gold": null,
+    "harmful_corrections": 0,
+    "polysemy_accuracy": null,
+    "parameters": 0,
+    "n_items": 352,
+    "clarification": 0.056818181818181816,
+    "identity_accuracy": null,
+    "identity_commitments": 0,
+    "belief_accuracy": 0.9859154929577465,
+    "seconds": 2.4229356319992803,
+    "neural_parameters": 0,
+    "error_budget": {
+     "lexical": 0.11931818181818182,
+     "grammar": 0.0,
+     "reference": 0.10795454545454546,
+     "source_reliability": 0.0,
+     "belief_propagation": 0.02556818181818182,
+     "planner": 0.0,
+     "temporal": 0.028409090909090908,
+     "unsupported_inference": 0.0
+    }
+   },
+   "unified_belief": {
+    "success": 0.6704545454545454,
+    "false_confident": 0.03977272727272727,
+    "abstention": 0.6136363636363636,
+    "unnecessary_abstention": 0.13352272727272727,
+    "correct_abstention": 0.48011363636363635,
+    "parse_coverage": 0.44623655913978494,
+    "parse_coverage_resolvable": 0.5734265734265734,
+    "resolvable_fraction": 0.7688172043010753,
+    "role_accuracy": 0.996,
+    "lexical_coverage": 0.5,
+    "lexical_wrong": 0,
+    "verification_cost": 10.329545454545455,
+    "routing_accuracy": 1.0,
+    "correction_rate": 0.0,
+    "correction_to_gold": null,
+    "harmful_corrections": 0,
+    "polysemy_accuracy": null,
+    "parameters": 0,
+    "n_items": 352,
+    "clarification": 0.09659090909090909,
+    "identity_accuracy": 0.9897260273972602,
+    "identity_commitments": 292,
+    "belief_accuracy": 0.9753086419753086,
+    "seconds": 2.609919479000382,
+    "neural_parameters": 0,
+    "error_budget": {
+     "lexical": 0.07386363636363637,
+     "grammar": 0.0,
+     "reference": 0.03977272727272727,
+     "source_reliability": 0.002840909090909091,
+     "belief_propagation": 0.028409090909090908,
+     "planner": 0.002840909090909091,
+     "temporal": 0.02556818181818182,
+     "unsupported_inference": 0.0
+    },
+    "calibration_choice": {},
+    "rollbacks": 302
+   },
+   "unified_calibrated": {
+    "success": 0.5852272727272727,
+    "false_confident": 0.019886363636363636,
+    "abstention": 0.7159090909090909,
+    "unnecessary_abstention": 0.2159090909090909,
+    "correct_abstention": 0.5,
+    "parse_coverage": 0.2903225806451613,
+    "parse_coverage_resolvable": 0.43548387096774194,
+    "resolvable_fraction": 0.6666666666666666,
+    "role_accuracy": 0.996,
+    "lexical_coverage": 0.3333333333333333,
+    "lexical_wrong": 0,
+    "verification_cost": 11.247159090909092,
+    "routing_accuracy": 1.0,
+    "correction_rate": 0.0,
+    "correction_to_gold": null,
+    "harmful_corrections": 0,
+    "polysemy_accuracy": null,
+    "parameters": 0,
+    "n_items": 352,
+    "clarification": 0.09659090909090909,
+    "identity_accuracy": null,
+    "identity_commitments": 0,
+    "belief_accuracy": 1.0,
+    "seconds": 9.600558309000917,
+    "neural_parameters": 0,
+    "error_budget": {
+     "lexical": 0.11647727272727272,
+     "grammar": 0.0,
+     "reference": 0.056818181818181816,
+     "source_reliability": 0.0,
+     "belief_propagation": 0.03125,
+     "planner": 0.0,
+     "temporal": 0.03125,
+     "unsupported_inference": 0.0
+    },
+    "calibration_choice": {
+     "observation_threshold": 0.97,
+     "query_threshold": 0.97
+    },
+    "rollbacks": 164
+   }
+  }
+ ],
+ "seconds": 169.7
+}

@@ -1,0 +1,740 @@
+{
+ "multitask": [
+  {
+   "vanilla": {
+    "average_accuracy": 0.5928,
+    "new_task": 0.9814,
+    "backward_transfer": -0.4091,
+    "forward_transfer": -0.0088,
+    "forgetting": 0.411,
+    "retention": 0.572,
+    "param_growth": 1.0,
+    "memory_bytes": 0,
+    "compute_steps": 5000,
+    "recurrence": [
+     {
+      "latency_steps": 250,
+      "reused": false
+     }
+    ]
+   },
+   "replay": {
+    "average_accuracy": 0.8439,
+    "new_task": 0.9449,
+    "backward_transfer": -0.1063,
+    "forward_transfer": -0.0453,
+    "forgetting": 0.1083,
+    "retention": 0.84,
+    "param_growth": 1.0,
+    "memory_bytes": 13440,
+    "compute_steps": 5000,
+    "recurrence": [
+     {
+      "latency_steps": 250,
+      "reused": false
+     }
+    ]
+   },
+   "ewc": {
+    "average_accuracy": 0.5813,
+    "new_task": 0.9781,
+    "backward_transfer": -0.4178,
+    "forward_transfer": -0.0121,
+    "forgetting": 0.4192,
+    "retention": 0.5592,
+    "param_growth": 1.0,
+    "memory_bytes": 235840,
+    "compute_steps": 5000,
+    "recurrence": [
+     {
+      "latency_steps": 250,
+      "reused": false
+     }
+    ]
+   },
+   "projected": {
+    "average_accuracy": 0.6889,
+    "new_task": 0.9686,
+    "backward_transfer": -0.2944,
+    "forward_transfer": -0.0217,
+    "forgetting": 0.2956,
+    "retention": 0.6735,
+    "param_growth": 1.0,
+    "memory_bytes": 1456552,
+    "compute_steps": 5000,
+    "recurrence": [
+     {
+      "latency_steps": 250,
+      "reused": false
+     }
+    ]
+   },
+   "invariant_constraints": {
+    "average_accuracy": 0.8586,
+    "new_task": 0.943,
+    "backward_transfer": -0.0888,
+    "forward_transfer": -0.0473,
+    "forgetting": 0.0931,
+    "retention": 0.8563,
+    "param_growth": 1.0,
+    "memory_bytes": 8960,
+    "compute_steps": 5000,
+    "recurrence": [
+     {
+      "latency_steps": 250,
+      "reused": false
+     }
+    ]
+   },
+   "structural_growth": {
+    "average_accuracy": 0.9877,
+    "new_task": 0.9939,
+    "backward_transfer": -0.0066,
+    "forward_transfer": 0.0037,
+    "forgetting": 0.007,
+    "retention": 0.9877,
+    "param_growth": 16.0,
+    "memory_bytes": 1558,
+    "compute_steps": 5700,
+    "recurrence": [
+     {
+      "latency_steps": 0,
+      "reused": true
+     }
+    ],
+    "kinds": {
+     "grow": 19,
+     "reactivate": 1
+    }
+   },
+   "compositional": {
+    "average_accuracy": 0.9877,
+    "new_task": 0.9939,
+    "backward_transfer": -0.0066,
+    "forward_transfer": 0.0037,
+    "forgetting": 0.007,
+    "retention": 0.9877,
+    "param_growth": 6.573,
+    "memory_bytes": 1408,
+    "compute_steps": 3200,
+    "recurrence": [
+     {
+      "latency_steps": 0,
+      "reused": true
+     }
+    ],
+    "kinds": {
+     "grow": 2,
+     "reuse": 5,
+     "adapter": 11,
+     "reactivate": 1,
+     "compose": 1
+    }
+   }
+  },
+  {
+   "vanilla": {
+    "average_accuracy": 0.5342,
+    "new_task": 0.8941,
+    "backward_transfer": -0.3789,
+    "forward_transfer": -0.0359,
+    "forgetting": 0.3929,
+    "retention": 0.514,
+    "param_growth": 1.0,
+    "memory_bytes": 0,
+    "compute_steps": 5000,
+    "recurrence": [
+     {
+      "latency_steps": 250,
+      "reused": false
+     },
+     {
+      "latency_steps": 250,
+      "reused": false
+     },
+     {
+      "latency_steps": 250,
+      "reused": false
+     },
+     {
+      "latency_steps": 250,
+      "reused": false
+     },
+     {
+      "latency_steps": 250,
+      "reused": false
+     },
+     {
+      "latency_steps": 250,
+      "reused": false
+     }
+    ]
+   },
+   "replay": {
+    "average_accuracy": 0.823,
+    "new_task": 0.8812,
+    "backward_transfer": -0.0613,
+    "forward_transfer": -0.0488,
+    "forgetting": 0.081,
+    "retention": 0.8152,
+    "param_growth": 1.0,
+    "memory_bytes": 13440,
+    "compute_steps": 5000,
+    "recurrence": [
+     {
+      "latency_steps": 250,
+      "reused": false
+     },
+     {
+      "latency_steps": 250,
+      "reused": false
+     },
+     {
+      "latency_steps": 250,
+      "reused": false
+     },
+     {
+      "latency_steps": 250,
+      "reused": false
+     },
+     {
+      "latency_steps": 250,
+      "reused": false
+     },
+     {
+      "latency_steps": 250,
+      "reused": false
+     }
+    ]
+   },
+   "ewc": {
+    "average_accuracy": 0.5396,
+    "new_task": 0.9244,
+    "backward_transfer": -0.405,
+    "forward_transfer": -0.0057,
+    "forgetting": 0.4231,
+    "retention": 0.5167,
+    "param_growth": 1.0,
+    "memory_bytes": 235840,
+    "compute_steps": 5000,
+    "recurrence": [
+     {
+      "latency_steps": 250,
+      "reused": false
+     },
+     {
+      "latency_steps": 250,
+      "reused": false
+     },
+     {
+      "latency_steps": 250,
+      "reused": false
+     },
+     {
+      "latency_steps": 250,
+      "reused": false
+     },
+     {
+      "latency_steps": 250,
+      "reused": false
+     },
+     {
+      "latency_steps": 250,
+      "reused": false
+     }
+    ]
+   },
+   "projected": {
+    "average_accuracy": 0.6172,
+    "new_task": 0.9227,
+    "backward_transfer": -0.3215,
+    "forward_transfer": -0.0074,
+    "forgetting": 0.3302,
+    "retention": 0.602,
+    "param_growth": 1.0,
+    "memory_bytes": 1657016,
+    "compute_steps": 5000,
+    "recurrence": [
+     {
+      "latency_steps": 250,
+      "reused": false
+     },
+     {
+      "latency_steps": 250,
+      "reused": false
+     },
+     {
+      "latency_steps": 250,
+      "reused": false
+     },
+     {
+      "latency_steps": 250,
+      "reused": false
+     },
+     {
+      "latency_steps": 250,
+      "reused": false
+     },
+     {
+      "latency_steps": 250,
+      "reused": false
+     }
+    ]
+   },
+   "invariant_constraints": {
+    "average_accuracy": 0.7924,
+    "new_task": 0.8721,
+    "backward_transfer": -0.0839,
+    "forward_transfer": -0.058,
+    "forgetting": 0.0915,
+    "retention": 0.7843,
+    "param_growth": 1.0,
+    "memory_bytes": 8960,
+    "compute_steps": 5000,
+    "recurrence": [
+     {
+      "latency_steps": 250,
+      "reused": false
+     },
+     {
+      "latency_steps": 250,
+      "reused": false
+     },
+     {
+      "latency_steps": 250,
+      "reused": false
+     },
+     {
+      "latency_steps": 250,
+      "reused": false
+     },
+     {
+      "latency_steps": 250,
+      "reused": false
+     },
+     {
+      "latency_steps": 250,
+      "reused": false
+     }
+    ]
+   },
+   "structural_growth": {
+    "average_accuracy": 0.9785,
+    "new_task": 0.9838,
+    "backward_transfer": -0.0056,
+    "forward_transfer": 0.0537,
+    "forgetting": 0.0066,
+    "retention": 0.9776,
+    "param_growth": 14.0,
+    "memory_bytes": 1148,
+    "compute_steps": 4450,
+    "recurrence": [
+     {
+      "latency_steps": 0,
+      "reused": true
+     },
+     {
+      "latency_steps": 0,
+      "reused": true
+     },
+     {
+      "latency_steps": 0,
+      "reused": true
+     },
+     {
+      "latency_steps": 250,
+      "reused": false
+     },
+     {
+      "latency_steps": 0,
+      "reused": true
+     },
+     {
+      "latency_steps": 0,
+      "reused": true
+     }
+    ],
+    "kinds": {
+     "grow": 14,
+     "reactivate": 5,
+     "refine_inplace": 1
+    }
+   },
+   "compositional": {
+    "average_accuracy": 0.973,
+    "new_task": 0.9811,
+    "backward_transfer": -0.0084,
+    "forward_transfer": 0.051,
+    "forgetting": 0.0086,
+    "retention": 0.9718,
+    "param_growth": 6.079,
+    "memory_bytes": 1260,
+    "compute_steps": 4150,
+    "recurrence": [
+     {
+      "latency_steps": 0,
+      "reused": true
+     },
+     {
+      "latency_steps": 0,
+      "reused": true
+     },
+     {
+      "latency_steps": 0,
+      "reused": true
+     },
+     {
+      "latency_steps": 450,
+      "reused": true
+     },
+     {
+      "latency_steps": 0,
+      "reused": true
+     },
+     {
+      "latency_steps": 0,
+      "reused": true
+     }
+    ],
+    "kinds": {
+     "grow": 4,
+     "adapter": 5,
+     "reactivate": 5,
+     "compose": 3,
+     "reuse": 3
+    }
+   }
+  },
+  {
+   "vanilla": {
+    "average_accuracy": 0.5883,
+    "new_task": 0.9773,
+    "backward_transfer": -0.4095,
+    "forward_transfer": -0.0068,
+    "forgetting": 0.4106,
+    "retention": 0.5668,
+    "param_growth": 1.0,
+    "memory_bytes": 0,
+    "compute_steps": 5000,
+    "recurrence": [
+     {
+      "latency_steps": 250,
+      "reused": false
+     },
+     {
+      "latency_steps": 250,
+      "reused": false
+     },
+     {
+      "latency_steps": 250,
+      "reused": false
+     },
+     {
+      "latency_steps": 250,
+      "reused": false
+     },
+     {
+      "latency_steps": 250,
+      "reused": false
+     }
+    ]
+   },
+   "replay": {
+    "average_accuracy": 0.8791,
+    "new_task": 0.9564,
+    "backward_transfer": -0.0814,
+    "forward_transfer": -0.0277,
+    "forgetting": 0.0878,
+    "retention": 0.8754,
+    "param_growth": 1.0,
+    "memory_bytes": 13440,
+    "compute_steps": 5000,
+    "recurrence": [
+     {
+      "latency_steps": 250,
+      "reused": false
+     },
+     {
+      "latency_steps": 250,
+      "reused": false
+     },
+     {
+      "latency_steps": 250,
+      "reused": false
+     },
+     {
+      "latency_steps": 250,
+      "reused": false
+     },
+     {
+      "latency_steps": 250,
+      "reused": false
+     }
+    ]
+   },
+   "ewc": {
+    "average_accuracy": 0.5896,
+    "new_task": 0.9787,
+    "backward_transfer": -0.4095,
+    "forward_transfer": -0.0055,
+    "forgetting": 0.4116,
+    "retention": 0.5687,
+    "param_growth": 1.0,
+    "memory_bytes": 235840,
+    "compute_steps": 5000,
+    "recurrence": [
+     {
+      "latency_steps": 250,
+      "reused": false
+     },
+     {
+      "latency_steps": 250,
+      "reused": false
+     },
+     {
+      "latency_steps": 250,
+      "reused": false
+     },
+     {
+      "latency_steps": 250,
+      "reused": false
+     },
+     {
+      "latency_steps": 250,
+      "reused": false
+     }
+    ]
+   },
+   "projected": {
+    "average_accuracy": 0.6498,
+    "new_task": 0.984,
+    "backward_transfer": -0.3518,
+    "forward_transfer": -0.0002,
+    "forgetting": 0.3518,
+    "retention": 0.6314,
+    "param_growth": 1.0,
+    "memory_bytes": 1450656,
+    "compute_steps": 5000,
+    "recurrence": [
+     {
+      "latency_steps": 250,
+      "reused": false
+     },
+     {
+      "latency_steps": 250,
+      "reused": false
+     },
+     {
+      "latency_steps": 250,
+      "reused": false
+     },
+     {
+      "latency_steps": 250,
+      "reused": false
+     },
+     {
+      "latency_steps": 250,
+      "reused": false
+     }
+    ]
+   },
+   "invariant_constraints": {
+    "average_accuracy": 0.8785,
+    "new_task": 0.9578,
+    "backward_transfer": -0.0835,
+    "forward_transfer": -0.0264,
+    "forgetting": 0.0855,
+    "retention": 0.8736,
+    "param_growth": 1.0,
+    "memory_bytes": 8960,
+    "compute_steps": 5000,
+    "recurrence": [
+     {
+      "latency_steps": 250,
+      "reused": false
+     },
+     {
+      "latency_steps": 250,
+      "reused": false
+     },
+     {
+      "latency_steps": 250,
+      "reused": false
+     },
+     {
+      "latency_steps": 250,
+      "reused": false
+     },
+     {
+      "latency_steps": 250,
+      "reused": false
+     }
+    ]
+   },
+   "structural_growth": {
+    "average_accuracy": 0.9949,
+    "new_task": 0.9975,
+    "backward_transfer": -0.0027,
+    "forward_transfer": 0.0133,
+    "forgetting": 0.0027,
+    "retention": 0.9949,
+    "param_growth": 15.0,
+    "memory_bytes": 1230,
+    "compute_steps": 4500,
+    "recurrence": [
+     {
+      "latency_steps": 0,
+      "reused": true
+     },
+     {
+      "latency_steps": 0,
+      "reused": true
+     },
+     {
+      "latency_steps": 0,
+      "reused": true
+     },
+     {
+      "latency_steps": 0,
+      "reused": true
+     },
+     {
+      "latency_steps": 0,
+      "reused": true
+     }
+    ],
+    "kinds": {
+     "grow": 15,
+     "reactivate": 5
+    }
+   },
+   "compositional": {
+    "average_accuracy": 0.9949,
+    "new_task": 0.9975,
+    "backward_transfer": -0.0027,
+    "forward_transfer": 0.0133,
+    "forgetting": 0.0027,
+    "retention": 0.9949,
+    "param_growth": 4.742,
+    "memory_bytes": 1212,
+    "compute_steps": 2100,
+    "recurrence": [
+     {
+      "latency_steps": 0,
+      "reused": true
+     },
+     {
+      "latency_steps": 0,
+      "reused": true
+     },
+     {
+      "latency_steps": 0,
+      "reused": true
+     },
+     {
+      "latency_steps": 0,
+      "reused": true
+     },
+     {
+      "latency_steps": 0,
+      "reused": true
+     }
+    ],
+    "kinds": {
+     "grow": 1,
+     "adapter": 9,
+     "compose": 3,
+     "reactivate": 5,
+     "reuse": 2
+    }
+   }
+  }
+ ],
+ "credit": {
+  "all": {
+   "accuracy": 1.0,
+   "interventions": 10.0,
+   "sign_cost": 0.0,
+   "n": 42
+  },
+  "random_topk": {
+   "accuracy": 0.381,
+   "interventions": 3.0,
+   "sign_cost": 0.0,
+   "n": 42
+  },
+  "sensitivity_topk": {
+   "accuracy": 0.357,
+   "interventions": 3.0,
+   "sign_cost": 0.05,
+   "n": 42
+  },
+  "voi": {
+   "accuracy": 1.0,
+   "interventions": 1.57,
+   "sign_cost": 0.33,
+   "n": 42
+  }
+ },
+ "cross_domain": {
+  "language": {
+   "domain": "language",
+   "tasks": 10,
+   "generalizes": 1.0,
+   "kinds": {
+    "grow": 4,
+    "adapt": 1,
+    "reuse": 3,
+    "compose": 2
+   },
+   "retention": 1.0,
+   "evaluations": 204,
+   "primitive_families": 5,
+   "skills": 7
+  },
+  "algebra": {
+   "domain": "algebra",
+   "tasks": 10,
+   "generalizes": 1.0,
+   "kinds": {
+    "grow": 5,
+    "reuse": 3,
+    "compose": 2
+   },
+   "retention": 1.0,
+   "evaluations": 410,
+   "primitive_families": 5,
+   "skills": 7
+  },
+  "code": {
+   "domain": "code",
+   "tasks": 10,
+   "generalizes": 0.9,
+   "kinds": {
+    "grow": 3,
+    "reuse": 4,
+    "adapt": 1,
+    "compose": 2
+   },
+   "retention": 1.0,
+   "evaluations": 122,
+   "primitive_families": 5,
+   "skills": 6
+  },
+  "strings": {
+   "domain": "strings",
+   "tasks": 10,
+   "generalizes": 1.0,
+   "kinds": {
+    "grow": 4,
+    "adapt": 1,
+    "compose": 3,
+    "reuse": 2
+   },
+   "retention": 1.0,
+   "evaluations": 241,
+   "primitive_families": 6,
+   "skills": 8
+  }
+ }
+}

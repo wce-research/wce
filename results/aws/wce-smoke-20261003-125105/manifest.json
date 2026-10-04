@@ -1,0 +1,30 @@
+{
+ "run_id": "wce-smoke-20261003-125105",
+ "git_commit": "no-git",
+ "code_hash": "6ff4001796722c6a",
+ "config_hash": "4f0945379334",
+ "timestamp": "20261003-125105",
+ "region": "eu-north-1",
+ "identity": "AWSReservedSSO_WCE-Research-Runner_251aca5f63af0b9d",
+ "instance_type": "t3.large",
+ "image": "763104351884.dkr.ecr.eu-north-1.amazonaws.com/pytorch-training:2.5.1-cpu-py311-ubuntu22.04-sagemaker",
+ "backend": "ec2",
+ "kind": "smoke",
+ "keys": [
+  "0"
+ ],
+ "jobs": [
+  {
+   "name": "wce-smoke-20261003-125105-s0",
+   "units": 1,
+   "output": "s3://wce-research/robust/runs/wce-smoke-20261003-125105/wce-smoke-20261003-125105-s0/",
+   "instance_id": "i-058a8edfdab4c0570",
+   "command_id": "d98da89b-404d-4f43-819f-32a50537f0a0",
+   "instance_state": "shutting-down",
+   "status": "Failed",
+   "failure": "tput.\n\nnote: This error originates from a subprocess, and is likely not a problem with pip.\n++ aws s3 sync /opt/wce/out s3://wce-research/robust/runs/wce-smoke-20261003-125105/wce-smoke-20261003-125105-s0/ --quiet --region eu-north-1\n++ exit 1\n++ shutdown -h now\nfailed to run commands: exit status 1",
+   "runtime_s": 59.0
+  }
+ ],
+ "status": "Failed"
+}

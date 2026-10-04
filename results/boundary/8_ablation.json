@@ -1,0 +1,1 @@
+[8, "ablation", {"all": [0.455, 1106], "without_rotate": [0.455, 1106], "without_angle": [0.636, 823], "without_norm": [0.273, 847], "without_and": [0.364, 827], "without_or": [0.364, 827], "without_translate": [0.364, 532], "without_interval": [0.273, 528], "without_xor": [0.364, 820]}]

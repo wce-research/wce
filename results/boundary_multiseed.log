@@ -1,0 +1,386 @@
+python3 scripts/boundary_multiseed.py 16 12
+ok results/boundary/0_main.json
+ok results/boundary/1_main.json
+ok results/boundary/4_main.json
+ok results/boundary/2_main.json
+ok results/boundary/3_main.json
+ok results/boundary/6_main.json
+ok results/boundary/5_main.json
+ok results/boundary/9_main.json
+ok results/boundary/7_main.json
+ok results/boundary/8_main.json
+ok results/boundary/13_main.json
+ok results/boundary/12_main.json
+ok results/boundary/15_main.json
+ok results/boundary/10_main.json
+ok results/boundary/1_ablation.json
+ok results/boundary/0_ablation.json
+ok results/boundary/0_depth.json
+ok results/boundary/11_main.json
+ok results/boundary/2_depth.json
+ok results/boundary/3_ablation.json
+ok results/boundary/3_depth.json
+ok results/boundary/4_depth.json
+ok results/boundary/4_ablation.json
+ok results/boundary/5_ablation.json
+ok results/boundary/5_depth.json
+ok results/boundary/6_ablation.json
+ok results/boundary/2_ablation.json
+ok results/boundary/6_depth.json
+ok results/boundary/8_ablation.json
+ok results/boundary/7_ablation.json
+ok results/boundary/7_depth.json
+ok results/boundary/9_depth.json
+ok results/boundary/9_ablation.json
+ok results/boundary/1_depth.json
+ok results/boundary/12_ablation.json
+ok results/boundary/12_depth.json
+ok results/boundary/8_depth.json
+ok results/boundary/11_ablation.json
+ok results/boundary/10_depth.json
+ok results/boundary/13_depth.json
+ok results/boundary/14_ablation.json
+ok results/boundary/10_ablation.json
+ok results/boundary/0_active.json
+ok results/boundary/11_depth.json
+ok results/boundary/13_ablation.json
+ok results/boundary/15_ablation.json
+ok results/boundary/1_crystal.json
+ok results/boundary/15_depth.json
+ok results/boundary/1_active.json
+ok results/boundary/2_crystal.json
+ok results/boundary/0_crystal.json
+ok results/boundary/2_active.json
+ok results/boundary/4_active.json
+ok results/boundary/3_active.json
+ok results/boundary/3_crystal.json
+ok results/boundary/5_active.json
+ok results/boundary/6_active.json
+ok results/boundary/5_crystal.json
+ok results/boundary/4_crystal.json
+ok results/boundary/7_active.json
+ok results/boundary/14_depth.json
+ok results/boundary/7_crystal.json
+ok results/boundary/8_active.json
+ok results/boundary/6_crystal.json
+ok results/boundary/8_crystal.json
+ok results/boundary/9_active.json
+ok results/boundary/9_crystal.json
+ok results/boundary/10_active.json
+ok results/boundary/10_crystal.json
+ok results/boundary/11_active.json
+ok results/boundary/11_crystal.json
+ok results/boundary/12_active.json
+ok results/boundary/12_crystal.json
+ok results/boundary/13_active.json
+ok results/boundary/14_active.json
+ok results/boundary/13_crystal.json
+ok results/boundary/15_crystal.json
+ok results/boundary/15_active.json
+ok results/boundary/14_crystal.json
+ok results/boundary/1_family.json
+ok results/boundary/3_family.json
+ok results/boundary/10_family.json
+ok results/boundary/8_family.json
+ok results/boundary/4_family.json
+ok results/boundary/6_family.json
+ok results/boundary/2_family.json
+ok results/boundary/0_family.json
+ok results/boundary/5_family.json
+ok results/boundary/0_shared.json
+ok results/boundary/0_residual.json
+ok results/boundary/0_overfit.json
+ok results/boundary/7_family.json
+ok results/boundary/9_family.json
+ok results/boundary/0_cross_domain.json
+ok results/boundary/0_confidence.json
+ok results/boundary/0_anchor.json
+ok results/boundary/1_anchor.json
+ok results/boundary/1_shared.json
+ok results/boundary/1_residual.json
+ok results/boundary/1_overfit.json
+ok results/boundary/0_stability.json
+ok results/boundary/1_confidence.json
+ok results/boundary/1_cross_domain.json
+ok results/boundary/0_recall.json
+ok results/boundary/0_budget.json
+ok results/boundary/14_main.json
+ok results/boundary/2_shared.json
+ok results/boundary/12_family.json
+ok results/boundary/2_overfit.json
+ok results/boundary/2_residual.json
+ok results/boundary/15_family.json
+ok results/boundary/2_cross_domain.json
+ok results/boundary/13_family.json
+ok results/boundary/11_family.json
+ok results/boundary/1_stability.json
+ok results/boundary/3_shared.json
+ok results/boundary/14_family.json
+ok results/boundary/3_overfit.json
+ok results/boundary/3_residual.json
+ok results/boundary/2_confidence.json
+ok results/boundary/3_cross_domain.json
+ok results/boundary/1_recall.json
+ok results/boundary/2_anchor.json
+ok results/boundary/3_confidence.json
+ok results/boundary/4_shared.json
+ok results/boundary/4_residual.json
+ok results/boundary/4_overfit.json
+ok results/boundary/2_stability.json
+ok results/boundary/1_budget.json
+ok results/boundary/4_cross_domain.json
+ok results/boundary/3_anchor.json
+ok results/boundary/3_stability.json
+ok results/boundary/4_anchor.json
+ok results/boundary/5_shared.json
+ok results/boundary/4_confidence.json
+ok results/boundary/5_overfit.json
+ok results/boundary/5_residual.json
+ok results/boundary/2_budget.json
+ok results/boundary/5_cross_domain.json
+ok results/boundary/5_anchor.json
+ok results/boundary/2_recall.json
+ok results/boundary/4_stability.json
+ok results/boundary/6_shared.json
+ok results/boundary/3_recall.json
+ok results/boundary/6_overfit.json
+ok results/boundary/5_confidence.json
+ok results/boundary/6_residual.json
+ok results/boundary/6_cross_domain.json
+ok results/boundary/3_budget.json
+ok results/boundary/4_recall.json
+ok results/boundary/7_residual.json
+ok results/boundary/7_shared.json
+ok results/boundary/5_stability.json
+ok results/boundary/7_overfit.json
+ok results/boundary/6_confidence.json
+ok results/boundary/4_budget.json
+ok results/boundary/7_cross_domain.json
+ok results/boundary/6_anchor.json
+ok results/boundary/7_anchor.json
+ok results/boundary/5_recall.json
+ok results/boundary/8_shared.json
+ok results/boundary/8_residual.json
+ok results/boundary/8_overfit.json
+ok results/boundary/7_confidence.json
+ok results/boundary/6_stability.json
+ok results/boundary/8_cross_domain.json
+ok results/boundary/5_budget.json
+ok results/boundary/8_anchor.json
+ok results/boundary/7_stability.json
+ok results/boundary/9_shared.json
+ok results/boundary/9_residual.json
+ok results/boundary/9_overfit.json
+ok results/boundary/6_recall.json
+ok results/boundary/8_confidence.json
+ok results/boundary/9_cross_domain.json
+ok results/boundary/6_budget.json
+ok results/boundary/7_recall.json
+ok results/boundary/9_anchor.json
+ok results/boundary/10_shared.json
+ok results/boundary/7_budget.json
+ok results/boundary/10_overfit.json
+ok results/boundary/8_stability.json
+ok results/boundary/9_confidence.json
+ok results/boundary/10_cross_domain.json
+ok results/boundary/10_residual.json
+ok results/boundary/8_budget.json
+ok results/boundary/10_confidence.json
+ok results/boundary/11_shared.json
+ok results/boundary/9_stability.json
+ok results/boundary/11_overfit.json
+ok results/boundary/8_recall.json
+ok results/boundary/11_residual.json
+ok results/boundary/11_cross_domain.json
+ok results/boundary/10_anchor.json
+ok results/boundary/11_anchor.json
+ok results/boundary/12_residual.json
+ok results/boundary/12_shared.json
+ok results/boundary/11_confidence.json
+ok results/boundary/12_overfit.json
+ok results/boundary/9_recall.json
+ok results/boundary/9_budget.json
+ok results/boundary/12_cross_domain.json
+ok results/boundary/10_stability.json
+ok results/boundary/12_confidence.json
+ok results/boundary/13_residual.json
+ok results/boundary/13_shared.json
+ok results/boundary/10_recall.json
+ok results/boundary/13_overfit.json
+ok results/boundary/11_stability.json
+ok results/boundary/12_anchor.json
+ok results/boundary/13_cross_domain.json
+ok results/boundary/10_budget.json
+ok results/boundary/13_anchor.json
+ok results/boundary/11_recall.json
+ok results/boundary/14_shared.json
+ok results/boundary/14_residual.json
+ok results/boundary/14_overfit.json
+ok results/boundary/12_stability.json
+ok results/boundary/13_confidence.json
+ok results/boundary/14_cross_domain.json
+ok results/boundary/11_budget.json
+ok results/boundary/12_recall.json
+ok results/boundary/14_confidence.json
+ok results/boundary/15_shared.json
+ok results/boundary/13_stability.json
+ok results/boundary/15_overfit.json
+ok results/boundary/15_residual.json
+ok results/boundary/14_anchor.json
+ok results/boundary/15_cross_domain.json
+ok results/boundary/12_budget.json
+ok results/boundary/14_stability.json
+ok results/boundary/13_recall.json
+ok results/boundary/13_budget.json
+ok results/boundary/15_confidence.json
+ok results/boundary/15_anchor.json
+ok results/boundary/15_stability.json
+ok results/boundary/14_recall.json
+ok results/boundary/14_budget.json
+ok results/boundary/15_recall.json
+ok results/boundary/15_budget.json
+{
+ "H1": {
+  "value": 0.2422,
+  "families_recovered": {
+   "xor_halfspaces": 10,
+   "capsule": 6,
+   "crescent": 10,
+   "wedge_ring": 5
+  },
+  "verdict": "RÉFUTÉE"
+ },
+ "H2": {
+  "vs_mlp": {
+   "mean": 0.1544,
+   "ci95": [
+    0.0971,
+    0.2117
+   ],
+   "n": 16
+  },
+  "vs_memorization": {
+   "mean": -0.005,
+   "ci95": [
+    -0.0395,
+    0.0295
+   ],
+   "n": 16
+  },
+  "verdict": "NON CONCLUANTE"
+ },
+ "H3": {
+  "value": {
+   "macro_acc": {
+    "mean": 0.9146,
+    "ci95": [
+     0.8918,
+     0.9374
+    ],
+    "n": 16
+   },
+   "search_acc": {
+    "mean": 0.9106,
+    "ci95": [
+     0.8871,
+     0.934
+    ],
+    "n": 16
+   },
+   "macro_evals": {
+    "mean": 72.7857,
+    "ci95": [
+     61.0557,
+     84.5158
+    ],
+    "n": 16
+   },
+   "search_evals": {
+    "mean": 87.4821,
+    "ci95": [
+     76.366,
+     98.5983
+    ],
+    "n": 16
+   },
+   "macro_seconds": {
+    "mean": 30.2114,
+    "ci95": [
+     25.0767,
+     35.3461
+    ],
+    "n": 16
+   },
+   "search_seconds": {
+    "mean": 34.6668,
+    "ci95": [
+     29.9136,
+     39.42
+    ],
+    "n": 16
+   }
+  },
+  "verdict": "NON CONCLUANTE"
+ },
+ "H4": {
+  "ig": {
+   "median_queries": 31,
+   "identified": 0.482,
+   "n": 112
+  },
+  "random": {
+   "median_queries": 31,
+   "identified": 0.116,
+   "n": 112
+  },
+  "verdict": "RÉFUTÉE"
+ },
+ "H5": {
+  "value": {
+   "refutation_of_wrong": 0.873,
+   "false_refutation": 0.509,
+   "wrong_self_consistent": 1.0,
+   "n_wrong": 229,
+   "n_correct": 57
+  },
+  "verdict": "NON CONCLUANTE"
+ },
+ "H6": {
+  "fraction": 0.062,
+  "loss": -0.0083,
+  "verdict": "RÉFUTÉE"
+ },
+ "H7": {
+  "expert": [
+   0.9611,
+   82.0
+  ],
+  "program_residual": [
+   0.9612,
+   16.4583
+  ],
+  "verdict": "SOUTENUE"
+ },
+ "H8": {
+  "abstention": 0.703,
+  "false_reject": 0.25,
+  "verdict": "NON CONCLUANTE"
+ },
+ "H9": {
+  "primitive_types": 10,
+  "necessary_primitives": [
+   "norm",
+   "translate"
+  ],
+  "families_covered_estimate": 10,
+  "coverage_all": {
+   "mean": 0.4775,
+   "ci95": [
+    0.4296,
+    0.5254
+   ],
+   "n": 4
+  },
+  "verdict": "SOUTENUE"
+ }
+}

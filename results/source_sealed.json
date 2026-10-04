@@ -1,0 +1,55 @@
+{
+ "em": {
+  "n": 640,
+  "success": 0.8609,
+  "false_confident": 0.0703,
+  "abstention": 0.3141,
+  "exact_class": 0.8094,
+  "conflict_recall": 0.6907,
+  "drift_flagged": {},
+  "dependency_grouped": {},
+  "belief_ece": 0.0412,
+  "reliability_ece": 0.0618
+ },
+ "beta_mean": {
+  "n": 640,
+  "success": 0.8984,
+  "false_confident": 0.0547,
+  "abstention": 0.3016,
+  "exact_class": 0.8047,
+  "conflict_recall": 0.4124,
+  "drift_flagged": {},
+  "dependency_grouped": {},
+  "belief_ece": 0.0173,
+  "reliability_ece": 0.0705
+ },
+ "beta_lower": {
+  "n": 640,
+  "success": 0.9,
+  "false_confident": 0.0453,
+  "abstention": 0.3187,
+  "exact_class": 0.825,
+  "conflict_recall": 0.4742,
+  "drift_flagged": {},
+  "dependency_grouped": {},
+  "belief_ece": 0.0128,
+  "reliability_ece": 0.0705
+ },
+ "beta_full": {
+  "n": 640,
+  "success": 0.9375,
+  "false_confident": 0.0187,
+  "abstention": 0.3344,
+  "exact_class": 0.8672,
+  "conflict_recall": 0.5567,
+  "drift_flagged": {
+   "drifting": true
+  },
+  "dependency_grouped": {
+   "copier": 3,
+   "original": 3
+  },
+  "belief_ece": 0.0007,
+  "reliability_ece": 0.0481
+ }
+}

@@ -1,0 +1,7464 @@
+{
+ "summary": {
+  "multitask": {
+   "vanilla": {
+    "average_accuracy": {
+     "mean": 0.5748,
+     "sd": 0.0606,
+     "ci95": [
+      0.5451,
+      0.6045
+     ],
+     "n": 16
+    },
+    "new_task": {
+     "mean": 0.9451,
+     "sd": 0.0347,
+     "ci95": [
+      0.9281,
+      0.9621
+     ],
+     "n": 16
+    },
+    "retention": {
+     "mean": 0.5457,
+     "sd": 0.0657,
+     "ci95": [
+      0.5136,
+      0.5779
+     ],
+     "n": 16
+    },
+    "forgetting": {
+     "mean": 0.4001,
+     "sd": 0.0688,
+     "ci95": [
+      0.3664,
+      0.4339
+     ],
+     "n": 16
+    },
+    "backward_transfer": {
+     "mean": -0.3988,
+     "sd": 0.0683,
+     "ci95": [
+      -0.4322,
+      -0.3653
+     ],
+     "n": 16
+    },
+    "forward_transfer": {
+     "mean": -0.0143,
+     "sd": 0.0141,
+     "ci95": [
+      -0.0212,
+      -0.0074
+     ],
+     "n": 16
+    },
+    "param_growth": {
+     "mean": 1.0,
+     "sd": 0.0,
+     "ci95": [
+      1.0,
+      1.0
+     ],
+     "n": 16
+    },
+    "memory_bytes": {
+     "mean": 0.0,
+     "sd": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "compute_steps": {
+     "mean": 3500.0,
+     "sd": 0.0,
+     "ci95": [
+      3500.0,
+      3500.0
+     ],
+     "n": 16
+    }
+   },
+   "replay": {
+    "average_accuracy": {
+     "mean": 0.8337,
+     "sd": 0.0502,
+     "ci95": [
+      0.8091,
+      0.8583
+     ],
+     "n": 16
+    },
+    "new_task": {
+     "mean": 0.9197,
+     "sd": 0.0314,
+     "ci95": [
+      0.9043,
+      0.935
+     ],
+     "n": 16
+    },
+    "retention": {
+     "mean": 0.8276,
+     "sd": 0.0525,
+     "ci95": [
+      0.8019,
+      0.8534
+     ],
+     "n": 16
+    },
+    "forgetting": {
+     "mean": 0.0958,
+     "sd": 0.024,
+     "ci95": [
+      0.084,
+      0.1075
+     ],
+     "n": 16
+    },
+    "backward_transfer": {
+     "mean": -0.0926,
+     "sd": 0.0244,
+     "ci95": [
+      -0.1045,
+      -0.0806
+     ],
+     "n": 16
+    },
+    "forward_transfer": {
+     "mean": -0.0398,
+     "sd": 0.0179,
+     "ci95": [
+      -0.0486,
+      -0.031
+     ],
+     "n": 16
+    },
+    "param_growth": {
+     "mean": 1.0,
+     "sd": 0.0,
+     "ci95": [
+      1.0,
+      1.0
+     ],
+     "n": 16
+    },
+    "memory_bytes": {
+     "mean": 9408.0,
+     "sd": 0.0,
+     "ci95": [
+      9408.0,
+      9408.0
+     ],
+     "n": 16
+    },
+    "compute_steps": {
+     "mean": 3500.0,
+     "sd": 0.0,
+     "ci95": [
+      3500.0,
+      3500.0
+     ],
+     "n": 16
+    }
+   },
+   "ewc": {
+    "average_accuracy": {
+     "mean": 0.5797,
+     "sd": 0.0525,
+     "ci95": [
+      0.5539,
+      0.6054
+     ],
+     "n": 16
+    },
+    "new_task": {
+     "mean": 0.9447,
+     "sd": 0.031,
+     "ci95": [
+      0.9295,
+      0.9598
+     ],
+     "n": 16
+    },
+    "retention": {
+     "mean": 0.5507,
+     "sd": 0.0563,
+     "ci95": [
+      0.5231,
+      0.5784
+     ],
+     "n": 16
+    },
+    "forgetting": {
+     "mean": 0.394,
+     "sd": 0.0587,
+     "ci95": [
+      0.3652,
+      0.4228
+     ],
+     "n": 16
+    },
+    "backward_transfer": {
+     "mean": -0.3931,
+     "sd": 0.0589,
+     "ci95": [
+      -0.4219,
+      -0.3642
+     ],
+     "n": 16
+    },
+    "forward_transfer": {
+     "mean": -0.0148,
+     "sd": 0.0118,
+     "ci95": [
+      -0.0205,
+      -0.009
+     ],
+     "n": 16
+    },
+    "param_growth": {
+     "mean": 1.0,
+     "sd": 0.0,
+     "ci95": [
+      1.0,
+      1.0
+     ],
+     "n": 16
+    },
+    "memory_bytes": {
+     "mean": 165088.0,
+     "sd": 0.0,
+     "ci95": [
+      165088.0,
+      165088.0
+     ],
+     "n": 16
+    },
+    "compute_steps": {
+     "mean": 3500.0,
+     "sd": 0.0,
+     "ci95": [
+      3500.0,
+      3500.0
+     ],
+     "n": 16
+    }
+   },
+   "projected": {
+    "average_accuracy": {
+     "mean": 0.6551,
+     "sd": 0.0564,
+     "ci95": [
+      0.6275,
+      0.6828
+     ],
+     "n": 16
+    },
+    "new_task": {
+     "mean": 0.9511,
+     "sd": 0.0299,
+     "ci95": [
+      0.9364,
+      0.9658
+     ],
+     "n": 16
+    },
+    "retention": {
+     "mean": 0.6315,
+     "sd": 0.0597,
+     "ci95": [
+      0.6023,
+      0.6608
+     ],
+     "n": 16
+    },
+    "forgetting": {
+     "mean": 0.3203,
+     "sd": 0.0479,
+     "ci95": [
+      0.2969,
+      0.3438
+     ],
+     "n": 16
+    },
+    "backward_transfer": {
+     "mean": -0.3188,
+     "sd": 0.0486,
+     "ci95": [
+      -0.3426,
+      -0.2949
+     ],
+     "n": 16
+    },
+    "forward_transfer": {
+     "mean": -0.0083,
+     "sd": 0.0147,
+     "ci95": [
+      -0.0155,
+      -0.0011
+     ],
+     "n": 16
+    },
+    "param_growth": {
+     "mean": 1.0,
+     "sd": 0.0,
+     "ci95": [
+      1.0,
+      1.0
+     ],
+     "n": 16
+    },
+    "memory_bytes": {
+     "mean": 1011700.5,
+     "sd": 80754.9344,
+     "ci95": [
+      972130.5821,
+      1051270.4179
+     ],
+     "n": 16
+    },
+    "compute_steps": {
+     "mean": 3500.0,
+     "sd": 0.0,
+     "ci95": [
+      3500.0,
+      3500.0
+     ],
+     "n": 16
+    }
+   },
+   "invariant_constraints": {
+    "average_accuracy": {
+     "mean": 0.8487,
+     "sd": 0.0529,
+     "ci95": [
+      0.8228,
+      0.8746
+     ],
+     "n": 16
+    },
+    "new_task": {
+     "mean": 0.9235,
+     "sd": 0.0353,
+     "ci95": [
+      0.9062,
+      0.9408
+     ],
+     "n": 16
+    },
+    "retention": {
+     "mean": 0.8429,
+     "sd": 0.0566,
+     "ci95": [
+      0.8152,
+      0.8706
+     ],
+     "n": 16
+    },
+    "forgetting": {
+     "mean": 0.0834,
+     "sd": 0.0279,
+     "ci95": [
+      0.0697,
+      0.0971
+     ],
+     "n": 16
+    },
+    "backward_transfer": {
+     "mean": -0.0806,
+     "sd": 0.0283,
+     "ci95": [
+      -0.0945,
+      -0.0667
+     ],
+     "n": 16
+    },
+    "forward_transfer": {
+     "mean": -0.036,
+     "sd": 0.0148,
+     "ci95": [
+      -0.0432,
+      -0.0287
+     ],
+     "n": 16
+    },
+    "param_growth": {
+     "mean": 1.0,
+     "sd": 0.0,
+     "ci95": [
+      1.0,
+      1.0
+     ],
+     "n": 16
+    },
+    "memory_bytes": {
+     "mean": 6272.0,
+     "sd": 0.0,
+     "ci95": [
+      6272.0,
+      6272.0
+     ],
+     "n": 16
+    },
+    "compute_steps": {
+     "mean": 3500.0,
+     "sd": 0.0,
+     "ci95": [
+      3500.0,
+      3500.0
+     ],
+     "n": 16
+    }
+   },
+   "structural_growth": {
+    "average_accuracy": {
+     "mean": 0.9839,
+     "sd": 0.0094,
+     "ci95": [
+      0.9792,
+      0.9885
+     ],
+     "n": 16
+    },
+    "new_task": {
+     "mean": 0.9881,
+     "sd": 0.0089,
+     "ci95": [
+      0.9837,
+      0.9925
+     ],
+     "n": 16
+    },
+    "retention": {
+     "mean": 0.9839,
+     "sd": 0.01,
+     "ci95": [
+      0.979,
+      0.9887
+     ],
+     "n": 16
+    },
+    "forgetting": {
+     "mean": 0.0047,
+     "sd": 0.0015,
+     "ci95": [
+      0.0039,
+      0.0054
+     ],
+     "n": 16
+    },
+    "backward_transfer": {
+     "mean": -0.0046,
+     "sd": 0.0015,
+     "ci95": [
+      -0.0053,
+      -0.0039
+     ],
+     "n": 16
+    },
+    "forward_transfer": {
+     "mean": 0.0287,
+     "sd": 0.0222,
+     "ci95": [
+      0.0178,
+      0.0395
+     ],
+     "n": 16
+    },
+    "param_growth": {
+     "mean": 12.4375,
+     "sd": 1.315,
+     "ci95": [
+      11.7932,
+      13.0818
+     ],
+     "n": 16
+    },
+    "memory_bytes": {
+     "mean": 1019.875,
+     "sd": 107.8282,
+     "ci95": [
+      967.0392,
+      1072.7108
+     ],
+     "n": 16
+    },
+    "compute_steps": {
+     "mean": 3731.25,
+     "sd": 394.4933,
+     "ci95": [
+      3537.9483,
+      3924.5517
+     ],
+     "n": 16
+    }
+   },
+   "compositional": {
+    "average_accuracy": {
+     "mean": 0.9812,
+     "sd": 0.0244,
+     "ci95": [
+      0.9693,
+      0.9931
+     ],
+     "n": 16
+    },
+    "new_task": {
+     "mean": 0.9854,
+     "sd": 0.0241,
+     "ci95": [
+      0.9736,
+      0.9972
+     ],
+     "n": 16
+    },
+    "retention": {
+     "mean": 0.9806,
+     "sd": 0.0258,
+     "ci95": [
+      0.9679,
+      0.9932
+     ],
+     "n": 16
+    },
+    "forgetting": {
+     "mean": 0.0046,
+     "sd": 0.0015,
+     "ci95": [
+      0.0039,
+      0.0054
+     ],
+     "n": 16
+    },
+    "backward_transfer": {
+     "mean": -0.0045,
+     "sd": 0.0015,
+     "ci95": [
+      -0.0053,
+      -0.0038
+     ],
+     "n": 16
+    },
+    "forward_transfer": {
+     "mean": 0.026,
+     "sd": 0.0139,
+     "ci95": [
+      0.0191,
+      0.0328
+     ],
+     "n": 16
+    },
+    "param_growth": {
+     "mean": 5.5111,
+     "sd": 2.0769,
+     "ci95": [
+      4.4935,
+      6.5288
+     ],
+     "n": 16
+    },
+    "memory_bytes": {
+     "mean": 958.5,
+     "sd": 153.1909,
+     "ci95": [
+      883.4364,
+      1033.5636
+     ],
+     "n": 16
+    },
+    "compute_steps": {
+     "mean": 2481.25,
+     "sd": 677.4646,
+     "ci95": [
+      2149.2923,
+      2813.2077
+     ],
+     "n": 16
+    }
+   }
+  },
+  "credit": {
+   "all": {
+    "accuracy": {
+     "mean": 0.9909,
+     "sd": 0.0208,
+     "ci95": [
+      0.9808,
+      1.0011
+     ],
+     "n": 16
+    },
+    "interventions": {
+     "mean": 10.0,
+     "sd": 0.0,
+     "ci95": [
+      10.0,
+      10.0
+     ],
+     "n": 16
+    }
+   },
+   "random_topk": {
+    "accuracy": {
+     "mean": 0.381,
+     "sd": 0.0297,
+     "ci95": [
+      0.3664,
+      0.3956
+     ],
+     "n": 16
+    },
+    "interventions": {
+     "mean": 3.0,
+     "sd": 0.0,
+     "ci95": [
+      3.0,
+      3.0
+     ],
+     "n": 16
+    }
+   },
+   "sensitivity_topk": {
+    "accuracy": {
+     "mean": 0.3334,
+     "sd": 0.0674,
+     "ci95": [
+      0.3004,
+      0.3665
+     ],
+     "n": 16
+    },
+    "interventions": {
+     "mean": 3.0,
+     "sd": 0.0,
+     "ci95": [
+      3.0,
+      3.0
+     ],
+     "n": 16
+    }
+   },
+   "voi": {
+    "accuracy": {
+     "mean": 1.0,
+     "sd": 0.0,
+     "ci95": [
+      1.0,
+      1.0
+     ],
+     "n": 16
+    },
+    "interventions": {
+     "mean": 1.5388,
+     "sd": 0.119,
+     "ci95": [
+      1.4804,
+      1.5971
+     ],
+     "n": 16
+    }
+   }
+  },
+  "cross_domain": {
+   "language": {
+    "generalizes": {
+     "mean": 1.0,
+     "sd": 0.0,
+     "ci95": [
+      1.0,
+      1.0
+     ],
+     "n": 16
+    },
+    "retention": {
+     "mean": 1.0,
+     "sd": 0.0,
+     "ci95": [
+      1.0,
+      1.0
+     ],
+     "n": 16
+    },
+    "evaluations": {
+     "mean": 201.625,
+     "sd": 89.3531,
+     "ci95": [
+      157.842,
+      245.408
+     ],
+     "n": 16
+    }
+   },
+   "algebra": {
+    "generalizes": {
+     "mean": 0.9563,
+     "sd": 0.1031,
+     "ci95": [
+      0.9057,
+      1.0068
+     ],
+     "n": 16
+    },
+    "retention": {
+     "mean": 1.0,
+     "sd": 0.0,
+     "ci95": [
+      1.0,
+      1.0
+     ],
+     "n": 16
+    },
+    "evaluations": {
+     "mean": 1296.1875,
+     "sd": 2409.7856,
+     "ci95": [
+      115.3925,
+      2476.9825
+     ],
+     "n": 16
+    }
+   },
+   "code": {
+    "generalizes": {
+     "mean": 0.925,
+     "sd": 0.139,
+     "ci95": [
+      0.8569,
+      0.9931
+     ],
+     "n": 16
+    },
+    "retention": {
+     "mean": 1.0,
+     "sd": 0.0,
+     "ci95": [
+      1.0,
+      1.0
+     ],
+     "n": 16
+    },
+    "evaluations": {
+     "mean": 301.125,
+     "sd": 430.2255,
+     "ci95": [
+      90.3145,
+      511.9355
+     ],
+     "n": 16
+    }
+   },
+   "strings": {
+    "generalizes": {
+     "mean": 0.9625,
+     "sd": 0.1088,
+     "ci95": [
+      0.9092,
+      1.0158
+     ],
+     "n": 16
+    },
+    "retention": {
+     "mean": 1.0,
+     "sd": 0.0,
+     "ci95": [
+      1.0,
+      1.0
+     ],
+     "n": 16
+    },
+    "evaluations": {
+     "mean": 561.5,
+     "sd": 865.9399,
+     "ci95": [
+      137.1895,
+      985.8105
+     ],
+     "n": 16
+    }
+   }
+  },
+  "probes": {
+   "k=4": {
+    "synthesized": {
+     "mean": 0.7703,
+     "sd": 0.1535,
+     "ci95": [
+      0.695,
+      0.8455
+     ],
+     "n": 16
+    },
+    "random": {
+     "mean": 0.8113,
+     "sd": 0.1347,
+     "ci95": [
+      0.7453,
+      0.8772
+     ],
+     "n": 16
+    }
+   },
+   "k=8": {
+    "synthesized": {
+     "mean": 0.9038,
+     "sd": 0.1032,
+     "ci95": [
+      0.8533,
+      0.9544
+     ],
+     "n": 16
+    },
+    "random": {
+     "mean": 0.9124,
+     "sd": 0.0871,
+     "ci95": [
+      0.8697,
+      0.955
+     ],
+     "n": 16
+    }
+   },
+   "k=16": {
+    "synthesized": {
+     "mean": 0.9522,
+     "sd": 0.0673,
+     "ci95": [
+      0.9192,
+      0.9851
+     ],
+     "n": 16
+    },
+    "random": {
+     "mean": 0.9519,
+     "sd": 0.0737,
+     "ci95": [
+      0.9158,
+      0.988
+     ],
+     "n": 16
+    }
+   },
+   "k=32": {
+    "synthesized": {
+     "mean": 0.9739,
+     "sd": 0.0456,
+     "ci95": [
+      0.9515,
+      0.9963
+     ],
+     "n": 16
+    },
+    "random": {
+     "mean": 0.9727,
+     "sd": 0.0451,
+     "ci95": [
+      0.9506,
+      0.9948
+     ],
+     "n": 16
+    }
+   }
+  },
+  "full_replay": {
+   "mean": 0.9854,
+   "sd": 0.0206,
+   "ci95": [
+    0.9752,
+    0.9955
+   ],
+   "n": 16
+  },
+  "subspace": {
+   "vanilla": {
+    "retention_A": {
+     "mean": 0.2834,
+     "sd": 0.2431,
+     "ci95": [
+      0.1644,
+      0.4025
+     ],
+     "n": 16
+    },
+    "new_B": {
+     "mean": 0.9761,
+     "sd": 0.037,
+     "ci95": [
+      0.958,
+      0.9942
+     ],
+     "n": 16
+    }
+   },
+   "projected_null_space": {
+    "retention_A": {
+     "mean": 0.3594,
+     "sd": 0.2222,
+     "ci95": [
+      0.2505,
+      0.4683
+     ],
+     "n": 16
+    },
+    "new_B": {
+     "mean": 0.9829,
+     "sd": 0.0493,
+     "ci95": [
+      0.9588,
+      1.0071
+     ],
+     "n": 16
+    }
+   },
+   "invariant_constrained": {
+    "retention_A": {
+     "mean": 0.9634,
+     "sd": 0.0521,
+     "ci95": [
+      0.9379,
+      0.9889
+     ],
+     "n": 16
+    },
+    "new_B": {
+     "mean": 0.9539,
+     "sd": 0.0855,
+     "ci95": [
+      0.912,
+      0.9958
+     ],
+     "n": 16
+    }
+   },
+   "structural_growth": {
+    "retention_A": {
+     "mean": 0.9995,
+     "sd": 0.0013,
+     "ci95": [
+      0.9989,
+      1.0002
+     ],
+     "n": 16
+    },
+    "new_B": {
+     "mean": 0.9932,
+     "sd": 0.0168,
+     "ci95": [
+      0.9849,
+      1.0014
+     ],
+     "n": 16
+    }
+   }
+  },
+  "regeneration": {
+   "certificate_repair_rate": {
+    "mean": 0.7156,
+    "sd": 0.1849,
+    "ci95": [
+     0.6249,
+     0.8062
+    ],
+    "n": 16
+   },
+   "accuracy_before": {
+    "mean": 0.9875,
+    "sd": 0.0094,
+    "ci95": [
+     0.9829,
+     0.9921
+    ],
+    "n": 16
+   },
+   "accuracy_corrupted": {
+    "mean": 0.7874,
+    "sd": 0.1003,
+    "ci95": [
+     0.7382,
+     0.8366
+    ],
+    "n": 16
+   },
+   "accuracy_regenerated": {
+    "mean": 0.8779,
+    "sd": 0.0526,
+    "ci95": [
+     0.8522,
+     0.9037
+    ],
+    "n": 16
+   }
+  },
+  "economy": {
+   "n_families_used": {
+    "mean": 5.625,
+    "sd": 0.7188,
+    "ci95": [
+     5.2728,
+     5.9772
+    ],
+    "n": 16
+   },
+   "compression_ratio": {
+    "mean": 4.6125,
+    "sd": 0.5474,
+    "ci95": [
+     4.3443,
+     4.8807
+    ],
+    "n": 16
+   },
+   "grown": {
+    "mean": 3.625,
+    "sd": 2.5788,
+    "ci95": [
+     2.3614,
+     4.8886
+    ],
+    "n": 16
+   },
+   "grown_later_reused": {
+    "mean": 3.0,
+    "sd": 3.1411,
+    "ci95": [
+     1.4608,
+     4.5392
+    ],
+    "n": 16
+   }
+  },
+  "compositional_kinds": {
+   "reactivate": {
+    "mean": 1.5625,
+    "sd": 1.315,
+    "ci95": [
+     0.9182,
+     2.2068
+    ],
+    "n": 16
+   },
+   "reuse": {
+    "mean": 3.0625,
+    "sd": 1.1815,
+    "ci95": [
+     2.4836,
+     3.6414
+    ],
+    "n": 16
+   },
+   "compose": {
+    "mean": 1.125,
+    "sd": 1.0247,
+    "ci95": [
+     0.6229,
+     1.6271
+    ],
+    "n": 16
+   },
+   "adapter": {
+    "mean": 4.6875,
+    "sd": 2.7011,
+    "ci95": [
+     3.364,
+     6.011
+    ],
+    "n": 16
+   },
+   "grow": {
+    "mean": 3.5625,
+    "sd": 2.8277,
+    "ci95": [
+     2.1769,
+     4.9481
+    ],
+    "n": 16
+   },
+   "refine_inplace": {
+    "mean": 0.0,
+    "sd": 0.0,
+    "ci95": [
+     0.0,
+     0.0
+    ],
+    "n": 16
+   }
+  }
+ },
+ "comparisons": {
+  "compositional_vs_vanilla": {
+   "average_accuracy": {
+    "mean": 0.4064,
+    "sd": 0.0596,
+    "ci95": [
+     0.3771,
+     0.4356
+    ],
+    "n": 16,
+    "seeds_positive": 16,
+    "seeds_negative": 0
+   },
+   "new_task": {
+    "mean": 0.0403,
+    "sd": 0.0231,
+    "ci95": [
+     0.0289,
+     0.0516
+    ],
+    "n": 16,
+    "seeds_positive": 16,
+    "seeds_negative": 0
+   },
+   "forgetting": {
+    "mean": -0.3955,
+    "sd": 0.0684,
+    "ci95": [
+     -0.429,
+     -0.362
+    ],
+    "n": 16,
+    "seeds_positive": 0,
+    "seeds_negative": 16
+   },
+   "param_growth": {
+    "mean": 4.5111,
+    "sd": 2.0769,
+    "ci95": [
+     3.4935,
+     5.5288
+    ],
+    "n": 16,
+    "seeds_positive": 16,
+    "seeds_negative": 0
+   }
+  },
+  "compositional_vs_replay": {
+   "average_accuracy": {
+    "mean": 0.1475,
+    "sd": 0.0384,
+    "ci95": [
+     0.1287,
+     0.1663
+    ],
+    "n": 16,
+    "seeds_positive": 16,
+    "seeds_negative": 0
+   },
+   "new_task": {
+    "mean": 0.0657,
+    "sd": 0.0241,
+    "ci95": [
+     0.0539,
+     0.0775
+    ],
+    "n": 16,
+    "seeds_positive": 16,
+    "seeds_negative": 0
+   },
+   "forgetting": {
+    "mean": -0.0912,
+    "sd": 0.0235,
+    "ci95": [
+     -0.1027,
+     -0.0796
+    ],
+    "n": 16,
+    "seeds_positive": 0,
+    "seeds_negative": 16
+   },
+   "param_growth": {
+    "mean": 4.5111,
+    "sd": 2.0769,
+    "ci95": [
+     3.4935,
+     5.5288
+    ],
+    "n": 16,
+    "seeds_positive": 16,
+    "seeds_negative": 0
+   }
+  },
+  "compositional_vs_ewc": {
+   "average_accuracy": {
+    "mean": 0.4015,
+    "sd": 0.0517,
+    "ci95": [
+     0.3762,
+     0.4269
+    ],
+    "n": 16,
+    "seeds_positive": 16,
+    "seeds_negative": 0
+   },
+   "new_task": {
+    "mean": 0.0407,
+    "sd": 0.0179,
+    "ci95": [
+     0.0319,
+     0.0495
+    ],
+    "n": 16,
+    "seeds_positive": 16,
+    "seeds_negative": 0
+   },
+   "forgetting": {
+    "mean": -0.3894,
+    "sd": 0.0585,
+    "ci95": [
+     -0.418,
+     -0.3607
+    ],
+    "n": 16,
+    "seeds_positive": 0,
+    "seeds_negative": 16
+   },
+   "param_growth": {
+    "mean": 4.5111,
+    "sd": 2.0769,
+    "ci95": [
+     3.4935,
+     5.5288
+    ],
+    "n": 16,
+    "seeds_positive": 16,
+    "seeds_negative": 0
+   }
+  },
+  "compositional_vs_projected": {
+   "average_accuracy": {
+    "mean": 0.3261,
+    "sd": 0.0505,
+    "ci95": [
+     0.3013,
+     0.3508
+    ],
+    "n": 16,
+    "seeds_positive": 16,
+    "seeds_negative": 0
+   },
+   "new_task": {
+    "mean": 0.0343,
+    "sd": 0.0203,
+    "ci95": [
+     0.0243,
+     0.0443
+    ],
+    "n": 16,
+    "seeds_positive": 16,
+    "seeds_negative": 0
+   },
+   "forgetting": {
+    "mean": -0.3157,
+    "sd": 0.0475,
+    "ci95": [
+     -0.339,
+     -0.2924
+    ],
+    "n": 16,
+    "seeds_positive": 0,
+    "seeds_negative": 16
+   },
+   "param_growth": {
+    "mean": 4.5111,
+    "sd": 2.0769,
+    "ci95": [
+     3.4935,
+     5.5288
+    ],
+    "n": 16,
+    "seeds_positive": 16,
+    "seeds_negative": 0
+   }
+  },
+  "compositional_vs_invariant_constraints": {
+   "average_accuracy": {
+    "mean": 0.1325,
+    "sd": 0.0405,
+    "ci95": [
+     0.1127,
+     0.1524
+    ],
+    "n": 16,
+    "seeds_positive": 16,
+    "seeds_negative": 0
+   },
+   "new_task": {
+    "mean": 0.0619,
+    "sd": 0.0234,
+    "ci95": [
+     0.0504,
+     0.0734
+    ],
+    "n": 16,
+    "seeds_positive": 16,
+    "seeds_negative": 0
+   },
+   "forgetting": {
+    "mean": -0.0788,
+    "sd": 0.0279,
+    "ci95": [
+     -0.0924,
+     -0.0651
+    ],
+    "n": 16,
+    "seeds_positive": 0,
+    "seeds_negative": 16
+   },
+   "param_growth": {
+    "mean": 4.5111,
+    "sd": 2.0769,
+    "ci95": [
+     3.4935,
+     5.5288
+    ],
+    "n": 16,
+    "seeds_positive": 16,
+    "seeds_negative": 0
+   }
+  },
+  "compositional_vs_structural_growth": {
+   "average_accuracy": {
+    "mean": -0.0027,
+    "sd": 0.0168,
+    "ci95": [
+     -0.0109,
+     0.0056
+    ],
+    "n": 16,
+    "seeds_positive": 8,
+    "seeds_negative": 5
+   },
+   "new_task": {
+    "mean": -0.0027,
+    "sd": 0.0168,
+    "ci95": [
+     -0.0109,
+     0.0055
+    ],
+    "n": 16,
+    "seeds_positive": 7,
+    "seeds_negative": 5
+   },
+   "forgetting": {
+    "mean": -0.0,
+    "sd": 0.0002,
+    "ci95": [
+     -0.0001,
+     0.0001
+    ],
+    "n": 16,
+    "seeds_positive": 1,
+    "seeds_negative": 2
+   },
+   "param_growth": {
+    "mean": -6.9264,
+    "sd": 1.5712,
+    "ci95": [
+     -7.6963,
+     -6.1565
+    ],
+    "n": 16,
+    "seeds_positive": 0,
+    "seeds_negative": 16
+   }
+  },
+  "voi_vs_all_interventions": {
+   "mean": -8.4612,
+   "sd": 0.119,
+   "ci95": [
+    -8.5196,
+    -8.4029
+   ],
+   "n": 16,
+   "seeds_positive": 0,
+   "seeds_negative": 16
+  }
+ },
+ "per_seed": [
+  {
+   "multitask": {
+    "vanilla": {
+     "average_accuracy": 0.553,
+     "new_task": 0.9693,
+     "backward_transfer": -0.4483,
+     "forward_transfer": -0.0075,
+     "forgetting": 0.4492,
+     "retention": 0.5186,
+     "param_growth": 1.0,
+     "memory_bytes": 0,
+     "compute_steps": 3500,
+     "recurrence": [
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      }
+     ],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "replay": {
+     "average_accuracy": 0.8326,
+     "new_task": 0.9417,
+     "backward_transfer": -0.1175,
+     "forward_transfer": -0.0352,
+     "forgetting": 0.1193,
+     "retention": 0.8293,
+     "param_growth": 1.0,
+     "memory_bytes": 9408,
+     "compute_steps": 3500,
+     "recurrence": [
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      }
+     ],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "ewc": {
+     "average_accuracy": 0.5539,
+     "new_task": 0.9657,
+     "backward_transfer": -0.4435,
+     "forward_transfer": -0.0112,
+     "forgetting": 0.4438,
+     "retention": 0.5207,
+     "param_growth": 1.0,
+     "memory_bytes": 165088,
+     "compute_steps": 3500,
+     "recurrence": [
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      }
+     ],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "projected": {
+     "average_accuracy": 0.6434,
+     "new_task": 0.9587,
+     "backward_transfer": -0.3395,
+     "forward_transfer": -0.0181,
+     "forgetting": 0.3395,
+     "retention": 0.6163,
+     "param_growth": 1.0,
+     "memory_bytes": 1020176,
+     "compute_steps": 3500,
+     "recurrence": [
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      }
+     ],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "invariant_constraints": {
+     "average_accuracy": 0.8943,
+     "new_task": 0.9534,
+     "backward_transfer": -0.0637,
+     "forward_transfer": -0.0234,
+     "forgetting": 0.0658,
+     "retention": 0.8912,
+     "param_growth": 1.0,
+     "memory_bytes": 6272,
+     "compute_steps": 3500,
+     "recurrence": [
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      }
+     ],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "structural_growth": {
+     "average_accuracy": 0.986,
+     "new_task": 0.9916,
+     "backward_transfer": -0.006,
+     "forward_transfer": 0.0148,
+     "forgetting": 0.006,
+     "retention": 0.9865,
+     "param_growth": 12.0,
+     "memory_bytes": 984,
+     "compute_steps": 3600,
+     "recurrence": [
+      {
+       "latency_steps": 0,
+       "reused": true
+      },
+      {
+       "latency_steps": 0,
+       "reused": true
+      }
+     ],
+     "kinds": {
+      "grow": 12,
+      "reactivate": 2
+     },
+     "rollbacks": 0,
+     "reused_modules": 12,
+     "composed": 0,
+     "grown_modules": 12,
+     "macros": 1,
+     "programs": 12,
+     "evaluations": 0
+    },
+    "compositional": {
+     "average_accuracy": 0.9886,
+     "new_task": 0.9941,
+     "backward_transfer": -0.006,
+     "forward_transfer": 0.0173,
+     "forgetting": 0.006,
+     "retention": 0.9892,
+     "param_growth": 9.0,
+     "memory_bytes": 966,
+     "compute_steps": 3100,
+     "recurrence": [
+      {
+       "latency_steps": 0,
+       "reused": true
+      },
+      {
+       "latency_steps": 0,
+       "reused": true
+      }
+     ],
+     "kinds": {
+      "grow": 9,
+      "reactivate": 2,
+      "reuse": 2,
+      "compose": 1
+     },
+     "rollbacks": 0,
+     "reused_modules": 12,
+     "composed": 2,
+     "grown_modules": 9,
+     "macros": 3,
+     "programs": 12,
+     "evaluations": 123
+    }
+   },
+   "credit": {
+    "all": {
+     "accuracy": 1.0,
+     "interventions": 10.0,
+     "sign_cost": 0.0,
+     "n": 25
+    },
+    "random_topk": {
+     "accuracy": 0.36,
+     "interventions": 3.0,
+     "sign_cost": 0.0,
+     "n": 25
+    },
+    "sensitivity_topk": {
+     "accuracy": 0.24,
+     "interventions": 3.0,
+     "sign_cost": 0.05,
+     "n": 25
+    },
+    "voi": {
+     "accuracy": 1.0,
+     "interventions": 1.48,
+     "sign_cost": 0.33,
+     "n": 25
+    }
+   },
+   "cross_domain": {
+    "language": {
+     "domain": "language",
+     "tasks": 10,
+     "generalizes": 1.0,
+     "kinds": {
+      "grow": 4,
+      "reuse": 5,
+      "adapt": 1
+     },
+     "retention": 1.0,
+     "evaluations": 297,
+     "primitive_families": 5,
+     "skills": 5
+    },
+    "algebra": {
+     "domain": "algebra",
+     "tasks": 10,
+     "generalizes": 0.9,
+     "kinds": {
+      "grow": 3,
+      "reuse": 4,
+      "fail": 1,
+      "compose": 1,
+      "adapt": 1
+     },
+     "retention": 1.0,
+     "evaluations": 2589,
+     "primitive_families": 5,
+     "skills": 5
+    },
+    "code": {
+     "domain": "code",
+     "tasks": 10,
+     "generalizes": 0.9,
+     "kinds": {
+      "grow": 4,
+      "reuse": 5,
+      "compose": 1
+     },
+     "retention": 1.0,
+     "evaluations": 143,
+     "primitive_families": 5,
+     "skills": 5
+    },
+    "strings": {
+     "domain": "strings",
+     "tasks": 10,
+     "generalizes": 0.8,
+     "kinds": {
+      "grow": 4,
+      "reuse": 2,
+      "fail": 2,
+      "compose": 2
+     },
+     "retention": 1.0,
+     "evaluations": 1793,
+     "primitive_families": 6,
+     "skills": 6
+    }
+   },
+   "probes": {
+    "reference_A": 1.0,
+    "k=4": {
+     "synthesized": {
+      "retention_A": 0.9062,
+      "new_B": 0.9805
+     },
+     "random": {
+      "retention_A": 0.9453,
+      "new_B": 0.9609
+     }
+    },
+    "k=8": {
+     "synthesized": {
+      "retention_A": 0.9609,
+      "new_B": 0.9688
+     },
+     "random": {
+      "retention_A": 0.9609,
+      "new_B": 0.957
+     }
+    },
+    "k=16": {
+     "synthesized": {
+      "retention_A": 0.9609,
+      "new_B": 0.9844
+     },
+     "random": {
+      "retention_A": 0.9766,
+      "new_B": 0.9609
+     }
+    },
+    "k=32": {
+     "synthesized": {
+      "retention_A": 0.9688,
+      "new_B": 0.9805
+     },
+     "random": {
+      "retention_A": 0.9688,
+      "new_B": 0.9531
+     }
+    },
+    "full_replay(128)": {
+     "retention_A": 0.9922,
+     "new_B": 0.9844
+    }
+   },
+   "subspace": {
+    "null_space_rank": 15,
+    "parameters": 1474,
+    "vanilla": {
+     "retention_A": 0.0781,
+     "new_B": 1.0,
+     "J_old\u00b7\u0394\u03b8": 0.4088,
+     "params_added": 0
+    },
+    "projected_null_space": {
+     "retention_A": 0.4492,
+     "new_B": 0.9961,
+     "J_old\u00b7\u0394\u03b8": 0.0,
+     "params_added": 0
+    },
+    "invariant_constrained": {
+     "retention_A": 0.9805,
+     "new_B": 0.9961,
+     "J_old\u00b7\u0394\u03b8": 0.0441,
+     "params_added": 0
+    },
+    "structural_growth": {
+     "retention_A": 1.0,
+     "new_B": 0.9961,
+     "params_added": 178
+    }
+   },
+   "regeneration": {
+    "modules": 4,
+    "certificate_repair_rate": 0.583,
+    "accuracy_before": 0.977,
+    "accuracy_corrupted": 0.8512,
+    "accuracy_regenerated": 0.89
+   },
+   "economy": {
+    "families_used": {
+     "AddModule": 6,
+     "ParameterUpdate": 6,
+     "ReuseSkill": 14,
+     "AllocateSubspace": 4,
+     "FastWeightUpdate": 4,
+     "ComposeSkills": 4
+    },
+    "n_families_used": 6,
+    "n_families_available": 15,
+    "programs": 14,
+    "macros": [
+     [
+      "AddModule+ParameterUpdate+ReuseSkill",
+      6,
+      2
+     ],
+     [
+      "AllocateSubspace+FastWeightUpdate+ReuseSkill",
+      4,
+      3
+     ],
+     [
+      "ComposeSkills+ReuseSkill",
+      4,
+      4
+     ]
+    ],
+    "history_raw_bytes": 5392,
+    "history_stored_bytes": 1276,
+    "compression_ratio": 4.23,
+    "grown": 6,
+    "grown_later_reused": 3,
+    "library_entries": 7
+   }
+  },
+  {
+   "multitask": {
+    "vanilla": {
+     "average_accuracy": 0.5667,
+     "new_task": 0.9643,
+     "backward_transfer": -0.4282,
+     "forward_transfer": -0.0195,
+     "forgetting": 0.4318,
+     "retention": 0.5367,
+     "param_growth": 1.0,
+     "memory_bytes": 0,
+     "compute_steps": 3500,
+     "recurrence": [
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      }
+     ],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "replay": {
+     "average_accuracy": 0.8504,
+     "new_task": 0.9328,
+     "backward_transfer": -0.0886,
+     "forward_transfer": -0.0511,
+     "forgetting": 0.0962,
+     "retention": 0.8407,
+     "param_growth": 1.0,
+     "memory_bytes": 9408,
+     "compute_steps": 3500,
+     "recurrence": [
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      }
+     ],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "ewc": {
+     "average_accuracy": 0.647,
+     "new_task": 0.966,
+     "backward_transfer": -0.3434,
+     "forward_transfer": -0.0179,
+     "forgetting": 0.3486,
+     "retention": 0.6211,
+     "param_growth": 1.0,
+     "memory_bytes": 165088,
+     "compute_steps": 3500,
+     "recurrence": [
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      }
+     ],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "projected": {
+     "average_accuracy": 0.7109,
+     "new_task": 0.9794,
+     "backward_transfer": -0.2891,
+     "forward_transfer": -0.0045,
+     "forgetting": 0.2957,
+     "retention": 0.692,
+     "param_growth": 1.0,
+     "memory_bytes": 1061448,
+     "compute_steps": 3500,
+     "recurrence": [
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      }
+     ],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "invariant_constraints": {
+     "average_accuracy": 0.8675,
+     "new_task": 0.9646,
+     "backward_transfer": -0.1046,
+     "forward_transfer": -0.0193,
+     "forgetting": 0.1115,
+     "retention": 0.8606,
+     "param_growth": 1.0,
+     "memory_bytes": 6272,
+     "compute_steps": 3500,
+     "recurrence": [
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      }
+     ],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "structural_growth": {
+     "average_accuracy": 0.9916,
+     "new_task": 0.9947,
+     "backward_transfer": -0.0033,
+     "forward_transfer": 0.0109,
+     "forgetting": 0.0036,
+     "retention": 0.9916,
+     "param_growth": 12.0,
+     "memory_bytes": 984,
+     "compute_steps": 3600,
+     "recurrence": [
+      {
+       "latency_steps": 0,
+       "reused": true
+      },
+      {
+       "latency_steps": 0,
+       "reused": true
+      }
+     ],
+     "kinds": {
+      "grow": 12,
+      "reactivate": 2
+     },
+     "rollbacks": 0,
+     "reused_modules": 12,
+     "composed": 0,
+     "grown_modules": 12,
+     "macros": 1,
+     "programs": 12,
+     "evaluations": 0
+    },
+    "compositional": {
+     "average_accuracy": 0.9916,
+     "new_task": 0.9947,
+     "backward_transfer": -0.0033,
+     "forward_transfer": 0.0109,
+     "forgetting": 0.0036,
+     "retention": 0.9916,
+     "param_growth": 4.494,
+     "memory_bytes": 802,
+     "compute_steps": 2000,
+     "recurrence": [
+      {
+       "latency_steps": 0,
+       "reused": true
+      },
+      {
+       "latency_steps": 0,
+       "reused": true
+      }
+     ],
+     "kinds": {
+      "grow": 2,
+      "reuse": 4,
+      "adapter": 6,
+      "reactivate": 2
+     },
+     "rollbacks": 0,
+     "reused_modules": 12,
+     "composed": 1,
+     "grown_modules": 2,
+     "macros": 4,
+     "programs": 12,
+     "evaluations": 105
+    }
+   },
+   "credit": {
+    "all": {
+     "accuracy": 1.0,
+     "interventions": 10.0,
+     "sign_cost": 0.0,
+     "n": 27
+    },
+    "random_topk": {
+     "accuracy": 0.407,
+     "interventions": 3.0,
+     "sign_cost": 0.0,
+     "n": 27
+    },
+    "sensitivity_topk": {
+     "accuracy": 0.296,
+     "interventions": 3.0,
+     "sign_cost": 0.05,
+     "n": 27
+    },
+    "voi": {
+     "accuracy": 1.0,
+     "interventions": 1.48,
+     "sign_cost": 0.33,
+     "n": 27
+    }
+   },
+   "cross_domain": {
+    "language": {
+     "domain": "language",
+     "tasks": 10,
+     "generalizes": 1.0,
+     "kinds": {
+      "grow": 3,
+      "reuse": 5,
+      "compose": 2
+     },
+     "retention": 1.0,
+     "evaluations": 369,
+     "primitive_families": 5,
+     "skills": 5
+    },
+    "algebra": {
+     "domain": "algebra",
+     "tasks": 10,
+     "generalizes": 0.6,
+     "kinds": {
+      "grow": 2,
+      "reuse": 3,
+      "fail": 4,
+      "adapt": 1
+     },
+     "retention": 1.0,
+     "evaluations": 9793,
+     "primitive_families": 5,
+     "skills": 3
+    },
+    "code": {
+     "domain": "code",
+     "tasks": 10,
+     "generalizes": 0.6,
+     "kinds": {
+      "grow": 2,
+      "reuse": 4,
+      "fail": 4
+     },
+     "retention": 1.0,
+     "evaluations": 1685,
+     "primitive_families": 5,
+     "skills": 2
+    },
+    "strings": {
+     "domain": "strings",
+     "tasks": 10,
+     "generalizes": 0.6,
+     "kinds": {
+      "grow": 3,
+      "reuse": 2,
+      "fail": 4,
+      "compose": 1
+     },
+     "retention": 1.0,
+     "evaluations": 3440,
+     "primitive_families": 6,
+     "skills": 4
+    }
+   },
+   "probes": {
+    "reference_A": 0.9023,
+    "k=4": {
+     "synthesized": {
+      "retention_A": 0.6562,
+      "new_B": 0.8203
+     },
+     "random": {
+      "retention_A": 0.6523,
+      "new_B": 0.8438
+     }
+    },
+    "k=8": {
+     "synthesized": {
+      "retention_A": 0.6719,
+      "new_B": 0.8594
+     },
+     "random": {
+      "retention_A": 0.6602,
+      "new_B": 0.8594
+     }
+    },
+    "k=16": {
+     "synthesized": {
+      "retention_A": 0.7656,
+      "new_B": 0.8828
+     },
+     "random": {
+      "retention_A": 0.7227,
+      "new_B": 0.875
+     }
+    },
+    "k=32": {
+     "synthesized": {
+      "retention_A": 0.8281,
+      "new_B": 0.8828
+     },
+     "random": {
+      "retention_A": 0.8789,
+      "new_B": 0.8906
+     }
+    },
+    "full_replay(128)": {
+     "retention_A": 0.957,
+     "new_B": 0.9062
+    }
+   },
+   "subspace": {
+    "null_space_rank": 13,
+    "parameters": 1474,
+    "vanilla": {
+     "retention_A": 0.1328,
+     "new_B": 0.9883,
+     "J_old\u00b7\u0394\u03b8": 0.4488,
+     "params_added": 0
+    },
+    "projected_null_space": {
+     "retention_A": 0.25,
+     "new_B": 1.0,
+     "J_old\u00b7\u0394\u03b8": 0.0,
+     "params_added": 0
+    },
+    "invariant_constrained": {
+     "retention_A": 0.9961,
+     "new_B": 0.9844,
+     "J_old\u00b7\u0394\u03b8": 0.0552,
+     "params_added": 0
+    },
+    "structural_growth": {
+     "retention_A": 1.0,
+     "new_B": 1.0,
+     "params_added": 178
+    }
+   },
+   "regeneration": {
+    "modules": 1,
+    "certificate_repair_rate": 0.5,
+    "accuracy_before": 0.994,
+    "accuracy_corrupted": 0.701,
+    "accuracy_regenerated": 0.812
+   },
+   "economy": {
+    "families_used": {
+     "AddModule": 1,
+     "ParameterUpdate": 1,
+     "ReuseSkill": 12,
+     "AllocateSubspace": 6,
+     "FastWeightUpdate": 6,
+     "ComposeSkills": 4
+    },
+    "n_families_used": 6,
+    "n_families_available": 15,
+    "programs": 12,
+    "macros": [
+     [
+      "AddModule+ParameterUpdate+ReuseSkill",
+      1,
+      0
+     ],
+     [
+      "AllocateSubspace+FastWeightUpdate+ReuseSkill",
+      6,
+      2
+     ],
+     [
+      "ComposeSkills+ReuseSkill",
+      4,
+      4
+     ],
+     [
+      "ReuseSkill",
+      1,
+      0
+     ]
+    ],
+    "history_raw_bytes": 5392,
+    "history_stored_bytes": 1046,
+    "compression_ratio": 5.15,
+    "grown": 1,
+    "grown_later_reused": 1,
+    "library_entries": 4
+   }
+  },
+  {
+   "multitask": {
+    "vanilla": {
+     "average_accuracy": 0.637,
+     "new_task": 0.9682,
+     "backward_transfer": -0.3567,
+     "forward_transfer": -0.0056,
+     "forgetting": 0.357,
+     "retention": 0.6166,
+     "param_growth": 1.0,
+     "memory_bytes": 0,
+     "compute_steps": 3500,
+     "recurrence": [
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      }
+     ],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "replay": {
+     "average_accuracy": 0.8878,
+     "new_task": 0.9439,
+     "backward_transfer": -0.0604,
+     "forward_transfer": -0.0299,
+     "forgetting": 0.0634,
+     "retention": 0.893,
+     "param_growth": 1.0,
+     "memory_bytes": 9408,
+     "compute_steps": 3500,
+     "recurrence": [
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      }
+     ],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "ewc": {
+     "average_accuracy": 0.5555,
+     "new_task": 0.969,
+     "backward_transfer": -0.4453,
+     "forward_transfer": -0.0047,
+     "forgetting": 0.4456,
+     "retention": 0.5276,
+     "param_growth": 1.0,
+     "memory_bytes": 165088,
+     "compute_steps": 3500,
+     "recurrence": [
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      }
+     ],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "projected": {
+     "average_accuracy": 0.6987,
+     "new_task": 0.9802,
+     "backward_transfer": -0.3032,
+     "forward_transfer": 0.0064,
+     "forgetting": 0.3038,
+     "retention": 0.6833,
+     "param_growth": 1.0,
+     "memory_bytes": 955320,
+     "compute_steps": 3500,
+     "recurrence": [
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      }
+     ],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "invariant_constraints": {
+     "average_accuracy": 0.8943,
+     "new_task": 0.942,
+     "backward_transfer": -0.0514,
+     "forward_transfer": -0.0318,
+     "forgetting": 0.0544,
+     "retention": 0.9002,
+     "param_growth": 1.0,
+     "memory_bytes": 6272,
+     "compute_steps": 3500,
+     "recurrence": [
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      }
+     ],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "structural_growth": {
+     "average_accuracy": 0.9914,
+     "new_task": 0.9933,
+     "backward_transfer": -0.0021,
+     "forward_transfer": 0.0195,
+     "forgetting": 0.0021,
+     "retention": 0.9931,
+     "param_growth": 11.0,
+     "memory_bytes": 902,
+     "compute_steps": 3300,
+     "recurrence": [
+      {
+       "latency_steps": 0,
+       "reused": true
+      },
+      {
+       "latency_steps": 0,
+       "reused": true
+      },
+      {
+       "latency_steps": 0,
+       "reused": true
+      }
+     ],
+     "kinds": {
+      "grow": 11,
+      "reactivate": 3
+     },
+     "rollbacks": 0,
+     "reused_modules": 11,
+     "composed": 0,
+     "grown_modules": 11,
+     "macros": 1,
+     "programs": 11,
+     "evaluations": 0
+    },
+    "compositional": {
+     "average_accuracy": 0.9964,
+     "new_task": 0.9983,
+     "backward_transfer": -0.0021,
+     "forward_transfer": 0.0246,
+     "forgetting": 0.0021,
+     "retention": 0.9964,
+     "param_growth": 2.663,
+     "memory_bytes": 736,
+     "compute_steps": 1500,
+     "recurrence": [
+      {
+       "latency_steps": 0,
+       "reused": true
+      },
+      {
+       "latency_steps": 0,
+       "reused": true
+      },
+      {
+       "latency_steps": 0,
+       "reused": true
+      }
+     ],
+     "kinds": {
+      "grow": 1,
+      "adapter": 4,
+      "reactivate": 3,
+      "reuse": 3,
+      "compose": 3
+     },
+     "rollbacks": 0,
+     "reused_modules": 11,
+     "composed": 3,
+     "grown_modules": 1,
+     "macros": 4,
+     "programs": 11,
+     "evaluations": 152
+    }
+   },
+   "credit": {
+    "all": {
+     "accuracy": 1.0,
+     "interventions": 10.0,
+     "sign_cost": 0.0,
+     "n": 26
+    },
+    "random_topk": {
+     "accuracy": 0.385,
+     "interventions": 3.0,
+     "sign_cost": 0.0,
+     "n": 26
+    },
+    "sensitivity_topk": {
+     "accuracy": 0.308,
+     "interventions": 3.0,
+     "sign_cost": 0.05,
+     "n": 26
+    },
+    "voi": {
+     "accuracy": 1.0,
+     "interventions": 1.46,
+     "sign_cost": 0.33,
+     "n": 26
+    }
+   },
+   "cross_domain": {
+    "language": {
+     "domain": "language",
+     "tasks": 10,
+     "generalizes": 1.0,
+     "kinds": {
+      "grow": 2,
+      "reuse": 6,
+      "adapt": 2
+     },
+     "retention": 1.0,
+     "evaluations": 87,
+     "primitive_families": 5,
+     "skills": 4
+    },
+    "algebra": {
+     "domain": "algebra",
+     "tasks": 10,
+     "generalizes": 1.0,
+     "kinds": {
+      "grow": 2,
+      "reuse": 6,
+      "adapt": 2
+     },
+     "retention": 1.0,
+     "evaluations": 196,
+     "primitive_families": 5,
+     "skills": 4
+    },
+    "code": {
+     "domain": "code",
+     "tasks": 10,
+     "generalizes": 1.0,
+     "kinds": {
+      "grow": 1,
+      "adapt": 2,
+      "reuse": 6,
+      "compose": 1
+     },
+     "retention": 1.0,
+     "evaluations": 31,
+     "primitive_families": 5,
+     "skills": 4
+    },
+    "strings": {
+     "domain": "strings",
+     "tasks": 10,
+     "generalizes": 1.0,
+     "kinds": {
+      "grow": 3,
+      "adapt": 3,
+      "reuse": 4
+     },
+     "retention": 1.0,
+     "evaluations": 105,
+     "primitive_families": 6,
+     "skills": 6
+    }
+   },
+   "probes": {
+    "reference_A": 0.9922,
+    "k=4": {
+     "synthesized": {
+      "retention_A": 0.3789,
+      "new_B": 0.9844
+     },
+     "random": {
+      "retention_A": 0.5742,
+      "new_B": 0.9844
+     }
+    },
+    "k=8": {
+     "synthesized": {
+      "retention_A": 0.9414,
+      "new_B": 0.9766
+     },
+     "random": {
+      "retention_A": 0.832,
+      "new_B": 0.9844
+     }
+    },
+    "k=16": {
+     "synthesized": {
+      "retention_A": 0.9648,
+      "new_B": 0.9727
+     },
+     "random": {
+      "retention_A": 0.9609,
+      "new_B": 0.9844
+     }
+    },
+    "k=32": {
+     "synthesized": {
+      "retention_A": 0.9922,
+      "new_B": 0.9766
+     },
+     "random": {
+      "retention_A": 0.9883,
+      "new_B": 0.9805
+     }
+    },
+    "full_replay(128)": {
+     "retention_A": 0.9883,
+     "new_B": 0.9766
+    }
+   },
+   "subspace": {
+    "null_space_rank": 11,
+    "parameters": 1474,
+    "vanilla": {
+     "retention_A": 0.7539,
+     "new_B": 1.0,
+     "J_old\u00b7\u0394\u03b8": 0.4079,
+     "params_added": 0
+    },
+    "projected_null_space": {
+     "retention_A": 0.6211,
+     "new_B": 1.0,
+     "J_old\u00b7\u0394\u03b8": 0.0,
+     "params_added": 0
+    },
+    "invariant_constrained": {
+     "retention_A": 0.9961,
+     "new_B": 0.9922,
+     "J_old\u00b7\u0394\u03b8": 0.0242,
+     "params_added": 0
+    },
+    "structural_growth": {
+     "retention_A": 1.0,
+     "new_B": 1.0,
+     "params_added": 178
+    }
+   },
+   "regeneration": {
+    "modules": 2,
+    "certificate_repair_rate": 1.0,
+    "accuracy_before": 0.995,
+    "accuracy_corrupted": 0.8295,
+    "accuracy_regenerated": 0.9185
+   },
+   "economy": {
+    "families_used": {
+     "AddModule": 3,
+     "ParameterUpdate": 3,
+     "ReuseSkill": 14,
+     "AllocateSubspace": 11,
+     "FastWeightUpdate": 11
+    },
+    "n_families_used": 5,
+    "n_families_available": 15,
+    "programs": 14,
+    "macros": [
+     [
+      "AddModule+ParameterUpdate+ReuseSkill",
+      3,
+      2
+     ],
+     [
+      "AllocateSubspace+FastWeightUpdate+ReuseSkill",
+      11,
+      3
+     ]
+    ],
+    "history_raw_bytes": 5392,
+    "history_stored_bytes": 1244,
+    "compression_ratio": 4.33,
+    "grown": 3,
+    "grown_later_reused": 0,
+    "library_entries": 4
+   }
+  },
+  {
+   "multitask": {
+    "vanilla": {
+     "average_accuracy": 0.5787,
+     "new_task": 0.9757,
+     "backward_transfer": -0.4276,
+     "forward_transfer": 0.0045,
+     "forgetting": 0.4276,
+     "retention": 0.5505,
+     "param_growth": 1.0,
+     "memory_bytes": 0,
+     "compute_steps": 3500,
+     "recurrence": [
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      }
+     ],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "replay": {
+     "average_accuracy": 0.8546,
+     "new_task": 0.9442,
+     "backward_transfer": -0.0965,
+     "forward_transfer": -0.0271,
+     "forgetting": 0.0971,
+     "retention": 0.8495,
+     "param_growth": 1.0,
+     "memory_bytes": 9408,
+     "compute_steps": 3500,
+     "recurrence": [
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      }
+     ],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "ewc": {
+     "average_accuracy": 0.5711,
+     "new_task": 0.9498,
+     "backward_transfer": -0.4078,
+     "forward_transfer": -0.0215,
+     "forgetting": 0.4078,
+     "retention": 0.546,
+     "param_growth": 1.0,
+     "memory_bytes": 165088,
+     "compute_steps": 3500,
+     "recurrence": [
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      }
+     ],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "projected": {
+     "average_accuracy": 0.7333,
+     "new_task": 0.959,
+     "backward_transfer": -0.2431,
+     "forward_transfer": -0.0123,
+     "forgetting": 0.2434,
+     "retention": 0.7136,
+     "param_growth": 1.0,
+     "memory_bytes": 908152,
+     "compute_steps": 3500,
+     "recurrence": [
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      }
+     ],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "invariant_constraints": {
+     "average_accuracy": 0.8705,
+     "new_task": 0.9489,
+     "backward_transfer": -0.0844,
+     "forward_transfer": -0.0223,
+     "forgetting": 0.0856,
+     "retention": 0.8642,
+     "param_growth": 1.0,
+     "memory_bytes": 6272,
+     "compute_steps": 3500,
+     "recurrence": [
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      }
+     ],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "structural_growth": {
+     "average_accuracy": 0.9796,
+     "new_task": 0.983,
+     "backward_transfer": -0.0036,
+     "forward_transfer": 0.0117,
+     "forgetting": 0.0036,
+     "retention": 0.9793,
+     "param_growth": 10.0,
+     "memory_bytes": 820,
+     "compute_steps": 3000,
+     "recurrence": [
+      {
+       "latency_steps": 0,
+       "reused": true
+      },
+      {
+       "latency_steps": 0,
+       "reused": true
+      },
+      {
+       "latency_steps": 0,
+       "reused": true
+      },
+      {
+       "latency_steps": 0,
+       "reused": true
+      }
+     ],
+     "kinds": {
+      "grow": 10,
+      "reactivate": 4
+     },
+     "rollbacks": 0,
+     "reused_modules": 10,
+     "composed": 0,
+     "grown_modules": 10,
+     "macros": 1,
+     "programs": 10,
+     "evaluations": 0
+    },
+    "compositional": {
+     "average_accuracy": 0.9933,
+     "new_task": 0.9967,
+     "backward_transfer": -0.0036,
+     "forward_transfer": 0.0254,
+     "forgetting": 0.0036,
+     "retention": 0.994,
+     "param_growth": 2.663,
+     "memory_bytes": 720,
+     "compute_steps": 1500,
+     "recurrence": [
+      {
+       "latency_steps": 0,
+       "reused": true
+      },
+      {
+       "latency_steps": 0,
+       "reused": true
+      },
+      {
+       "latency_steps": 0,
+       "reused": true
+      },
+      {
+       "latency_steps": 0,
+       "reused": true
+      }
+     ],
+     "kinds": {
+      "grow": 1,
+      "reuse": 3,
+      "adapter": 4,
+      "reactivate": 4,
+      "compose": 2
+     },
+     "rollbacks": 0,
+     "reused_modules": 10,
+     "composed": 3,
+     "grown_modules": 1,
+     "macros": 4,
+     "programs": 10,
+     "evaluations": 69
+    }
+   },
+   "credit": {
+    "all": {
+     "accuracy": 0.929,
+     "interventions": 10.0,
+     "sign_cost": 0.0,
+     "n": 28
+    },
+    "random_topk": {
+     "accuracy": 0.357,
+     "interventions": 3.0,
+     "sign_cost": 0.0,
+     "n": 28
+    },
+    "sensitivity_topk": {
+     "accuracy": 0.286,
+     "interventions": 3.0,
+     "sign_cost": 0.05,
+     "n": 28
+    },
+    "voi": {
+     "accuracy": 1.0,
+     "interventions": 1.43,
+     "sign_cost": 0.33,
+     "n": 28
+    }
+   },
+   "cross_domain": {
+    "language": {
+     "domain": "language",
+     "tasks": 10,
+     "generalizes": 1.0,
+     "kinds": {
+      "grow": 5,
+      "adapt": 1,
+      "reuse": 2,
+      "compose": 2
+     },
+     "retention": 1.0,
+     "evaluations": 291,
+     "primitive_families": 5,
+     "skills": 8
+    },
+    "algebra": {
+     "domain": "algebra",
+     "tasks": 10,
+     "generalizes": 0.9,
+     "kinds": {
+      "grow": 5,
+      "reuse": 5
+     },
+     "retention": 1.0,
+     "evaluations": 610,
+     "primitive_families": 5,
+     "skills": 5
+    },
+    "code": {
+     "domain": "code",
+     "tasks": 10,
+     "generalizes": 1.0,
+     "kinds": {
+      "grow": 4,
+      "adapt": 3,
+      "reuse": 1,
+      "compose": 2
+     },
+     "retention": 1.0,
+     "evaluations": 317,
+     "primitive_families": 5,
+     "skills": 9
+    },
+    "strings": {
+     "domain": "strings",
+     "tasks": 10,
+     "generalizes": 1.0,
+     "kinds": {
+      "grow": 6,
+      "reuse": 3,
+      "compose": 1
+     },
+     "retention": 1.0,
+     "evaluations": 397,
+     "primitive_families": 6,
+     "skills": 7
+    }
+   },
+   "probes": {
+    "reference_A": 1.0,
+    "k=4": {
+     "synthesized": {
+      "retention_A": 0.625,
+      "new_B": 1.0
+     },
+     "random": {
+      "retention_A": 0.707,
+      "new_B": 1.0
+     }
+    },
+    "k=8": {
+     "synthesized": {
+      "retention_A": 0.7148,
+      "new_B": 1.0
+     },
+     "random": {
+      "retention_A": 0.8125,
+      "new_B": 1.0
+     }
+    },
+    "k=16": {
+     "synthesized": {
+      "retention_A": 0.9727,
+      "new_B": 1.0
+     },
+     "random": {
+      "retention_A": 0.9336,
+      "new_B": 1.0
+     }
+    },
+    "k=32": {
+     "synthesized": {
+      "retention_A": 0.9805,
+      "new_B": 1.0
+     },
+     "random": {
+      "retention_A": 0.9805,
+      "new_B": 1.0
+     }
+    },
+    "full_replay(128)": {
+     "retention_A": 1.0,
+     "new_B": 0.9961
+    }
+   },
+   "subspace": {
+    "null_space_rank": 9,
+    "parameters": 1474,
+    "vanilla": {
+     "retention_A": 0.0,
+     "new_B": 1.0,
+     "J_old\u00b7\u0394\u03b8": 0.4345,
+     "params_added": 0
+    },
+    "projected_null_space": {
+     "retention_A": 0.0,
+     "new_B": 1.0,
+     "J_old\u00b7\u0394\u03b8": 0.0,
+     "params_added": 0
+    },
+    "invariant_constrained": {
+     "retention_A": 0.9688,
+     "new_B": 0.9883,
+     "J_old\u00b7\u0394\u03b8": 0.0516,
+     "params_added": 0
+    },
+    "structural_growth": {
+     "retention_A": 0.9961,
+     "new_B": 1.0,
+     "params_added": 178
+    }
+   },
+   "regeneration": {
+    "modules": 1,
+    "certificate_repair_rate": 0.7,
+    "accuracy_before": 0.997,
+    "accuracy_corrupted": 0.589,
+    "accuracy_regenerated": 0.798
+   },
+   "economy": {
+    "families_used": {
+     "AddModule": 2,
+     "ParameterUpdate": 2,
+     "ReuseSkill": 16,
+     "AllocateSubspace": 8,
+     "FastWeightUpdate": 8,
+     "ComposeSkills": 5
+    },
+    "n_families_used": 6,
+    "n_families_available": 15,
+    "programs": 16,
+    "macros": [
+     [
+      "AddModule+ParameterUpdate+ReuseSkill",
+      2,
+      2
+     ],
+     [
+      "AllocateSubspace+FastWeightUpdate+ReuseSkill",
+      8,
+      2
+     ],
+     [
+      "ComposeSkills+ReuseSkill",
+      5,
+      4
+     ],
+     [
+      "ReuseSkill",
+      1,
+      0
+     ]
+    ],
+    "history_raw_bytes": 5392,
+    "history_stored_bytes": 1374,
+    "compression_ratio": 3.92,
+    "grown": 2,
+    "grown_later_reused": 2,
+    "library_entries": 6
+   }
+  },
+  {
+   "multitask": {
+    "vanilla": {
+     "average_accuracy": 0.6258,
+     "new_task": 0.9032,
+     "backward_transfer": -0.2987,
+     "forward_transfer": -0.0466,
+     "forgetting": 0.2987,
+     "retention": 0.6028,
+     "param_growth": 1.0,
+     "memory_bytes": 0,
+     "compute_steps": 3500,
+     "recurrence": [
+      {
+       "latency_steps": 250,
+       "reused": false
+      }
+     ],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "replay": {
+     "average_accuracy": 0.8295,
+     "new_task": 0.892,
+     "backward_transfer": -0.0673,
+     "forward_transfer": -0.0578,
+     "forgetting": 0.0733,
+     "retention": 0.8236,
+     "param_growth": 1.0,
+     "memory_bytes": 9408,
+     "compute_steps": 3500,
+     "recurrence": [
+      {
+       "latency_steps": 250,
+       "reused": false
+      }
+     ],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "ewc": {
+     "average_accuracy": 0.6113,
+     "new_task": 0.928,
+     "backward_transfer": -0.341,
+     "forward_transfer": -0.0218,
+     "forgetting": 0.341,
+     "retention": 0.5856,
+     "param_growth": 1.0,
+     "memory_bytes": 165088,
+     "compute_steps": 3500,
+     "recurrence": [
+      {
+       "latency_steps": 250,
+       "reused": false
+      }
+     ],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "projected": {
+     "average_accuracy": 0.6669,
+     "new_task": 0.923,
+     "backward_transfer": -0.2758,
+     "forward_transfer": -0.0268,
+     "forgetting": 0.2758,
+     "retention": 0.6442,
+     "param_growth": 1.0,
+     "memory_bytes": 961216,
+     "compute_steps": 3500,
+     "recurrence": [
+      {
+       "latency_steps": 250,
+       "reused": false
+      }
+     ],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "invariant_constraints": {
+     "average_accuracy": 0.8468,
+     "new_task": 0.8954,
+     "backward_transfer": -0.0523,
+     "forward_transfer": -0.0544,
+     "forgetting": 0.0532,
+     "retention": 0.8407,
+     "param_growth": 1.0,
+     "memory_bytes": 6272,
+     "compute_steps": 3500,
+     "recurrence": [
+      {
+       "latency_steps": 250,
+       "reused": false
+      }
+     ],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "structural_growth": {
+     "average_accuracy": 0.9819,
+     "new_task": 0.9866,
+     "backward_transfer": -0.0051,
+     "forward_transfer": 0.0368,
+     "forgetting": 0.0051,
+     "retention": 0.9805,
+     "param_growth": 13.0,
+     "memory_bytes": 1066,
+     "compute_steps": 3900,
+     "recurrence": [
+      {
+       "latency_steps": 0,
+       "reused": true
+      }
+     ],
+     "kinds": {
+      "grow": 13,
+      "reactivate": 1
+     },
+     "rollbacks": 0,
+     "reused_modules": 13,
+     "composed": 0,
+     "grown_modules": 13,
+     "macros": 1,
+     "programs": 13,
+     "evaluations": 0
+    },
+    "compositional": {
+     "average_accuracy": 0.9841,
+     "new_task": 0.9888,
+     "backward_transfer": -0.0051,
+     "forward_transfer": 0.0391,
+     "forgetting": 0.0051,
+     "retention": 0.9829,
+     "param_growth": 5.494,
+     "memory_bytes": 1080,
+     "compute_steps": 2700,
+     "recurrence": [
+      {
+       "latency_steps": 0,
+       "reused": true
+      }
+     ],
+     "kinds": {
+      "grow": 3,
+      "reuse": 2,
+      "adapter": 6,
+      "reactivate": 1,
+      "compose": 2
+     },
+     "rollbacks": 0,
+     "reused_modules": 13,
+     "composed": 3,
+     "grown_modules": 3,
+     "macros": 4,
+     "programs": 13,
+     "evaluations": 348
+    }
+   },
+   "credit": {
+    "all": {
+     "accuracy": 1.0,
+     "interventions": 10.0,
+     "sign_cost": 0.0,
+     "n": 30
+    },
+    "random_topk": {
+     "accuracy": 0.4,
+     "interventions": 3.0,
+     "sign_cost": 0.0,
+     "n": 30
+    },
+    "sensitivity_topk": {
+     "accuracy": 0.4,
+     "interventions": 3.0,
+     "sign_cost": 0.05,
+     "n": 30
+    },
+    "voi": {
+     "accuracy": 1.0,
+     "interventions": 1.83,
+     "sign_cost": 0.33,
+     "n": 30
+    }
+   },
+   "cross_domain": {
+    "language": {
+     "domain": "language",
+     "tasks": 10,
+     "generalizes": 1.0,
+     "kinds": {
+      "grow": 6,
+      "reuse": 3,
+      "compose": 1
+     },
+     "retention": 1.0,
+     "evaluations": 223,
+     "primitive_families": 5,
+     "skills": 7
+    },
+    "algebra": {
+     "domain": "algebra",
+     "tasks": 10,
+     "generalizes": 1.0,
+     "kinds": {
+      "grow": 6,
+      "reuse": 3,
+      "compose": 1
+     },
+     "retention": 1.0,
+     "evaluations": 330,
+     "primitive_families": 5,
+     "skills": 7
+    },
+    "code": {
+     "domain": "code",
+     "tasks": 10,
+     "generalizes": 1.0,
+     "kinds": {
+      "grow": 5,
+      "reuse": 4,
+      "compose": 1
+     },
+     "retention": 1.0,
+     "evaluations": 114,
+     "primitive_families": 5,
+     "skills": 6
+    },
+    "strings": {
+     "domain": "strings",
+     "tasks": 10,
+     "generalizes": 1.0,
+     "kinds": {
+      "grow": 7,
+      "reuse": 3
+     },
+     "retention": 1.0,
+     "evaluations": 233,
+     "primitive_families": 6,
+     "skills": 7
+    }
+   },
+   "probes": {
+    "reference_A": 1.0,
+    "k=4": {
+     "synthesized": {
+      "retention_A": 0.9336,
+      "new_B": 0.9844
+     },
+     "random": {
+      "retention_A": 0.9922,
+      "new_B": 0.9883
+     }
+    },
+    "k=8": {
+     "synthesized": {
+      "retention_A": 0.9844,
+      "new_B": 0.9883
+     },
+     "random": {
+      "retention_A": 0.9922,
+      "new_B": 0.9883
+     }
+    },
+    "k=16": {
+     "synthesized": {
+      "retention_A": 0.9961,
+      "new_B": 0.9883
+     },
+     "random": {
+      "retention_A": 1.0,
+      "new_B": 0.9844
+     }
+    },
+    "k=32": {
+     "synthesized": {
+      "retention_A": 1.0,
+      "new_B": 0.9844
+     },
+     "random": {
+      "retention_A": 1.0,
+      "new_B": 0.9883
+     }
+    },
+    "full_replay(128)": {
+     "retention_A": 1.0,
+     "new_B": 0.9922
+    }
+   },
+   "subspace": {
+    "null_space_rank": 26,
+    "parameters": 1474,
+    "vanilla": {
+     "retention_A": 0.0312,
+     "new_B": 0.9961,
+     "J_old\u00b7\u0394\u03b8": 0.3181,
+     "params_added": 0
+    },
+    "projected_null_space": {
+     "retention_A": 0.1367,
+     "new_B": 1.0,
+     "J_old\u00b7\u0394\u03b8": 0.0,
+     "params_added": 0
+    },
+    "invariant_constrained": {
+     "retention_A": 0.9453,
+     "new_B": 0.9922,
+     "J_old\u00b7\u0394\u03b8": 0.111,
+     "params_added": 0
+    },
+    "structural_growth": {
+     "retention_A": 1.0,
+     "new_B": 1.0,
+     "params_added": 178
+    }
+   },
+   "regeneration": {
+    "modules": 2,
+    "certificate_repair_rate": 0.571,
+    "accuracy_before": 0.992,
+    "accuracy_corrupted": 0.8325,
+    "accuracy_regenerated": 0.9045
+   },
+   "economy": {
+    "families_used": {
+     "AddModule": 3,
+     "ParameterUpdate": 3,
+     "ReuseSkill": 14,
+     "AllocateSubspace": 3,
+     "FastWeightUpdate": 3,
+     "ComposeSkills": 6
+    },
+    "n_families_used": 6,
+    "n_families_available": 15,
+    "programs": 14,
+    "macros": [
+     [
+      "AddModule+ParameterUpdate+ReuseSkill",
+      3,
+      2
+     ],
+     [
+      "AllocateSubspace+FastWeightUpdate+ReuseSkill",
+      3,
+      2
+     ],
+     [
+      "ComposeSkills+ReuseSkill",
+      6,
+      4
+     ],
+     [
+      "ReuseSkill",
+      2,
+      0
+     ]
+    ],
+    "history_raw_bytes": 5392,
+    "history_stored_bytes": 1128,
+    "compression_ratio": 4.78,
+    "grown": 3,
+    "grown_later_reused": 4,
+    "library_entries": 5
+   }
+  },
+  {
+   "multitask": {
+    "vanilla": {
+     "average_accuracy": 0.5502,
+     "new_task": 0.8521,
+     "backward_transfer": -0.3251,
+     "forward_transfer": -0.017,
+     "forgetting": 0.3251,
+     "retention": 0.5276,
+     "param_growth": 1.0,
+     "memory_bytes": 0,
+     "compute_steps": 3500,
+     "recurrence": [],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "replay": {
+     "average_accuracy": 0.7132,
+     "new_task": 0.8465,
+     "backward_transfer": -0.1436,
+     "forward_transfer": -0.0226,
+     "forgetting": 0.1445,
+     "retention": 0.704,
+     "param_growth": 1.0,
+     "memory_bytes": 9408,
+     "compute_steps": 3500,
+     "recurrence": [],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "ewc": {
+     "average_accuracy": 0.5469,
+     "new_task": 0.8557,
+     "backward_transfer": -0.3326,
+     "forward_transfer": -0.0134,
+     "forgetting": 0.3329,
+     "retention": 0.527,
+     "param_growth": 1.0,
+     "memory_bytes": 165088,
+     "compute_steps": 3500,
+     "recurrence": [],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "projected": {
+     "average_accuracy": 0.5795,
+     "new_task": 0.8705,
+     "backward_transfer": -0.3134,
+     "forward_transfer": 0.0014,
+     "forgetting": 0.3134,
+     "retention": 0.5556,
+     "param_growth": 1.0,
+     "memory_bytes": 1155784,
+     "compute_steps": 3500,
+     "recurrence": [],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "invariant_constraints": {
+     "average_accuracy": 0.7252,
+     "new_task": 0.8318,
+     "backward_transfer": -0.1148,
+     "forward_transfer": -0.0374,
+     "forgetting": 0.1169,
+     "retention": 0.7145,
+     "param_growth": 1.0,
+     "memory_bytes": 6272,
+     "compute_steps": 3500,
+     "recurrence": [],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "structural_growth": {
+     "average_accuracy": 0.9568,
+     "new_task": 0.9618,
+     "backward_transfer": -0.0054,
+     "forward_transfer": 0.0926,
+     "forgetting": 0.006,
+     "retention": 0.9561,
+     "param_growth": 14.0,
+     "memory_bytes": 1148,
+     "compute_steps": 4200,
+     "recurrence": [],
+     "kinds": {
+      "grow": 14
+     },
+     "rollbacks": 0,
+     "reused_modules": 14,
+     "composed": 0,
+     "grown_modules": 14,
+     "macros": 1,
+     "programs": 14,
+     "evaluations": 0
+    },
+    "compositional": {
+     "average_accuracy": 0.8948,
+     "new_task": 0.8998,
+     "backward_transfer": -0.0054,
+     "forward_transfer": 0.0307,
+     "forgetting": 0.006,
+     "retention": 0.8894,
+     "param_growth": 5.91,
+     "memory_bytes": 982,
+     "compute_steps": 4000,
+     "recurrence": [],
+     "kinds": {
+      "grow": 3,
+      "reuse": 4,
+      "adapter": 7
+     },
+     "rollbacks": 0,
+     "reused_modules": 14,
+     "composed": 1,
+     "grown_modules": 3,
+     "macros": 4,
+     "programs": 14,
+     "evaluations": 387
+    }
+   },
+   "credit": {
+    "all": {
+     "accuracy": 1.0,
+     "interventions": 10.0,
+     "sign_cost": 0.0,
+     "n": 27
+    },
+    "random_topk": {
+     "accuracy": 0.333,
+     "interventions": 3.0,
+     "sign_cost": 0.0,
+     "n": 27
+    },
+    "sensitivity_topk": {
+     "accuracy": 0.407,
+     "interventions": 3.0,
+     "sign_cost": 0.05,
+     "n": 27
+    },
+    "voi": {
+     "accuracy": 1.0,
+     "interventions": 1.59,
+     "sign_cost": 0.33,
+     "n": 27
+    }
+   },
+   "cross_domain": {
+    "language": {
+     "domain": "language",
+     "tasks": 10,
+     "generalizes": 1.0,
+     "kinds": {
+      "grow": 5,
+      "reuse": 2,
+      "adapt": 1,
+      "compose": 2
+     },
+     "retention": 1.0,
+     "evaluations": 271,
+     "primitive_families": 5,
+     "skills": 8
+    },
+    "algebra": {
+     "domain": "algebra",
+     "tasks": 10,
+     "generalizes": 1.0,
+     "kinds": {
+      "grow": 4,
+      "adapt": 1,
+      "compose": 3,
+      "reuse": 2
+     },
+     "retention": 1.0,
+     "evaluations": 466,
+     "primitive_families": 5,
+     "skills": 8
+    },
+    "code": {
+     "domain": "code",
+     "tasks": 10,
+     "generalizes": 1.0,
+     "kinds": {
+      "grow": 4,
+      "adapt": 3,
+      "compose": 2,
+      "reuse": 1
+     },
+     "retention": 1.0,
+     "evaluations": 283,
+     "primitive_families": 5,
+     "skills": 9
+    },
+    "strings": {
+     "domain": "strings",
+     "tasks": 10,
+     "generalizes": 1.0,
+     "kinds": {
+      "grow": 6,
+      "compose": 3,
+      "adapt": 1
+     },
+     "retention": 1.0,
+     "evaluations": 543,
+     "primitive_families": 6,
+     "skills": 10
+    }
+   },
+   "probes": {
+    "reference_A": 1.0,
+    "k=4": {
+     "synthesized": {
+      "retention_A": 0.918,
+      "new_B": 0.9727
+     },
+     "random": {
+      "retention_A": 0.9062,
+      "new_B": 0.9688
+     }
+    },
+    "k=8": {
+     "synthesized": {
+      "retention_A": 1.0,
+      "new_B": 0.9766
+     },
+     "random": {
+      "retention_A": 0.9805,
+      "new_B": 0.9766
+     }
+    },
+    "k=16": {
+     "synthesized": {
+      "retention_A": 1.0,
+      "new_B": 0.9766
+     },
+     "random": {
+      "retention_A": 1.0,
+      "new_B": 0.9727
+     }
+    },
+    "k=32": {
+     "synthesized": {
+      "retention_A": 1.0,
+      "new_B": 0.9766
+     },
+     "random": {
+      "retention_A": 1.0,
+      "new_B": 0.9805
+     }
+    },
+    "full_replay(128)": {
+     "retention_A": 0.9883,
+     "new_B": 0.9805
+    }
+   },
+   "subspace": {
+    "null_space_rank": 12,
+    "parameters": 1474,
+    "vanilla": {
+     "retention_A": 0.3672,
+     "new_B": 1.0,
+     "J_old\u00b7\u0394\u03b8": 0.3499,
+     "params_added": 0
+    },
+    "projected_null_space": {
+     "retention_A": 0.5,
+     "new_B": 1.0,
+     "J_old\u00b7\u0394\u03b8": 0.0,
+     "params_added": 0
+    },
+    "invariant_constrained": {
+     "retention_A": 0.9883,
+     "new_B": 1.0,
+     "J_old\u00b7\u0394\u03b8": 0.0596,
+     "params_added": 0
+    },
+    "structural_growth": {
+     "retention_A": 1.0,
+     "new_B": 1.0,
+     "params_added": 178
+    }
+   },
+   "regeneration": {
+    "modules": 1,
+    "certificate_repair_rate": 0.889,
+    "accuracy_before": 0.989,
+    "accuracy_corrupted": 0.74,
+    "accuracy_regenerated": 0.914
+   },
+   "economy": {
+    "families_used": {
+     "AddModule": 1,
+     "ParameterUpdate": 1,
+     "ReuseSkill": 14,
+     "AllocateSubspace": 7,
+     "FastWeightUpdate": 7,
+     "ComposeSkills": 6
+    },
+    "n_families_used": 6,
+    "n_families_available": 15,
+    "programs": 14,
+    "macros": [
+     [
+      "AddModule+ParameterUpdate+ReuseSkill",
+      1,
+      0
+     ],
+     [
+      "AllocateSubspace+FastWeightUpdate+ReuseSkill",
+      7,
+      2
+     ],
+     [
+      "ComposeSkills+ReuseSkill",
+      6,
+      4
+     ]
+    ],
+    "history_raw_bytes": 5392,
+    "history_stored_bytes": 1276,
+    "compression_ratio": 4.23,
+    "grown": 1,
+    "grown_later_reused": 0,
+    "library_entries": 5
+   }
+  },
+  {
+   "multitask": {
+    "vanilla": {
+     "average_accuracy": 0.6621,
+     "new_task": 0.9741,
+     "backward_transfer": -0.3359,
+     "forward_transfer": -0.0112,
+     "forgetting": 0.3386,
+     "retention": 0.6364,
+     "param_growth": 1.0,
+     "memory_bytes": 0,
+     "compute_steps": 3500,
+     "recurrence": [
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      }
+     ],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "replay": {
+     "average_accuracy": 0.8901,
+     "new_task": 0.9537,
+     "backward_transfer": -0.0685,
+     "forward_transfer": -0.0315,
+     "forgetting": 0.0724,
+     "retention": 0.8837,
+     "param_growth": 1.0,
+     "memory_bytes": 9408,
+     "compute_steps": 3500,
+     "recurrence": [
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      }
+     ],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "ewc": {
+     "average_accuracy": 0.6445,
+     "new_task": 0.9807,
+     "backward_transfer": -0.3621,
+     "forward_transfer": -0.0045,
+     "forgetting": 0.3639,
+     "retention": 0.6175,
+     "param_growth": 1.0,
+     "memory_bytes": 165088,
+     "compute_steps": 3500,
+     "recurrence": [
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      }
+     ],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "projected": {
+     "average_accuracy": 0.7285,
+     "new_task": 0.9754,
+     "backward_transfer": -0.2659,
+     "forward_transfer": -0.0098,
+     "forgetting": 0.2662,
+     "retention": 0.7079,
+     "param_growth": 1.0,
+     "memory_bytes": 1008384,
+     "compute_steps": 3500,
+     "recurrence": [
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      }
+     ],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "invariant_constraints": {
+     "average_accuracy": 0.8834,
+     "new_task": 0.9456,
+     "backward_transfer": -0.067,
+     "forward_transfer": -0.0396,
+     "forgetting": 0.0772,
+     "retention": 0.8789,
+     "param_growth": 1.0,
+     "memory_bytes": 6272,
+     "compute_steps": 3500,
+     "recurrence": [
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      }
+     ],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "structural_growth": {
+     "average_accuracy": 0.9925,
+     "new_task": 0.9944,
+     "backward_transfer": -0.0021,
+     "forward_transfer": 0.0092,
+     "forgetting": 0.0021,
+     "retention": 0.9934,
+     "param_growth": 12.0,
+     "memory_bytes": 984,
+     "compute_steps": 3600,
+     "recurrence": [
+      {
+       "latency_steps": 0,
+       "reused": true
+      },
+      {
+       "latency_steps": 0,
+       "reused": true
+      }
+     ],
+     "kinds": {
+      "grow": 12,
+      "reactivate": 2
+     },
+     "rollbacks": 0,
+     "reused_modules": 12,
+     "composed": 0,
+     "grown_modules": 12,
+     "macros": 1,
+     "programs": 12,
+     "evaluations": 0
+    },
+    "compositional": {
+     "average_accuracy": 0.9925,
+     "new_task": 0.9944,
+     "backward_transfer": -0.0021,
+     "forward_transfer": 0.0092,
+     "forgetting": 0.0021,
+     "retention": 0.9934,
+     "param_growth": 4.247,
+     "memory_bytes": 720,
+     "compute_steps": 1900,
+     "recurrence": [
+      {
+       "latency_steps": 0,
+       "reused": true
+      },
+      {
+       "latency_steps": 0,
+       "reused": true
+      }
+     ],
+     "kinds": {
+      "grow": 3,
+      "adapter": 3,
+      "reuse": 6,
+      "reactivate": 2
+     },
+     "rollbacks": 0,
+     "reused_modules": 12,
+     "composed": 2,
+     "grown_modules": 3,
+     "macros": 4,
+     "programs": 12,
+     "evaluations": 116
+    }
+   },
+   "credit": {
+    "all": {
+     "accuracy": 1.0,
+     "interventions": 10.0,
+     "sign_cost": 0.0,
+     "n": 26
+    },
+    "random_topk": {
+     "accuracy": 0.346,
+     "interventions": 3.0,
+     "sign_cost": 0.0,
+     "n": 26
+    },
+    "sensitivity_topk": {
+     "accuracy": 0.231,
+     "interventions": 3.0,
+     "sign_cost": 0.05,
+     "n": 26
+    },
+    "voi": {
+     "accuracy": 1.0,
+     "interventions": 1.54,
+     "sign_cost": 0.33,
+     "n": 26
+    }
+   },
+   "cross_domain": {
+    "language": {
+     "domain": "language",
+     "tasks": 10,
+     "generalizes": 1.0,
+     "kinds": {
+      "grow": 5,
+      "reuse": 3,
+      "compose": 1,
+      "adapt": 1
+     },
+     "retention": 1.0,
+     "evaluations": 166,
+     "primitive_families": 5,
+     "skills": 7
+    },
+    "algebra": {
+     "domain": "algebra",
+     "tasks": 10,
+     "generalizes": 1.0,
+     "kinds": {
+      "grow": 4,
+      "adapt": 5,
+      "reuse": 1
+     },
+     "retention": 1.0,
+     "evaluations": 445,
+     "primitive_families": 5,
+     "skills": 9
+    },
+    "code": {
+     "domain": "code",
+     "tasks": 10,
+     "generalizes": 1.0,
+     "kinds": {
+      "grow": 6,
+      "reuse": 3,
+      "compose": 1
+     },
+     "retention": 1.0,
+     "evaluations": 160,
+     "primitive_families": 5,
+     "skills": 7
+    },
+    "strings": {
+     "domain": "strings",
+     "tasks": 10,
+     "generalizes": 1.0,
+     "kinds": {
+      "grow": 5,
+      "adapt": 1,
+      "compose": 1,
+      "reuse": 3
+     },
+     "retention": 1.0,
+     "evaluations": 256,
+     "primitive_families": 6,
+     "skills": 7
+    }
+   },
+   "probes": {
+    "reference_A": 0.8984,
+    "k=4": {
+     "synthesized": {
+      "retention_A": 0.625,
+      "new_B": 0.9531
+     },
+     "random": {
+      "retention_A": 0.7227,
+      "new_B": 0.9688
+     }
+    },
+    "k=8": {
+     "synthesized": {
+      "retention_A": 0.7422,
+      "new_B": 0.9648
+     },
+     "random": {
+      "retention_A": 0.8594,
+      "new_B": 0.9648
+     }
+    },
+    "k=16": {
+     "synthesized": {
+      "retention_A": 0.8164,
+      "new_B": 0.9492
+     },
+     "random": {
+      "retention_A": 0.832,
+      "new_B": 0.9648
+     }
+    },
+    "k=32": {
+     "synthesized": {
+      "retention_A": 0.9023,
+      "new_B": 0.9531
+     },
+     "random": {
+      "retention_A": 0.8438,
+      "new_B": 0.9648
+     }
+    },
+    "full_replay(128)": {
+     "retention_A": 0.9258,
+     "new_B": 0.9688
+    }
+   },
+   "subspace": {
+    "null_space_rank": 12,
+    "parameters": 1474,
+    "vanilla": {
+     "retention_A": 0.3789,
+     "new_B": 0.9609,
+     "J_old\u00b7\u0394\u03b8": 0.3211,
+     "params_added": 0
+    },
+    "projected_null_space": {
+     "retention_A": 0.4141,
+     "new_B": 1.0,
+     "J_old\u00b7\u0394\u03b8": 0.0,
+     "params_added": 0
+    },
+    "invariant_constrained": {
+     "retention_A": 0.9883,
+     "new_B": 0.918,
+     "J_old\u00b7\u0394\u03b8": 0.0097,
+     "params_added": 0
+    },
+    "structural_growth": {
+     "retention_A": 1.0,
+     "new_B": 1.0,
+     "params_added": 178
+    }
+   },
+   "regeneration": {
+    "modules": 2,
+    "certificate_repair_rate": 0.6,
+    "accuracy_before": 0.971,
+    "accuracy_corrupted": 0.7555,
+    "accuracy_regenerated": 0.819
+   },
+   "economy": {
+    "families_used": {
+     "AddModule": 9,
+     "ParameterUpdate": 9,
+     "ReuseSkill": 15,
+     "ComposeSkills": 4,
+     "AllocateSubspace": 1,
+     "FastWeightUpdate": 1
+    },
+    "n_families_used": 6,
+    "n_families_available": 15,
+    "programs": 15,
+    "macros": [
+     [
+      "AddModule+ParameterUpdate+ReuseSkill",
+      9,
+      2
+     ],
+     [
+      "ComposeSkills+ReuseSkill",
+      4,
+      4
+     ],
+     [
+      "ReuseSkill",
+      1,
+      0
+     ],
+     [
+      "AllocateSubspace+FastWeightUpdate+ReuseSkill",
+      1,
+      0
+     ]
+    ],
+    "history_raw_bytes": 5392,
+    "history_stored_bytes": 1292,
+    "compression_ratio": 4.17,
+    "grown": 9,
+    "grown_later_reused": 7,
+    "library_entries": 6
+   }
+  },
+  {
+   "multitask": {
+    "vanilla": {
+     "average_accuracy": 0.6203,
+     "new_task": 0.9383,
+     "backward_transfer": -0.3425,
+     "forward_transfer": -0.0259,
+     "forgetting": 0.3425,
+     "retention": 0.6016,
+     "param_growth": 1.0,
+     "memory_bytes": 0,
+     "compute_steps": 3500,
+     "recurrence": [
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      }
+     ],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "replay": {
+     "average_accuracy": 0.8203,
+     "new_task": 0.9074,
+     "backward_transfer": -0.0938,
+     "forward_transfer": -0.0569,
+     "forgetting": 0.0956,
+     "retention": 0.8143,
+     "param_growth": 1.0,
+     "memory_bytes": 9408,
+     "compute_steps": 3500,
+     "recurrence": [
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      }
+     ],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "ewc": {
+     "average_accuracy": 0.6099,
+     "new_task": 0.9364,
+     "backward_transfer": -0.3516,
+     "forward_transfer": -0.0279,
+     "forgetting": 0.3519,
+     "retention": 0.591,
+     "param_growth": 1.0,
+     "memory_bytes": 165088,
+     "compute_steps": 3500,
+     "recurrence": [
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      }
+     ],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "projected": {
+     "average_accuracy": 0.5963,
+     "new_task": 0.928,
+     "backward_transfer": -0.3573,
+     "forward_transfer": -0.0363,
+     "forgetting": 0.3585,
+     "retention": 0.582,
+     "param_growth": 1.0,
+     "memory_bytes": 1020176,
+     "compute_steps": 3500,
+     "recurrence": [
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      }
+     ],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "invariant_constraints": {
+     "average_accuracy": 0.8477,
+     "new_task": 0.9191,
+     "backward_transfer": -0.0769,
+     "forward_transfer": -0.0452,
+     "forgetting": 0.0778,
+     "retention": 0.8483,
+     "param_growth": 1.0,
+     "memory_bytes": 6272,
+     "compute_steps": 3500,
+     "recurrence": [
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      }
+     ],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "structural_growth": {
+     "average_accuracy": 0.9838,
+     "new_task": 0.9886,
+     "backward_transfer": -0.0051,
+     "forward_transfer": 0.0243,
+     "forgetting": 0.0051,
+     "retention": 0.9874,
+     "param_growth": 12.0,
+     "memory_bytes": 984,
+     "compute_steps": 3600,
+     "recurrence": [
+      {
+       "latency_steps": 0,
+       "reused": true
+      },
+      {
+       "latency_steps": 0,
+       "reused": true
+      }
+     ],
+     "kinds": {
+      "grow": 12,
+      "reactivate": 2
+     },
+     "rollbacks": 0,
+     "reused_modules": 12,
+     "composed": 0,
+     "grown_modules": 12,
+     "macros": 1,
+     "programs": 12,
+     "evaluations": 0
+    },
+    "compositional": {
+     "average_accuracy": 0.9922,
+     "new_task": 0.9969,
+     "backward_transfer": -0.0051,
+     "forward_transfer": 0.0326,
+     "forgetting": 0.0051,
+     "retention": 0.9916,
+     "param_growth": 4.494,
+     "memory_bytes": 982,
+     "compute_steps": 2200,
+     "recurrence": [
+      {
+       "latency_steps": 0,
+       "reused": true
+      },
+      {
+       "latency_steps": 0,
+       "reused": true
+      }
+     ],
+     "kinds": {
+      "grow": 2,
+      "adapter": 6,
+      "compose": 1,
+      "reactivate": 2,
+      "reuse": 3
+     },
+     "rollbacks": 0,
+     "reused_modules": 12,
+     "composed": 3,
+     "grown_modules": 2,
+     "macros": 4,
+     "programs": 12,
+     "evaluations": 79
+    }
+   },
+   "credit": {
+    "all": {
+     "accuracy": 1.0,
+     "interventions": 10.0,
+     "sign_cost": 0.0,
+     "n": 28
+    },
+    "random_topk": {
+     "accuracy": 0.357,
+     "interventions": 3.0,
+     "sign_cost": 0.0,
+     "n": 28
+    },
+    "sensitivity_topk": {
+     "accuracy": 0.286,
+     "interventions": 3.0,
+     "sign_cost": 0.05,
+     "n": 28
+    },
+    "voi": {
+     "accuracy": 1.0,
+     "interventions": 1.54,
+     "sign_cost": 0.33,
+     "n": 28
+    }
+   },
+   "cross_domain": {
+    "language": {
+     "domain": "language",
+     "tasks": 10,
+     "generalizes": 1.0,
+     "kinds": {
+      "grow": 6,
+      "reuse": 2,
+      "compose": 2
+     },
+     "retention": 1.0,
+     "evaluations": 207,
+     "primitive_families": 5,
+     "skills": 8
+    },
+    "algebra": {
+     "domain": "algebra",
+     "tasks": 10,
+     "generalizes": 1.0,
+     "kinds": {
+      "grow": 5,
+      "adapt": 2,
+      "compose": 2,
+      "reuse": 1
+     },
+     "retention": 1.0,
+     "evaluations": 512,
+     "primitive_families": 5,
+     "skills": 9
+    },
+    "code": {
+     "domain": "code",
+     "tasks": 10,
+     "generalizes": 1.0,
+     "kinds": {
+      "grow": 6,
+      "reuse": 3,
+      "compose": 1
+     },
+     "retention": 1.0,
+     "evaluations": 165,
+     "primitive_families": 5,
+     "skills": 7
+    },
+    "strings": {
+     "domain": "strings",
+     "tasks": 10,
+     "generalizes": 1.0,
+     "kinds": {
+      "grow": 5,
+      "compose": 2,
+      "reuse": 1,
+      "adapt": 2
+     },
+     "retention": 1.0,
+     "evaluations": 387,
+     "primitive_families": 6,
+     "skills": 9
+    }
+   },
+   "probes": {
+    "reference_A": 1.0,
+    "k=4": {
+     "synthesized": {
+      "retention_A": 0.8828,
+      "new_B": 0.9961
+     },
+     "random": {
+      "retention_A": 0.8906,
+      "new_B": 0.9961
+     }
+    },
+    "k=8": {
+     "synthesized": {
+      "retention_A": 0.918,
+      "new_B": 0.9922
+     },
+     "random": {
+      "retention_A": 0.918,
+      "new_B": 0.9961
+     }
+    },
+    "k=16": {
+     "synthesized": {
+      "retention_A": 0.9453,
+      "new_B": 0.9922
+     },
+     "random": {
+      "retention_A": 0.9766,
+      "new_B": 0.9961
+     }
+    },
+    "k=32": {
+     "synthesized": {
+      "retention_A": 0.9883,
+      "new_B": 0.9922
+     },
+     "random": {
+      "retention_A": 0.9844,
+      "new_B": 0.9961
+     }
+    },
+    "full_replay(128)": {
+     "retention_A": 0.9961,
+     "new_B": 1.0
+    }
+   },
+   "subspace": {
+    "null_space_rank": 9,
+    "parameters": 1474,
+    "vanilla": {
+     "retention_A": 0.0156,
+     "new_B": 0.9922,
+     "J_old\u00b7\u0394\u03b8": 0.3798,
+     "params_added": 0
+    },
+    "projected_null_space": {
+     "retention_A": 0.2422,
+     "new_B": 1.0,
+     "J_old\u00b7\u0394\u03b8": 0.0,
+     "params_added": 0
+    },
+    "invariant_constrained": {
+     "retention_A": 0.9766,
+     "new_B": 0.9844,
+     "J_old\u00b7\u0394\u03b8": 0.0156,
+     "params_added": 0
+    },
+    "structural_growth": {
+     "retention_A": 1.0,
+     "new_B": 1.0,
+     "params_added": 178
+    }
+   },
+   "regeneration": {
+    "modules": 1,
+    "certificate_repair_rate": 0.75,
+    "accuracy_before": 0.996,
+    "accuracy_corrupted": 0.569,
+    "accuracy_regenerated": 0.775
+   },
+   "economy": {
+    "families_used": {
+     "AddModule": 1,
+     "ParameterUpdate": 1,
+     "ReuseSkill": 13,
+     "ComposeSkills": 4,
+     "AllocateSubspace": 6,
+     "FastWeightUpdate": 6
+    },
+    "n_families_used": 6,
+    "n_families_available": 15,
+    "programs": 13,
+    "macros": [
+     [
+      "AddModule+ParameterUpdate+ReuseSkill",
+      1,
+      0
+     ],
+     [
+      "ComposeSkills+ReuseSkill",
+      4,
+      4
+     ],
+     [
+      "AllocateSubspace+FastWeightUpdate+ReuseSkill",
+      6,
+      2
+     ],
+     [
+      "ReuseSkill",
+      2,
+      0
+     ]
+    ],
+    "history_raw_bytes": 5392,
+    "history_stored_bytes": 1046,
+    "compression_ratio": 5.15,
+    "grown": 1,
+    "grown_later_reused": 1,
+    "library_entries": 5
+   }
+  },
+  {
+   "multitask": {
+    "vanilla": {
+     "average_accuracy": 0.5293,
+     "new_task": 0.9782,
+     "backward_transfer": -0.4835,
+     "forward_transfer": -0.0022,
+     "forgetting": 0.4835,
+     "retention": 0.4949,
+     "param_growth": 1.0,
+     "memory_bytes": 0,
+     "compute_steps": 3500,
+     "recurrence": [
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      }
+     ],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "replay": {
+     "average_accuracy": 0.8864,
+     "new_task": 0.945,
+     "backward_transfer": -0.0631,
+     "forward_transfer": -0.0354,
+     "forgetting": 0.064,
+     "retention": 0.8819,
+     "param_growth": 1.0,
+     "memory_bytes": 9408,
+     "compute_steps": 3500,
+     "recurrence": [
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      }
+     ],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "ewc": {
+     "average_accuracy": 0.5483,
+     "new_task": 0.971,
+     "backward_transfer": -0.4552,
+     "forward_transfer": -0.0095,
+     "forgetting": 0.4558,
+     "retention": 0.5144,
+     "param_growth": 1.0,
+     "memory_bytes": 165088,
+     "compute_steps": 3500,
+     "recurrence": [
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      }
+     ],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "projected": {
+     "average_accuracy": 0.7115,
+     "new_task": 0.9704,
+     "backward_transfer": -0.2788,
+     "forward_transfer": -0.01,
+     "forgetting": 0.2794,
+     "retention": 0.6902,
+     "param_growth": 1.0,
+     "memory_bytes": 961216,
+     "compute_steps": 3500,
+     "recurrence": [
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      }
+     ],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "invariant_constraints": {
+     "average_accuracy": 0.9171,
+     "new_task": 0.9623,
+     "backward_transfer": -0.0487,
+     "forward_transfer": -0.0181,
+     "forgetting": 0.0499,
+     "retention": 0.9174,
+     "param_growth": 1.0,
+     "memory_bytes": 6272,
+     "compute_steps": 3500,
+     "recurrence": [
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      }
+     ],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "structural_growth": {
+     "average_accuracy": 0.9897,
+     "new_task": 0.9961,
+     "backward_transfer": -0.0069,
+     "forward_transfer": 0.0156,
+     "forgetting": 0.0069,
+     "retention": 0.9904,
+     "param_growth": 11.0,
+     "memory_bytes": 902,
+     "compute_steps": 3300,
+     "recurrence": [
+      {
+       "latency_steps": 0,
+       "reused": true
+      },
+      {
+       "latency_steps": 0,
+       "reused": true
+      },
+      {
+       "latency_steps": 0,
+       "reused": true
+      }
+     ],
+     "kinds": {
+      "grow": 11,
+      "reactivate": 3
+     },
+     "rollbacks": 0,
+     "reused_modules": 11,
+     "composed": 0,
+     "grown_modules": 11,
+     "macros": 1,
+     "programs": 11,
+     "evaluations": 0
+    },
+    "compositional": {
+     "average_accuracy": 0.9883,
+     "new_task": 0.9947,
+     "backward_transfer": -0.0069,
+     "forward_transfer": 0.0142,
+     "forgetting": 0.0069,
+     "retention": 0.9889,
+     "param_growth": 4.494,
+     "memory_bytes": 900,
+     "compute_steps": 2000,
+     "recurrence": [
+      {
+       "latency_steps": 0,
+       "reused": true
+      },
+      {
+       "latency_steps": 0,
+       "reused": true
+      },
+      {
+       "latency_steps": 0,
+       "reused": true
+      }
+     ],
+     "kinds": {
+      "grow": 2,
+      "reuse": 2,
+      "adapter": 6,
+      "reactivate": 3,
+      "compose": 1
+     },
+     "rollbacks": 0,
+     "reused_modules": 11,
+     "composed": 2,
+     "grown_modules": 2,
+     "macros": 4,
+     "programs": 11,
+     "evaluations": 94
+    }
+   },
+   "credit": {
+    "all": {
+     "accuracy": 1.0,
+     "interventions": 10.0,
+     "sign_cost": 0.0,
+     "n": 27
+    },
+    "random_topk": {
+     "accuracy": 0.37,
+     "interventions": 3.0,
+     "sign_cost": 0.0,
+     "n": 27
+    },
+    "sensitivity_topk": {
+     "accuracy": 0.37,
+     "interventions": 3.0,
+     "sign_cost": 0.05,
+     "n": 27
+    },
+    "voi": {
+     "accuracy": 1.0,
+     "interventions": 1.52,
+     "sign_cost": 0.33,
+     "n": 27
+    }
+   },
+   "cross_domain": {
+    "language": {
+     "domain": "language",
+     "tasks": 10,
+     "generalizes": 1.0,
+     "kinds": {
+      "grow": 4,
+      "reuse": 3,
+      "adapt": 1,
+      "compose": 2
+     },
+     "retention": 1.0,
+     "evaluations": 203,
+     "primitive_families": 5,
+     "skills": 7
+    },
+    "algebra": {
+     "domain": "algebra",
+     "tasks": 10,
+     "generalizes": 0.9,
+     "kinds": {
+      "grow": 5,
+      "reuse": 1,
+      "adapt": 2,
+      "fail": 1,
+      "compose": 1
+     },
+     "retention": 1.0,
+     "evaluations": 2965,
+     "primitive_families": 5,
+     "skills": 8
+    },
+    "code": {
+     "domain": "code",
+     "tasks": 10,
+     "generalizes": 0.6,
+     "kinds": {
+      "grow": 4,
+      "reuse": 3,
+      "compose": 1,
+      "fail": 2
+     },
+     "retention": 1.0,
+     "evaluations": 983,
+     "primitive_families": 5,
+     "skills": 5
+    },
+    "strings": {
+     "domain": "strings",
+     "tasks": 10,
+     "generalizes": 1.0,
+     "kinds": {
+      "grow": 5,
+      "reuse": 4,
+      "compose": 1
+     },
+     "retention": 1.0,
+     "evaluations": 190,
+     "primitive_families": 6,
+     "skills": 6
+    }
+   },
+   "probes": {
+    "reference_A": 1.0,
+    "k=4": {
+     "synthesized": {
+      "retention_A": 0.8242,
+      "new_B": 1.0
+     },
+     "random": {
+      "retention_A": 0.8594,
+      "new_B": 1.0
+     }
+    },
+    "k=8": {
+     "synthesized": {
+      "retention_A": 0.9766,
+      "new_B": 1.0
+     },
+     "random": {
+      "retention_A": 0.8984,
+      "new_B": 1.0
+     }
+    },
+    "k=16": {
+     "synthesized": {
+      "retention_A": 0.9844,
+      "new_B": 1.0
+     },
+     "random": {
+      "retention_A": 0.9727,
+      "new_B": 1.0
+     }
+    },
+    "k=32": {
+     "synthesized": {
+      "retention_A": 0.9922,
+      "new_B": 1.0
+     },
+     "random": {
+      "retention_A": 0.9922,
+      "new_B": 1.0
+     }
+    },
+    "full_replay(128)": {
+     "retention_A": 0.9805,
+     "new_B": 0.9922
+    }
+   },
+   "subspace": {
+    "null_space_rank": 18,
+    "parameters": 1474,
+    "vanilla": {
+     "retention_A": 0.4961,
+     "new_B": 0.9844,
+     "J_old\u00b7\u0394\u03b8": 0.4325,
+     "params_added": 0
+    },
+    "projected_null_space": {
+     "retention_A": 0.6641,
+     "new_B": 0.9961,
+     "J_old\u00b7\u0394\u03b8": 0.0,
+     "params_added": 0
+    },
+    "invariant_constrained": {
+     "retention_A": 0.9844,
+     "new_B": 0.9922,
+     "J_old\u00b7\u0394\u03b8": 0.058,
+     "params_added": 0
+    },
+    "structural_growth": {
+     "retention_A": 1.0,
+     "new_B": 0.9961,
+     "params_added": 178
+    }
+   },
+   "regeneration": {
+    "modules": 2,
+    "certificate_repair_rate": 0.778,
+    "accuracy_before": 0.993,
+    "accuracy_corrupted": 0.8495,
+    "accuracy_regenerated": 0.935
+   },
+   "economy": {
+    "families_used": {
+     "AddModule": 2,
+     "ParameterUpdate": 2,
+     "ReuseSkill": 15,
+     "AllocateSubspace": 10,
+     "FastWeightUpdate": 10,
+     "ComposeSkills": 3
+    },
+    "n_families_used": 6,
+    "n_families_available": 15,
+    "programs": 15,
+    "macros": [
+     [
+      "AddModule+ParameterUpdate+ReuseSkill",
+      2,
+      2
+     ],
+     [
+      "AllocateSubspace+FastWeightUpdate+ReuseSkill",
+      10,
+      3
+     ],
+     [
+      "ComposeSkills+ReuseSkill",
+      3,
+      4
+     ]
+    ],
+    "history_raw_bytes": 5392,
+    "history_stored_bytes": 1358,
+    "compression_ratio": 3.97,
+    "grown": 2,
+    "grown_later_reused": 2,
+    "library_entries": 7
+   }
+  },
+  {
+   "multitask": {
+    "vanilla": {
+     "average_accuracy": 0.5218,
+     "new_task": 0.9403,
+     "backward_transfer": -0.4507,
+     "forward_transfer": -0.0234,
+     "forgetting": 0.4507,
+     "retention": 0.4856,
+     "param_growth": 1.0,
+     "memory_bytes": 0,
+     "compute_steps": 3500,
+     "recurrence": [],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "replay": {
+     "average_accuracy": 0.7754,
+     "new_task": 0.8848,
+     "backward_transfer": -0.1178,
+     "forward_transfer": -0.079,
+     "forgetting": 0.1178,
+     "retention": 0.7629,
+     "param_growth": 1.0,
+     "memory_bytes": 9408,
+     "compute_steps": 3500,
+     "recurrence": [],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "ewc": {
+     "average_accuracy": 0.56,
+     "new_task": 0.9266,
+     "backward_transfer": -0.3948,
+     "forward_transfer": -0.0371,
+     "forgetting": 0.3948,
+     "retention": 0.5279,
+     "param_growth": 1.0,
+     "memory_bytes": 165088,
+     "compute_steps": 3500,
+     "recurrence": [],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "projected": {
+     "average_accuracy": 0.611,
+     "new_task": 0.954,
+     "backward_transfer": -0.3693,
+     "forward_transfer": -0.0098,
+     "forgetting": 0.3693,
+     "retention": 0.5817,
+     "param_growth": 1.0,
+     "memory_bytes": 1108616,
+     "compute_steps": 3500,
+     "recurrence": [],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "invariant_constraints": {
+     "average_accuracy": 0.7773,
+     "new_task": 0.9021,
+     "backward_transfer": -0.1343,
+     "forward_transfer": -0.0617,
+     "forgetting": 0.1343,
+     "retention": 0.7656,
+     "param_growth": 1.0,
+     "memory_bytes": 6272,
+     "compute_steps": 3500,
+     "recurrence": [],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "structural_growth": {
+     "average_accuracy": 0.9908,
+     "new_task": 0.995,
+     "backward_transfer": -0.0045,
+     "forward_transfer": 0.0312,
+     "forgetting": 0.0051,
+     "retention": 0.9907,
+     "param_growth": 14.0,
+     "memory_bytes": 1148,
+     "compute_steps": 4200,
+     "recurrence": [],
+     "kinds": {
+      "grow": 14
+     },
+     "rollbacks": 0,
+     "reused_modules": 14,
+     "composed": 0,
+     "grown_modules": 14,
+     "macros": 1,
+     "programs": 14,
+     "evaluations": 0
+    },
+    "compositional": {
+     "average_accuracy": 0.9891,
+     "new_task": 0.9933,
+     "backward_transfer": -0.0045,
+     "forward_transfer": 0.0296,
+     "forgetting": 0.0051,
+     "retention": 0.9889,
+     "param_growth": 6.157,
+     "memory_bytes": 1212,
+     "compute_steps": 2800,
+     "recurrence": [],
+     "kinds": {
+      "grow": 2,
+      "reuse": 2,
+      "adapter": 10
+     },
+     "rollbacks": 0,
+     "reused_modules": 14,
+     "composed": 2,
+     "grown_modules": 2,
+     "macros": 3,
+     "programs": 14,
+     "evaluations": 128
+    }
+   },
+   "credit": {
+    "all": {
+     "accuracy": 0.963,
+     "interventions": 10.0,
+     "sign_cost": 0.0,
+     "n": 27
+    },
+    "random_topk": {
+     "accuracy": 0.407,
+     "interventions": 3.0,
+     "sign_cost": 0.0,
+     "n": 27
+    },
+    "sensitivity_topk": {
+     "accuracy": 0.222,
+     "interventions": 3.0,
+     "sign_cost": 0.05,
+     "n": 27
+    },
+    "voi": {
+     "accuracy": 1.0,
+     "interventions": 1.44,
+     "sign_cost": 0.33,
+     "n": 27
+    }
+   },
+   "cross_domain": {
+    "language": {
+     "domain": "language",
+     "tasks": 10,
+     "generalizes": 1.0,
+     "kinds": {
+      "grow": 3,
+      "compose": 2,
+      "reuse": 4,
+      "adapt": 1
+     },
+     "retention": 1.0,
+     "evaluations": 124,
+     "primitive_families": 5,
+     "skills": 6
+    },
+    "algebra": {
+     "domain": "algebra",
+     "tasks": 10,
+     "generalizes": 1.0,
+     "kinds": {
+      "grow": 3,
+      "compose": 3,
+      "reuse": 3,
+      "adapt": 1
+     },
+     "retention": 1.0,
+     "evaluations": 331,
+     "primitive_families": 5,
+     "skills": 7
+    },
+    "code": {
+     "domain": "code",
+     "tasks": 10,
+     "generalizes": 1.0,
+     "kinds": {
+      "grow": 3,
+      "compose": 2,
+      "reuse": 4,
+      "adapt": 1
+     },
+     "retention": 1.0,
+     "evaluations": 123,
+     "primitive_families": 5,
+     "skills": 6
+    },
+    "strings": {
+     "domain": "strings",
+     "tasks": 10,
+     "generalizes": 1.0,
+     "kinds": {
+      "grow": 3,
+      "adapt": 2,
+      "reuse": 4,
+      "compose": 1
+     },
+     "retention": 1.0,
+     "evaluations": 208,
+     "primitive_families": 6,
+     "skills": 6
+    }
+   },
+   "probes": {
+    "reference_A": 1.0,
+    "k=4": {
+     "synthesized": {
+      "retention_A": 0.8633,
+      "new_B": 0.9766
+     },
+     "random": {
+      "retention_A": 0.9609,
+      "new_B": 0.9727
+     }
+    },
+    "k=8": {
+     "synthesized": {
+      "retention_A": 0.9688,
+      "new_B": 0.9727
+     },
+     "random": {
+      "retention_A": 0.9727,
+      "new_B": 0.9648
+     }
+    },
+    "k=16": {
+     "synthesized": {
+      "retention_A": 0.9766,
+      "new_B": 0.9688
+     },
+     "random": {
+      "retention_A": 0.9727,
+      "new_B": 0.9648
+     }
+    },
+    "k=32": {
+     "synthesized": {
+      "retention_A": 0.9805,
+      "new_B": 0.9727
+     },
+     "random": {
+      "retention_A": 0.9766,
+      "new_B": 0.9648
+     }
+    },
+    "full_replay(128)": {
+     "retention_A": 0.9883,
+     "new_B": 0.9961
+    }
+   },
+   "subspace": {
+    "null_space_rank": 24,
+    "parameters": 1474,
+    "vanilla": {
+     "retention_A": 0.4258,
+     "new_B": 0.9961,
+     "J_old\u00b7\u0394\u03b8": 0.1534,
+     "params_added": 0
+    },
+    "projected_null_space": {
+     "retention_A": 0.2812,
+     "new_B": 1.0,
+     "J_old\u00b7\u0394\u03b8": 0.0,
+     "params_added": 0
+    },
+    "invariant_constrained": {
+     "retention_A": 0.9219,
+     "new_B": 0.9609,
+     "J_old\u00b7\u0394\u03b8": 0.1047,
+     "params_added": 0
+    },
+    "structural_growth": {
+     "retention_A": 1.0,
+     "new_B": 1.0,
+     "params_added": 178
+    }
+   },
+   "regeneration": {
+    "modules": 4,
+    "certificate_repair_rate": 0.9,
+    "accuracy_before": 0.974,
+    "accuracy_corrupted": 0.8915,
+    "accuracy_regenerated": 0.9277
+   },
+   "economy": {
+    "families_used": {
+     "AddModule": 5,
+     "ParameterUpdate": 5,
+     "ReuseSkill": 14,
+     "ComposeSkills": 3,
+     "AllocateSubspace": 6,
+     "FastWeightUpdate": 6
+    },
+    "n_families_used": 6,
+    "n_families_available": 15,
+    "programs": 14,
+    "macros": [
+     [
+      "AddModule+ParameterUpdate+ReuseSkill",
+      5,
+      2
+     ],
+     [
+      "ComposeSkills+ReuseSkill",
+      3,
+      4
+     ],
+     [
+      "AllocateSubspace+FastWeightUpdate+ReuseSkill",
+      6,
+      3
+     ]
+    ],
+    "history_raw_bytes": 5392,
+    "history_stored_bytes": 1276,
+    "compression_ratio": 4.23,
+    "grown": 5,
+    "grown_later_reused": 4,
+    "library_entries": 5
+   }
+  },
+  {
+   "multitask": {
+    "vanilla": {
+     "average_accuracy": 0.5145,
+     "new_task": 0.9194,
+     "backward_transfer": -0.436,
+     "forward_transfer": -0.0081,
+     "forgetting": 0.436,
+     "retention": 0.4832,
+     "param_growth": 1.0,
+     "memory_bytes": 0,
+     "compute_steps": 3500,
+     "recurrence": [
+      {
+       "latency_steps": 250,
+       "reused": false
+      }
+     ],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "replay": {
+     "average_accuracy": 0.8005,
+     "new_task": 0.9007,
+     "backward_transfer": -0.1079,
+     "forward_transfer": -0.0268,
+     "forgetting": 0.1127,
+     "retention": 0.7963,
+     "param_growth": 1.0,
+     "memory_bytes": 9408,
+     "compute_steps": 3500,
+     "recurrence": [
+      {
+       "latency_steps": 250,
+       "reused": false
+      }
+     ],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "ewc": {
+     "average_accuracy": 0.5444,
+     "new_task": 0.9389,
+     "backward_transfer": -0.4249,
+     "forward_transfer": 0.0114,
+     "forgetting": 0.4249,
+     "retention": 0.5105,
+     "param_growth": 1.0,
+     "memory_bytes": 165088,
+     "compute_steps": 3500,
+     "recurrence": [
+      {
+       "latency_steps": 250,
+       "reused": false
+      }
+     ],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "projected": {
+     "average_accuracy": 0.6214,
+     "new_task": 0.9397,
+     "backward_transfer": -0.3428,
+     "forward_transfer": 0.0123,
+     "forgetting": 0.3431,
+     "retention": 0.5928,
+     "param_growth": 1.0,
+     "memory_bytes": 1055552,
+     "compute_steps": 3500,
+     "recurrence": [
+      {
+       "latency_steps": 250,
+       "reused": false
+      }
+     ],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "invariant_constraints": {
+     "average_accuracy": 0.8142,
+     "new_task": 0.9007,
+     "backward_transfer": -0.0931,
+     "forward_transfer": -0.0268,
+     "forgetting": 0.0944,
+     "retention": 0.8062,
+     "param_growth": 1.0,
+     "memory_bytes": 6272,
+     "compute_steps": 3500,
+     "recurrence": [
+      {
+       "latency_steps": 250,
+       "reused": false
+      }
+     ],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "structural_growth": {
+     "average_accuracy": 0.9791,
+     "new_task": 0.9855,
+     "backward_transfer": -0.0069,
+     "forward_transfer": 0.058,
+     "forgetting": 0.0069,
+     "retention": 0.9775,
+     "param_growth": 13.0,
+     "memory_bytes": 1066,
+     "compute_steps": 3900,
+     "recurrence": [
+      {
+       "latency_steps": 0,
+       "reused": true
+      }
+     ],
+     "kinds": {
+      "grow": 13,
+      "reactivate": 1
+     },
+     "rollbacks": 0,
+     "reused_modules": 13,
+     "composed": 0,
+     "grown_modules": 13,
+     "macros": 1,
+     "programs": 13,
+     "evaluations": 0
+    },
+    "compositional": {
+     "average_accuracy": 0.9824,
+     "new_task": 0.9891,
+     "backward_transfer": -0.0072,
+     "forward_transfer": 0.0617,
+     "forgetting": 0.0072,
+     "retention": 0.9811,
+     "param_growth": 6.079,
+     "memory_bytes": 1080,
+     "compute_steps": 3000,
+     "recurrence": [
+      {
+       "latency_steps": 0,
+       "reused": true
+      }
+     ],
+     "kinds": {
+      "grow": 4,
+      "adapter": 5,
+      "reuse": 2,
+      "reactivate": 1,
+      "compose": 2
+     },
+     "rollbacks": 0,
+     "reused_modules": 13,
+     "composed": 3,
+     "grown_modules": 4,
+     "macros": 4,
+     "programs": 13,
+     "evaluations": 482
+    }
+   },
+   "credit": {
+    "all": {
+     "accuracy": 1.0,
+     "interventions": 10.0,
+     "sign_cost": 0.0,
+     "n": 26
+    },
+    "random_topk": {
+     "accuracy": 0.385,
+     "interventions": 3.0,
+     "sign_cost": 0.0,
+     "n": 26
+    },
+    "sensitivity_topk": {
+     "accuracy": 0.385,
+     "interventions": 3.0,
+     "sign_cost": 0.05,
+     "n": 26
+    },
+    "voi": {
+     "accuracy": 1.0,
+     "interventions": 1.54,
+     "sign_cost": 0.33,
+     "n": 26
+    }
+   },
+   "cross_domain": {
+    "language": {
+     "domain": "language",
+     "tasks": 10,
+     "generalizes": 1.0,
+     "kinds": {
+      "grow": 4,
+      "reuse": 3,
+      "adapt": 2,
+      "compose": 1
+     },
+     "retention": 1.0,
+     "evaluations": 300,
+     "primitive_families": 5,
+     "skills": 7
+    },
+    "algebra": {
+     "domain": "algebra",
+     "tasks": 10,
+     "generalizes": 1.0,
+     "kinds": {
+      "grow": 4,
+      "reuse": 4,
+      "compose": 2
+     },
+     "retention": 1.0,
+     "evaluations": 602,
+     "primitive_families": 5,
+     "skills": 6
+    },
+    "code": {
+     "domain": "code",
+     "tasks": 10,
+     "generalizes": 1.0,
+     "kinds": {
+      "grow": 4,
+      "reuse": 3,
+      "compose": 3
+     },
+     "retention": 1.0,
+     "evaluations": 180,
+     "primitive_families": 5,
+     "skills": 7
+    },
+    "strings": {
+     "domain": "strings",
+     "tasks": 10,
+     "generalizes": 1.0,
+     "kinds": {
+      "grow": 4,
+      "reuse": 2,
+      "adapt": 2,
+      "compose": 2
+     },
+     "retention": 1.0,
+     "evaluations": 390,
+     "primitive_families": 6,
+     "skills": 8
+    }
+   },
+   "probes": {
+    "reference_A": 0.9961,
+    "k=4": {
+     "synthesized": {
+      "retention_A": 0.7852,
+      "new_B": 0.9609
+     },
+     "random": {
+      "retention_A": 0.8945,
+      "new_B": 0.9648
+     }
+    },
+    "k=8": {
+     "synthesized": {
+      "retention_A": 0.9727,
+      "new_B": 0.9375
+     },
+     "random": {
+      "retention_A": 0.9492,
+      "new_B": 0.9531
+     }
+    },
+    "k=16": {
+     "synthesized": {
+      "retention_A": 0.9766,
+      "new_B": 0.9609
+     },
+     "random": {
+      "retention_A": 0.9844,
+      "new_B": 0.9531
+     }
+    },
+    "k=32": {
+     "synthesized": {
+      "retention_A": 0.9961,
+      "new_B": 0.9336
+     },
+     "random": {
+      "retention_A": 1.0,
+      "new_B": 0.9297
+     }
+    },
+    "full_replay(128)": {
+     "retention_A": 0.9922,
+     "new_B": 0.957
+    }
+   },
+   "subspace": {
+    "null_space_rank": 16,
+    "parameters": 1474,
+    "vanilla": {
+     "retention_A": 0.5352,
+     "new_B": 0.957,
+     "J_old\u00b7\u0394\u03b8": 0.341,
+     "params_added": 0
+    },
+    "projected_null_space": {
+     "retention_A": 0.5352,
+     "new_B": 0.9922,
+     "J_old\u00b7\u0394\u03b8": 0.0,
+     "params_added": 0
+    },
+    "invariant_constrained": {
+     "retention_A": 1.0,
+     "new_B": 0.9688,
+     "J_old\u00b7\u0394\u03b8": 0.0163,
+     "params_added": 0
+    },
+    "structural_growth": {
+     "retention_A": 1.0,
+     "new_B": 1.0,
+     "params_added": 178
+    }
+   },
+   "regeneration": {
+    "modules": 2,
+    "certificate_repair_rate": 1.0,
+    "accuracy_before": 0.995,
+    "accuracy_corrupted": 0.7245,
+    "accuracy_regenerated": 0.887
+   },
+   "economy": {
+    "families_used": {
+     "AddModule": 2,
+     "ParameterUpdate": 2,
+     "ReuseSkill": 12,
+     "AllocateSubspace": 9,
+     "FastWeightUpdate": 9
+    },
+    "n_families_used": 5,
+    "n_families_available": 15,
+    "programs": 12,
+    "macros": [
+     [
+      "AddModule+ParameterUpdate+ReuseSkill",
+      2,
+      2
+     ],
+     [
+      "AllocateSubspace+FastWeightUpdate+ReuseSkill",
+      9,
+      3
+     ],
+     [
+      "ReuseSkill",
+      1,
+      0
+     ]
+    ],
+    "history_raw_bytes": 5392,
+    "history_stored_bytes": 1014,
+    "compression_ratio": 5.32,
+    "grown": 2,
+    "grown_later_reused": 0,
+    "library_entries": 4
+   }
+  },
+  {
+   "multitask": {
+    "vanilla": {
+     "average_accuracy": 0.4975,
+     "new_task": 0.971,
+     "backward_transfer": -0.5099,
+     "forward_transfer": -0.0061,
+     "forgetting": 0.5126,
+     "retention": 0.4594,
+     "param_growth": 1.0,
+     "memory_bytes": 0,
+     "compute_steps": 3500,
+     "recurrence": [
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      }
+     ],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "replay": {
+     "average_accuracy": 0.8613,
+     "new_task": 0.9386,
+     "backward_transfer": -0.0832,
+     "forward_transfer": -0.0385,
+     "forgetting": 0.0883,
+     "retention": 0.8561,
+     "param_growth": 1.0,
+     "memory_bytes": 9408,
+     "compute_steps": 3500,
+     "recurrence": [
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      }
+     ],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "ewc": {
+     "average_accuracy": 0.4874,
+     "new_task": 0.9693,
+     "backward_transfer": -0.5189,
+     "forward_transfer": -0.0078,
+     "forgetting": 0.5201,
+     "retention": 0.4483,
+     "param_growth": 1.0,
+     "memory_bytes": 165088,
+     "compute_steps": 3500,
+     "recurrence": [
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      }
+     ],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "projected": {
+     "average_accuracy": 0.5857,
+     "new_task": 0.9707,
+     "backward_transfer": -0.4147,
+     "forward_transfer": -0.0064,
+     "forgetting": 0.4147,
+     "retention": 0.5547,
+     "param_growth": 1.0,
+     "memory_bytes": 908152,
+     "compute_steps": 3500,
+     "recurrence": [
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      }
+     ],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "invariant_constraints": {
+     "average_accuracy": 0.8834,
+     "new_task": 0.9565,
+     "backward_transfer": -0.0787,
+     "forward_transfer": -0.0206,
+     "forgetting": 0.0808,
+     "retention": 0.8771,
+     "param_growth": 1.0,
+     "memory_bytes": 6272,
+     "compute_steps": 3500,
+     "recurrence": [
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      }
+     ],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "structural_growth": {
+     "average_accuracy": 0.9849,
+     "new_task": 0.9891,
+     "backward_transfer": -0.0045,
+     "forward_transfer": 0.012,
+     "forgetting": 0.0045,
+     "retention": 0.9847,
+     "param_growth": 12.0,
+     "memory_bytes": 984,
+     "compute_steps": 3600,
+     "recurrence": [
+      {
+       "latency_steps": 0,
+       "reused": true
+      },
+      {
+       "latency_steps": 0,
+       "reused": true
+      }
+     ],
+     "kinds": {
+      "grow": 12,
+      "reactivate": 2
+     },
+     "rollbacks": 0,
+     "reused_modules": 12,
+     "composed": 0,
+     "grown_modules": 12,
+     "macros": 1,
+     "programs": 12,
+     "evaluations": 0
+    },
+    "compositional": {
+     "average_accuracy": 0.9847,
+     "new_task": 0.9888,
+     "backward_transfer": -0.0045,
+     "forward_transfer": 0.0117,
+     "forgetting": 0.0045,
+     "retention": 0.9844,
+     "param_growth": 4.663,
+     "memory_bytes": 900,
+     "compute_steps": 2100,
+     "recurrence": [
+      {
+       "latency_steps": 0,
+       "reused": true
+      },
+      {
+       "latency_steps": 0,
+       "reused": true
+      }
+     ],
+     "kinds": {
+      "grow": 3,
+      "reuse": 4,
+      "adapter": 4,
+      "reactivate": 2,
+      "compose": 1
+     },
+     "rollbacks": 0,
+     "reused_modules": 12,
+     "composed": 3,
+     "grown_modules": 3,
+     "macros": 4,
+     "programs": 12,
+     "evaluations": 236
+    }
+   },
+   "credit": {
+    "all": {
+     "accuracy": 1.0,
+     "interventions": 10.0,
+     "sign_cost": 0.0,
+     "n": 25
+    },
+    "random_topk": {
+     "accuracy": 0.36,
+     "interventions": 3.0,
+     "sign_cost": 0.0,
+     "n": 25
+    },
+    "sensitivity_topk": {
+     "accuracy": 0.36,
+     "interventions": 3.0,
+     "sign_cost": 0.05,
+     "n": 25
+    },
+    "voi": {
+     "accuracy": 1.0,
+     "interventions": 1.44,
+     "sign_cost": 0.33,
+     "n": 25
+    }
+   },
+   "cross_domain": {
+    "language": {
+     "domain": "language",
+     "tasks": 10,
+     "generalizes": 1.0,
+     "kinds": {
+      "grow": 4,
+      "reuse": 4,
+      "compose": 1,
+      "adapt": 1
+     },
+     "retention": 1.0,
+     "evaluations": 112,
+     "primitive_families": 5,
+     "skills": 6
+    },
+    "algebra": {
+     "domain": "algebra",
+     "tasks": 10,
+     "generalizes": 1.0,
+     "kinds": {
+      "grow": 4,
+      "adapt": 2,
+      "reuse": 3,
+      "compose": 1
+     },
+     "retention": 1.0,
+     "evaluations": 184,
+     "primitive_families": 5,
+     "skills": 7
+    },
+    "code": {
+     "domain": "code",
+     "tasks": 10,
+     "generalizes": 1.0,
+     "kinds": {
+      "grow": 4,
+      "reuse": 4,
+      "compose": 1,
+      "adapt": 1
+     },
+     "retention": 1.0,
+     "evaluations": 85,
+     "primitive_families": 5,
+     "skills": 6
+    },
+    "strings": {
+     "domain": "strings",
+     "tasks": 10,
+     "generalizes": 1.0,
+     "kinds": {
+      "grow": 4,
+      "reuse": 5,
+      "adapt": 1
+     },
+     "retention": 1.0,
+     "evaluations": 151,
+     "primitive_families": 6,
+     "skills": 5
+    }
+   },
+   "probes": {
+    "reference_A": 1.0,
+    "k=4": {
+     "synthesized": {
+      "retention_A": 0.8047,
+      "new_B": 0.9961
+     },
+     "random": {
+      "retention_A": 0.8086,
+      "new_B": 1.0
+     }
+    },
+    "k=8": {
+     "synthesized": {
+      "retention_A": 0.8906,
+      "new_B": 0.9844
+     },
+     "random": {
+      "retention_A": 0.9922,
+      "new_B": 0.9961
+     }
+    },
+    "k=16": {
+     "synthesized": {
+      "retention_A": 1.0,
+      "new_B": 0.9922
+     },
+     "random": {
+      "retention_A": 1.0,
+      "new_B": 0.9883
+     }
+    },
+    "k=32": {
+     "synthesized": {
+      "retention_A": 1.0,
+      "new_B": 0.9961
+     },
+     "random": {
+      "retention_A": 1.0,
+      "new_B": 0.9961
+     }
+    },
+    "full_replay(128)": {
+     "retention_A": 1.0,
+     "new_B": 0.9961
+    }
+   },
+   "subspace": {
+    "null_space_rank": 13,
+    "parameters": 1474,
+    "vanilla": {
+     "retention_A": 0.1016,
+     "new_B": 0.9922,
+     "J_old\u00b7\u0394\u03b8": 0.4947,
+     "params_added": 0
+    },
+    "projected_null_space": {
+     "retention_A": 0.0352,
+     "new_B": 1.0,
+     "J_old\u00b7\u0394\u03b8": 0.0,
+     "params_added": 0
+    },
+    "invariant_constrained": {
+     "retention_A": 0.9531,
+     "new_B": 0.9492,
+     "J_old\u00b7\u0394\u03b8": 0.0231,
+     "params_added": 0
+    },
+    "structural_growth": {
+     "retention_A": 1.0,
+     "new_B": 0.9961,
+     "params_added": 178
+    }
+   },
+   "regeneration": {
+    "modules": 3,
+    "certificate_repair_rate": 0.4,
+    "accuracy_before": 0.971,
+    "accuracy_corrupted": 0.8243,
+    "accuracy_regenerated": 0.8323
+   },
+   "economy": {
+    "families_used": {
+     "AddModule": 7,
+     "ParameterUpdate": 7,
+     "ReuseSkill": 14,
+     "ComposeSkills": 6
+    },
+    "n_families_used": 4,
+    "n_families_available": 15,
+    "programs": 14,
+    "macros": [
+     [
+      "AddModule+ParameterUpdate+ReuseSkill",
+      7,
+      2
+     ],
+     [
+      "ComposeSkills+ReuseSkill",
+      6,
+      4
+     ],
+     [
+      "ReuseSkill",
+      1,
+      0
+     ]
+    ],
+    "history_raw_bytes": 5392,
+    "history_stored_bytes": 1162,
+    "compression_ratio": 4.64,
+    "grown": 7,
+    "grown_later_reused": 12,
+    "library_entries": 6
+   }
+  },
+  {
+   "multitask": {
+    "vanilla": {
+     "average_accuracy": 0.5343,
+     "new_task": 0.9099,
+     "backward_transfer": -0.4044,
+     "forward_transfer": -0.0402,
+     "forgetting": 0.4044,
+     "retention": 0.5021,
+     "param_growth": 1.0,
+     "memory_bytes": 0,
+     "compute_steps": 3500,
+     "recurrence": [],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "replay": {
+     "average_accuracy": 0.7723,
+     "new_task": 0.8836,
+     "backward_transfer": -0.1199,
+     "forward_transfer": -0.0664,
+     "forgetting": 0.1211,
+     "retention": 0.762,
+     "param_growth": 1.0,
+     "memory_bytes": 9408,
+     "compute_steps": 3500,
+     "recurrence": [],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "ewc": {
+     "average_accuracy": 0.5728,
+     "new_task": 0.9208,
+     "backward_transfer": -0.3747,
+     "forward_transfer": -0.0293,
+     "forgetting": 0.3747,
+     "retention": 0.5424,
+     "param_growth": 1.0,
+     "memory_bytes": 165088,
+     "compute_steps": 3500,
+     "recurrence": [],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "projected": {
+     "average_accuracy": 0.6175,
+     "new_task": 0.9188,
+     "backward_transfer": -0.3245,
+     "forward_transfer": -0.0312,
+     "forgetting": 0.3245,
+     "retention": 0.5898,
+     "param_growth": 1.0,
+     "memory_bytes": 1138096,
+     "compute_steps": 3500,
+     "recurrence": [],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "invariant_constraints": {
+     "average_accuracy": 0.7994,
+     "new_task": 0.8901,
+     "backward_transfer": -0.0977,
+     "forward_transfer": -0.06,
+     "forgetting": 0.0989,
+     "retention": 0.7885,
+     "param_growth": 1.0,
+     "memory_bytes": 6272,
+     "compute_steps": 3500,
+     "recurrence": [],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "structural_growth": {
+     "average_accuracy": 0.99,
+     "new_task": 0.9927,
+     "backward_transfer": -0.003,
+     "forward_transfer": 0.0427,
+     "forgetting": 0.003,
+     "retention": 0.9895,
+     "param_growth": 14.0,
+     "memory_bytes": 1148,
+     "compute_steps": 4200,
+     "recurrence": [],
+     "kinds": {
+      "grow": 14
+     },
+     "rollbacks": 0,
+     "reused_modules": 14,
+     "composed": 0,
+     "grown_modules": 14,
+     "macros": 1,
+     "programs": 14,
+     "evaluations": 0
+    },
+    "compositional": {
+     "average_accuracy": 0.9902,
+     "new_task": 0.993,
+     "backward_transfer": -0.003,
+     "forward_transfer": 0.043,
+     "forgetting": 0.003,
+     "retention": 0.9898,
+     "param_growth": 10.0,
+     "memory_bytes": 1114,
+     "compute_steps": 3200,
+     "recurrence": [],
+     "kinds": {
+      "grow": 10,
+      "reuse": 4
+     },
+     "rollbacks": 0,
+     "reused_modules": 14,
+     "composed": 3,
+     "grown_modules": 10,
+     "macros": 3,
+     "programs": 14,
+     "evaluations": 25
+    }
+   },
+   "credit": {
+    "all": {
+     "accuracy": 1.0,
+     "interventions": 10.0,
+     "sign_cost": 0.0,
+     "n": 31
+    },
+    "random_topk": {
+     "accuracy": 0.387,
+     "interventions": 3.0,
+     "sign_cost": 0.0,
+     "n": 31
+    },
+    "sensitivity_topk": {
+     "accuracy": 0.419,
+     "interventions": 3.0,
+     "sign_cost": 0.05,
+     "n": 31
+    },
+    "voi": {
+     "accuracy": 1.0,
+     "interventions": 1.81,
+     "sign_cost": 0.33,
+     "n": 31
+    }
+   },
+   "cross_domain": {
+    "language": {
+     "domain": "language",
+     "tasks": 10,
+     "generalizes": 1.0,
+     "kinds": {
+      "grow": 5,
+      "compose": 2,
+      "reuse": 3
+     },
+     "retention": 1.0,
+     "evaluations": 167,
+     "primitive_families": 5,
+     "skills": 7
+    },
+    "algebra": {
+     "domain": "algebra",
+     "tasks": 10,
+     "generalizes": 1.0,
+     "kinds": {
+      "grow": 5,
+      "compose": 2,
+      "adapt": 2,
+      "reuse": 1
+     },
+     "retention": 1.0,
+     "evaluations": 534,
+     "primitive_families": 5,
+     "skills": 9
+    },
+    "code": {
+     "domain": "code",
+     "tasks": 10,
+     "generalizes": 0.8,
+     "kinds": {
+      "grow": 5,
+      "compose": 3,
+      "reuse": 2
+     },
+     "retention": 1.0,
+     "evaluations": 186,
+     "primitive_families": 5,
+     "skills": 8
+    },
+    "strings": {
+     "domain": "strings",
+     "tasks": 10,
+     "generalizes": 1.0,
+     "kinds": {
+      "grow": 6,
+      "compose": 1,
+      "adapt": 1,
+      "reuse": 2
+     },
+     "retention": 1.0,
+     "evaluations": 361,
+     "primitive_families": 6,
+     "skills": 8
+    }
+   },
+   "probes": {
+    "reference_A": 0.9883,
+    "k=4": {
+     "synthesized": {
+      "retention_A": 0.9648,
+      "new_B": 0.9961
+     },
+     "random": {
+      "retention_A": 0.9766,
+      "new_B": 0.9883
+     }
+    },
+    "k=8": {
+     "synthesized": {
+      "retention_A": 0.9922,
+      "new_B": 0.9844
+     },
+     "random": {
+      "retention_A": 0.9844,
+      "new_B": 0.9922
+     }
+    },
+    "k=16": {
+     "synthesized": {
+      "retention_A": 0.9883,
+      "new_B": 0.9844
+     },
+     "random": {
+      "retention_A": 0.9883,
+      "new_B": 0.9883
+     }
+    },
+    "k=32": {
+     "synthesized": {
+      "retention_A": 0.9961,
+      "new_B": 0.9883
+     },
+     "random": {
+      "retention_A": 0.9922,
+      "new_B": 0.9883
+     }
+    },
+    "full_replay(128)": {
+     "retention_A": 1.0,
+     "new_B": 0.9961
+    }
+   },
+   "subspace": {
+    "null_space_rank": 27,
+    "parameters": 1474,
+    "vanilla": {
+     "retention_A": 0.5,
+     "new_B": 0.9375,
+     "J_old\u00b7\u0394\u03b8": 0.2027,
+     "params_added": 0
+    },
+    "projected_null_space": {
+     "retention_A": 0.5664,
+     "new_B": 0.9336,
+     "J_old\u00b7\u0394\u03b8": 0.0,
+     "params_added": 0
+    },
+    "invariant_constrained": {
+     "retention_A": 0.7852,
+     "new_B": 0.918,
+     "J_old\u00b7\u0394\u03b8": 0.0753,
+     "params_added": 0
+    },
+    "structural_growth": {
+     "retention_A": 1.0,
+     "new_B": 0.9883,
+     "params_added": 178
+    }
+   },
+   "regeneration": {
+    "modules": 3,
+    "certificate_repair_rate": 0.625,
+    "accuracy_before": 0.986,
+    "accuracy_corrupted": 0.8493,
+    "accuracy_regenerated": 0.8973
+   },
+   "economy": {
+    "families_used": {
+     "AddModule": 2,
+     "ParameterUpdate": 2,
+     "ReuseSkill": 13,
+     "AllocateSubspace": 6,
+     "FastWeightUpdate": 6,
+     "ComposeSkills": 5
+    },
+    "n_families_used": 6,
+    "n_families_available": 15,
+    "programs": 13,
+    "macros": [
+     [
+      "AddModule+ParameterUpdate+ReuseSkill",
+      2,
+      2
+     ],
+     [
+      "AllocateSubspace+FastWeightUpdate+ReuseSkill",
+      6,
+      3
+     ],
+     [
+      "ComposeSkills+ReuseSkill",
+      5,
+      4
+     ]
+    ],
+    "history_raw_bytes": 5392,
+    "history_stored_bytes": 1194,
+    "compression_ratio": 4.52,
+    "grown": 2,
+    "grown_later_reused": 2,
+    "library_entries": 6
+   }
+  },
+  {
+   "multitask": {
+    "vanilla": {
+     "average_accuracy": 0.5402,
+     "new_task": 0.9489,
+     "backward_transfer": -0.4402,
+     "forward_transfer": -0.0148,
+     "forgetting": 0.4402,
+     "retention": 0.5057,
+     "param_growth": 1.0,
+     "memory_bytes": 0,
+     "compute_steps": 3500,
+     "recurrence": [],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "replay": {
+     "average_accuracy": 0.8304,
+     "new_task": 0.9216,
+     "backward_transfer": -0.0983,
+     "forward_transfer": -0.0421,
+     "forgetting": 0.1001,
+     "retention": 0.8212,
+     "param_growth": 1.0,
+     "memory_bytes": 9408,
+     "compute_steps": 3500,
+     "recurrence": [],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "ewc": {
+     "average_accuracy": 0.5494,
+     "new_task": 0.9481,
+     "backward_transfer": -0.4294,
+     "forward_transfer": -0.0156,
+     "forgetting": 0.4294,
+     "retention": 0.5147,
+     "param_growth": 1.0,
+     "memory_bytes": 165088,
+     "compute_steps": 3500,
+     "recurrence": [],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "projected": {
+     "average_accuracy": 0.5831,
+     "new_task": 0.9545,
+     "backward_transfer": -0.3999,
+     "forward_transfer": -0.0092,
+     "forgetting": 0.3999,
+     "retention": 0.5511,
+     "param_growth": 1.0,
+     "memory_bytes": 996592,
+     "compute_steps": 3500,
+     "recurrence": [],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "invariant_constraints": {
+     "average_accuracy": 0.7991,
+     "new_task": 0.9116,
+     "backward_transfer": -0.1211,
+     "forward_transfer": -0.0522,
+     "forgetting": 0.1217,
+     "retention": 0.7861,
+     "param_growth": 1.0,
+     "memory_bytes": 6272,
+     "compute_steps": 3500,
+     "recurrence": [],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "structural_growth": {
+     "average_accuracy": 0.9721,
+     "new_task": 0.9774,
+     "backward_transfer": -0.0057,
+     "forward_transfer": 0.0137,
+     "forgetting": 0.0057,
+     "retention": 0.9712,
+     "param_growth": 14.0,
+     "memory_bytes": 1148,
+     "compute_steps": 4200,
+     "recurrence": [],
+     "kinds": {
+      "grow": 14
+     },
+     "rollbacks": 0,
+     "reused_modules": 14,
+     "composed": 0,
+     "grown_modules": 14,
+     "macros": 1,
+     "programs": 14,
+     "evaluations": 0
+    },
+    "compositional": {
+     "average_accuracy": 0.9727,
+     "new_task": 0.9774,
+     "backward_transfer": -0.0051,
+     "forward_transfer": 0.0137,
+     "forgetting": 0.0051,
+     "retention": 0.9718,
+     "param_growth": 8.416,
+     "memory_bytes": 1146,
+     "compute_steps": 3000,
+     "recurrence": [],
+     "kinds": {
+      "grow": 8,
+      "adapter": 1,
+      "compose": 3,
+      "reuse": 2
+     },
+     "rollbacks": 0,
+     "reused_modules": 14,
+     "composed": 4,
+     "grown_modules": 8,
+     "macros": 4,
+     "programs": 14,
+     "evaluations": 290
+    }
+   },
+   "credit": {
+    "all": {
+     "accuracy": 1.0,
+     "interventions": 10.0,
+     "sign_cost": 0.0,
+     "n": 26
+    },
+    "random_topk": {
+     "accuracy": 0.423,
+     "interventions": 3.0,
+     "sign_cost": 0.0,
+     "n": 26
+    },
+    "sensitivity_topk": {
+     "accuracy": 0.385,
+     "interventions": 3.0,
+     "sign_cost": 0.05,
+     "n": 26
+    },
+    "voi": {
+     "accuracy": 1.0,
+     "interventions": 1.54,
+     "sign_cost": 0.33,
+     "n": 26
+    }
+   },
+   "cross_domain": {
+    "language": {
+     "domain": "language",
+     "tasks": 10,
+     "generalizes": 1.0,
+     "kinds": {
+      "grow": 3,
+      "reuse": 6,
+      "compose": 1
+     },
+     "retention": 1.0,
+     "evaluations": 74,
+     "primitive_families": 5,
+     "skills": 4
+    },
+    "algebra": {
+     "domain": "algebra",
+     "tasks": 10,
+     "generalizes": 1.0,
+     "kinds": {
+      "grow": 3,
+      "reuse": 5,
+      "adapt": 1,
+      "compose": 1
+     },
+     "retention": 1.0,
+     "evaluations": 196,
+     "primitive_families": 5,
+     "skills": 5
+    },
+    "code": {
+     "domain": "code",
+     "tasks": 10,
+     "generalizes": 1.0,
+     "kinds": {
+      "grow": 2,
+      "reuse": 5,
+      "adapt": 1,
+      "compose": 2
+     },
+     "retention": 1.0,
+     "evaluations": 48,
+     "primitive_families": 5,
+     "skills": 5
+    },
+    "strings": {
+     "domain": "strings",
+     "tasks": 10,
+     "generalizes": 1.0,
+     "kinds": {
+      "grow": 3,
+      "reuse": 5,
+      "adapt": 1,
+      "compose": 1
+     },
+     "retention": 1.0,
+     "evaluations": 130,
+     "primitive_families": 6,
+     "skills": 5
+    }
+   },
+   "probes": {
+    "reference_A": 1.0,
+    "k=4": {
+     "synthesized": {
+      "retention_A": 0.6797,
+      "new_B": 0.9961
+     },
+     "random": {
+      "retention_A": 0.6289,
+      "new_B": 0.9883
+     }
+    },
+    "k=8": {
+     "synthesized": {
+      "retention_A": 0.9258,
+      "new_B": 0.9922
+     },
+     "random": {
+      "retention_A": 0.9336,
+      "new_B": 0.9805
+     }
+    },
+    "k=16": {
+     "synthesized": {
+      "retention_A": 0.9766,
+      "new_B": 0.9883
+     },
+     "random": {
+      "retention_A": 0.9805,
+      "new_B": 0.9844
+     }
+    },
+    "k=32": {
+     "synthesized": {
+      "retention_A": 0.9961,
+      "new_B": 0.9844
+     },
+     "random": {
+      "retention_A": 0.9922,
+      "new_B": 0.9922
+     }
+    },
+    "full_replay(128)": {
+     "retention_A": 0.9961,
+     "new_B": 0.9922
+    }
+   },
+   "subspace": {
+    "null_space_rank": 12,
+    "parameters": 1474,
+    "vanilla": {
+     "retention_A": 0.1758,
+     "new_B": 0.9844,
+     "J_old\u00b7\u0394\u03b8": 0.3553,
+     "params_added": 0
+    },
+    "projected_null_space": {
+     "retention_A": 0.4609,
+     "new_B": 1.0,
+     "J_old\u00b7\u0394\u03b8": 0.0,
+     "params_added": 0
+    },
+    "invariant_constrained": {
+     "retention_A": 0.9844,
+     "new_B": 0.9961,
+     "J_old\u00b7\u0394\u03b8": 0.0425,
+     "params_added": 0
+    },
+    "structural_growth": {
+     "retention_A": 1.0,
+     "new_B": 1.0,
+     "params_added": 178
+    }
+   },
+   "regeneration": {
+    "modules": 2,
+    "certificate_repair_rate": 0.5,
+    "accuracy_before": 0.982,
+    "accuracy_corrupted": 0.8715,
+    "accuracy_regenerated": 0.8985
+   },
+   "economy": {
+    "families_used": {
+     "AddModule": 8,
+     "ParameterUpdate": 8,
+     "ReuseSkill": 13,
+     "ComposeSkills": 3
+    },
+    "n_families_used": 4,
+    "n_families_available": 15,
+    "programs": 13,
+    "macros": [
+     [
+      "AddModule+ParameterUpdate+ReuseSkill",
+      8,
+      2
+     ],
+     [
+      "ComposeSkills+ReuseSkill",
+      3,
+      4
+     ],
+     [
+      "ReuseSkill",
+      2,
+      1
+     ]
+    ],
+    "history_raw_bytes": 5392,
+    "history_stored_bytes": 998,
+    "compression_ratio": 5.4,
+    "grown": 8,
+    "grown_later_reused": 6,
+    "library_entries": 6
+   }
+  },
+  {
+   "multitask": {
+    "vanilla": {
+     "average_accuracy": 0.5502,
+     "new_task": 0.9392,
+     "backward_transfer": -0.4189,
+     "forward_transfer": -0.0017,
+     "forgetting": 0.4306,
+     "retention": 0.5162,
+     "param_growth": 1.0,
+     "memory_bytes": 0,
+     "compute_steps": 3500,
+     "recurrence": [
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      }
+     ],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "replay": {
+     "average_accuracy": 0.8343,
+     "new_task": 0.9185,
+     "backward_transfer": -0.0907,
+     "forward_transfer": -0.0223,
+     "forgetting": 0.1031,
+     "retention": 0.8293,
+     "param_growth": 1.0,
+     "memory_bytes": 9408,
+     "compute_steps": 3500,
+     "recurrence": [
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      }
+     ],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "ewc": {
+     "average_accuracy": 0.5658,
+     "new_task": 0.921,
+     "backward_transfer": -0.3825,
+     "forward_transfer": -0.0198,
+     "forgetting": 0.3876,
+     "retention": 0.5334,
+     "param_growth": 1.0,
+     "memory_bytes": 165088,
+     "compute_steps": 3500,
+     "recurrence": [
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      }
+     ],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "projected": {
+     "average_accuracy": 0.6797,
+     "new_task": 0.9481,
+     "backward_transfer": -0.2891,
+     "forward_transfer": 0.0073,
+     "forgetting": 0.3038,
+     "retention": 0.6566,
+     "param_growth": 1.0,
+     "memory_bytes": 1043760,
+     "compute_steps": 3500,
+     "recurrence": [
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      }
+     ],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "invariant_constraints": {
+     "average_accuracy": 0.851,
+     "new_task": 0.909,
+     "backward_transfer": -0.0625,
+     "forward_transfer": -0.0318,
+     "forgetting": 0.0733,
+     "retention": 0.8441,
+     "param_growth": 1.0,
+     "memory_bytes": 6272,
+     "compute_steps": 3500,
+     "recurrence": [
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      },
+      {
+       "latency_steps": 250,
+       "reused": false
+      }
+     ],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "structural_growth": {
+     "average_accuracy": 0.9791,
+     "new_task": 0.9833,
+     "backward_transfer": -0.0045,
+     "forward_transfer": 0.0424,
+     "forgetting": 0.0045,
+     "retention": 0.9778,
+     "param_growth": 11.0,
+     "memory_bytes": 902,
+     "compute_steps": 3300,
+     "recurrence": [
+      {
+       "latency_steps": 0,
+       "reused": true
+      },
+      {
+       "latency_steps": 0,
+       "reused": true
+      },
+      {
+       "latency_steps": 0,
+       "reused": true
+      }
+     ],
+     "kinds": {
+      "grow": 11,
+      "reactivate": 3
+     },
+     "rollbacks": 0,
+     "reused_modules": 11,
+     "composed": 0,
+     "grown_modules": 11,
+     "macros": 1,
+     "programs": 11,
+     "evaluations": 0
+    },
+    "compositional": {
+     "average_accuracy": 0.9657,
+     "new_task": 0.9696,
+     "backward_transfer": -0.0042,
+     "forward_transfer": 0.0287,
+     "forgetting": 0.0042,
+     "retention": 0.9633,
+     "param_growth": 4.494,
+     "memory_bytes": 998,
+     "compute_steps": 2300,
+     "recurrence": [
+      {
+       "latency_steps": 0,
+       "reused": true
+      },
+      {
+       "latency_steps": 0,
+       "reused": true
+      },
+      {
+       "latency_steps": 0,
+       "reused": true
+      }
+     ],
+     "kinds": {
+      "grow": 2,
+      "reuse": 2,
+      "adapter": 6,
+      "reactivate": 3,
+      "compose": 1
+     },
+     "rollbacks": 0,
+     "reused_modules": 11,
+     "composed": 3,
+     "grown_modules": 2,
+     "macros": 3,
+     "programs": 11,
+     "evaluations": 389
+    }
+   },
+   "credit": {
+    "all": {
+     "accuracy": 1.0,
+     "interventions": 10.0,
+     "sign_cost": 0.0,
+     "n": 24
+    },
+    "random_topk": {
+     "accuracy": 0.375,
+     "interventions": 3.0,
+     "sign_cost": 0.0,
+     "n": 24
+    },
+    "sensitivity_topk": {
+     "accuracy": 0.333,
+     "interventions": 3.0,
+     "sign_cost": 0.05,
+     "n": 24
+    },
+    "voi": {
+     "accuracy": 1.0,
+     "interventions": 1.46,
+     "sign_cost": 0.33,
+     "n": 24
+    }
+   },
+   "cross_domain": {
+    "language": {
+     "domain": "language",
+     "tasks": 10,
+     "generalizes": 1.0,
+     "kinds": {
+      "grow": 4,
+      "reuse": 5,
+      "compose": 1
+     },
+     "retention": 1.0,
+     "evaluations": 92,
+     "primitive_families": 5,
+     "skills": 5
+    },
+    "algebra": {
+     "domain": "algebra",
+     "tasks": 10,
+     "generalizes": 1.0,
+     "kinds": {
+      "grow": 5,
+      "reuse": 2,
+      "adapt": 2,
+      "compose": 1
+     },
+     "retention": 1.0,
+     "evaluations": 295,
+     "primitive_families": 5,
+     "skills": 8
+    },
+    "code": {
+     "domain": "code",
+     "tasks": 10,
+     "generalizes": 1.0,
+     "kinds": {
+      "grow": 4,
+      "reuse": 5,
+      "compose": 1
+     },
+     "retention": 1.0,
+     "evaluations": 78,
+     "primitive_families": 5,
+     "skills": 5
+    },
+    "strings": {
+     "domain": "strings",
+     "tasks": 10,
+     "generalizes": 1.0,
+     "kinds": {
+      "grow": 3,
+      "adapt": 2,
+      "reuse": 4,
+      "compose": 1
+     },
+     "retention": 1.0,
+     "evaluations": 79,
+     "primitive_families": 6,
+     "skills": 6
+    }
+   },
+   "probes": {
+    "reference_A": 0.9961,
+    "k=4": {
+     "synthesized": {
+      "retention_A": 0.6914,
+      "new_B": 0.9648
+     },
+     "random": {
+      "retention_A": 0.7148,
+      "new_B": 0.9844
+     }
+    },
+    "k=8": {
+     "synthesized": {
+      "retention_A": 0.8828,
+      "new_B": 0.9727
+     },
+     "random": {
+      "retention_A": 0.9258,
+      "new_B": 0.9688
+     }
+    },
+    "k=16": {
+     "synthesized": {
+      "retention_A": 0.9141,
+      "new_B": 0.9609
+     },
+     "random": {
+      "retention_A": 0.9375,
+      "new_B": 0.9492
+     }
+    },
+    "k=32": {
+     "synthesized": {
+      "retention_A": 0.9688,
+      "new_B": 0.9531
+     },
+     "random": {
+      "retention_A": 0.9688,
+      "new_B": 0.957
+     }
+    },
+    "full_replay(128)": {
+     "retention_A": 0.9609,
+     "new_B": 0.9727
+    }
+   },
+   "subspace": {
+    "null_space_rank": 10,
+    "parameters": 1474,
+    "vanilla": {
+     "retention_A": 0.543,
+     "new_B": 0.8555,
+     "J_old\u00b7\u0394\u03b8": 0.2201,
+     "params_added": 0
+    },
+    "projected_null_space": {
+     "retention_A": 0.5625,
+     "new_B": 0.8086,
+     "J_old\u00b7\u0394\u03b8": 0.0,
+     "params_added": 0
+    },
+    "invariant_constrained": {
+     "retention_A": 0.9883,
+     "new_B": 0.6484,
+     "J_old\u00b7\u0394\u03b8": 0.0247,
+     "params_added": 0
+    },
+    "structural_growth": {
+     "retention_A": 1.0,
+     "new_B": 0.9336,
+     "params_added": 178
+    }
+   },
+   "regeneration": {
+    "modules": 3,
+    "certificate_repair_rate": 0.875,
+    "accuracy_before": 0.994,
+    "accuracy_corrupted": 0.9043,
+    "accuracy_regenerated": 0.9387
+   },
+   "economy": {
+    "families_used": {
+     "AddModule": 3,
+     "ParameterUpdate": 3,
+     "ReuseSkill": 11,
+     "AllocateSubspace": 5,
+     "FastWeightUpdate": 5,
+     "ComposeSkills": 2
+    },
+    "n_families_used": 6,
+    "n_families_available": 15,
+    "programs": 11,
+    "macros": [
+     [
+      "AddModule+ParameterUpdate+ReuseSkill",
+      3,
+      2
+     ],
+     [
+      "AllocateSubspace+FastWeightUpdate+ReuseSkill",
+      5,
+      3
+     ],
+     [
+      "ComposeSkills+ReuseSkill",
+      2,
+      3
+     ],
+     [
+      "ReuseSkill",
+      1,
+      0
+     ]
+    ],
+    "history_raw_bytes": 5392,
+    "history_stored_bytes": 964,
+    "compression_ratio": 5.59,
+    "grown": 3,
+    "grown_later_reused": 2,
+    "library_entries": 5
+   }
+  },
+  {
+   "multitask": {
+    "vanilla": {
+     "average_accuracy": 0.7157,
+     "new_task": 0.9699,
+     "backward_transfer": -0.2737,
+     "forward_transfer": -0.0036,
+     "forgetting": 0.2737,
+     "retention": 0.6941,
+     "param_growth": 1.0,
+     "memory_bytes": 0,
+     "compute_steps": 3500,
+     "recurrence": [],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "replay": {
+     "average_accuracy": 0.9004,
+     "new_task": 0.9595,
+     "backward_transfer": -0.0637,
+     "forward_transfer": -0.014,
+     "forgetting": 0.0637,
+     "retention": 0.8945,
+     "param_growth": 1.0,
+     "memory_bytes": 9408,
+     "compute_steps": 3500,
+     "recurrence": [],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "ewc": {
+     "average_accuracy": 0.7065,
+     "new_task": 0.9676,
+     "backward_transfer": -0.2812,
+     "forward_transfer": -0.0059,
+     "forgetting": 0.2812,
+     "retention": 0.6839,
+     "param_growth": 1.0,
+     "memory_bytes": 165088,
+     "compute_steps": 3500,
+     "recurrence": [],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "projected": {
+     "average_accuracy": 0.7143,
+     "new_task": 0.9872,
+     "backward_transfer": -0.2939,
+     "forward_transfer": 0.0137,
+     "forgetting": 0.2942,
+     "retention": 0.6929,
+     "param_growth": 1.0,
+     "memory_bytes": 884568,
+     "compute_steps": 3500,
+     "recurrence": [],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "invariant_constraints": {
+     "average_accuracy": 0.9076,
+     "new_task": 0.9428,
+     "backward_transfer": -0.0379,
+     "forward_transfer": -0.0307,
+     "forgetting": 0.0385,
+     "retention": 0.9029,
+     "param_growth": 1.0,
+     "memory_bytes": 6272,
+     "compute_steps": 3500,
+     "recurrence": [],
+     "rollbacks": 0,
+     "reused_modules": 0,
+     "grown_modules": 0
+    },
+    "structural_growth": {
+     "average_accuracy": 0.9925,
+     "new_task": 0.9967,
+     "backward_transfer": -0.0045,
+     "forward_transfer": 0.0232,
+     "forgetting": 0.0045,
+     "retention": 0.9922,
+     "param_growth": 14.0,
+     "memory_bytes": 1148,
+     "compute_steps": 4200,
+     "recurrence": [],
+     "kinds": {
+      "grow": 14
+     },
+     "rollbacks": 0,
+     "reused_modules": 14,
+     "composed": 0,
+     "grown_modules": 14,
+     "macros": 1,
+     "programs": 14,
+     "evaluations": 0
+    },
+    "compositional": {
+     "average_accuracy": 0.9925,
+     "new_task": 0.9967,
+     "backward_transfer": -0.0045,
+     "forward_transfer": 0.0232,
+     "forgetting": 0.0045,
+     "retention": 0.9922,
+     "param_growth": 4.91,
+     "memory_bytes": 998,
+     "compute_steps": 2400,
+     "recurrence": [],
+     "kinds": {
+      "grow": 2,
+      "adapter": 7,
+      "reuse": 4,
+      "compose": 1
+     },
+     "rollbacks": 0,
+     "reused_modules": 14,
+     "composed": 2,
+     "grown_modules": 2,
+     "macros": 4,
+     "programs": 14,
+     "evaluations": 220
+    }
+   },
+   "credit": {
+    "all": {
+     "accuracy": 0.963,
+     "interventions": 10.0,
+     "sign_cost": 0.0,
+     "n": 27
+    },
+    "random_topk": {
+     "accuracy": 0.444,
+     "interventions": 3.0,
+     "sign_cost": 0.0,
+     "n": 27
+    },
+    "sensitivity_topk": {
+     "accuracy": 0.407,
+     "interventions": 3.0,
+     "sign_cost": 0.05,
+     "n": 27
+    },
+    "voi": {
+     "accuracy": 1.0,
+     "interventions": 1.52,
+     "sign_cost": 0.33,
+     "n": 27
+    }
+   },
+   "cross_domain": {
+    "language": {
+     "domain": "language",
+     "tasks": 10,
+     "generalizes": 1.0,
+     "kinds": {
+      "grow": 6,
+      "reuse": 3,
+      "compose": 1
+     },
+     "retention": 1.0,
+     "evaluations": 243,
+     "primitive_families": 5,
+     "skills": 7
+    },
+    "algebra": {
+     "domain": "algebra",
+     "tasks": 10,
+     "generalizes": 1.0,
+     "kinds": {
+      "grow": 6,
+      "compose": 3,
+      "adapt": 1
+     },
+     "retention": 1.0,
+     "evaluations": 691,
+     "primitive_families": 5,
+     "skills": 10
+    },
+    "code": {
+     "domain": "code",
+     "tasks": 10,
+     "generalizes": 0.9,
+     "kinds": {
+      "grow": 6,
+      "reuse": 2,
+      "compose": 2
+     },
+     "retention": 1.0,
+     "evaluations": 237,
+     "primitive_families": 5,
+     "skills": 8
+    },
+    "strings": {
+     "domain": "strings",
+     "tasks": 10,
+     "generalizes": 1.0,
+     "kinds": {
+      "grow": 6,
+      "compose": 3,
+      "reuse": 1
+     },
+     "retention": 1.0,
+     "evaluations": 321,
+     "primitive_families": 6,
+     "skills": 9
+    }
+   },
+   "probes": {
+    "reference_A": 1.0,
+    "k=4": {
+     "synthesized": {
+      "retention_A": 0.7852,
+      "new_B": 0.9922
+     },
+     "random": {
+      "retention_A": 0.7461,
+      "new_B": 0.9961
+     }
+    },
+    "k=8": {
+     "synthesized": {
+      "retention_A": 0.918,
+      "new_B": 0.9805
+     },
+     "random": {
+      "retention_A": 0.9258,
+      "new_B": 0.9844
+     }
+    },
+    "k=16": {
+     "synthesized": {
+      "retention_A": 0.9961,
+      "new_B": 0.9766
+     },
+     "random": {
+      "retention_A": 0.9922,
+      "new_B": 0.9844
+     }
+    },
+    "k=32": {
+     "synthesized": {
+      "retention_A": 0.9922,
+      "new_B": 0.9727
+     },
+     "random": {
+      "retention_A": 0.9961,
+      "new_B": 0.9805
+     }
+    },
+    "full_replay(128)": {
+     "retention_A": 1.0,
+     "new_B": 0.9961
+    }
+   },
+   "subspace": {
+    "null_space_rank": 10,
+    "parameters": 1474,
+    "vanilla": {
+     "retention_A": 0.0,
+     "new_B": 0.9727,
+     "J_old\u00b7\u0394\u03b8": 0.4937,
+     "params_added": 0
+    },
+    "projected_null_space": {
+     "retention_A": 0.0312,
+     "new_B": 1.0,
+     "J_old\u00b7\u0394\u03b8": 0.0,
+     "params_added": 0
+    },
+    "invariant_constrained": {
+     "retention_A": 0.957,
+     "new_B": 0.9727,
+     "J_old\u00b7\u0394\u03b8": 0.0519,
+     "params_added": 0
+    },
+    "structural_growth": {
+     "retention_A": 0.9961,
+     "new_B": 0.9805,
+     "params_added": 178
+    }
+   },
+   "regeneration": {
+    "modules": 2,
+    "certificate_repair_rate": 0.778,
+    "accuracy_before": 0.994,
+    "accuracy_corrupted": 0.8155,
+    "accuracy_regenerated": 0.8995
+   },
+   "economy": {
+    "families_used": {
+     "AddModule": 3,
+     "ParameterUpdate": 3,
+     "ReuseSkill": 16,
+     "ComposeSkills": 3,
+     "AllocateSubspace": 8,
+     "FastWeightUpdate": 8
+    },
+    "n_families_used": 6,
+    "n_families_available": 15,
+    "programs": 16,
+    "macros": [
+     [
+      "AddModule+ParameterUpdate+ReuseSkill",
+      3,
+      2
+     ],
+     [
+      "ComposeSkills+ReuseSkill",
+      3,
+      4
+     ],
+     [
+      "AllocateSubspace+FastWeightUpdate+ReuseSkill",
+      8,
+      3
+     ],
+     [
+      "ReuseSkill",
+      2,
+      1
+     ]
+    ],
+    "history_raw_bytes": 5392,
+    "history_stored_bytes": 1292,
+    "compression_ratio": 4.17,
+    "grown": 3,
+    "grown_later_reused": 2,
+    "library_entries": 5
+   }
+  }
+ ]
+}

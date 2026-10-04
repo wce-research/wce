@@ -1,0 +1,4566 @@
+{
+ "main": {
+  "memorization": {
+   "validation": {
+    "in_region": {
+     "mean": 0.9352,
+     "ci95": [
+      0.931,
+      0.9395
+     ],
+     "n": 16
+    },
+    "extrapolation": {
+     "mean": 0.8135,
+     "ci95": [
+      0.7927,
+      0.8342
+     ],
+     "n": 16
+    },
+    "functional_recovery": {
+     "mean": 0.0417,
+     "ci95": [
+      -0.019,
+      0.1023
+     ],
+     "n": 16
+    },
+    "structural_recovery": null,
+    "adequate": {
+     "mean": 1.0,
+     "ci95": [
+      1.0,
+      1.0
+     ],
+     "n": 16
+    },
+    "params": {
+     "mean": 600.0,
+     "ci95": [
+      600.0,
+      600.0
+     ],
+     "n": 16
+    },
+    "evaluations": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "seconds": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "queries": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "program_length": null
+   },
+   "held_out": {
+    "in_region": {
+     "mean": 0.9343,
+     "ci95": [
+      0.9303,
+      0.9383
+     ],
+     "n": 16
+    },
+    "extrapolation": {
+     "mean": 0.8022,
+     "ci95": [
+      0.7835,
+      0.8209
+     ],
+     "n": 16
+    },
+    "functional_recovery": {
+     "mean": 0.0156,
+     "ci95": [
+      -0.0071,
+      0.0384
+     ],
+     "n": 16
+    },
+    "structural_recovery": null,
+    "adequate": {
+     "mean": 1.0,
+     "ci95": [
+      1.0,
+      1.0
+     ],
+     "n": 16
+    },
+    "params": {
+     "mean": 600.0,
+     "ci95": [
+      600.0,
+      600.0
+     ],
+     "n": 16
+    },
+    "evaluations": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "seconds": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "queries": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "program_length": null
+   },
+   "partial": {
+    "in_region": {
+     "mean": 0.9473,
+     "ci95": [
+      0.9359,
+      0.9587
+     ],
+     "n": 16
+    },
+    "extrapolation": {
+     "mean": 0.8477,
+     "ci95": [
+      0.7725,
+      0.923
+     ],
+     "n": 16
+    },
+    "functional_recovery": {
+     "mean": 0.0625,
+     "ci95": [
+      -0.0707,
+      0.1957
+     ],
+     "n": 16
+    },
+    "structural_recovery": null,
+    "adequate": {
+     "mean": 1.0,
+     "ci95": [
+      1.0,
+      1.0
+     ],
+     "n": 16
+    },
+    "params": {
+     "mean": 600.0,
+     "ci95": [
+      600.0,
+      600.0
+     ],
+     "n": 16
+    },
+    "evaluations": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "seconds": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "queries": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "program_length": null
+   },
+   "unrepresentable": {
+    "in_region": {
+     "mean": 0.8861,
+     "ci95": [
+      0.8815,
+      0.8908
+     ],
+     "n": 16
+    },
+    "extrapolation": {
+     "mean": 0.5963,
+     "ci95": [
+      0.5732,
+      0.6195
+     ],
+     "n": 16
+    },
+    "functional_recovery": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "structural_recovery": null,
+    "adequate": {
+     "mean": 1.0,
+     "ci95": [
+      1.0,
+      1.0
+     ],
+     "n": 16
+    },
+    "params": {
+     "mean": 600.0,
+     "ci95": [
+      600.0,
+      600.0
+     ],
+     "n": 16
+    },
+    "evaluations": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "seconds": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "queries": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "program_length": null
+   },
+   "held_out_composition": {
+    "in_region": {
+     "mean": 0.929,
+     "ci95": [
+      0.9209,
+      0.9371
+     ],
+     "n": 16
+    },
+    "extrapolation": {
+     "mean": 0.739,
+     "ci95": [
+      0.6745,
+      0.8036
+     ],
+     "n": 16
+    },
+    "functional_recovery": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "structural_recovery": null,
+    "adequate": {
+     "mean": 1.0,
+     "ci95": [
+      1.0,
+      1.0
+     ],
+     "n": 16
+    },
+    "params": {
+     "mean": 600.0,
+     "ci95": [
+      600.0,
+      600.0
+     ],
+     "n": 16
+    },
+    "evaluations": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "seconds": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "queries": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "program_length": null
+   },
+   "double_held_out": {
+    "in_region": {
+     "mean": 0.9385,
+     "ci95": [
+      0.9291,
+      0.948
+     ],
+     "n": 16
+    },
+    "extrapolation": {
+     "mean": 0.575,
+     "ci95": [
+      0.4891,
+      0.6609
+     ],
+     "n": 16
+    },
+    "functional_recovery": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "structural_recovery": null,
+    "adequate": {
+     "mean": 1.0,
+     "ci95": [
+      1.0,
+      1.0
+     ],
+     "n": 16
+    },
+    "params": {
+     "mean": 600.0,
+     "ci95": [
+      600.0,
+      600.0
+     ],
+     "n": 16
+    },
+    "evaluations": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "seconds": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "queries": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "program_length": null
+   }
+  },
+  "knn": {
+   "validation": {
+    "in_region": {
+     "mean": 0.953,
+     "ci95": [
+      0.9476,
+      0.9584
+     ],
+     "n": 16
+    },
+    "extrapolation": {
+     "mean": 0.7856,
+     "ci95": [
+      0.75,
+      0.8212
+     ],
+     "n": 16
+    },
+    "functional_recovery": {
+     "mean": 0.0417,
+     "ci95": [
+      -0.019,
+      0.1023
+     ],
+     "n": 16
+    },
+    "structural_recovery": null,
+    "adequate": {
+     "mean": 1.0,
+     "ci95": [
+      1.0,
+      1.0
+     ],
+     "n": 16
+    },
+    "params": {
+     "mean": 600.0,
+     "ci95": [
+      600.0,
+      600.0
+     ],
+     "n": 16
+    },
+    "evaluations": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "seconds": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "queries": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "program_length": null
+   },
+   "held_out": {
+    "in_region": {
+     "mean": 0.9507,
+     "ci95": [
+      0.9487,
+      0.9528
+     ],
+     "n": 16
+    },
+    "extrapolation": {
+     "mean": 0.8113,
+     "ci95": [
+      0.7932,
+      0.8295
+     ],
+     "n": 16
+    },
+    "functional_recovery": {
+     "mean": 0.2188,
+     "ci95": [
+      0.1672,
+      0.2703
+     ],
+     "n": 16
+    },
+    "structural_recovery": null,
+    "adequate": {
+     "mean": 1.0,
+     "ci95": [
+      1.0,
+      1.0
+     ],
+     "n": 16
+    },
+    "params": {
+     "mean": 600.0,
+     "ci95": [
+      600.0,
+      600.0
+     ],
+     "n": 16
+    },
+    "evaluations": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "seconds": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "queries": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "program_length": null
+   },
+   "partial": {
+    "in_region": {
+     "mean": 0.9682,
+     "ci95": [
+      0.9617,
+      0.9748
+     ],
+     "n": 16
+    },
+    "extrapolation": {
+     "mean": 0.8445,
+     "ci95": [
+      0.7743,
+      0.9148
+     ],
+     "n": 16
+    },
+    "functional_recovery": {
+     "mean": 0.0625,
+     "ci95": [
+      -0.0707,
+      0.1957
+     ],
+     "n": 16
+    },
+    "structural_recovery": null,
+    "adequate": {
+     "mean": 1.0,
+     "ci95": [
+      1.0,
+      1.0
+     ],
+     "n": 16
+    },
+    "params": {
+     "mean": 600.0,
+     "ci95": [
+      600.0,
+      600.0
+     ],
+     "n": 16
+    },
+    "evaluations": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "seconds": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "queries": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "program_length": null
+   },
+   "unrepresentable": {
+    "in_region": {
+     "mean": 0.8713,
+     "ci95": [
+      0.8646,
+      0.8781
+     ],
+     "n": 16
+    },
+    "extrapolation": {
+     "mean": 0.606,
+     "ci95": [
+      0.5954,
+      0.6167
+     ],
+     "n": 16
+    },
+    "functional_recovery": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "structural_recovery": null,
+    "adequate": {
+     "mean": 1.0,
+     "ci95": [
+      1.0,
+      1.0
+     ],
+     "n": 16
+    },
+    "params": {
+     "mean": 600.0,
+     "ci95": [
+      600.0,
+      600.0
+     ],
+     "n": 16
+    },
+    "evaluations": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "seconds": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "queries": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "program_length": null
+   },
+   "held_out_composition": {
+    "in_region": {
+     "mean": 0.9452,
+     "ci95": [
+      0.9359,
+      0.9545
+     ],
+     "n": 16
+    },
+    "extrapolation": {
+     "mean": 0.7099,
+     "ci95": [
+      0.6311,
+      0.7887
+     ],
+     "n": 16
+    },
+    "functional_recovery": {
+     "mean": 0.0312,
+     "ci95": [
+      -0.0353,
+      0.0978
+     ],
+     "n": 16
+    },
+    "structural_recovery": null,
+    "adequate": {
+     "mean": 1.0,
+     "ci95": [
+      1.0,
+      1.0
+     ],
+     "n": 16
+    },
+    "params": {
+     "mean": 600.0,
+     "ci95": [
+      600.0,
+      600.0
+     ],
+     "n": 16
+    },
+    "evaluations": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "seconds": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "queries": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "program_length": null
+   },
+   "double_held_out": {
+    "in_region": {
+     "mean": 0.9603,
+     "ci95": [
+      0.951,
+      0.9697
+     ],
+     "n": 16
+    },
+    "extrapolation": {
+     "mean": 0.5404,
+     "ci95": [
+      0.4461,
+      0.6347
+     ],
+     "n": 16
+    },
+    "functional_recovery": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "structural_recovery": null,
+    "adequate": {
+     "mean": 1.0,
+     "ci95": [
+      1.0,
+      1.0
+     ],
+     "n": 16
+    },
+    "params": {
+     "mean": 600.0,
+     "ci95": [
+      600.0,
+      600.0
+     ],
+     "n": 16
+    },
+    "evaluations": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "seconds": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "queries": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "program_length": null
+   }
+  },
+  "mlp": {
+   "validation": {
+    "in_region": {
+     "mean": 0.9536,
+     "ci95": [
+      0.9498,
+      0.9574
+     ],
+     "n": 16
+    },
+    "extrapolation": {
+     "mean": 0.5642,
+     "ci95": [
+      0.505,
+      0.6233
+     ],
+     "n": 16
+    },
+    "functional_recovery": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "structural_recovery": null,
+    "adequate": {
+     "mean": 1.0,
+     "ci95": [
+      1.0,
+      1.0
+     ],
+     "n": 16
+    },
+    "params": {
+     "mean": 42.0,
+     "ci95": [
+      42.0,
+      42.0
+     ],
+     "n": 16
+    },
+    "evaluations": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "seconds": {
+     "mean": 0.6217,
+     "ci95": [
+      0.4749,
+      0.7685
+     ],
+     "n": 16
+    },
+    "queries": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "program_length": null
+   },
+   "held_out": {
+    "in_region": {
+     "mean": 0.9583,
+     "ci95": [
+      0.9549,
+      0.9616
+     ],
+     "n": 16
+    },
+    "extrapolation": {
+     "mean": 0.6143,
+     "ci95": [
+      0.5667,
+      0.6619
+     ],
+     "n": 16
+    },
+    "functional_recovery": {
+     "mean": 0.0156,
+     "ci95": [
+      -0.0071,
+      0.0384
+     ],
+     "n": 16
+    },
+    "structural_recovery": null,
+    "adequate": {
+     "mean": 1.0,
+     "ci95": [
+      1.0,
+      1.0
+     ],
+     "n": 16
+    },
+    "params": {
+     "mean": 42.0,
+     "ci95": [
+      42.0,
+      42.0
+     ],
+     "n": 16
+    },
+    "evaluations": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "seconds": {
+     "mean": 0.5946,
+     "ci95": [
+      0.4966,
+      0.6926
+     ],
+     "n": 16
+    },
+    "queries": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "program_length": null
+   },
+   "partial": {
+    "in_region": {
+     "mean": 0.9696,
+     "ci95": [
+      0.9615,
+      0.9778
+     ],
+     "n": 16
+    },
+    "extrapolation": {
+     "mean": 0.9315,
+     "ci95": [
+      0.9051,
+      0.958
+     ],
+     "n": 16
+    },
+    "functional_recovery": {
+     "mean": 0.25,
+     "ci95": [
+      0.0117,
+      0.4883
+     ],
+     "n": 16
+    },
+    "structural_recovery": null,
+    "adequate": {
+     "mean": 1.0,
+     "ci95": [
+      1.0,
+      1.0
+     ],
+     "n": 16
+    },
+    "params": {
+     "mean": 42.0,
+     "ci95": [
+      42.0,
+      42.0
+     ],
+     "n": 16
+    },
+    "evaluations": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "seconds": {
+     "mean": 0.7835,
+     "ci95": [
+      0.3326,
+      1.2344
+     ],
+     "n": 16
+    },
+    "queries": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "program_length": null
+   },
+   "unrepresentable": {
+    "in_region": {
+     "mean": 0.8586,
+     "ci95": [
+      0.8485,
+      0.8687
+     ],
+     "n": 16
+    },
+    "extrapolation": {
+     "mean": 0.5631,
+     "ci95": [
+      0.5322,
+      0.5939
+     ],
+     "n": 16
+    },
+    "functional_recovery": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "structural_recovery": null,
+    "adequate": {
+     "mean": 1.0,
+     "ci95": [
+      1.0,
+      1.0
+     ],
+     "n": 16
+    },
+    "params": {
+     "mean": 42.0,
+     "ci95": [
+      42.0,
+      42.0
+     ],
+     "n": 16
+    },
+    "evaluations": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "seconds": {
+     "mean": 0.4905,
+     "ci95": [
+      0.4452,
+      0.5358
+     ],
+     "n": 16
+    },
+    "queries": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "program_length": null
+   },
+   "held_out_composition": {
+    "in_region": {
+     "mean": 0.9541,
+     "ci95": [
+      0.9443,
+      0.9639
+     ],
+     "n": 16
+    },
+    "extrapolation": {
+     "mean": 0.6939,
+     "ci95": [
+      0.5977,
+      0.7901
+     ],
+     "n": 16
+    },
+    "functional_recovery": {
+     "mean": 0.0938,
+     "ci95": [
+      -0.0511,
+      0.2386
+     ],
+     "n": 16
+    },
+    "structural_recovery": null,
+    "adequate": {
+     "mean": 1.0,
+     "ci95": [
+      1.0,
+      1.0
+     ],
+     "n": 16
+    },
+    "params": {
+     "mean": 42.0,
+     "ci95": [
+      42.0,
+      42.0
+     ],
+     "n": 16
+    },
+    "evaluations": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "seconds": {
+     "mean": 0.5051,
+     "ci95": [
+      0.4621,
+      0.5482
+     ],
+     "n": 16
+    },
+    "queries": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "program_length": null
+   },
+   "double_held_out": {
+    "in_region": {
+     "mean": 0.9736,
+     "ci95": [
+      0.9671,
+      0.9802
+     ],
+     "n": 16
+    },
+    "extrapolation": {
+     "mean": 0.4952,
+     "ci95": [
+      0.397,
+      0.5935
+     ],
+     "n": 16
+    },
+    "functional_recovery": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "structural_recovery": null,
+    "adequate": {
+     "mean": 1.0,
+     "ci95": [
+      1.0,
+      1.0
+     ],
+     "n": 16
+    },
+    "params": {
+     "mean": 42.0,
+     "ci95": [
+      42.0,
+      42.0
+     ],
+     "n": 16
+    },
+    "evaluations": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "seconds": {
+     "mean": 0.5517,
+     "ci95": [
+      0.4474,
+      0.6559
+     ],
+     "n": 16
+    },
+    "queries": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "program_length": null
+   }
+  },
+  "oracle": {
+   "validation": {
+    "in_region": {
+     "mean": 0.964,
+     "ci95": [
+      0.9579,
+      0.9701
+     ],
+     "n": 16
+    },
+    "extrapolation": {
+     "mean": 0.9133,
+     "ci95": [
+      0.8918,
+      0.9347
+     ],
+     "n": 16
+    },
+    "functional_recovery": {
+     "mean": 0.4792,
+     "ci95": [
+      0.3674,
+      0.5909
+     ],
+     "n": 16
+    },
+    "structural_recovery": {
+     "mean": 1.0,
+     "ci95": [
+      1.0,
+      1.0
+     ],
+     "n": 16
+    },
+    "adequate": {
+     "mean": 1.0,
+     "ci95": [
+      1.0,
+      1.0
+     ],
+     "n": 16
+    },
+    "params": {
+     "mean": 5.3333,
+     "ci95": [
+      5.3333,
+      5.3333
+     ],
+     "n": 16
+    },
+    "evaluations": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "seconds": {
+     "mean": 1.0695,
+     "ci95": [
+      0.8389,
+      1.3
+     ],
+     "n": 16
+    },
+    "queries": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "program_length": {
+     "mean": 3.3333,
+     "ci95": [
+      3.3333,
+      3.3333
+     ],
+     "n": 16
+    }
+   },
+   "held_out": {
+    "in_region": {
+     "mean": 0.962,
+     "ci95": [
+      0.9562,
+      0.9679
+     ],
+     "n": 16
+    },
+    "extrapolation": {
+     "mean": 0.8972,
+     "ci95": [
+      0.8655,
+      0.9288
+     ],
+     "n": 16
+    },
+    "functional_recovery": {
+     "mean": 0.5417,
+     "ci95": [
+      0.4529,
+      0.6305
+     ],
+     "n": 16
+    },
+    "structural_recovery": {
+     "mean": 1.0,
+     "ci95": [
+      1.0,
+      1.0
+     ],
+     "n": 16
+    },
+    "adequate": {
+     "mean": 1.0,
+     "ci95": [
+      1.0,
+      1.0
+     ],
+     "n": 16
+    },
+    "params": {
+     "mean": 5.3333,
+     "ci95": [
+      5.3333,
+      5.3333
+     ],
+     "n": 16
+    },
+    "evaluations": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "seconds": {
+     "mean": 1.0785,
+     "ci95": [
+      0.9329,
+      1.2241
+     ],
+     "n": 16
+    },
+    "queries": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "program_length": {
+     "mean": 4.0,
+     "ci95": [
+      4.0,
+      4.0
+     ],
+     "n": 16
+    }
+   },
+   "partial": {
+    "in_region": {
+     "mean": 0.9648,
+     "ci95": [
+      0.9616,
+      0.968
+     ],
+     "n": 16
+    },
+    "extrapolation": {
+     "mean": 0.9716,
+     "ci95": [
+      0.9609,
+      0.9822
+     ],
+     "n": 16
+    },
+    "functional_recovery": {
+     "mean": 0.75,
+     "ci95": [
+      0.5117,
+      0.9883
+     ],
+     "n": 16
+    },
+    "structural_recovery": {
+     "mean": 1.0,
+     "ci95": [
+      1.0,
+      1.0
+     ],
+     "n": 16
+    },
+    "adequate": {
+     "mean": 1.0,
+     "ci95": [
+      1.0,
+      1.0
+     ],
+     "n": 16
+    },
+    "params": {
+     "mean": 2.0,
+     "ci95": [
+      2.0,
+      2.0
+     ],
+     "n": 16
+    },
+    "evaluations": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "seconds": {
+     "mean": 0.5963,
+     "ci95": [
+      0.5034,
+      0.6891
+     ],
+     "n": 16
+    },
+    "queries": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "program_length": {
+     "mean": 1.0,
+     "ci95": [
+      1.0,
+      1.0
+     ],
+     "n": 16
+    }
+   },
+   "unrepresentable": {
+    "in_region": null,
+    "extrapolation": null,
+    "functional_recovery": null,
+    "structural_recovery": null,
+    "adequate": null,
+    "params": null,
+    "evaluations": null,
+    "seconds": null,
+    "queries": null,
+    "program_length": null
+   },
+   "held_out_composition": {
+    "in_region": null,
+    "extrapolation": null,
+    "functional_recovery": null,
+    "structural_recovery": null,
+    "adequate": null,
+    "params": null,
+    "evaluations": null,
+    "seconds": null,
+    "queries": null,
+    "program_length": null
+   },
+   "double_held_out": {
+    "in_region": {
+     "mean": 0.9781,
+     "ci95": [
+      0.9716,
+      0.9846
+     ],
+     "n": 16
+    },
+    "extrapolation": {
+     "mean": 0.6656,
+     "ci95": [
+      0.5594,
+      0.7718
+     ],
+     "n": 16
+    },
+    "functional_recovery": {
+     "mean": 0.0625,
+     "ci95": [
+      -0.0707,
+      0.1957
+     ],
+     "n": 16
+    },
+    "structural_recovery": {
+     "mean": 1.0,
+     "ci95": [
+      1.0,
+      1.0
+     ],
+     "n": 16
+    },
+    "adequate": {
+     "mean": 1.0,
+     "ci95": [
+      1.0,
+      1.0
+     ],
+     "n": 16
+    },
+    "params": {
+     "mean": 5.0,
+     "ci95": [
+      4.4498,
+      5.5502
+     ],
+     "n": 16
+    },
+    "evaluations": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "seconds": {
+     "mean": 0.8714,
+     "ci95": [
+      0.7309,
+      1.0119
+     ],
+     "n": 16
+    },
+    "queries": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "program_length": {
+     "mean": 4.0,
+     "ci95": [
+      3.4498,
+      4.5502
+     ],
+     "n": 16
+    }
+   }
+  },
+  "search_no_au": {
+   "validation": {
+    "in_region": {
+     "mean": 0.967,
+     "ci95": [
+      0.9576,
+      0.9764
+     ],
+     "n": 16
+    },
+    "extrapolation": {
+     "mean": 0.8833,
+     "ci95": [
+      0.8267,
+      0.9398
+     ],
+     "n": 16
+    },
+    "functional_recovery": {
+     "mean": 0.4792,
+     "ci95": [
+      0.3674,
+      0.5909
+     ],
+     "n": 16
+    },
+    "structural_recovery": {
+     "mean": 0.2292,
+     "ci95": [
+      0.1442,
+      0.3142
+     ],
+     "n": 16
+    },
+    "adequate": {
+     "mean": 0.9375,
+     "ci95": [
+      0.8659,
+      1.0091
+     ],
+     "n": 16
+    },
+    "params": {
+     "mean": 4.0833,
+     "ci95": [
+      3.609,
+      4.5576
+     ],
+     "n": 16
+    },
+    "evaluations": {
+     "mean": 335.8958,
+     "ci95": [
+      291.4234,
+      380.3683
+     ],
+     "n": 16
+    },
+    "seconds": {
+     "mean": 138.9068,
+     "ci95": [
+      116.3309,
+      161.4827
+     ],
+     "n": 16
+    },
+    "queries": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "program_length": {
+     "mean": 2.6458,
+     "ci95": [
+      2.1717,
+      3.12
+     ],
+     "n": 16
+    }
+   },
+   "held_out": {
+    "in_region": {
+     "mean": 0.9526,
+     "ci95": [
+      0.9491,
+      0.9561
+     ],
+     "n": 16
+    },
+    "extrapolation": {
+     "mean": 0.812,
+     "ci95": [
+      0.7835,
+      0.8406
+     ],
+     "n": 16
+    },
+    "functional_recovery": {
+     "mean": 0.2422,
+     "ci95": [
+      0.1598,
+      0.3245
+     ],
+     "n": 16
+    },
+    "structural_recovery": {
+     "mean": 0.1094,
+     "ci95": [
+      0.0557,
+      0.1631
+     ],
+     "n": 16
+    },
+    "adequate": {
+     "mean": 0.7109,
+     "ci95": [
+      0.664,
+      0.7578
+     ],
+     "n": 16
+    },
+    "params": {
+     "mean": 5.2969,
+     "ci95": [
+      4.9404,
+      5.6533
+     ],
+     "n": 16
+    },
+    "evaluations": {
+     "mean": 326.6875,
+     "ci95": [
+      308.2084,
+      345.1666
+     ],
+     "n": 16
+    },
+    "seconds": {
+     "mean": 126.483,
+     "ci95": [
+      118.7782,
+      134.1878
+     ],
+     "n": 16
+    },
+    "queries": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "program_length": {
+     "mean": 3.8516,
+     "ci95": [
+      3.539,
+      4.1641
+     ],
+     "n": 16
+    }
+   },
+   "partial": {
+    "in_region": {
+     "mean": 0.9625,
+     "ci95": [
+      0.9552,
+      0.9698
+     ],
+     "n": 16
+    },
+    "extrapolation": {
+     "mean": 0.883,
+     "ci95": [
+      0.8025,
+      0.9636
+     ],
+     "n": 16
+    },
+    "functional_recovery": {
+     "mean": 0.375,
+     "ci95": [
+      0.1086,
+      0.6414
+     ],
+     "n": 16
+    },
+    "structural_recovery": {
+     "mean": 0.4375,
+     "ci95": [
+      0.1645,
+      0.7105
+     ],
+     "n": 16
+    },
+    "adequate": {
+     "mean": 0.875,
+     "ci95": [
+      0.693,
+      1.057
+     ],
+     "n": 16
+    },
+    "params": {
+     "mean": 3.0,
+     "ci95": [
+      2.3848,
+      3.6152
+     ],
+     "n": 16
+    },
+    "evaluations": {
+     "mean": 253.4375,
+     "ci95": [
+      163.9385,
+      342.9365
+     ],
+     "n": 16
+    },
+    "seconds": {
+     "mean": 92.1607,
+     "ci95": [
+      57.2947,
+      127.0268
+     ],
+     "n": 16
+    },
+    "queries": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "program_length": {
+     "mean": 1.75,
+     "ci95": [
+      1.1828,
+      2.3172
+     ],
+     "n": 16
+    }
+   },
+   "unrepresentable": {
+    "in_region": {
+     "mean": 0.8038,
+     "ci95": [
+      0.7921,
+      0.8156
+     ],
+     "n": 16
+    },
+    "extrapolation": {
+     "mean": 0.5707,
+     "ci95": [
+      0.5129,
+      0.6286
+     ],
+     "n": 16
+    },
+    "functional_recovery": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "structural_recovery": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "adequate": {
+     "mean": 0.3594,
+     "ci95": [
+      0.251,
+      0.4678
+     ],
+     "n": 16
+    },
+    "params": {
+     "mean": 6.6719,
+     "ci95": [
+      5.9268,
+      7.417
+     ],
+     "n": 16
+    },
+    "evaluations": {
+     "mean": 441.8125,
+     "ci95": [
+      425.8119,
+      457.8131
+     ],
+     "n": 16
+    },
+    "seconds": {
+     "mean": 166.128,
+     "ci95": [
+      156.6722,
+      175.5839
+     ],
+     "n": 16
+    },
+    "queries": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "program_length": {
+     "mean": 5.0938,
+     "ci95": [
+      4.4769,
+      5.7106
+     ],
+     "n": 16
+    }
+   },
+   "held_out_composition": {
+    "in_region": {
+     "mean": 0.9474,
+     "ci95": [
+      0.9326,
+      0.9622
+     ],
+     "n": 16
+    },
+    "extrapolation": {
+     "mean": 0.6807,
+     "ci95": [
+      0.5746,
+      0.7869
+     ],
+     "n": 16
+    },
+    "functional_recovery": {
+     "mean": 0.1562,
+     "ci95": [
+      0.0287,
+      0.2838
+     ],
+     "n": 16
+    },
+    "structural_recovery": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "adequate": {
+     "mean": 0.75,
+     "ci95": [
+      0.6124,
+      0.8876
+     ],
+     "n": 16
+    },
+    "params": {
+     "mean": 5.8125,
+     "ci95": [
+      4.9542,
+      6.6708
+     ],
+     "n": 16
+    },
+    "evaluations": {
+     "mean": 330.4062,
+     "ci95": [
+      284.6211,
+      376.1914
+     ],
+     "n": 16
+    },
+    "seconds": {
+     "mean": 118.9835,
+     "ci95": [
+      99.0921,
+      138.8749
+     ],
+     "n": 16
+    },
+    "queries": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "program_length": {
+     "mean": 4.2812,
+     "ci95": [
+      3.5156,
+      5.0469
+     ],
+     "n": 16
+    }
+   },
+   "double_held_out": {
+    "in_region": {
+     "mean": 0.9585,
+     "ci95": [
+      0.9414,
+      0.9757
+     ],
+     "n": 16
+    },
+    "extrapolation": {
+     "mean": 0.5964,
+     "ci95": [
+      0.4864,
+      0.7064
+     ],
+     "n": 16
+    },
+    "functional_recovery": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "structural_recovery": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "adequate": {
+     "mean": 0.875,
+     "ci95": [
+      0.693,
+      1.057
+     ],
+     "n": 16
+    },
+    "params": {
+     "mean": 3.4375,
+     "ci95": [
+      2.8233,
+      4.0517
+     ],
+     "n": 16
+    },
+    "evaluations": {
+     "mean": 265.875,
+     "ci95": [
+      185.8118,
+      345.9382
+     ],
+     "n": 16
+    },
+    "seconds": {
+     "mean": 92.3637,
+     "ci95": [
+      59.7531,
+      124.9744
+     ],
+     "n": 16
+    },
+    "queries": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "program_length": {
+     "mean": 2.1875,
+     "ci95": [
+      1.6298,
+      2.7452
+     ],
+     "n": 16
+    }
+   }
+  },
+  "bpi_full": {
+   "validation": {
+    "in_region": {
+     "mean": 0.9667,
+     "ci95": [
+      0.9597,
+      0.9738
+     ],
+     "n": 16
+    },
+    "extrapolation": {
+     "mean": 0.8915,
+     "ci95": [
+      0.8429,
+      0.9401
+     ],
+     "n": 16
+    },
+    "functional_recovery": {
+     "mean": 0.5208,
+     "ci95": [
+      0.4091,
+      0.6326
+     ],
+     "n": 16
+    },
+    "structural_recovery": {
+     "mean": 0.25,
+     "ci95": [
+      0.1706,
+      0.3294
+     ],
+     "n": 16
+    },
+    "adequate": {
+     "mean": 0.8958,
+     "ci95": [
+      0.8108,
+      0.9808
+     ],
+     "n": 16
+    },
+    "params": {
+     "mean": 4.2708,
+     "ci95": [
+      3.7846,
+      4.757
+     ],
+     "n": 16
+    },
+    "evaluations": {
+     "mean": 280.9583,
+     "ci95": [
+      235.7555,
+      326.1612
+     ],
+     "n": 16
+    },
+    "seconds": {
+     "mean": 116.2087,
+     "ci95": [
+      94.7534,
+      137.6641
+     ],
+     "n": 16
+    },
+    "queries": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "program_length": {
+     "mean": 2.8542,
+     "ci95": [
+      2.4341,
+      3.2742
+     ],
+     "n": 16
+    }
+   },
+   "held_out": {
+    "in_region": {
+     "mean": 0.9497,
+     "ci95": [
+      0.947,
+      0.9524
+     ],
+     "n": 16
+    },
+    "extrapolation": {
+     "mean": 0.7998,
+     "ci95": [
+      0.7689,
+      0.8307
+     ],
+     "n": 16
+    },
+    "functional_recovery": {
+     "mean": 0.2422,
+     "ci95": [
+      0.1969,
+      0.2875
+     ],
+     "n": 16
+    },
+    "structural_recovery": {
+     "mean": 0.0859,
+     "ci95": [
+      0.0458,
+      0.126
+     ],
+     "n": 16
+    },
+    "adequate": {
+     "mean": 0.75,
+     "ci95": [
+      0.6812,
+      0.8188
+     ],
+     "n": 16
+    },
+    "params": {
+     "mean": 5.0781,
+     "ci95": [
+      4.7678,
+      5.3885
+     ],
+     "n": 16
+    },
+    "evaluations": {
+     "mean": 298.7578,
+     "ci95": [
+      278.9666,
+      318.549
+     ],
+     "n": 16
+    },
+    "seconds": {
+     "mean": 118.4675,
+     "ci95": [
+      109.572,
+      127.363
+     ],
+     "n": 16
+    },
+    "queries": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "program_length": {
+     "mean": 3.6406,
+     "ci95": [
+      3.3722,
+      3.9091
+     ],
+     "n": 16
+    }
+   },
+   "partial": {
+    "in_region": {
+     "mean": 0.9563,
+     "ci95": [
+      0.9456,
+      0.9671
+     ],
+     "n": 16
+    },
+    "extrapolation": {
+     "mean": 0.8914,
+     "ci95": [
+      0.8181,
+      0.9646
+     ],
+     "n": 16
+    },
+    "functional_recovery": {
+     "mean": 0.25,
+     "ci95": [
+      0.0117,
+      0.4883
+     ],
+     "n": 16
+    },
+    "structural_recovery": {
+     "mean": 0.5,
+     "ci95": [
+      0.2249,
+      0.7751
+     ],
+     "n": 16
+    },
+    "adequate": {
+     "mean": 0.875,
+     "ci95": [
+      0.693,
+      1.057
+     ],
+     "n": 16
+    },
+    "params": {
+     "mean": 2.75,
+     "ci95": [
+      2.1828,
+      3.3172
+     ],
+     "n": 16
+    },
+    "evaluations": {
+     "mean": 184.0,
+     "ci95": [
+      105.5519,
+      262.4481
+     ],
+     "n": 16
+    },
+    "seconds": {
+     "mean": 66.7566,
+     "ci95": [
+      38.6401,
+      94.8731
+     ],
+     "n": 16
+    },
+    "queries": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "program_length": {
+     "mean": 1.5,
+     "ci95": [
+      0.9498,
+      2.0502
+     ],
+     "n": 16
+    }
+   },
+   "unrepresentable": {
+    "in_region": {
+     "mean": 0.8027,
+     "ci95": [
+      0.7901,
+      0.8154
+     ],
+     "n": 16
+    },
+    "extrapolation": {
+     "mean": 0.5771,
+     "ci95": [
+      0.522,
+      0.6322
+     ],
+     "n": 16
+    },
+    "functional_recovery": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "structural_recovery": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "adequate": {
+     "mean": 0.2969,
+     "ci95": [
+      0.1756,
+      0.4182
+     ],
+     "n": 16
+    },
+    "params": {
+     "mean": 6.6406,
+     "ci95": [
+      5.9616,
+      7.3197
+     ],
+     "n": 16
+    },
+    "evaluations": {
+     "mean": 437.6094,
+     "ci95": [
+      416.9057,
+      458.313
+     ],
+     "n": 16
+    },
+    "seconds": {
+     "mean": 163.811,
+     "ci95": [
+      152.9986,
+      174.6233
+     ],
+     "n": 16
+    },
+    "queries": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "program_length": {
+     "mean": 5.0938,
+     "ci95": [
+      4.5395,
+      5.648
+     ],
+     "n": 16
+    }
+   },
+   "held_out_composition": {
+    "in_region": {
+     "mean": 0.9474,
+     "ci95": [
+      0.9306,
+      0.9642
+     ],
+     "n": 16
+    },
+    "extrapolation": {
+     "mean": 0.7238,
+     "ci95": [
+      0.6051,
+      0.8426
+     ],
+     "n": 16
+    },
+    "functional_recovery": {
+     "mean": 0.25,
+     "ci95": [
+      0.1124,
+      0.3876
+     ],
+     "n": 16
+    },
+    "structural_recovery": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "adequate": {
+     "mean": 0.75,
+     "ci95": [
+      0.6124,
+      0.8876
+     ],
+     "n": 16
+    },
+    "params": {
+     "mean": 5.1562,
+     "ci95": [
+      4.3798,
+      5.9327
+     ],
+     "n": 16
+    },
+    "evaluations": {
+     "mean": 300.1875,
+     "ci95": [
+      238.9497,
+      361.4253
+     ],
+     "n": 16
+    },
+    "seconds": {
+     "mean": 109.5833,
+     "ci95": [
+      85.033,
+      134.1336
+     ],
+     "n": 16
+    },
+    "queries": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "program_length": {
+     "mean": 3.75,
+     "ci95": [
+      3.1122,
+      4.3878
+     ],
+     "n": 16
+    }
+   },
+   "double_held_out": {
+    "in_region": {
+     "mean": 0.9535,
+     "ci95": [
+      0.9323,
+      0.9747
+     ],
+     "n": 16
+    },
+    "extrapolation": {
+     "mean": 0.628,
+     "ci95": [
+      0.5256,
+      0.7305
+     ],
+     "n": 16
+    },
+    "functional_recovery": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "structural_recovery": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "adequate": {
+     "mean": 0.875,
+     "ci95": [
+      0.693,
+      1.057
+     ],
+     "n": 16
+    },
+    "params": {
+     "mean": 3.5625,
+     "ci95": [
+      2.9182,
+      4.2068
+     ],
+     "n": 16
+    },
+    "evaluations": {
+     "mean": 209.4375,
+     "ci95": [
+      126.8731,
+      292.0019
+     ],
+     "n": 16
+    },
+    "seconds": {
+     "mean": 74.2016,
+     "ci95": [
+      41.2343,
+      107.169
+     ],
+     "n": 16
+    },
+    "queries": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "program_length": {
+     "mean": 2.375,
+     "ci95": [
+      1.7637,
+      2.9863
+     ],
+     "n": 16
+    }
+   }
+  },
+  "bpi_active": {
+   "validation": {
+    "in_region": {
+     "mean": 0.9769,
+     "ci95": [
+      0.9718,
+      0.9819
+     ],
+     "n": 16
+    },
+    "extrapolation": {
+     "mean": 0.9523,
+     "ci95": [
+      0.9391,
+      0.9654
+     ],
+     "n": 16
+    },
+    "functional_recovery": {
+     "mean": 0.6875,
+     "ci95": [
+      0.6089,
+      0.7661
+     ],
+     "n": 16
+    },
+    "structural_recovery": {
+     "mean": 0.2292,
+     "ci95": [
+      0.1442,
+      0.3142
+     ],
+     "n": 16
+    },
+    "adequate": {
+     "mean": 0.8958,
+     "ci95": [
+      0.8108,
+      0.9808
+     ],
+     "n": 16
+    },
+    "params": {
+     "mean": 4.2917,
+     "ci95": [
+      3.7496,
+      4.8337
+     ],
+     "n": 16
+    },
+    "evaluations": {
+     "mean": 280.9583,
+     "ci95": [
+      235.7555,
+      326.1612
+     ],
+     "n": 16
+    },
+    "seconds": {
+     "mean": 120.4644,
+     "ci95": [
+      98.4491,
+      142.4798
+     ],
+     "n": 16
+    },
+    "queries": {
+     "mean": 12.0,
+     "ci95": [
+      12.0,
+      12.0
+     ],
+     "n": 16
+    },
+    "program_length": {
+     "mean": 2.9792,
+     "ci95": [
+      2.4387,
+      3.5196
+     ],
+     "n": 16
+    }
+   },
+   "held_out": {
+    "in_region": {
+     "mean": 0.9613,
+     "ci95": [
+      0.9589,
+      0.9638
+     ],
+     "n": 16
+    },
+    "extrapolation": {
+     "mean": 0.8886,
+     "ci95": [
+      0.8563,
+      0.9208
+     ],
+     "n": 16
+    },
+    "functional_recovery": {
+     "mean": 0.5234,
+     "ci95": [
+      0.4457,
+      0.6012
+     ],
+     "n": 16
+    },
+    "structural_recovery": {
+     "mean": 0.1172,
+     "ci95": [
+      0.0658,
+      0.1686
+     ],
+     "n": 16
+    },
+    "adequate": {
+     "mean": 0.75,
+     "ci95": [
+      0.6812,
+      0.8188
+     ],
+     "n": 16
+    },
+    "params": {
+     "mean": 5.5156,
+     "ci95": [
+      5.1693,
+      5.862
+     ],
+     "n": 16
+    },
+    "evaluations": {
+     "mean": 298.7578,
+     "ci95": [
+      278.9666,
+      318.549
+     ],
+     "n": 16
+    },
+    "seconds": {
+     "mean": 124.5642,
+     "ci95": [
+      115.4931,
+      133.6353
+     ],
+     "n": 16
+    },
+    "queries": {
+     "mean": 12.0,
+     "ci95": [
+      12.0,
+      12.0
+     ],
+     "n": 16
+    },
+    "program_length": {
+     "mean": 4.0156,
+     "ci95": [
+      3.695,
+      4.3363
+     ],
+     "n": 16
+    }
+   },
+   "partial": {
+    "in_region": {
+     "mean": 0.9651,
+     "ci95": [
+      0.9606,
+      0.9697
+     ],
+     "n": 16
+    },
+    "extrapolation": {
+     "mean": 0.9425,
+     "ci95": [
+      0.9041,
+      0.9809
+     ],
+     "n": 16
+    },
+    "functional_recovery": {
+     "mean": 0.5625,
+     "ci95": [
+      0.2895,
+      0.8355
+     ],
+     "n": 16
+    },
+    "structural_recovery": {
+     "mean": 0.5625,
+     "ci95": [
+      0.2895,
+      0.8355
+     ],
+     "n": 16
+    },
+    "adequate": {
+     "mean": 0.875,
+     "ci95": [
+      0.693,
+      1.057
+     ],
+     "n": 16
+    },
+    "params": {
+     "mean": 2.8125,
+     "ci95": [
+      2.1609,
+      3.4641
+     ],
+     "n": 16
+    },
+    "evaluations": {
+     "mean": 184.0,
+     "ci95": [
+      105.5519,
+      262.4481
+     ],
+     "n": 16
+    },
+    "seconds": {
+     "mean": 70.6146,
+     "ci95": [
+      40.9229,
+      100.3062
+     ],
+     "n": 16
+    },
+    "queries": {
+     "mean": 12.0,
+     "ci95": [
+      12.0,
+      12.0
+     ],
+     "n": 16
+    },
+    "program_length": {
+     "mean": 1.625,
+     "ci95": [
+      1.0455,
+      2.2045
+     ],
+     "n": 16
+    }
+   },
+   "unrepresentable": {
+    "in_region": {
+     "mean": 0.8264,
+     "ci95": [
+      0.8163,
+      0.8366
+     ],
+     "n": 16
+    },
+    "extrapolation": {
+     "mean": 0.5988,
+     "ci95": [
+      0.5594,
+      0.6383
+     ],
+     "n": 16
+    },
+    "functional_recovery": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "structural_recovery": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "adequate": {
+     "mean": 0.2969,
+     "ci95": [
+      0.1756,
+      0.4182
+     ],
+     "n": 16
+    },
+    "params": {
+     "mean": 8.0625,
+     "ci95": [
+      7.66,
+      8.465
+     ],
+     "n": 16
+    },
+    "evaluations": {
+     "mean": 437.6094,
+     "ci95": [
+      416.9057,
+      458.313
+     ],
+     "n": 16
+    },
+    "seconds": {
+     "mean": 170.6887,
+     "ci95": [
+      159.6617,
+      181.7157
+     ],
+     "n": 16
+    },
+    "queries": {
+     "mean": 12.0,
+     "ci95": [
+      12.0,
+      12.0
+     ],
+     "n": 16
+    },
+    "program_length": {
+     "mean": 6.2656,
+     "ci95": [
+      5.8874,
+      6.6438
+     ],
+     "n": 16
+    }
+   },
+   "held_out_composition": {
+    "in_region": {
+     "mean": 0.9603,
+     "ci95": [
+      0.951,
+      0.9695
+     ],
+     "n": 16
+    },
+    "extrapolation": {
+     "mean": 0.7968,
+     "ci95": [
+      0.7145,
+      0.8791
+     ],
+     "n": 16
+    },
+    "functional_recovery": {
+     "mean": 0.375,
+     "ci95": [
+      0.193,
+      0.557
+     ],
+     "n": 16
+    },
+    "structural_recovery": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "adequate": {
+     "mean": 0.75,
+     "ci95": [
+      0.6124,
+      0.8876
+     ],
+     "n": 16
+    },
+    "params": {
+     "mean": 6.375,
+     "ci95": [
+      5.4915,
+      7.2585
+     ],
+     "n": 16
+    },
+    "evaluations": {
+     "mean": 300.1875,
+     "ci95": [
+      238.9497,
+      361.4253
+     ],
+     "n": 16
+    },
+    "seconds": {
+     "mean": 115.3747,
+     "ci95": [
+      89.9598,
+      140.7895
+     ],
+     "n": 16
+    },
+    "queries": {
+     "mean": 12.0,
+     "ci95": [
+      12.0,
+      12.0
+     ],
+     "n": 16
+    },
+    "program_length": {
+     "mean": 4.8125,
+     "ci95": [
+      4.0725,
+      5.5525
+     ],
+     "n": 16
+    }
+   },
+   "double_held_out": {
+    "in_region": {
+     "mean": 0.9687,
+     "ci95": [
+      0.9551,
+      0.9823
+     ],
+     "n": 16
+    },
+    "extrapolation": {
+     "mean": 0.6298,
+     "ci95": [
+      0.5314,
+      0.7281
+     ],
+     "n": 16
+    },
+    "functional_recovery": {
+     "mean": 0.0625,
+     "ci95": [
+      -0.0707,
+      0.1957
+     ],
+     "n": 16
+    },
+    "structural_recovery": {
+     "mean": 0.0625,
+     "ci95": [
+      -0.0707,
+      0.1957
+     ],
+     "n": 16
+    },
+    "adequate": {
+     "mean": 0.875,
+     "ci95": [
+      0.693,
+      1.057
+     ],
+     "n": 16
+    },
+    "params": {
+     "mean": 4.125,
+     "ci95": [
+      3.1355,
+      5.1145
+     ],
+     "n": 16
+    },
+    "evaluations": {
+     "mean": 209.4375,
+     "ci95": [
+      126.8731,
+      292.0019
+     ],
+     "n": 16
+    },
+    "seconds": {
+     "mean": 77.9452,
+     "ci95": [
+      43.5263,
+      112.3641
+     ],
+     "n": 16
+    },
+    "queries": {
+     "mean": 12.0,
+     "ci95": [
+      12.0,
+      12.0
+     ],
+     "n": 16
+    },
+    "program_length": {
+     "mean": 2.9375,
+     "ci95": [
+      2.0361,
+      3.8389
+     ],
+     "n": 16
+    }
+   }
+  },
+  "program_residual": {
+   "validation": {
+    "in_region": {
+     "mean": 0.965,
+     "ci95": [
+      0.9601,
+      0.9699
+     ],
+     "n": 16
+    },
+    "extrapolation": {
+     "mean": 0.8316,
+     "ci95": [
+      0.7872,
+      0.876
+     ],
+     "n": 16
+    },
+    "functional_recovery": {
+     "mean": 0.3333,
+     "ci95": [
+      0.221,
+      0.4456
+     ],
+     "n": 16
+    },
+    "structural_recovery": {
+     "mean": 0.25,
+     "ci95": [
+      0.1706,
+      0.3294
+     ],
+     "n": 16
+    },
+    "adequate": {
+     "mean": 0.8958,
+     "ci95": [
+      0.8108,
+      0.9808
+     ],
+     "n": 16
+    },
+    "params": {
+     "mean": 17.2708,
+     "ci95": [
+      16.7846,
+      17.757
+     ],
+     "n": 16
+    },
+    "evaluations": {
+     "mean": 280.9583,
+     "ci95": [
+      235.7555,
+      326.1612
+     ],
+     "n": 16
+    },
+    "seconds": {
+     "mean": 116.2087,
+     "ci95": [
+      94.7534,
+      137.6641
+     ],
+     "n": 16
+    },
+    "queries": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "program_length": {
+     "mean": 2.8542,
+     "ci95": [
+      2.4341,
+      3.2742
+     ],
+     "n": 16
+    }
+   },
+   "held_out": {
+    "in_region": {
+     "mean": 0.9538,
+     "ci95": [
+      0.9495,
+      0.958
+     ],
+     "n": 16
+    },
+    "extrapolation": {
+     "mean": 0.7683,
+     "ci95": [
+      0.7369,
+      0.7997
+     ],
+     "n": 16
+    },
+    "functional_recovery": {
+     "mean": 0.1562,
+     "ci95": [
+      0.0854,
+      0.2271
+     ],
+     "n": 16
+    },
+    "structural_recovery": {
+     "mean": 0.0859,
+     "ci95": [
+      0.0458,
+      0.126
+     ],
+     "n": 16
+    },
+    "adequate": {
+     "mean": 0.75,
+     "ci95": [
+      0.6812,
+      0.8188
+     ],
+     "n": 16
+    },
+    "params": {
+     "mean": 18.0781,
+     "ci95": [
+      17.7678,
+      18.3885
+     ],
+     "n": 16
+    },
+    "evaluations": {
+     "mean": 298.7578,
+     "ci95": [
+      278.9666,
+      318.549
+     ],
+     "n": 16
+    },
+    "seconds": {
+     "mean": 118.4675,
+     "ci95": [
+      109.572,
+      127.363
+     ],
+     "n": 16
+    },
+    "queries": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "program_length": {
+     "mean": 3.6406,
+     "ci95": [
+      3.3722,
+      3.9091
+     ],
+     "n": 16
+    }
+   },
+   "partial": {
+    "in_region": {
+     "mean": 0.9594,
+     "ci95": [
+      0.9526,
+      0.9662
+     ],
+     "n": 16
+    },
+    "extrapolation": {
+     "mean": 0.7896,
+     "ci95": [
+      0.6632,
+      0.9159
+     ],
+     "n": 16
+    },
+    "functional_recovery": {
+     "mean": 0.1875,
+     "ci95": [
+      -0.0273,
+      0.4023
+     ],
+     "n": 16
+    },
+    "structural_recovery": {
+     "mean": 0.5,
+     "ci95": [
+      0.2249,
+      0.7751
+     ],
+     "n": 16
+    },
+    "adequate": {
+     "mean": 0.875,
+     "ci95": [
+      0.693,
+      1.057
+     ],
+     "n": 16
+    },
+    "params": {
+     "mean": 15.75,
+     "ci95": [
+      15.1828,
+      16.3172
+     ],
+     "n": 16
+    },
+    "evaluations": {
+     "mean": 184.0,
+     "ci95": [
+      105.5519,
+      262.4481
+     ],
+     "n": 16
+    },
+    "seconds": {
+     "mean": 66.7566,
+     "ci95": [
+      38.6401,
+      94.8731
+     ],
+     "n": 16
+    },
+    "queries": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "program_length": {
+     "mean": 1.5,
+     "ci95": [
+      0.9498,
+      2.0502
+     ],
+     "n": 16
+    }
+   },
+   "unrepresentable": {
+    "in_region": {
+     "mean": 0.8095,
+     "ci95": [
+      0.7973,
+      0.8217
+     ],
+     "n": 16
+    },
+    "extrapolation": {
+     "mean": 0.5546,
+     "ci95": [
+      0.5069,
+      0.6023
+     ],
+     "n": 16
+    },
+    "functional_recovery": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "structural_recovery": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "adequate": {
+     "mean": 0.2969,
+     "ci95": [
+      0.1756,
+      0.4182
+     ],
+     "n": 16
+    },
+    "params": {
+     "mean": 19.6406,
+     "ci95": [
+      18.9616,
+      20.3197
+     ],
+     "n": 16
+    },
+    "evaluations": {
+     "mean": 437.6094,
+     "ci95": [
+      416.9057,
+      458.313
+     ],
+     "n": 16
+    },
+    "seconds": {
+     "mean": 163.811,
+     "ci95": [
+      152.9986,
+      174.6233
+     ],
+     "n": 16
+    },
+    "queries": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "program_length": {
+     "mean": 5.0938,
+     "ci95": [
+      4.5395,
+      5.648
+     ],
+     "n": 16
+    }
+   },
+   "held_out_composition": {
+    "in_region": {
+     "mean": 0.9454,
+     "ci95": [
+      0.9292,
+      0.9617
+     ],
+     "n": 16
+    },
+    "extrapolation": {
+     "mean": 0.6934,
+     "ci95": [
+      0.5964,
+      0.7903
+     ],
+     "n": 16
+    },
+    "functional_recovery": {
+     "mean": 0.125,
+     "ci95": [
+      0.0059,
+      0.2441
+     ],
+     "n": 16
+    },
+    "structural_recovery": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "adequate": {
+     "mean": 0.75,
+     "ci95": [
+      0.6124,
+      0.8876
+     ],
+     "n": 16
+    },
+    "params": {
+     "mean": 18.1562,
+     "ci95": [
+      17.3798,
+      18.9327
+     ],
+     "n": 16
+    },
+    "evaluations": {
+     "mean": 300.1875,
+     "ci95": [
+      238.9497,
+      361.4253
+     ],
+     "n": 16
+    },
+    "seconds": {
+     "mean": 109.5833,
+     "ci95": [
+      85.033,
+      134.1336
+     ],
+     "n": 16
+    },
+    "queries": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "program_length": {
+     "mean": 3.75,
+     "ci95": [
+      3.1122,
+      4.3878
+     ],
+     "n": 16
+    }
+   },
+   "double_held_out": {
+    "in_region": {
+     "mean": 0.9602,
+     "ci95": [
+      0.9459,
+      0.9744
+     ],
+     "n": 16
+    },
+    "extrapolation": {
+     "mean": 0.586,
+     "ci95": [
+      0.4839,
+      0.6881
+     ],
+     "n": 16
+    },
+    "functional_recovery": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "structural_recovery": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "adequate": {
+     "mean": 0.875,
+     "ci95": [
+      0.693,
+      1.057
+     ],
+     "n": 16
+    },
+    "params": {
+     "mean": 16.5625,
+     "ci95": [
+      15.9182,
+      17.2068
+     ],
+     "n": 16
+    },
+    "evaluations": {
+     "mean": 209.4375,
+     "ci95": [
+      126.8731,
+      292.0019
+     ],
+     "n": 16
+    },
+    "seconds": {
+     "mean": 74.2016,
+     "ci95": [
+      41.2343,
+      107.169
+     ],
+     "n": 16
+    },
+    "queries": {
+     "mean": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "n": 16
+    },
+    "program_length": {
+     "mean": 2.375,
+     "ci95": [
+      1.7637,
+      2.9863
+     ],
+     "n": 16
+    }
+   }
+  }
+ },
+ "held_out_families_recovered": {
+  "xor_halfspaces": 10,
+  "capsule": 6,
+  "crescent": 10,
+  "wedge_ring": 5
+ },
+ "extrapolation_diff": {
+  "bpi_full_vs_mlp": {
+   "mean": 0.1544,
+   "ci95": [
+    0.0971,
+    0.2117
+   ],
+   "n": 16
+  },
+  "bpi_full_vs_memorization": {
+   "mean": -0.005,
+   "ci95": [
+    -0.0395,
+    0.0295
+   ],
+   "n": 16
+  },
+  "bpi_full_vs_knn": {
+   "mean": -0.0065,
+   "ci95": [
+    -0.0369,
+    0.024
+   ],
+   "n": 16
+  },
+  "bpi_full_vs_search_no_au": {
+   "mean": -0.0012,
+   "ci95": [
+    -0.025,
+    0.0227
+   ],
+   "n": 16
+  }
+ },
+ "family_reuse": {
+  "macro_acc": {
+   "mean": 0.9146,
+   "ci95": [
+    0.8918,
+    0.9374
+   ],
+   "n": 16
+  },
+  "search_acc": {
+   "mean": 0.9106,
+   "ci95": [
+    0.8871,
+    0.934
+   ],
+   "n": 16
+  },
+  "macro_evals": {
+   "mean": 72.7857,
+   "ci95": [
+    61.0557,
+    84.5158
+   ],
+   "n": 16
+  },
+  "search_evals": {
+   "mean": 87.4821,
+   "ci95": [
+    76.366,
+    98.5983
+   ],
+   "n": 16
+  },
+  "macro_seconds": {
+   "mean": 30.2114,
+   "ci95": [
+    25.0767,
+    35.3461
+   ],
+   "n": 16
+  },
+  "search_seconds": {
+   "mean": 34.6668,
+   "ci95": [
+    29.9136,
+    39.42
+   ],
+   "n": 16
+  }
+ },
+ "novelty": {
+  "accuracy": 0.479,
+  "confusion": {
+   "known->new_composition": 33,
+   "known->known": 40,
+   "known->new_parameterization": 26,
+   "known->unsupported": 13,
+   "new_composition->unsupported": 11,
+   "new_composition->known": 15,
+   "unsupported->new_composition": 20,
+   "unsupported->unsupported": 41,
+   "new_composition->new_composition": 34,
+   "unsupported->new_parameterization": 2,
+   "new_composition->new_parameterization": 4,
+   "unsupported->known": 1
+  }
+ },
+ "family_library": {
+  "STABLE": 33,
+  "REFUTED": 3,
+  "SUPPORTED": 12
+ },
+ "discovery": {
+  "recall": {
+   "mean": 0.0416,
+   "ci95": [
+    -0.019,
+    0.1022
+   ],
+   "n": 16
+  },
+  "false_promotions": {
+   "mean": 1.3125,
+   "ci95": [
+    0.8083,
+    1.8167
+   ],
+   "n": 16
+  },
+  "promoted": {
+   "mean": 1.4375,
+   "ci95": [
+    0.8549,
+    2.0201
+   ],
+   "n": 16
+  },
+  "families_recovered": {
+   "xor_halfspaces": 2
+  }
+ },
+ "active": {
+  "ig": {
+   "median_queries": 31,
+   "identified": 0.482,
+   "n": 112
+  },
+  "disagreement": {
+   "median_queries": 31,
+   "identified": 0.491,
+   "n": 112
+  },
+  "random": {
+   "median_queries": 31,
+   "identified": 0.116,
+   "n": 112
+  }
+ },
+ "anchor": {
+  "active": {
+   "refutation_of_wrong": 0.873,
+   "false_refutation": 0.509,
+   "wrong_self_consistent": 1.0,
+   "n_wrong": 229,
+   "n_correct": 57
+  },
+  "random": {
+   "refutation_of_wrong": 0.629,
+   "false_refutation": 0.018,
+   "wrong_self_consistent": 1.0,
+   "n_wrong": 229,
+   "n_correct": 57
+  }
+ },
+ "crystallization": {
+  "replaced_fraction_representable": 0.062,
+  "decisions": {
+   "program+residual": 139,
+   "keep_expert": 12,
+   "replace": 9
+  },
+  "decisions_unrepresentable": {
+   "program+residual": 34,
+   "keep_expert": 12,
+   "replace": 2
+  },
+  "acc_loss_replaced": {
+   "mean": -0.0083,
+   "ci95": [
+    -0.0147,
+    -0.0019
+   ],
+   "n": 9
+  },
+  "params_expert": {
+   "mean": 82.0,
+   "ci95": [
+    82.0,
+    82.0
+   ],
+   "n": 160
+  },
+  "params_after": {
+   "mean": 21.9812,
+   "ci95": [
+    19.2626,
+    24.6999
+   ],
+   "n": 160
+  },
+  "infer_speedup": {
+   "mean": 1.3989,
+   "ci95": [
+    1.0913,
+    1.7064
+   ],
+   "n": 148
+  }
+ },
+ "residual": {
+  "expert": {
+   "in": {
+    "mean": 0.9611,
+    "ci95": [
+     0.9563,
+     0.9659
+    ],
+    "n": 48
+   },
+   "extrapolation": {
+    "mean": 0.8777,
+    "ci95": [
+     0.8422,
+     0.9131
+    ],
+    "n": 48
+   },
+   "params": {
+    "mean": 82.0,
+    "ci95": [
+     82.0,
+     82.0
+    ],
+    "n": 48
+   }
+  },
+  "program": {
+   "in": {
+    "mean": 0.9597,
+    "ci95": [
+     0.9559,
+     0.9636
+    ],
+    "n": 48
+   },
+   "extrapolation": {
+    "mean": 0.8145,
+    "ci95": [
+     0.7588,
+     0.8702
+    ],
+    "n": 48
+   },
+   "params": {
+    "mean": 3.4583,
+    "ci95": [
+     3.0377,
+     3.879
+    ],
+    "n": 48
+   }
+  },
+  "program_residual": {
+   "in": {
+    "mean": 0.9612,
+    "ci95": [
+     0.9571,
+     0.9652
+    ],
+    "n": 48
+   },
+   "extrapolation": {
+    "mean": 0.8029,
+    "ci95": [
+     0.7433,
+     0.8625
+    ],
+    "n": 48
+   },
+   "params": {
+    "mean": 16.4583,
+    "ci95": [
+     16.0377,
+     16.879
+    ],
+    "n": 48
+   }
+  }
+ },
+ "shared_basis": {
+  "separate_params": {
+   "mean": 492.0,
+   "ci95": [
+    492.0,
+    492.0
+   ],
+   "n": 16
+  },
+  "shared_params": {
+   "mean": 372.0,
+   "ci95": [
+    372.0,
+    372.0
+   ],
+   "n": 16
+  },
+  "separate_acc": {
+   "mean": 0.8626,
+   "ci95": [
+    0.8544,
+    0.8707
+   ],
+   "n": 16
+  },
+  "shared_acc": {
+   "mean": 0.8523,
+   "ci95": [
+    0.8412,
+    0.8635
+   ],
+   "n": 16
+  },
+  "old_acc_frozen": {
+   "mean": 0.8766,
+   "ci95": [
+    0.8653,
+    0.8879
+   ],
+   "n": 16
+  },
+  "old_acc_after_basis_finetune": {
+   "mean": 0.7322,
+   "ci95": [
+    0.7162,
+    0.7483
+   ],
+   "n": 16
+  },
+  "head_regenerated_acc": {
+   "mean": 0.9455,
+   "ci95": [
+    0.9395,
+    0.9515
+   ],
+   "n": 16
+  },
+  "head_original_acc": {
+   "mean": 0.9432,
+   "ci95": [
+    0.9372,
+    0.9491
+   ],
+   "n": 16
+  }
+ },
+ "budget": {
+  "hard": {
+   "violated": 0,
+   "skills": {
+    "mean": 10.9375,
+    "ci95": [
+     10.8043,
+     11.0707
+    ],
+    "n": 16
+   },
+   "acc": {
+    "mean": 0.9378,
+    "ci95": [
+     0.9325,
+     0.943
+    ],
+    "n": 16
+   },
+   "used": {
+    "mean": 91.75,
+    "ci95": [
+     80.0983,
+     103.4017
+    ],
+    "n": 16
+   },
+   "operations": {
+    "program": 135,
+    "rejected_by_anchor": 17,
+    "program+residual": 40
+   }
+  },
+  "soft": {
+   "violated": 0,
+   "skills": {
+    "mean": 10.9375,
+    "ci95": [
+     10.8043,
+     11.0707
+    ],
+    "n": 16
+   },
+   "acc": {
+    "mean": 0.9378,
+    "ci95": [
+     0.9325,
+     0.943
+    ],
+    "n": 16
+   },
+   "used": {
+    "mean": 91.75,
+    "ci95": [
+     80.0983,
+     103.4017
+    ],
+    "n": 16
+   },
+   "operations": {
+    "program": 135,
+    "rejected_by_anchor": 17,
+    "program+residual": 40
+   }
+  }
+ },
+ "overfitting": {
+  "overfit_rate": 0.946,
+  "detected_given_overfit": 0.991,
+  "false_detection": 0.833
+ },
+ "stability": {
+  "same_structure": 0.17,
+  "functional_agreement": {
+   "mean": 0.8662,
+   "ci95": [
+    0.8413,
+    0.8911
+   ],
+   "n": 112
+  }
+ },
+ "confidence": {
+  "prediction_ece": {
+   "mean": 0.0746,
+   "ci95": [
+    0.0602,
+    0.0889
+   ],
+   "n": 16
+  },
+  "family_conf_when_structure_correct": {
+   "mean": 0.7139,
+   "ci95": [
+    0.5353,
+    0.8925
+   ],
+   "n": 10
+  },
+  "family_conf_when_structure_wrong": {
+   "mean": 0.7287,
+   "ci95": [
+    0.6836,
+    0.7737
+   ],
+   "n": 102
+  },
+  "param_sd": {
+   "mean": 0.5665,
+   "ci95": [
+    0.5012,
+    0.6318
+   ],
+   "n": 112
+  }
+ },
+ "cross_domain": {
+  "algebra": {
+   "solved": {
+    "mean": 1.0,
+    "ci95": [
+     1.0,
+     1.0
+    ],
+    "n": 16
+   },
+   "generalizes": {
+    "mean": 1.0,
+    "ci95": [
+     1.0,
+     1.0
+    ],
+    "n": 16
+   },
+   "family_reuse_success": {
+    "mean": 1.0,
+    "ci95": [
+     1.0,
+     1.0
+    ],
+    "n": 16
+   },
+   "family_evals": {
+    "mean": 6.1875,
+    "ci95": [
+     4.9538,
+     7.4212
+    ],
+    "n": 16
+   },
+   "full_search_evals": {
+    "mean": 20.5625,
+    "ci95": [
+     16.0171,
+     25.1079
+    ],
+    "n": 16
+   }
+  },
+  "language": {
+   "solved": {
+    "mean": 1.0,
+    "ci95": [
+     1.0,
+     1.0
+    ],
+    "n": 16
+   },
+   "generalizes": {
+    "mean": 0.8748,
+    "ci95": [
+     0.806,
+     0.9436
+    ],
+    "n": 16
+   },
+   "family_reuse_success": {
+    "mean": 1.0,
+    "ci95": [
+     1.0,
+     1.0
+    ],
+    "n": 16
+   },
+   "family_evals": {
+    "mean": 23.1875,
+    "ci95": [
+     13.3752,
+     32.9998
+    ],
+    "n": 16
+   },
+   "full_search_evals": {
+    "mean": 58.125,
+    "ci95": [
+     38.539,
+     77.711
+    ],
+    "n": 16
+   }
+  },
+  "code": {
+   "solved": {
+    "mean": 1.0,
+    "ci95": [
+     1.0,
+     1.0
+    ],
+    "n": 16
+   },
+   "generalizes": {
+    "mean": 0.8021,
+    "ci95": [
+     0.7092,
+     0.895
+    ],
+    "n": 16
+   },
+   "family_reuse_success": {
+    "mean": 1.0,
+    "ci95": [
+     1.0,
+     1.0
+    ],
+    "n": 16
+   },
+   "family_evals": {
+    "mean": 13.5,
+    "ci95": [
+     8.6875,
+     18.3125
+    ],
+    "n": 16
+   },
+   "full_search_evals": {
+    "mean": 49.4375,
+    "ci95": [
+     24.33,
+     74.545
+    ],
+    "n": 16
+   }
+  },
+  "sequences": {
+   "solved": {
+    "mean": 1.0,
+    "ci95": [
+     1.0,
+     1.0
+    ],
+    "n": 16
+   },
+   "generalizes": {
+    "mean": 1.0,
+    "ci95": [
+     1.0,
+     1.0
+    ],
+    "n": 16
+   },
+   "family_reuse_success": {
+    "mean": 1.0,
+    "ci95": [
+     1.0,
+     1.0
+    ],
+    "n": 16
+   },
+   "family_evals": {
+    "mean": 5.75,
+    "ci95": [
+     4.4523,
+     7.0477
+    ],
+    "n": 16
+   },
+   "full_search_evals": {
+    "mean": 20.375,
+    "ci95": [
+     16.3229,
+     24.4271
+    ],
+    "n": 16
+   }
+  }
+ },
+ "ablation": {
+  "all": {
+   "mean": 0.4775,
+   "ci95": [
+    0.4296,
+    0.5254
+   ],
+   "n": 4
+  },
+  "without_rotate": {
+   "mean": 0.4775,
+   "ci95": [
+    0.4296,
+    0.5254
+   ],
+   "n": 4
+  },
+  "without_angle": {
+   "mean": 0.6587,
+   "ci95": [
+    0.5367,
+    0.7808
+   ],
+   "n": 4
+  },
+  "without_norm": {
+   "mean": 0.3185,
+   "ci95": [
+    0.2625,
+    0.3745
+   ],
+   "n": 4
+  },
+  "without_and": {
+   "mean": 0.5455,
+   "ci95": [
+    0.3691,
+    0.7219
+   ],
+   "n": 4
+  },
+  "without_or": {
+   "mean": 0.5,
+   "ci95": [
+    0.3754,
+    0.6246
+   ],
+   "n": 4
+  },
+  "without_translate": {
+   "mean": 0.3412,
+   "ci95": [
+    0.2928,
+    0.3897
+   ],
+   "n": 4
+  },
+  "without_interval": {
+   "mean": 0.4773,
+   "ci95": [
+    0.3122,
+    0.6423
+   ],
+   "n": 4
+  },
+  "without_xor": {
+   "mean": 0.4773,
+   "ci95": [
+    0.385,
+    0.5695
+   ],
+   "n": 4
+  }
+ },
+ "depth": {
+  "1": {
+   "coverage": {
+    "mean": 0.393,
+    "ci95": [
+     0.2476,
+     0.5384
+    ],
+    "n": 4
+   },
+   "evaluations": {
+    "mean": 56.0,
+    "ci95": [
+     56.0,
+     56.0
+    ],
+    "n": 4
+   },
+   "seconds": {
+    "mean": 19.475,
+    "ci95": [
+     13.2619,
+     25.6881
+    ],
+    "n": 4
+   }
+  },
+  "2": {
+   "coverage": {
+    "mean": 0.4997,
+    "ci95": [
+     0.3479,
+     0.6516
+    ],
+    "n": 4
+   },
+   "evaluations": {
+    "mean": 339.25,
+    "ci95": [
+     293.7744,
+     384.7256
+    ],
+    "n": 4
+   },
+   "seconds": {
+    "mean": 110.8,
+    "ci95": [
+     86.0047,
+     135.5953
+    ],
+    "n": 4
+   }
+  },
+  "3": {
+   "coverage": {
+    "mean": 0.5,
+    "ci95": [
+     0.3038,
+     0.6962
+    ],
+    "n": 4
+   },
+   "evaluations": {
+    "mean": 733.0,
+    "ci95": [
+     480.8912,
+     985.1088
+    ],
+    "n": 4
+   },
+   "seconds": {
+    "mean": 299.45,
+    "ci95": [
+     195.7899,
+     403.1101
+    ],
+    "n": 4
+   }
+  },
+  "4": {
+   "coverage": {
+    "mean": 0.5,
+    "ci95": [
+     0.4126,
+     0.5874
+    ],
+    "n": 4
+   },
+   "evaluations": {
+    "mean": 748.75,
+    "ci95": [
+     582.7271,
+     914.7729
+    ],
+    "n": 4
+   },
+   "seconds": {
+    "mean": 316.7,
+    "ci95": [
+     225.1905,
+     408.2095
+    ],
+    "n": 4
+   }
+  },
+  "5": {
+   "coverage": {
+    "mean": 0.4287,
+    "ci95": [
+     0.2138,
+     0.6437
+    ],
+    "n": 4
+   },
+   "evaluations": {
+    "mean": 882.0,
+    "ci95": [
+     617.8491,
+     1146.1509
+    ],
+    "n": 4
+   },
+   "seconds": {
+    "mean": 384.45,
+    "ci95": [
+     295.0431,
+     473.8569
+    ],
+    "n": 4
+   }
+  }
+ },
+ "hypotheses": {
+  "H1": {
+   "value": 0.2422,
+   "families_recovered": {
+    "xor_halfspaces": 10,
+    "capsule": 6,
+    "crescent": 10,
+    "wedge_ring": 5
+   },
+   "verdict": "R\u00c9FUT\u00c9E"
+  },
+  "H2": {
+   "vs_mlp": {
+    "mean": 0.1544,
+    "ci95": [
+     0.0971,
+     0.2117
+    ],
+    "n": 16
+   },
+   "vs_memorization": {
+    "mean": -0.005,
+    "ci95": [
+     -0.0395,
+     0.0295
+    ],
+    "n": 16
+   },
+   "verdict": "NON CONCLUANTE"
+  },
+  "H3": {
+   "value": {
+    "macro_acc": {
+     "mean": 0.9146,
+     "ci95": [
+      0.8918,
+      0.9374
+     ],
+     "n": 16
+    },
+    "search_acc": {
+     "mean": 0.9106,
+     "ci95": [
+      0.8871,
+      0.934
+     ],
+     "n": 16
+    },
+    "macro_evals": {
+     "mean": 72.7857,
+     "ci95": [
+      61.0557,
+      84.5158
+     ],
+     "n": 16
+    },
+    "search_evals": {
+     "mean": 87.4821,
+     "ci95": [
+      76.366,
+      98.5983
+     ],
+     "n": 16
+    },
+    "macro_seconds": {
+     "mean": 30.2114,
+     "ci95": [
+      25.0767,
+      35.3461
+     ],
+     "n": 16
+    },
+    "search_seconds": {
+     "mean": 34.6668,
+     "ci95": [
+      29.9136,
+      39.42
+     ],
+     "n": 16
+    }
+   },
+   "verdict": "NON CONCLUANTE"
+  },
+  "H4": {
+   "ig": {
+    "median_queries": 31,
+    "identified": 0.482,
+    "n": 112
+   },
+   "random": {
+    "median_queries": 31,
+    "identified": 0.116,
+    "n": 112
+   },
+   "verdict": "R\u00c9FUT\u00c9E"
+  },
+  "H5": {
+   "value": {
+    "refutation_of_wrong": 0.873,
+    "false_refutation": 0.509,
+    "wrong_self_consistent": 1.0,
+    "n_wrong": 229,
+    "n_correct": 57
+   },
+   "verdict": "NON CONCLUANTE"
+  },
+  "H6": {
+   "fraction": 0.062,
+   "loss": -0.0083,
+   "verdict": "R\u00c9FUT\u00c9E"
+  },
+  "H7": {
+   "expert": [
+    0.9611,
+    82.0
+   ],
+   "program_residual": [
+    0.9612,
+    16.4583
+   ],
+   "verdict": "SOUTENUE"
+  },
+  "H8": {
+   "abstention": 0.703,
+   "false_reject": 0.25,
+   "verdict": "NON CONCLUANTE"
+  },
+  "H9": {
+   "primitive_types": 10,
+   "necessary_primitives": [
+    "norm",
+    "translate"
+   ],
+   "families_covered_estimate": 10,
+   "coverage_all": {
+    "mean": 0.4775,
+    "ci95": [
+     0.4296,
+     0.5254
+    ],
+    "n": 4
+   },
+   "verdict": "SOUTENUE"
+  }
+ }
+}
