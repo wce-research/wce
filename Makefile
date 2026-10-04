@@ -630,6 +630,18 @@ deep-prim-aggregate:
 deep-prim-report:
 	$(PYTHON) -m core.deep_prim_report report
 
+# sous-jalon Downstream Selection Loss (dev, vrais atomes fournis)
+DEEP_DOWN_KEYS ?= 0-15
+.PHONY: deep-run-down deep-down-aggregate deep-down-report
+deep-run-down:
+	$(DEEP_BACKEND) $(AWSPY) submit --kind deepdown --keys $(DEEP_DOWN_KEYS) --shards $(DEEP_SHARDS) --instance $(DEEP_INSTANCE) --max-runtime 10800
+
+deep-down-aggregate:
+	$(PYTHON) -m core.deep_down_report aggregate
+
+deep-down-report:
+	$(PYTHON) -m core.deep_down_report report
+
 deep-progress:
 	$(AWSPY) progress $(if $(RUN),--run $(RUN),)
 

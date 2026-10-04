@@ -1,0 +1,125 @@
+{
+ "run_id": "wce-deepdown-20261004-153523",
+ "git_commit": "0d9520b1ff3d5ef968f67a9e54ff0a1dce66ac3e",
+ "code_hash": "a08c735f3f6cbcae",
+ "config_hash": "8d5aae391758",
+ "timestamp": "20261004-153523",
+ "region": "eu-north-1",
+ "identity": "AWSReservedSSO_WCE-Research-Runner_251aca5f63af0b9d",
+ "instance_type": "c6i.xlarge",
+ "image": "763104351884.dkr.ecr.eu-north-1.amazonaws.com/pytorch-training:2.5.1-cpu-py311-ubuntu22.04-sagemaker",
+ "backend": "ec2",
+ "kind": "deepdown",
+ "keys": [
+  "0",
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9",
+  "10",
+  "11",
+  "12",
+  "13",
+  "14",
+  "15"
+ ],
+ "jobs": [
+  {
+   "name": "wce-deepdown-20261004-153523-s0",
+   "units": 8,
+   "unit_list": [
+    {
+     "kind": "deepdown",
+     "key": "0"
+    },
+    {
+     "kind": "deepdown",
+     "key": "2"
+    },
+    {
+     "kind": "deepdown",
+     "key": "4"
+    },
+    {
+     "kind": "deepdown",
+     "key": "6"
+    },
+    {
+     "kind": "deepdown",
+     "key": "8"
+    },
+    {
+     "kind": "deepdown",
+     "key": "10"
+    },
+    {
+     "kind": "deepdown",
+     "key": "12"
+    },
+    {
+     "kind": "deepdown",
+     "key": "14"
+    }
+   ],
+   "output": "s3://wce-research/robust/runs/wce-deepdown-20261004-153523/wce-deepdown-20261004-153523-s0/",
+   "instance_id": "i-0eafb001abda414a9",
+   "command_id": "cd4f2646-eee9-4277-bb19-04ae5ce6dfd2",
+   "instance_state": "terminated",
+   "status": "Completed",
+   "runtime_s": 207.0,
+   "failure": ""
+  },
+  {
+   "name": "wce-deepdown-20261004-153523-s1",
+   "units": 8,
+   "unit_list": [
+    {
+     "kind": "deepdown",
+     "key": "1"
+    },
+    {
+     "kind": "deepdown",
+     "key": "3"
+    },
+    {
+     "kind": "deepdown",
+     "key": "5"
+    },
+    {
+     "kind": "deepdown",
+     "key": "7"
+    },
+    {
+     "kind": "deepdown",
+     "key": "9"
+    },
+    {
+     "kind": "deepdown",
+     "key": "11"
+    },
+    {
+     "kind": "deepdown",
+     "key": "13"
+    },
+    {
+     "kind": "deepdown",
+     "key": "15"
+    }
+   ],
+   "output": "s3://wce-research/robust/runs/wce-deepdown-20261004-153523/wce-deepdown-20261004-153523-s1/",
+   "instance_id": "i-006c0804a7588dc22",
+   "command_id": "3ec17024-bf21-4c80-b9c3-d4f6cb673242",
+   "instance_state": "terminated",
+   "status": "Completed",
+   "runtime_s": 198.0,
+   "failure": ""
+  }
+ ],
+ "status": "Completed",
+ "max_runtime": 10800
+}

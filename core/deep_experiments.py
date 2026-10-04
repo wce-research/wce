@@ -453,7 +453,20 @@ def neural_subunits(key):
     return [("train", run)]
 
 
-SUBUNITS = {"deepprofile": profile_subunits, "deepdev": dev_subunits, "deepgen": gen_subunits, "deepcover": cover_subunits, "deepprim": prim_subunits, "deepneural": neural_subunits}
+# ================================================================ sous-jalon Downstream Selection Loss (dev, vrais atomes fournis)
+
+DOWN_DEPTHS = (2, 3, 4, 5)
+
+
+def down_task(key, d, regime): return make_task(11000 + int(key) * 10 + d, d, regime, kind=("iid", "boundary", "grouped_outliers")[(int(key) + d) % 3], split="dev")
+
+
+def down_subunits(key):
+    from core.deep_downstream import trace_task
+    return [(f"d{d}_{reg}", (lambda d=d, reg=reg: [_row(down_task(key, d, reg), {"experiment": "downstream", **trace_task(down_task(key, d, reg), int(key))})])) for d in DOWN_DEPTHS for reg in GEN_REGIMES]
+
+
+SUBUNITS = {"deepdown": down_subunits, "deepprofile": profile_subunits, "deepdev": dev_subunits, "deepgen": gen_subunits, "deepcover": cover_subunits, "deepprim": prim_subunits, "deepneural": neural_subunits}
 
 
 def subunit_ids(kind, key): return [sid for sid, _ in SUBUNITS[kind](key)]
