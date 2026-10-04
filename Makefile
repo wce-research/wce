@@ -557,3 +557,41 @@ aws-run-rest:
 
 aws-run-caltrain:
 	$(AWSPY) submit --kind caltrain --keys 0-5 --shards $(AWS_SHARDS) --instance $(AWS_INSTANCE)
+
+# ---- jalon Deep Compositional Structure Discovery & Model-Class Boundary
+.PHONY: deep-check deep-test
+deep-check:
+	$(PYTHON) -m compileall -q core/deep_world.py core/deep_structure.py core/deep_fit.py core/deep_search.py core/deep_equivalence.py core/deep_boundary.py core/deep_experiments.py tests/test_deep.py
+	$(PYTHON) -c "from core.deep_world import sealed_hash, SEALED_SHA256; assert sealed_hash() == SEALED_SHA256, 'lot scellé modifié'; print('lot scellé intact :', SEALED_SHA256[:16])"
+
+deep-test:
+	$(PYTHON) -m unittest tests.test_deep
+
+# Calculs quantitatifs : AWS uniquement (EC2 + SSM explicite, c6i.xlarge, checkpoints S3, reprise, terminaison automatique).
+DEEP_BACKEND = WCE_BACKEND=ec2
+DEEP_INSTANCE ?= c6i.xlarge
+DEEP_SHARDS ?= 2
+DEEP_KEYS ?= 0-15
+DEEP_PROFILE_KEYS ?= 0
+DEEP_DEV_KEYS ?= 0-7
+.PHONY: deep-profile deep-run-dev deep-run-val deep-run-multiseed deep-run-sealed deep-progress deep-resume deep-status deep-fetch deep-timing deep-aggregate
+deep-profile:
+	$(DEEP_BACKEND) $(AWSPY) submit --kind deepprofile --keys $(DEEP_PROFILE_KEYS) --shards 1 --instance $(DEEP_INSTANCE) --max-runtime 10800
+
+deep-run-dev:
+	$(DEEP_BACKEND) $(AWSPY) submit --kind deepdev --keys $(DEEP_DEV_KEYS) --shards $(DEEP_SHARDS) --instance $(DEEP_INSTANCE) --max-runtime 21600
+
+deep-progress:
+	$(AWSPY) progress $(if $(RUN),--run $(RUN),)
+
+deep-status:
+	$(AWSPY) status $(if $(RUN),--run $(RUN),)
+
+deep-resume:
+	$(DEEP_BACKEND) $(AWSPY) resume --run $(RUN)
+
+deep-fetch:
+	$(AWSPY) fetch $(if $(RUN),--run $(RUN),)
+
+deep-timing:
+	$(AWSPY) timing

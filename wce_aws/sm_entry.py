@@ -100,6 +100,9 @@ def run_sub(task):
         if kind in SPECIAL:
             from wce_aws import bench
             rows = dict(bench.SUBS[kind](key))[sid]()
+        elif kind.startswith("deep"):                                   # jalon Deep Compositional Structure Discovery
+            from core.deep_experiments import run_subunit as deep_run
+            rows = deep_run(kind, key, sid)
         else:
             from core.robust_experiments import run_subunit
             rows = run_subunit(kind, key, sid)
@@ -114,6 +117,9 @@ def sub_ids(kind, key):
     if kind in SPECIAL:
         from wce_aws import bench
         return [sid for sid, _ in bench.SUBS[kind](key)]
+    if kind.startswith("deep"):
+        from core.deep_experiments import subunit_ids as deep_ids
+        return deep_ids(kind, key)
     from core.robust_experiments import subunit_ids
     return subunit_ids(kind, key)
 
