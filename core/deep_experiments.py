@@ -510,7 +510,15 @@ def rp_subunits(key):
     return subunits(key)
 
 
-SUBUNITS = {"deeprp": rp_subunits, "deepobj": obj_subunits, "deepe2e": e2e_subunits, "deepresid": resid_subunits, "deepvo": vo_subunits, "deepopt": opt_subunits, "deepdown": down_subunits, "deepprofile": profile_subunits, "deepdev": dev_subunits, "deepgen": gen_subunits, "deepcover": cover_subunits, "deepprim": prim_subunits, "deepneural": neural_subunits}
+# ================================================================ sous-jalon Partial-Observation Primitive Parameter Inference (dev)
+
+def po_subunits(key):
+    """Clés 0–15 : masquage contrôlé et mesures actives ; clés 500+ : chaîne aval à type connu (tâches jamais utilisées)."""
+    from core.deep_partial_exp import subunits
+    return subunits(key)
+
+
+SUBUNITS = {"deeppo": po_subunits, "deeprp": rp_subunits, "deepobj": obj_subunits, "deepe2e": e2e_subunits, "deepresid": resid_subunits, "deepvo": vo_subunits, "deepopt": opt_subunits, "deepdown": down_subunits, "deepprofile": profile_subunits, "deepdev": dev_subunits, "deepgen": gen_subunits, "deepcover": cover_subunits, "deepprim": prim_subunits, "deepneural": neural_subunits}
 
 
 def subunit_ids(kind, key): return [sid for sid, _ in SUBUNITS[kind](key)]

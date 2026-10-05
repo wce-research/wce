@@ -1,0 +1,205 @@
+{
+ "run_id": "wce-deeppo-20261005-005310",
+ "git_commit": "981ec93910a0cc38180b2f73fa154fbacad465e9",
+ "code_hash": "38de0e470309f446",
+ "config_hash": "d0ac4c66e206",
+ "timestamp": "20261005-005310",
+ "region": "eu-north-1",
+ "identity": "AWSReservedSSO_WCE-Research-Runner_251aca5f63af0b9d",
+ "instance_type": "c6i.xlarge",
+ "image": "763104351884.dkr.ecr.eu-north-1.amazonaws.com/pytorch-training:2.5.1-cpu-py311-ubuntu22.04-sagemaker",
+ "backend": "ec2",
+ "kind": "deeppo",
+ "keys": [
+  "0",
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9",
+  "10",
+  "11",
+  "12",
+  "13",
+  "14",
+  "15",
+  "500",
+  "501",
+  "502",
+  "503",
+  "504",
+  "505",
+  "506",
+  "507",
+  "508",
+  "509",
+  "510",
+  "511",
+  "512",
+  "513",
+  "514",
+  "515"
+ ],
+ "jobs": [
+  {
+   "name": "wce-deeppo-20261005-005310-s0",
+   "units": 16,
+   "unit_list": [
+    {
+     "kind": "deeppo",
+     "key": "0"
+    },
+    {
+     "kind": "deeppo",
+     "key": "2"
+    },
+    {
+     "kind": "deeppo",
+     "key": "4"
+    },
+    {
+     "kind": "deeppo",
+     "key": "6"
+    },
+    {
+     "kind": "deeppo",
+     "key": "8"
+    },
+    {
+     "kind": "deeppo",
+     "key": "10"
+    },
+    {
+     "kind": "deeppo",
+     "key": "12"
+    },
+    {
+     "kind": "deeppo",
+     "key": "14"
+    },
+    {
+     "kind": "deeppo",
+     "key": "500"
+    },
+    {
+     "kind": "deeppo",
+     "key": "502"
+    },
+    {
+     "kind": "deeppo",
+     "key": "504"
+    },
+    {
+     "kind": "deeppo",
+     "key": "506"
+    },
+    {
+     "kind": "deeppo",
+     "key": "508"
+    },
+    {
+     "kind": "deeppo",
+     "key": "510"
+    },
+    {
+     "kind": "deeppo",
+     "key": "512"
+    },
+    {
+     "kind": "deeppo",
+     "key": "514"
+    }
+   ],
+   "output": "s3://wce-research/robust/runs/wce-deeppo-20261005-005310/wce-deeppo-20261005-005310-s0/",
+   "instance_id": "i-00e56b27c768edb5b",
+   "command_id": "a7111a70-6338-4bcf-b7b0-dd9a1afbba90",
+   "instance_state": "gone",
+   "status": "Completed",
+   "runtime_s": 3490.0,
+   "failure": ""
+  },
+  {
+   "name": "wce-deeppo-20261005-005310-s1",
+   "units": 16,
+   "unit_list": [
+    {
+     "kind": "deeppo",
+     "key": "1"
+    },
+    {
+     "kind": "deeppo",
+     "key": "3"
+    },
+    {
+     "kind": "deeppo",
+     "key": "5"
+    },
+    {
+     "kind": "deeppo",
+     "key": "7"
+    },
+    {
+     "kind": "deeppo",
+     "key": "9"
+    },
+    {
+     "kind": "deeppo",
+     "key": "11"
+    },
+    {
+     "kind": "deeppo",
+     "key": "13"
+    },
+    {
+     "kind": "deeppo",
+     "key": "15"
+    },
+    {
+     "kind": "deeppo",
+     "key": "501"
+    },
+    {
+     "kind": "deeppo",
+     "key": "503"
+    },
+    {
+     "kind": "deeppo",
+     "key": "505"
+    },
+    {
+     "kind": "deeppo",
+     "key": "507"
+    },
+    {
+     "kind": "deeppo",
+     "key": "509"
+    },
+    {
+     "kind": "deeppo",
+     "key": "511"
+    },
+    {
+     "kind": "deeppo",
+     "key": "513"
+    },
+    {
+     "kind": "deeppo",
+     "key": "515"
+    }
+   ],
+   "output": "s3://wce-research/robust/runs/wce-deeppo-20261005-005310/wce-deeppo-20261005-005310-s1/",
+   "instance_id": "i-065fabbdab341aa32",
+   "command_id": "2aab0a38-030f-4b29-8f2d-4e24c86e1792",
+   "instance_state": "gone",
+   "status": "Completed",
+   "runtime_s": 3661.0,
+   "failure": ""
+  }
+ ],
+ "status": "Completed",
+ "max_runtime": 21600
+}

@@ -710,6 +710,27 @@ deep-rp-aggregate:
 deep-rp-report:
 	$(PYTHON) -m core.deep_rp_report report
 
+# sous-jalon Partial-Observation Primitive Parameter Inference (dev uniquement)
+DEEP_PO_KEYS ?= 0-15,500-515
+.PHONY: deep-po-test deep-po-smoke deep-po-chain-smoke deep-run-po deep-po-aggregate deep-po-report
+deep-po-test:
+	$(PYTHON) -m unittest tests.test_deep_partial
+
+deep-po-smoke:
+	$(PYTHON) -m core.deep_po_report smoke
+
+deep-po-chain-smoke:
+	$(PYTHON) -m core.deep_po_report chain-smoke
+
+deep-run-po:
+	$(DEEP_BACKEND) $(AWSPY) submit --kind deeppo --keys $(DEEP_PO_KEYS) --shards $(DEEP_SHARDS) --instance $(DEEP_INSTANCE) --max-runtime 21600
+
+deep-po-aggregate:
+	$(PYTHON) -m core.deep_po_report aggregate
+
+deep-po-report:
+	$(PYTHON) -m core.deep_po_report report
+
 deep-progress:
 	$(AWSPY) progress $(if $(RUN),--run $(RUN),)
 
