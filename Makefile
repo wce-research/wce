@@ -731,6 +731,27 @@ deep-po-aggregate:
 deep-po-report:
 	$(PYTHON) -m core.deep_po_report report
 
+# sous-jalon Fragment Attribution & Primitive Type Inference (dev uniquement)
+DEEP_FT_KEYS ?= 0-15,600-615
+.PHONY: deep-ft-test deep-ft-smoke deep-ft-chain-smoke deep-run-ft deep-ft-aggregate deep-ft-report
+deep-ft-test:
+	$(PYTHON) -m unittest tests.test_deep_fragments
+
+deep-ft-smoke:
+	$(PYTHON) -m core.deep_ft_report smoke
+
+deep-ft-chain-smoke:
+	$(PYTHON) -m core.deep_ft_report chain-smoke
+
+deep-run-ft:
+	$(DEEP_BACKEND) $(AWSPY) submit --kind deepft --keys $(DEEP_FT_KEYS) --shards $(DEEP_SHARDS) --instance $(DEEP_INSTANCE) --max-runtime 21600
+
+deep-ft-aggregate:
+	$(PYTHON) -m core.deep_ft_report aggregate
+
+deep-ft-report:
+	$(PYTHON) -m core.deep_ft_report report
+
 deep-progress:
 	$(AWSPY) progress $(if $(RUN),--run $(RUN),)
 

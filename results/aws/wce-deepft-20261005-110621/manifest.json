@@ -1,0 +1,205 @@
+{
+ "run_id": "wce-deepft-20261005-110621",
+ "git_commit": "5dab04ed1da263fe99c1533809e33e8222ffbc28",
+ "code_hash": "f46315a4fedc82f8",
+ "config_hash": "f23f226007af",
+ "timestamp": "20261005-110621",
+ "region": "eu-north-1",
+ "identity": "AWSReservedSSO_WCE-Research-Runner_251aca5f63af0b9d",
+ "instance_type": "c6i.xlarge",
+ "image": "763104351884.dkr.ecr.eu-north-1.amazonaws.com/pytorch-training:2.5.1-cpu-py311-ubuntu22.04-sagemaker",
+ "backend": "ec2",
+ "kind": "deepft",
+ "keys": [
+  "0",
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9",
+  "10",
+  "11",
+  "12",
+  "13",
+  "14",
+  "15",
+  "600",
+  "601",
+  "602",
+  "603",
+  "604",
+  "605",
+  "606",
+  "607",
+  "608",
+  "609",
+  "610",
+  "611",
+  "612",
+  "613",
+  "614",
+  "615"
+ ],
+ "jobs": [
+  {
+   "name": "wce-deepft-20261005-110621-s0",
+   "units": 16,
+   "unit_list": [
+    {
+     "kind": "deepft",
+     "key": "0"
+    },
+    {
+     "kind": "deepft",
+     "key": "2"
+    },
+    {
+     "kind": "deepft",
+     "key": "4"
+    },
+    {
+     "kind": "deepft",
+     "key": "6"
+    },
+    {
+     "kind": "deepft",
+     "key": "8"
+    },
+    {
+     "kind": "deepft",
+     "key": "10"
+    },
+    {
+     "kind": "deepft",
+     "key": "12"
+    },
+    {
+     "kind": "deepft",
+     "key": "14"
+    },
+    {
+     "kind": "deepft",
+     "key": "600"
+    },
+    {
+     "kind": "deepft",
+     "key": "602"
+    },
+    {
+     "kind": "deepft",
+     "key": "604"
+    },
+    {
+     "kind": "deepft",
+     "key": "606"
+    },
+    {
+     "kind": "deepft",
+     "key": "608"
+    },
+    {
+     "kind": "deepft",
+     "key": "610"
+    },
+    {
+     "kind": "deepft",
+     "key": "612"
+    },
+    {
+     "kind": "deepft",
+     "key": "614"
+    }
+   ],
+   "output": "s3://wce-research/robust/runs/wce-deepft-20261005-110621/wce-deepft-20261005-110621-s0/",
+   "instance_id": "i-09cc7da8f1fb46af2",
+   "command_id": "8017d83d-c493-4b52-a348-6c9ec9d2aaac",
+   "instance_state": "gone",
+   "status": "Completed",
+   "failure": "",
+   "runtime_s": 4951.0
+  },
+  {
+   "name": "wce-deepft-20261005-110621-s1",
+   "units": 16,
+   "unit_list": [
+    {
+     "kind": "deepft",
+     "key": "1"
+    },
+    {
+     "kind": "deepft",
+     "key": "3"
+    },
+    {
+     "kind": "deepft",
+     "key": "5"
+    },
+    {
+     "kind": "deepft",
+     "key": "7"
+    },
+    {
+     "kind": "deepft",
+     "key": "9"
+    },
+    {
+     "kind": "deepft",
+     "key": "11"
+    },
+    {
+     "kind": "deepft",
+     "key": "13"
+    },
+    {
+     "kind": "deepft",
+     "key": "15"
+    },
+    {
+     "kind": "deepft",
+     "key": "601"
+    },
+    {
+     "kind": "deepft",
+     "key": "603"
+    },
+    {
+     "kind": "deepft",
+     "key": "605"
+    },
+    {
+     "kind": "deepft",
+     "key": "607"
+    },
+    {
+     "kind": "deepft",
+     "key": "609"
+    },
+    {
+     "kind": "deepft",
+     "key": "611"
+    },
+    {
+     "kind": "deepft",
+     "key": "613"
+    },
+    {
+     "kind": "deepft",
+     "key": "615"
+    }
+   ],
+   "output": "s3://wce-research/robust/runs/wce-deepft-20261005-110621/wce-deepft-20261005-110621-s1/",
+   "instance_id": "i-095b3155b9078e405",
+   "command_id": "d373a923-fd7c-4cf1-9778-77b147059018",
+   "instance_state": "gone",
+   "status": "Completed",
+   "failure": "",
+   "runtime_s": 5035.0
+  }
+ ],
+ "status": "Completed",
+ "max_runtime": 21600
+}
