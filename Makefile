@@ -752,6 +752,30 @@ deep-ft-aggregate:
 deep-ft-report:
 	$(PYTHON) -m core.deep_ft_report report
 
+# sous-jalon Boundary Ownership & Fragment Attribution (dev uniquement)
+DEEP_BO_KEYS ?= 0-15,700-731
+.PHONY: deep-bo-test deep-bo-smoke deep-bo-tune deep-bo-chain-smoke deep-run-bo deep-bo-aggregate deep-bo-report
+deep-bo-test:
+	$(PYTHON) -m unittest tests.test_deep_ownership
+
+deep-bo-smoke:
+	$(PYTHON) -m core.deep_bo_report smoke
+
+deep-bo-tune:
+	$(PYTHON) -m core.deep_bo_report tune
+
+deep-bo-chain-smoke:
+	$(PYTHON) -m core.deep_bo_report chain-smoke
+
+deep-run-bo:
+	$(DEEP_BACKEND) $(AWSPY) submit --kind deepbo --keys $(DEEP_BO_KEYS) --shards $(DEEP_SHARDS) --instance $(DEEP_INSTANCE) --max-runtime 21600
+
+deep-bo-aggregate:
+	$(PYTHON) -m core.deep_bo_report aggregate
+
+deep-bo-report:
+	$(PYTHON) -m core.deep_bo_report report
+
 deep-progress:
 	$(AWSPY) progress $(if $(RUN),--run $(RUN),)
 

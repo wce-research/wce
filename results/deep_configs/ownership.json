@@ -1,0 +1,133 @@
+{
+ "config": {
+  "lam": 10.0,
+  "gamma": 0.0,
+  "chance": 3.0,
+  "temperature": 16.0
+ },
+ "selected_on": "120 scènes de mise au point",
+ "criterion": "coût de hasard par calibration nulle, puis F1 d'attribution + appartenance top-1, puis ECE",
+ "null_calibration": [
+  {
+   "chance": 0.0,
+   "assigned_on_random_labels": 0.9589
+  },
+  {
+   "chance": 0.5,
+   "assigned_on_random_labels": 0.8604
+  },
+  {
+   "chance": 1.0,
+   "assigned_on_random_labels": 0.705
+  },
+  {
+   "chance": 1.5,
+   "assigned_on_random_labels": 0.4937
+  },
+  {
+   "chance": 2.0,
+   "assigned_on_random_labels": 0.3964
+  },
+  {
+   "chance": 3.0,
+   "assigned_on_random_labels": 0.3235
+  }
+ ],
+ "grid": [
+  {
+   "lam": 6.0,
+   "gamma": 0.0,
+   "f1": 0.6967,
+   "top1": 0.3853
+  },
+  {
+   "lam": 6.0,
+   "gamma": 0.5,
+   "f1": 0.6528,
+   "top1": 0.2906
+  },
+  {
+   "lam": 6.0,
+   "gamma": 1.0,
+   "f1": 0.5931,
+   "top1": 0.2332
+  },
+  {
+   "lam": 10.0,
+   "gamma": 0.0,
+   "f1": 0.7002,
+   "top1": 0.3836
+  },
+  {
+   "lam": 10.0,
+   "gamma": 0.5,
+   "f1": 0.6582,
+   "top1": 0.3075
+  },
+  {
+   "lam": 10.0,
+   "gamma": 1.0,
+   "f1": 0.4982,
+   "top1": 0.2183
+  },
+  {
+   "lam": 16.0,
+   "gamma": 0.0,
+   "f1": 0.6672,
+   "top1": 0.3443
+  },
+  {
+   "lam": 16.0,
+   "gamma": 0.5,
+   "f1": 0.5691,
+   "top1": 0.2848
+  },
+  {
+   "lam": 16.0,
+   "gamma": 1.0,
+   "f1": 0.3456,
+   "top1": 0.1874
+  }
+ ],
+ "temperatures": [
+  {
+   "temperature": 0.5,
+   "ece": 0.5779,
+   "accuracy": 0.3957,
+   "mean_confidence": 0.9737
+  },
+  {
+   "temperature": 1.0,
+   "ece": 0.517,
+   "accuracy": 0.3957,
+   "mean_confidence": 0.9127
+  },
+  {
+   "temperature": 2.0,
+   "ece": 0.3654,
+   "accuracy": 0.3957,
+   "mean_confidence": 0.7611
+  },
+  {
+   "temperature": 4.0,
+   "ece": 0.2114,
+   "accuracy": 0.3957,
+   "mean_confidence": 0.6071
+  },
+  {
+   "temperature": 8.0,
+   "ece": 0.1158,
+   "accuracy": 0.3957,
+   "mean_confidence": 0.5115
+  },
+  {
+   "temperature": 16.0,
+   "ece": 0.0674,
+   "accuracy": 0.3957,
+   "mean_confidence": 0.4618
+  }
+ ],
+ "null_target": 0.1,
+ "null_target_met": false,
+ "note": "Aucun coût de hasard testé ne ramène l'attribution sur étiquettes aléatoires sous 10 % ; le plus fort (3.0) est retenu, il laisse 32 %."
+}

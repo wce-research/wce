@@ -1,0 +1,285 @@
+{
+ "run_id": "wce-deepbo-20261005-211529",
+ "git_commit": "f15db41b63ea41d669f3b3af32eb1e0053908bd7",
+ "code_hash": "0fb0a295f563a744",
+ "config_hash": "afd18ff6f1da",
+ "timestamp": "20261005-211529",
+ "region": "eu-north-1",
+ "identity": "AWSReservedSSO_WCE-Research-Runner_251aca5f63af0b9d",
+ "instance_type": "c6i.xlarge",
+ "image": "763104351884.dkr.ecr.eu-north-1.amazonaws.com/pytorch-training:2.5.1-cpu-py311-ubuntu22.04-sagemaker",
+ "backend": "ec2",
+ "kind": "deepbo",
+ "keys": [
+  "0",
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9",
+  "10",
+  "11",
+  "12",
+  "13",
+  "14",
+  "15",
+  "700",
+  "701",
+  "702",
+  "703",
+  "704",
+  "705",
+  "706",
+  "707",
+  "708",
+  "709",
+  "710",
+  "711",
+  "712",
+  "713",
+  "714",
+  "715",
+  "716",
+  "717",
+  "718",
+  "719",
+  "720",
+  "721",
+  "722",
+  "723",
+  "724",
+  "725",
+  "726",
+  "727",
+  "728",
+  "729",
+  "730",
+  "731"
+ ],
+ "jobs": [
+  {
+   "name": "wce-deepbo-20261005-211529-s0",
+   "units": 24,
+   "unit_list": [
+    {
+     "kind": "deepbo",
+     "key": "0"
+    },
+    {
+     "kind": "deepbo",
+     "key": "2"
+    },
+    {
+     "kind": "deepbo",
+     "key": "4"
+    },
+    {
+     "kind": "deepbo",
+     "key": "6"
+    },
+    {
+     "kind": "deepbo",
+     "key": "8"
+    },
+    {
+     "kind": "deepbo",
+     "key": "10"
+    },
+    {
+     "kind": "deepbo",
+     "key": "12"
+    },
+    {
+     "kind": "deepbo",
+     "key": "14"
+    },
+    {
+     "kind": "deepbo",
+     "key": "700"
+    },
+    {
+     "kind": "deepbo",
+     "key": "702"
+    },
+    {
+     "kind": "deepbo",
+     "key": "704"
+    },
+    {
+     "kind": "deepbo",
+     "key": "706"
+    },
+    {
+     "kind": "deepbo",
+     "key": "708"
+    },
+    {
+     "kind": "deepbo",
+     "key": "710"
+    },
+    {
+     "kind": "deepbo",
+     "key": "712"
+    },
+    {
+     "kind": "deepbo",
+     "key": "714"
+    },
+    {
+     "kind": "deepbo",
+     "key": "716"
+    },
+    {
+     "kind": "deepbo",
+     "key": "718"
+    },
+    {
+     "kind": "deepbo",
+     "key": "720"
+    },
+    {
+     "kind": "deepbo",
+     "key": "722"
+    },
+    {
+     "kind": "deepbo",
+     "key": "724"
+    },
+    {
+     "kind": "deepbo",
+     "key": "726"
+    },
+    {
+     "kind": "deepbo",
+     "key": "728"
+    },
+    {
+     "kind": "deepbo",
+     "key": "730"
+    }
+   ],
+   "output": "s3://wce-research/robust/runs/wce-deepbo-20261005-211529/wce-deepbo-20261005-211529-s0/",
+   "instance_id": "i-0970119a322e5f36a",
+   "command_id": "75677e0d-9ffc-4141-b63b-20559a6651fa",
+   "instance_state": "gone",
+   "status": "Completed",
+   "failure": "",
+   "runtime_s": 4848.0
+  },
+  {
+   "name": "wce-deepbo-20261005-211529-s1",
+   "units": 24,
+   "unit_list": [
+    {
+     "kind": "deepbo",
+     "key": "1"
+    },
+    {
+     "kind": "deepbo",
+     "key": "3"
+    },
+    {
+     "kind": "deepbo",
+     "key": "5"
+    },
+    {
+     "kind": "deepbo",
+     "key": "7"
+    },
+    {
+     "kind": "deepbo",
+     "key": "9"
+    },
+    {
+     "kind": "deepbo",
+     "key": "11"
+    },
+    {
+     "kind": "deepbo",
+     "key": "13"
+    },
+    {
+     "kind": "deepbo",
+     "key": "15"
+    },
+    {
+     "kind": "deepbo",
+     "key": "701"
+    },
+    {
+     "kind": "deepbo",
+     "key": "703"
+    },
+    {
+     "kind": "deepbo",
+     "key": "705"
+    },
+    {
+     "kind": "deepbo",
+     "key": "707"
+    },
+    {
+     "kind": "deepbo",
+     "key": "709"
+    },
+    {
+     "kind": "deepbo",
+     "key": "711"
+    },
+    {
+     "kind": "deepbo",
+     "key": "713"
+    },
+    {
+     "kind": "deepbo",
+     "key": "715"
+    },
+    {
+     "kind": "deepbo",
+     "key": "717"
+    },
+    {
+     "kind": "deepbo",
+     "key": "719"
+    },
+    {
+     "kind": "deepbo",
+     "key": "721"
+    },
+    {
+     "kind": "deepbo",
+     "key": "723"
+    },
+    {
+     "kind": "deepbo",
+     "key": "725"
+    },
+    {
+     "kind": "deepbo",
+     "key": "727"
+    },
+    {
+     "kind": "deepbo",
+     "key": "729"
+    },
+    {
+     "kind": "deepbo",
+     "key": "731"
+    }
+   ],
+   "output": "s3://wce-research/robust/runs/wce-deepbo-20261005-211529/wce-deepbo-20261005-211529-s1/",
+   "instance_id": "i-0c73fb1387e13e134",
+   "command_id": "03414086-fc94-4de5-9208-1cbe5912293a",
+   "instance_state": "gone",
+   "status": "Completed",
+   "failure": "",
+   "runtime_s": 5190.0
+  }
+ ],
+ "status": "Completed",
+ "max_runtime": 21600
+}

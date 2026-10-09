@@ -1,0 +1,35 @@
+{
+ "official_baseline": {
+  "name": "pipeline gelé",
+  "status": "official",
+  "note": "référence confirmatoire ; DeepSearch(\"factorized\", validated=None), littéraux par gradient"
+ },
+ "candidate_baseline": {
+  "name": "flat_scene_k3",
+  "status": "candidate baseline",
+  "definition": "core.deep_fragments.flat_types(observe(X, y), k=3) → literals → DeepSearch(\"factorized\", fact_literals=…, fact_residual=False, validated=None)",
+  "evidence": {
+   "first_seen": "wce-deepft-20261005-110621 (128 tâches dev, sélectionné parmi une douzaine de bras)",
+   "confirmed_on": "wce-deepbo-20261005-211529 (256 tâches dev nouvelles, trois bras désignés d'avance)",
+   "candidate_structure_diff": [
+    0.137,
+    [
+     0.09,
+     0.184
+    ]
+   ],
+   "final_agreement_diff": [
+    0.023,
+    [
+     0.015,
+     0.031
+    ]
+   ]
+  },
+  "limits": "dev uniquement, une graine ; ne remplace pas la baseline officielle ; non branché par défaut"
+ },
+ "not_integrated": [
+  "own_k3",
+  "own_nc_k3"
+ ]
+}

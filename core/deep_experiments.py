@@ -526,7 +526,15 @@ def ft_subunits(key):
     return subunits(key)
 
 
-SUBUNITS = {"deepft": ft_subunits, "deeppo": po_subunits, "deeprp": rp_subunits, "deepobj": obj_subunits, "deepe2e": e2e_subunits, "deepresid": resid_subunits, "deepvo": vo_subunits, "deepopt": opt_subunits, "deepdown": down_subunits, "deepprofile": profile_subunits, "deepdev": dev_subunits, "deepgen": gen_subunits, "deepcover": cover_subunits, "deepprim": prim_subunits, "deepneural": neural_subunits}
+# ================================================================ sous-jalon Boundary Ownership & Fragment Attribution (dev)
+
+def bo_subunits(key):
+    """Clés 0–15 : attribution, matrice oracle, visibilité, secteurs ; clés 700+ : chaîne aval et confirmation de flat_scene_k3."""
+    from core.deep_ownership_exp import subunits
+    return subunits(key)
+
+
+SUBUNITS = {"deepbo": bo_subunits, "deepft": ft_subunits, "deeppo": po_subunits, "deeprp": rp_subunits, "deepobj": obj_subunits, "deepe2e": e2e_subunits, "deepresid": resid_subunits, "deepvo": vo_subunits, "deepopt": opt_subunits, "deepdown": down_subunits, "deepprofile": profile_subunits, "deepdev": dev_subunits, "deepgen": gen_subunits, "deepcover": cover_subunits, "deepprim": prim_subunits, "deepneural": neural_subunits}
 
 
 def subunit_ids(kind, key): return [sid for sid, _ in SUBUNITS[kind](key)]
