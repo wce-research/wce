@@ -776,6 +776,24 @@ deep-bo-aggregate:
 deep-bo-report:
 	$(PYTHON) -m core.deep_bo_report report
 
+# sous-jalon Deep Composition & Final Reconstruction with Oracle Atoms (dev uniquement ; vrais atomes fournis)
+DEEP_DC_KEYS ?= 800-831
+.PHONY: deep-dc-test deep-dc-smoke deep-run-dc deep-dc-aggregate deep-dc-report
+deep-dc-test:
+	$(PYTHON) -m unittest tests.test_deep_compose
+
+deep-dc-smoke:
+	$(PYTHON) -m core.deep_dc_report smoke
+
+deep-run-dc:
+	$(DEEP_BACKEND) $(AWSPY) submit --kind deepdc --keys $(DEEP_DC_KEYS) --shards $(DEEP_SHARDS) --instance $(DEEP_INSTANCE) --max-runtime 21600
+
+deep-dc-aggregate:
+	$(PYTHON) -m core.deep_dc_report aggregate
+
+deep-dc-report:
+	$(PYTHON) -m core.deep_dc_report report
+
 deep-progress:
 	$(AWSPY) progress $(if $(RUN),--run $(RUN),)
 

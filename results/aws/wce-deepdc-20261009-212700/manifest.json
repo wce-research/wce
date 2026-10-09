@@ -1,0 +1,205 @@
+{
+ "run_id": "wce-deepdc-20261009-212700",
+ "git_commit": "bdb69bb7ef4232cf41aec650b6c7a80b97c01c66",
+ "code_hash": "e0375fbb5a23e66c",
+ "config_hash": "567c62652803",
+ "timestamp": "20261009-212700",
+ "region": "eu-north-1",
+ "identity": "AWSReservedSSO_WCE-Research-Runner_251aca5f63af0b9d",
+ "instance_type": "c6i.xlarge",
+ "image": "763104351884.dkr.ecr.eu-north-1.amazonaws.com/pytorch-training:2.5.1-cpu-py311-ubuntu22.04-sagemaker",
+ "backend": "ec2",
+ "kind": "deepdc",
+ "keys": [
+  "800",
+  "801",
+  "802",
+  "803",
+  "804",
+  "805",
+  "806",
+  "807",
+  "808",
+  "809",
+  "810",
+  "811",
+  "812",
+  "813",
+  "814",
+  "815",
+  "816",
+  "817",
+  "818",
+  "819",
+  "820",
+  "821",
+  "822",
+  "823",
+  "824",
+  "825",
+  "826",
+  "827",
+  "828",
+  "829",
+  "830",
+  "831"
+ ],
+ "jobs": [
+  {
+   "name": "wce-deepdc-20261009-212700-s0",
+   "units": 16,
+   "unit_list": [
+    {
+     "kind": "deepdc",
+     "key": "800"
+    },
+    {
+     "kind": "deepdc",
+     "key": "802"
+    },
+    {
+     "kind": "deepdc",
+     "key": "804"
+    },
+    {
+     "kind": "deepdc",
+     "key": "806"
+    },
+    {
+     "kind": "deepdc",
+     "key": "808"
+    },
+    {
+     "kind": "deepdc",
+     "key": "810"
+    },
+    {
+     "kind": "deepdc",
+     "key": "812"
+    },
+    {
+     "kind": "deepdc",
+     "key": "814"
+    },
+    {
+     "kind": "deepdc",
+     "key": "816"
+    },
+    {
+     "kind": "deepdc",
+     "key": "818"
+    },
+    {
+     "kind": "deepdc",
+     "key": "820"
+    },
+    {
+     "kind": "deepdc",
+     "key": "822"
+    },
+    {
+     "kind": "deepdc",
+     "key": "824"
+    },
+    {
+     "kind": "deepdc",
+     "key": "826"
+    },
+    {
+     "kind": "deepdc",
+     "key": "828"
+    },
+    {
+     "kind": "deepdc",
+     "key": "830"
+    }
+   ],
+   "output": "s3://wce-research/robust/runs/wce-deepdc-20261009-212700/wce-deepdc-20261009-212700-s0/",
+   "instance_id": "i-0cd3f9e2371e4b7fa",
+   "command_id": "5a05c0d9-ee50-47ae-97ad-0d51f39f6947",
+   "instance_state": "terminated",
+   "status": "Completed",
+   "failure": "",
+   "runtime_s": 1727.0
+  },
+  {
+   "name": "wce-deepdc-20261009-212700-s1",
+   "units": 16,
+   "unit_list": [
+    {
+     "kind": "deepdc",
+     "key": "801"
+    },
+    {
+     "kind": "deepdc",
+     "key": "803"
+    },
+    {
+     "kind": "deepdc",
+     "key": "805"
+    },
+    {
+     "kind": "deepdc",
+     "key": "807"
+    },
+    {
+     "kind": "deepdc",
+     "key": "809"
+    },
+    {
+     "kind": "deepdc",
+     "key": "811"
+    },
+    {
+     "kind": "deepdc",
+     "key": "813"
+    },
+    {
+     "kind": "deepdc",
+     "key": "815"
+    },
+    {
+     "kind": "deepdc",
+     "key": "817"
+    },
+    {
+     "kind": "deepdc",
+     "key": "819"
+    },
+    {
+     "kind": "deepdc",
+     "key": "821"
+    },
+    {
+     "kind": "deepdc",
+     "key": "823"
+    },
+    {
+     "kind": "deepdc",
+     "key": "825"
+    },
+    {
+     "kind": "deepdc",
+     "key": "827"
+    },
+    {
+     "kind": "deepdc",
+     "key": "829"
+    },
+    {
+     "kind": "deepdc",
+     "key": "831"
+    }
+   ],
+   "output": "s3://wce-research/robust/runs/wce-deepdc-20261009-212700/wce-deepdc-20261009-212700-s1/",
+   "instance_id": "i-0352e945ed05e2a5e",
+   "command_id": "a095fd68-bc56-4843-97a2-37a1d79afdd0",
+   "instance_state": "terminated",
+   "status": "Completed",
+   "failure": "",
+   "runtime_s": 1423.0
+  }
+ ],
+ "status": "Completed",
+ "max_runtime": 21600
+}

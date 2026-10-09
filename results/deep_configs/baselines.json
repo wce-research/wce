@@ -29,7 +29,20 @@
   "limits": "dev uniquement, une graine ; ne remplace pas la baseline officielle ; non branché par défaut"
  },
  "not_integrated": [
+  "composition sur classes (core.deep_compose)",
   "own_k3",
   "own_nc_k3"
- ]
+ ],
+ "class_composition_scope": {
+  "verdict": "DEEP COMPOSITION READY FOR END-TO-END VALIDATION",
+  "scope": [
+   "vrais atomes",
+   "vrais paramètres",
+   "jusqu'à 6 atomes",
+   "aucun résultat confirmatoire global",
+   "aucun lot scellé"
+  ],
+  "run": "wce-deepdc-20261009-212700",
+  "status": "non branché ; pas le pipeline officiel"
+ }
 }
