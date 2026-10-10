@@ -1290,6 +1290,24 @@
     ]
   },
   {
+    "path": "core/deep_sealed.py",
+    "group": "core",
+    "classes": [
+      "SealedSecretMissing"
+    ],
+    "functions": [
+      "salt_path",
+      "load_salt",
+      "create_salt",
+      "salt_fingerprint",
+      "derived_seed",
+      "sealed_spec",
+      "sealed_task",
+      "sealed_hash",
+      "verify"
+    ]
+  },
+  {
     "path": "core/deep_search.py",
     "group": "core",
     "classes": [
