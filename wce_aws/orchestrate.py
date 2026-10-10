@@ -106,6 +106,62 @@ def smoke(submit_job=False):
     print(json.dumps(report, indent=1, ensure_ascii=False)); return report
 
 
+def quotas():
+    """LECTURE SEULE : quotas Service Quotas utiles à WCE et historique des demandes. N'appelle que `get-service-quota`,
+    `list-service-quotas` et `list-requested-service-quota-change-history` ; ne soumet et ne modifie rien."""
+    def call(*args):
+        cmd = ["aws", *args, "--region", REGION, "--profile", PROFILE, "--output", "json"]; p = subprocess.run(cmd, capture_output=True, text=True)
+        return (json.loads(p.stdout or "{}"), None) if p.returncode == 0 else (None, (p.stderr or "").strip().splitlines()[-1][:300] if p.stderr.strip() else "erreur")
+    out = {"region": REGION, "errors": []}
+    q, e = call("service-quotas", "get-service-quota", "--service-code", "ec2", "--quota-code", "L-1216C47A")
+    out["ec2_standard"] = {"code": "L-1216C47A", "name": q["Quota"]["QuotaName"], "value": q["Quota"]["Value"], "adjustable": q["Quota"].get("Adjustable")} if q else {"code": "L-1216C47A", "error": e}
+    sm, e = call("service-quotas", "list-service-quotas", "--service-code", "sagemaker", "--no-paginate", "--max-results", "100"); items = []
+    cmd_all, e2 = call("service-quotas", "list-service-quotas", "--service-code", "sagemaker")
+    for x in (cmd_all or sm or {}).get("Quotas", []):
+        n = x["QuotaName"].lower()
+        if ("processing job usage" in n or "training job usage" in n) and "spot" not in n and any(t in n for t in ("ml.c5.", "ml.m5.", "ml.t3.", "ml.c6i.", "ml.c7i.")): items.append({"code": x["QuotaCode"], "name": x["QuotaName"], "value": x["Value"]})
+    if cmd_all is None and sm is None: out["errors"].append({"call": "list-service-quotas sagemaker", "error": e2 or e})
+    out["sagemaker_nonzero_or_requested"] = sorted(items, key=lambda z: z["name"]); hist = []
+    for svc in ("ec2", "sagemaker"):
+        h, e = call("service-quotas", "list-requested-service-quota-change-history", "--service-code", svc)
+        if h is None: out["errors"].append({"call": f"list-requested-service-quota-change-history {svc}", "error": e}); continue
+        hist += [{"service": r.get("ServiceCode"), "code": r.get("QuotaCode"), "quota": r.get("QuotaName"), "desired": r.get("DesiredValue"), "status": r.get("Status"), "created": str(r.get("Created")), "last_updated": str(r.get("LastUpdated")), "case": r.get("CaseId"), "level": r.get("QuotaRequestedAtLevel")} for r in h.get("RequestedQuotas", [])]
+    out["requests"] = sorted(hist, key=lambda r: r["last_updated"], reverse=True); req = {r["code"] for r in hist}
+    out["sagemaker_nonzero_or_requested"] = [x for x in out["sagemaker_nonzero_or_requested"] if x["value"] > 0 or x["code"] in req]
+    print(json.dumps(out, indent=1, ensure_ascii=False)); return out
+
+
+def bench_report(kind="deepbenchhp"):
+    """Banc d'instances : lit les runs `kind` déjà récupérés (aucun appel AWS). Par type : temps, débit, coût, mémoire,
+    erreurs, et comparaison NUMÉRIQUE des résultats avec la référence c6i.xlarge (champs de temps et de mémoire exclus)."""
+    skip = ("seconds", "rss_mb", "runtime_s", "cpu_s"); runs = {}
+    def strip(x):
+        if isinstance(x, dict): return {k: strip(v) for k, v in sorted(x.items()) if k not in skip}
+        return [strip(v) for v in x] if isinstance(x, list) else x
+    def diff(a, b, out):
+        if isinstance(a, dict) and isinstance(b, dict):
+            for k in set(a) | set(b): diff(a.get(k), b.get(k), out)
+        elif isinstance(a, list) and isinstance(b, list) and len(a) == len(b):
+            for u, v in zip(a, b): diff(u, v, out)
+        elif isinstance(a, (int, float)) and isinstance(b, (int, float)) and not isinstance(a, bool) and not isinstance(b, bool): out["numeric"] += 1; out["max_abs"] = max(out["max_abs"], abs(a - b)); out["differing"] += abs(a - b) > 1e-9
+        else: out["other"] += 1; out["other_differing"] += a != b
+    for p, man in manifests():
+        if man.get("kind") != kind: continue
+        for j in man["jobs"]:
+            jd = os.path.join(os.path.dirname(p), "artifacts", j["name"])
+            try: t = json.load(open(os.path.join(jd, "_timing.json"))); sm = json.load(open(os.path.join(jd, "_shard_summary.json")))
+            except (OSError, ValueError): runs[man["run_id"]] = {"instance": man.get("instance_type"), "error": "artefacts absents ou incomplets"}; continue
+            res = {os.path.basename(f): strip(json.load(open(f))) for f in sorted(glob.glob(os.path.join(jd, f"{kind}_*.json")))}; inst = man.get("instance_type"); price = PRICE_USD_H.get(inst); n = sm.get("subunits_run", 0); billed = t["setup_s"] + t["job_s"]
+            runs[man["run_id"]] = {"instance": inst, "setup_s": t["setup_s"], "job_s": t["job_s"], "wall_s": sm.get("wall_s"), "subunits": n, "subunits_per_s": round(n / sm["wall_s"], 5) if sm.get("wall_s") else None, "work_s": sm.get("work_s"), "parallel_efficiency": sm.get("parallel_efficiency"), "cpu_avg_pct": sm.get("cpu_avg_pct"),
+                                   "peak_rss_mb": sm.get("peak_rss_mb"), "mem_available_min_mb": sm.get("mem_available_min_mb"), "mem_total_mb": round(t.get("mem_total_kb", 0) / 1024), "errors": sm.get("errors"), "unit_status": [u["status"] for u in sm.get("units", [])], "exit_code": t.get("exit_code"),
+                                   "price_usd_h": price, "cost_run_usd": round(billed / 3600 * price, 4) if price else None, "cost_per_subunit_usd": round(sm["wall_s"] / 3600 * price / n, 6) if price and n and sm.get("wall_s") else None, "_res": res}
+    res = {k: r.pop("_res") for k, r in runs.items() if "_res" in r}; rk = next((k for k in res if runs[k]["instance"] == "c6i.xlarge"), None)
+    for k in res:
+        if rk is None: continue
+        d = {"numeric": 0, "differing": 0, "max_abs": 0.0, "other": 0, "other_differing": 0}; diff(res[rk], res[k], d); runs[k]["vs_c6i"] = d; runs[k]["speedup_vs_c6i"] = round(runs[rk]["wall_s"] / runs[k]["wall_s"], 3) if runs[k].get("wall_s") else None
+    out = os.path.join(ROOT, "results", "aws_instance_bench.json"); json.dump(runs, open(out, "w"), indent=1); print(json.dumps(runs, indent=1, ensure_ascii=False)); print("->", out); return runs
+
+
 def whoami():
     """`sts get-caller-identity` avec le profil runner ; échoue si l'identité n'est pas WCE-Research-Runner."""
     ident = aws("sts", "get-caller-identity"); arn = ident["Arn"]
@@ -154,7 +210,7 @@ def ec2_user_data(max_runtime):
 
 
 SYNC_PERIOD_S = 45
-PRICE_USD_H = {"t3.medium": 0.0432, "t3.large": 0.0864, "c6i.large": 0.091, "c6i.xlarge": 0.182}   # tarifs à la demande eu-north-1 APPROXIMATIFS (à vérifier sur la facture)
+PRICE_USD_H = {"t3.medium": 0.0432, "t3.large": 0.0864, "c6i.large": 0.091, "c6i.xlarge": 0.182, "c7i.xlarge": 0.1911, "c7i-flex.xlarge": 0.1816, "c8i.xlarge": 0.2007}   # tarifs à la demande eu-north-1 APPROXIMATIFS (à vérifier sur la facture)
 
 
 def ec2_job_script(units, code_uri, out, instance, run_id, procs=0):
@@ -202,6 +258,26 @@ def ec2_diagnose():
         err = subprocess.run(cmd, capture_output=True, text=True).stderr
         if "c6i" in label and "DryRunOperation" not in err: out[label + " — message complet"] = err.strip()[:900]
         out[label] = "AUTORISÉ (DryRunOperation)" if "DryRunOperation" in err else ("REFUSÉ : " + (" sur ".join(re.search(r"perform: (\S+) on resource: (\S+)", err).groups()) if "on resource" in err else err.strip()[-200:]))
+    print(json.dumps(out, indent=1, ensure_ascii=False)); return out
+
+
+BENCH_TYPES = ("c6i.xlarge", "c7i.xlarge", "c7i-flex.xlarge", "c8i.xlarge")
+EC2_AMI_ARM = "resolve:ssm:/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-arm64"
+
+
+def ec2_probe(types=BENCH_TYPES):
+    """LECTURE SEULE / SANS création : pour chaque type candidat, disponibilité dans la région, caractéristiques, et
+    `run-instances --dry-run` avec EXACTEMENT les tags et le profil du lancement réel. Aucune ressource n'est créée."""
+    out = {}; spec = json.dumps([{"ResourceType": t, "Tags": EC2_TAGS} for t in ("instance", "volume")])
+    for inst in types:
+        row = {}; off = aws("ec2", "describe-instance-type-offerings", "--location-type", "availability-zone", "--filters", f"Name=instance-type,Values={inst}", check=False)
+        row["zones"] = sorted(o["Location"] for o in (off or {}).get("InstanceTypeOfferings", [])) if off is not None else "lecture refusée"
+        d = aws("ec2", "describe-instance-types", "--instance-types", inst, check=False); arch = "x86_64"
+        if d and d.get("InstanceTypes"):
+            t = d["InstanceTypes"][0]; arch = t["ProcessorInfo"]["SupportedArchitectures"][0]; row.update({"vcpus": t["VCpuInfo"]["DefaultVCpus"], "memory_gib": t["MemoryInfo"]["SizeInMiB"] / 1024, "arch": arch, "cpu": t["ProcessorInfo"].get("Manufacturer"), "ghz": t["ProcessorInfo"].get("SustainedClockSpeedInGhz")})
+        cmd = ["aws", "ec2", "run-instances", "--dry-run", "--image-id", EC2_AMI_ARM if arch == "arm64" else EC2_AMI, "--instance-type", inst, "--count", "1", "--region", REGION, "--profile", PROFILE, "--tag-specifications", spec, "--iam-instance-profile", f"Name={EC2_PROFILE}"]
+        err = subprocess.run(cmd, capture_output=True, text=True).stderr; m = re.search(r"perform: (\S+) on resource: (\S+)", err)
+        row["dry_run"] = "AUTORISÉ (DryRunOperation)" if "DryRunOperation" in err else "REFUSÉ : " + (" sur ".join(m.groups()) if m else err.strip()[-260:]); out[inst] = row
     print(json.dumps(out, indent=1, ensure_ascii=False)); return out
 
 
@@ -483,6 +559,9 @@ if __name__ == "__main__":
     try:
         if a.cmd == "smoke": smoke(a.submit)
         elif a.cmd == "whoami": whoami()
+        elif a.cmd == "quotas": quotas()
+        elif a.cmd == "ec2-probe": ec2_probe()
+        elif a.cmd == "bench-report": bench_report()
         elif a.cmd == "progress": progress(a.run)
         elif a.cmd == "resume": resume(a.run)
         elif a.cmd == "inspect": identity(); inspect_run(a.run)

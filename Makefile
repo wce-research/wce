@@ -528,6 +528,25 @@ aws-whoami:
 aws-check-guardrails:
 	$(AWSPY) check-guardrails
 
+# lecture seule : quotas et historique des demandes Service Quotas (ne soumet et ne modifie rien)
+.PHONY: aws-quotas aws-ec2-probe
+aws-quotas:
+	$(AWSPY) quotas
+
+# sans création : disponibilité et autorisation (dry-run) des types candidats au banc d'instances
+aws-ec2-probe:
+	$(AWSPY) ec2-probe
+
+# banc d'instances : même workload (clé de mise au point 1090 du sous-jalon High-Precision, 42 sous-unités), une instance
+# de 4 vCPU par type ; runs `wce-deepbenchhp-*`, distincts des agrégats scientifiques (`wce-deephp-*`)
+BENCH_INSTANCE ?= c6i.xlarge
+.PHONY: aws-bench-instance aws-bench-report
+aws-bench-instance:
+	$(DEEP_BACKEND) $(AWSPY) submit --kind deepbenchhp --keys 1090 --shards 1 --instance $(BENCH_INSTANCE) --max-runtime 5400
+
+aws-bench-report:
+	$(AWSPY) bench-report
+
 aws-ec2-diagnose:
 	$(AWSPY) ec2-diagnose
 

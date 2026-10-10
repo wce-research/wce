@@ -1,0 +1,122 @@
+{
+ "wce-deepbenchhp-20261010-133806": {
+  "instance": "c6i.xlarge",
+  "setup_s": 63,
+  "job_s": 684,
+  "wall_s": 683.65,
+  "subunits": 42,
+  "subunits_per_s": 0.06143,
+  "work_s": 2663.51,
+  "parallel_efficiency": 0.974,
+  "cpu_avg_pct": 97.8,
+  "peak_rss_mb": 537.5,
+  "mem_available_min_mb": 3932,
+  "mem_total_mb": 7779,
+  "errors": {},
+  "unit_status": [
+   "ok"
+  ],
+  "exit_code": 0,
+  "price_usd_h": 0.182,
+  "cost_run_usd": 0.0378,
+  "cost_per_subunit_usd": 0.000823,
+  "vs_c6i": {
+   "numeric": 44078,
+   "differing": 0,
+   "max_abs": 0.0,
+   "other": 30451,
+   "other_differing": 0
+  },
+  "speedup_vs_c6i": 1.0
+ },
+ "wce-deepbenchhp-20261010-133825": {
+  "instance": "c7i.xlarge",
+  "setup_s": 60,
+  "job_s": 530,
+  "wall_s": 530.08,
+  "subunits": 42,
+  "subunits_per_s": 0.07923,
+  "work_s": 2069.11,
+  "parallel_efficiency": 0.976,
+  "cpu_avg_pct": 98.1,
+  "peak_rss_mb": 524.6,
+  "mem_available_min_mb": 3403,
+  "mem_total_mb": 7779,
+  "errors": {},
+  "unit_status": [
+   "ok"
+  ],
+  "exit_code": 0,
+  "price_usd_h": 0.1911,
+  "cost_run_usd": 0.0313,
+  "cost_per_subunit_usd": 0.00067,
+  "vs_c6i": {
+   "numeric": 44078,
+   "differing": 0,
+   "max_abs": 0.0,
+   "other": 30451,
+   "other_differing": 0
+  },
+  "speedup_vs_c6i": 1.29
+ },
+ "wce-deepbenchhp-20261010-135119": {
+  "instance": "c7i-flex.xlarge",
+  "setup_s": 60,
+  "job_s": 560,
+  "wall_s": 559.33,
+  "subunits": 42,
+  "subunits_per_s": 0.07509,
+  "work_s": 2187.74,
+  "parallel_efficiency": 0.978,
+  "cpu_avg_pct": 98.3,
+  "peak_rss_mb": 536.9,
+  "mem_available_min_mb": 4042,
+  "mem_total_mb": 7779,
+  "errors": {},
+  "unit_status": [
+   "ok"
+  ],
+  "exit_code": 0,
+  "price_usd_h": 0.1816,
+  "cost_run_usd": 0.0313,
+  "cost_per_subunit_usd": 0.000672,
+  "vs_c6i": {
+   "numeric": 44078,
+   "differing": 0,
+   "max_abs": 0.0,
+   "other": 30451,
+   "other_differing": 0
+  },
+  "speedup_vs_c6i": 1.222
+ },
+ "wce-deepbenchhp-20261010-135136": {
+  "instance": "c8i.xlarge",
+  "setup_s": 56,
+  "job_s": 441,
+  "wall_s": 440.79,
+  "subunits": 42,
+  "subunits_per_s": 0.09528,
+  "work_s": 1730.62,
+  "parallel_efficiency": 0.982,
+  "cpu_avg_pct": 98.8,
+  "peak_rss_mb": 530.0,
+  "mem_available_min_mb": 3990,
+  "mem_total_mb": 7779,
+  "errors": {},
+  "unit_status": [
+   "ok"
+  ],
+  "exit_code": 0,
+  "price_usd_h": 0.2007,
+  "cost_run_usd": 0.0277,
+  "cost_per_subunit_usd": 0.000585,
+  "vs_c6i": {
+   "numeric": 44078,
+   "differing": 0,
+   "max_abs": 0.0,
+   "other": 30451,
+   "other_differing": 0
+  },
+  "speedup_vs_c6i": 1.551
+ }
+}

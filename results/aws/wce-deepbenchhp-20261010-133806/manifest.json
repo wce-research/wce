@@ -1,0 +1,33 @@
+{
+ "run_id": "wce-deepbenchhp-20261010-133806",
+ "git_commit": "0f3e4432ee1d4a3b231dd95d2a561a54e2f4fb0d",
+ "code_hash": "0d009766add29852",
+ "config_hash": "9bc88611f1a4",
+ "timestamp": "20261010-133806",
+ "region": "eu-north-1",
+ "identity": "AWSReservedSSO_WCE-Research-Runner_251aca5f63af0b9d",
+ "instance_type": "c6i.xlarge",
+ "image": "763104351884.dkr.ecr.eu-north-1.amazonaws.com/pytorch-training:2.5.1-cpu-py311-ubuntu22.04-sagemaker",
+ "backend": "ec2",
+ "kind": "deepbenchhp",
+ "keys": [
+  "1090"
+ ],
+ "jobs": [
+  {
+   "name": "wce-deepbenchhp-20261010-133806-s0",
+   "units": 1,
+   "unit_list": [
+    {
+     "kind": "deepbenchhp",
+     "key": "1090"
+    }
+   ],
+   "output": "s3://wce-research/robust/runs/wce-deepbenchhp-20261010-133806/wce-deepbenchhp-20261010-133806-s0/",
+   "instance_id": "i-0908ca2882c10f47d",
+   "command_id": "95ab9e88-a3eb-45f9-b9ec-3567c0354ca9"
+  }
+ ],
+ "status": "Submitted",
+ "max_runtime": 5400
+}

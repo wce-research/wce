@@ -556,7 +556,7 @@ class CheckpointTests(unittest.TestCase):
     def test_stop_checks_tags(self): src = inspect.getsource(ORC.stop_run); self.assertIn('tags.get("Project") == "WCE"', src); self.assertIn("cancel-command", src)
     def test_resume_same_prefix(self): src = inspect.getsource(ORC.resume); self.assertIn('j["output"]', src); self.assertIn('j.get("status") == "Completed"', src)
     def test_manifest_saved_per_launch(self): self.assertIn("save(); continue", inspect.getsource(ORC.submit))
-    def test_prices_only_allowed_types(self): self.assertEqual(set(ORC.PRICE_USD_H), {"t3.medium", "t3.large", "c6i.large", "c6i.xlarge"})
+    def test_prices_only_allowed_types(self): self.assertEqual(set(ORC.PRICE_USD_H), {"t3.medium", "t3.large", "c6i.large", "c6i.xlarge", "c7i.xlarge", "c7i-flex.xlarge", "c8i.xlarge"})
     def test_make_targets_observability(self):
         mk = open("Makefile").read()
         for t in ("aws-progress:", "aws-resume:", "aws-stop:", "aws-inspect:", "aws-profile:", "aws-bench:", "aws-timing:", "aws-run-caltrain:", "aws-ec2-diagnose:"): self.assertIn(t, mk)
