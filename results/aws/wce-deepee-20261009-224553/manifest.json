@@ -1,0 +1,205 @@
+{
+ "run_id": "wce-deepee-20261009-224553",
+ "git_commit": "fe105feb29b735d5509aa1e06256264e4b95c8f9",
+ "code_hash": "7ed442b4842d816e",
+ "config_hash": "6e5dc7dbfa24",
+ "timestamp": "20261009-224553",
+ "region": "eu-north-1",
+ "identity": "AWSReservedSSO_WCE-Research-Runner_251aca5f63af0b9d",
+ "instance_type": "c6i.xlarge",
+ "image": "763104351884.dkr.ecr.eu-north-1.amazonaws.com/pytorch-training:2.5.1-cpu-py311-ubuntu22.04-sagemaker",
+ "backend": "ec2",
+ "kind": "deepee",
+ "keys": [
+  "900",
+  "901",
+  "902",
+  "903",
+  "904",
+  "905",
+  "906",
+  "907",
+  "908",
+  "909",
+  "910",
+  "911",
+  "912",
+  "913",
+  "914",
+  "915",
+  "916",
+  "917",
+  "918",
+  "919",
+  "920",
+  "921",
+  "922",
+  "923",
+  "924",
+  "925",
+  "926",
+  "927",
+  "928",
+  "929",
+  "930",
+  "931"
+ ],
+ "jobs": [
+  {
+   "name": "wce-deepee-20261009-224553-s0",
+   "units": 16,
+   "unit_list": [
+    {
+     "kind": "deepee",
+     "key": "900"
+    },
+    {
+     "kind": "deepee",
+     "key": "902"
+    },
+    {
+     "kind": "deepee",
+     "key": "904"
+    },
+    {
+     "kind": "deepee",
+     "key": "906"
+    },
+    {
+     "kind": "deepee",
+     "key": "908"
+    },
+    {
+     "kind": "deepee",
+     "key": "910"
+    },
+    {
+     "kind": "deepee",
+     "key": "912"
+    },
+    {
+     "kind": "deepee",
+     "key": "914"
+    },
+    {
+     "kind": "deepee",
+     "key": "916"
+    },
+    {
+     "kind": "deepee",
+     "key": "918"
+    },
+    {
+     "kind": "deepee",
+     "key": "920"
+    },
+    {
+     "kind": "deepee",
+     "key": "922"
+    },
+    {
+     "kind": "deepee",
+     "key": "924"
+    },
+    {
+     "kind": "deepee",
+     "key": "926"
+    },
+    {
+     "kind": "deepee",
+     "key": "928"
+    },
+    {
+     "kind": "deepee",
+     "key": "930"
+    }
+   ],
+   "output": "s3://wce-research/robust/runs/wce-deepee-20261009-224553/wce-deepee-20261009-224553-s0/",
+   "instance_id": "i-09e7fd158d62585f9",
+   "command_id": "6e349153-65d8-4571-a8a2-3ffe63deb8c9",
+   "instance_state": "gone",
+   "status": "Completed",
+   "failure": "",
+   "runtime_s": 4335.0
+  },
+  {
+   "name": "wce-deepee-20261009-224553-s1",
+   "units": 16,
+   "unit_list": [
+    {
+     "kind": "deepee",
+     "key": "901"
+    },
+    {
+     "kind": "deepee",
+     "key": "903"
+    },
+    {
+     "kind": "deepee",
+     "key": "905"
+    },
+    {
+     "kind": "deepee",
+     "key": "907"
+    },
+    {
+     "kind": "deepee",
+     "key": "909"
+    },
+    {
+     "kind": "deepee",
+     "key": "911"
+    },
+    {
+     "kind": "deepee",
+     "key": "913"
+    },
+    {
+     "kind": "deepee",
+     "key": "915"
+    },
+    {
+     "kind": "deepee",
+     "key": "917"
+    },
+    {
+     "kind": "deepee",
+     "key": "919"
+    },
+    {
+     "kind": "deepee",
+     "key": "921"
+    },
+    {
+     "kind": "deepee",
+     "key": "923"
+    },
+    {
+     "kind": "deepee",
+     "key": "925"
+    },
+    {
+     "kind": "deepee",
+     "key": "927"
+    },
+    {
+     "kind": "deepee",
+     "key": "929"
+    },
+    {
+     "kind": "deepee",
+     "key": "931"
+    }
+   ],
+   "output": "s3://wce-research/robust/runs/wce-deepee-20261009-224553/wce-deepee-20261009-224553-s1/",
+   "instance_id": "i-0caf343876a3ae0fe",
+   "command_id": "db4f70fa-9db4-4ac3-869f-1cbd795d01af",
+   "instance_state": "gone",
+   "status": "Completed",
+   "failure": "",
+   "runtime_s": 4464.0
+  }
+ ],
+ "status": "Completed",
+ "max_runtime": 21600
+}

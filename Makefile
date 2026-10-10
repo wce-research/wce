@@ -794,6 +794,27 @@ deep-dc-aggregate:
 deep-dc-report:
 	$(PYTHON) -m core.deep_dc_report report
 
+# sous-jalon End-to-End Composition with Discovered Atoms (dev uniquement ; aucun oracle dans les chaînes principales)
+DEEP_EE_KEYS ?= 900-931
+.PHONY: deep-ee-test deep-ee-smoke deep-ee-tune deep-run-ee deep-ee-aggregate deep-ee-report
+deep-ee-test:
+	$(PYTHON) -m unittest tests.test_deep_e2e
+
+deep-ee-smoke:
+	$(PYTHON) -m core.deep_ee_report smoke
+
+deep-ee-tune:
+	$(PYTHON) -m core.deep_ee_report tune
+
+deep-run-ee:
+	$(DEEP_BACKEND) $(AWSPY) submit --kind deepee --keys $(DEEP_EE_KEYS) --shards $(DEEP_SHARDS) --instance $(DEEP_INSTANCE) --max-runtime 21600
+
+deep-ee-aggregate:
+	$(PYTHON) -m core.deep_ee_report aggregate
+
+deep-ee-report:
+	$(PYTHON) -m core.deep_ee_report report
+
 deep-progress:
 	$(AWSPY) progress $(if $(RUN),--run $(RUN),)
 

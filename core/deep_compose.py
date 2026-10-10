@@ -91,9 +91,12 @@ class CellSpace:
     """Atomes donnés + observations → cellules. Un masque (entier 64 bits, un bit par cellule occupée) décrit une
     composition ; son nombre d'erreurs sur les observations se lit directement sur les comptes par cellule."""
 
-    def __init__(self, atoms: Sequence[BNode], X: torch.Tensor, y: torch.Tensor):
-        if not 1 <= len(atoms) <= MAX_ATOMS: raise ValueError(f"entre 1 et {MAX_ATOMS} atomes (2^n cellules doivent tenir sur 64 bits)")
+    def __init__(self, atoms: Sequence[BNode], X: torch.Tensor, y: torch.Tensor, max_atoms: int = MAX_ATOMS):
+        """`max_atoms` peut être relevé quand des unités ne créent pas de cellules nouvelles (un atome et son complément) :
+        la seule contrainte réelle est que les cellules OCCUPÉES tiennent sur 64 bits."""
+        if not 1 <= len(atoms) <= max_atoms: raise ValueError(f"entre 1 et {max_atoms} atomes (les cellules doivent tenir sur 64 bits)")
         self.atoms = list(atoms); self.n = len(atoms); self.N = len(X); code = self.codes_of(X); self.codes, inv = np.unique(code, return_inverse=True); self.K = len(self.codes); yb = y.numpy().astype(np.float64)
+        if self.K > 64: raise ValueError(f"{self.K} cellules occupées : plus de 64")
         self.pos = np.bincount(inv, weights=yb, minlength=self.K); self.count = np.bincount(inv, minlength=self.K).astype(np.float64); self.neg = self.count - self.pos; self.gain = self.pos - self.neg; self.total_pos = float(self.pos.sum())
         self.atom_masks = [self._pack(((self.codes >> U(i)) & U(1)).astype(bool)) for i in range(self.n)]; self.full = (1 << self.K) - 1
         self.target = self._pack(self.pos > self.neg); self.floor = float(np.minimum(self.pos, self.neg).sum()); self._shift = np.arange(self.K, dtype=U)
