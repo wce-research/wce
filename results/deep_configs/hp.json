@@ -1,0 +1,37 @@
+{
+ "note": "Sous-jalon High-Precision Primitive Estimation. Réglages fixés sur les clés de MISE AU POINT 1090-1095 uniquement, avant le lancement des runs AWS. Seuls band_factor et cos_normal ont été choisis sur une mesure (rappel des courbes vraies à 300 et 600 observations) ; les autres valeurs sont les valeurs par défaut, non balayées. La validation hors-échantillon exige un gain significatif (test apparié, z >= 1,64) : sans ce seuil, la procédure était acceptée sur des étiquettes aléatoires (test unitaire).",
+ "tuning_keys": "1090-1095",
+ "config": {
+  "k": 5,
+  "sources": [
+   "flat",
+   "components"
+  ],
+  "curves": true,
+  "lines": 12,
+  "circles": 10,
+  "band_factor": 0.8,
+  "cos_normal": 0.5,
+  "joint": true,
+  "n_refine_sets": 3,
+  "sweeps": 2,
+  "samples": 48,
+  "scale": 0.08,
+  "margin": 1.5,
+  "births": 2,
+  "birth_samples": 1500,
+  "birth_top": 4,
+  "birth_gain": 3.0,
+  "birth_per_param": 1.4,
+  "prune_gain": 1.5,
+  "cv_repeats": 24,
+  "cv_fraction": 0.2,
+  "validate": "holdout",
+  "holdout_repeats": 3,
+  "holdout_fraction": 0.3,
+  "holdout_z": 1.64,
+  "refine": true,
+  "morphology": true,
+  "describe": false
+ }
+}

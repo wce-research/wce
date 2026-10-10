@@ -1,0 +1,203 @@
+{
+ "run_id": "wce-deephp-20261010-092830",
+ "git_commit": "828b5c5853ad6192367cbf2a6e1f01e292d876d0",
+ "code_hash": "c15bf967aa2bbf7f",
+ "config_hash": "e933c58aa955",
+ "timestamp": "20261010-092830",
+ "region": "eu-north-1",
+ "identity": "AWSReservedSSO_WCE-Research-Runner_251aca5f63af0b9d",
+ "instance_type": "c6i.xlarge",
+ "image": "763104351884.dkr.ecr.eu-north-1.amazonaws.com/pytorch-training:2.5.1-cpu-py311-ubuntu22.04-sagemaker",
+ "backend": "ec2",
+ "kind": "deephp",
+ "keys": [
+  "1100",
+  "1101",
+  "1102",
+  "1103",
+  "1104",
+  "1105",
+  "1106",
+  "1107",
+  "1108",
+  "1109",
+  "1110",
+  "1111",
+  "1112",
+  "1113",
+  "1114",
+  "1115",
+  "1116",
+  "1117",
+  "1118",
+  "1119",
+  "1120",
+  "1121",
+  "1122",
+  "1123",
+  "1124",
+  "1125",
+  "1126",
+  "1127",
+  "1128",
+  "1129",
+  "1130",
+  "1131"
+ ],
+ "jobs": [
+  {
+   "name": "wce-deephp-20261010-092830-s0",
+   "units": 16,
+   "unit_list": [
+    {
+     "kind": "deephp",
+     "key": "1100"
+    },
+    {
+     "kind": "deephp",
+     "key": "1102"
+    },
+    {
+     "kind": "deephp",
+     "key": "1104"
+    },
+    {
+     "kind": "deephp",
+     "key": "1106"
+    },
+    {
+     "kind": "deephp",
+     "key": "1108"
+    },
+    {
+     "kind": "deephp",
+     "key": "1110"
+    },
+    {
+     "kind": "deephp",
+     "key": "1112"
+    },
+    {
+     "kind": "deephp",
+     "key": "1114"
+    },
+    {
+     "kind": "deephp",
+     "key": "1116"
+    },
+    {
+     "kind": "deephp",
+     "key": "1118"
+    },
+    {
+     "kind": "deephp",
+     "key": "1120"
+    },
+    {
+     "kind": "deephp",
+     "key": "1122"
+    },
+    {
+     "kind": "deephp",
+     "key": "1124"
+    },
+    {
+     "kind": "deephp",
+     "key": "1126"
+    },
+    {
+     "kind": "deephp",
+     "key": "1128"
+    },
+    {
+     "kind": "deephp",
+     "key": "1130"
+    }
+   ],
+   "output": "s3://wce-research/robust/runs/wce-deephp-20261010-092830/wce-deephp-20261010-092830-s0/",
+   "instance_id": "i-075b0fa6c3b809497",
+   "command_id": "4a879e56-4c55-42ec-82d3-bdcae153a5c2",
+   "instance_state": "gone",
+   "status": "InProgress",
+   "failure": ""
+  },
+  {
+   "name": "wce-deephp-20261010-092830-s1",
+   "units": 16,
+   "unit_list": [
+    {
+     "kind": "deephp",
+     "key": "1101"
+    },
+    {
+     "kind": "deephp",
+     "key": "1103"
+    },
+    {
+     "kind": "deephp",
+     "key": "1105"
+    },
+    {
+     "kind": "deephp",
+     "key": "1107"
+    },
+    {
+     "kind": "deephp",
+     "key": "1109"
+    },
+    {
+     "kind": "deephp",
+     "key": "1111"
+    },
+    {
+     "kind": "deephp",
+     "key": "1113"
+    },
+    {
+     "kind": "deephp",
+     "key": "1115"
+    },
+    {
+     "kind": "deephp",
+     "key": "1117"
+    },
+    {
+     "kind": "deephp",
+     "key": "1119"
+    },
+    {
+     "kind": "deephp",
+     "key": "1121"
+    },
+    {
+     "kind": "deephp",
+     "key": "1123"
+    },
+    {
+     "kind": "deephp",
+     "key": "1125"
+    },
+    {
+     "kind": "deephp",
+     "key": "1127"
+    },
+    {
+     "kind": "deephp",
+     "key": "1129"
+    },
+    {
+     "kind": "deephp",
+     "key": "1131"
+    }
+   ],
+   "output": "s3://wce-research/robust/runs/wce-deephp-20261010-092830/wce-deephp-20261010-092830-s1/",
+   "instance_id": "i-0775ceede9720a2cf",
+   "command_id": "7b1ffdd8-2db3-4b70-bf65-c33edd79cd80",
+   "instance_state": "gone",
+   "status": "InProgress",
+   "failure": ""
+  }
+ ],
+ "status": "InProgress",
+ "max_runtime": 36000
+}

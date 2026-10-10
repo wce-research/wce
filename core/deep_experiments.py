@@ -558,7 +558,15 @@ def lp_subunits(key):
     return subunits(key)
 
 
-SUBUNITS = {"deeplp": lp_subunits, "deepee": ee_subunits, "deepdc": dc_subunits, "deepbo": bo_subunits, "deepft": ft_subunits, "deeppo": po_subunits, "deeprp": rp_subunits, "deepobj": obj_subunits, "deepe2e": e2e_subunits, "deepresid": resid_subunits, "deepvo": vo_subunits, "deepopt": opt_subunits, "deepdown": down_subunits, "deepprofile": profile_subunits, "deepdev": dev_subunits, "deepgen": gen_subunits, "deepcover": cover_subunits, "deepprim": prim_subunits, "deepneural": neural_subunits}
+# ================================================================ sous-jalon High-Precision Primitive Estimation (dev)
+
+def hp_subunits(key):
+    """Clés 1100–1131 : banc par primitive, carte de sensibilité, naissance, chaînes A / B / C (standard, rich, dense), OOD."""
+    from core.deep_hp_exp import subunits
+    return subunits(key)
+
+
+SUBUNITS = {"deephp": hp_subunits, "deeplp": lp_subunits, "deepee": ee_subunits, "deepdc": dc_subunits, "deepbo": bo_subunits, "deepft": ft_subunits, "deeppo": po_subunits, "deeprp": rp_subunits, "deepobj": obj_subunits, "deepe2e": e2e_subunits, "deepresid": resid_subunits, "deepvo": vo_subunits, "deepopt": opt_subunits, "deepdown": down_subunits, "deepprofile": profile_subunits, "deepdev": dev_subunits, "deepgen": gen_subunits, "deepcover": cover_subunits, "deepprim": prim_subunits, "deepneural": neural_subunits}
 
 
 def subunit_ids(kind, key): return [sid for sid, _ in SUBUNITS[kind](key)]

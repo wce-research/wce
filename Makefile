@@ -833,6 +833,21 @@ deep-lp-aggregate:
 deep-lp-report:
 	$(PYTHON) -m core.deep_lp_report report
 
+# sous-jalon High-Precision Primitive Estimation (dev uniquement ; aucun oracle dans les chaînes principales)
+DEEP_HP_KEYS ?= 1100-1131
+.PHONY: deep-hp-test deep-run-hp deep-hp-aggregate deep-hp-report
+deep-hp-test:
+	$(PYTHON) -m unittest tests.test_deep_hp
+
+deep-run-hp:
+	$(DEEP_BACKEND) $(AWSPY) submit --kind deephp --keys $(DEEP_HP_KEYS) --shards $(DEEP_SHARDS) --instance $(DEEP_INSTANCE) --max-runtime 36000
+
+deep-hp-aggregate:
+	$(PYTHON) -m core.deep_hp_report aggregate
+
+deep-hp-report:
+	$(PYTHON) -m core.deep_hp_report report
+
 deep-progress:
 	$(AWSPY) progress $(if $(RUN),--run $(RUN),)
 
