@@ -2,14 +2,11 @@
 
 ## Reporting a vulnerability
 
-No dedicated private security channel is operational yet. Until one is listed here:
+Please report security issues privately to **security@wcelabs.com**. Do not open a public issue for a
+vulnerability, a credential, or anything that would compromise a sealed evaluation set.
 
-- do **not** publish the details of a vulnerability, a credential or anything that would compromise a sealed
-  evaluation set in a public issue;
-- open a minimal public issue on this repository asking for a private channel, without technical details. A
-  maintainer will reply with a way to send the report privately.
-
-This section will be replaced by a confirmed private contact as soon as one is operational.
+Include what you found, how to reproduce it, and the affected commit. We will acknowledge the report and keep you
+informed of the fix.
 
 ## Scope
 
