@@ -11,12 +11,12 @@ dossier('/research/methodology',
  ('Méthode & protocoles','Relier chaque affirmation à une expérience et à un critère annoncé.','Méthode',[
  ('Avant de mesurer','Fixer la question, les baselines, les graines et les critères de succès avant exécution. Le préenregistrement des certificats génératifs distingue huit hypothèses et leurs seuils : ce protocole ne doit pas être réécrit après lecture des résultats.'),
  ('Comparer à budget visible','Mémoire, nombre de paramètres, nombre de requêtes et coût d’entraînement sont des axes distincts. Une exactitude plus élevée ne suffit pas à conclure si les budgets diffèrent ; les fichiers continuum exposent plusieurs de ces dimensions.'),
- ('Publier l’unité statistique','Le protocole des certificats utilise la graine comme unité statistique, avec au moins 16 graines et des intervalles à 95 %. Ne pas confondre ces graines avec les 96 observations du résumé de couverture prédictive.'),
+ ('Publier l’unité statistique','Le protocole des certificats utilise la graine comme unité statistique, avec au moins 16 graines et des intervalles à 95 %. Ne pas confondre ces graines avec les 96 cas agrégés du résumé de couverture prédictive.'),
  ('Conserver les verdicts','Les hypothèses soutenues, réfutées et non concluantes appartiennent au même dossier. Un verdict est attaché à son protocole, pas à une supériorité générale de WCE.')]),
  ('Methods & protocols','Connect each claim to an experiment and a declared criterion.','Method',[
  ('Before measurement','Fix the question, baselines, seeds and success criteria before execution. The generative certificates preregistration distinguishes eight hypotheses and their thresholds; the protocol must not be rewritten after inspecting results.'),
  ('Compare with visible budgets','Memory, parameter count, query count and training cost are separate axes. Higher accuracy is insufficient when budgets differ; continuum artifacts expose several of these dimensions.'),
- ('Publish the statistical unit','The certificates protocol uses seeds as the statistical unit, with at least 16 seeds and 95% intervals. These seeds are not the 96 observations in the predictive coverage summary.'),
+ ('Publish the statistical unit','The certificates protocol uses seeds as the statistical unit, with at least 16 seeds and 95% intervals. These seeds are not the 96 aggregated cases in the predictive coverage summary.'),
  ('Preserve the verdicts','Supported, refuted and inconclusive hypotheses belong in the same record. A verdict applies to its protocol, not to general superiority of WCE.')]),
  ('docs/hypotheses_generative_certificates.md','scripts/continuum_seed.py','scripts/continuum_aggregate.py'),('/research/continual','/research/limitations'))
 
@@ -24,12 +24,12 @@ dossier('/research/limitations',
  ('Limites & résultats négatifs','Ce que les artefacts actuels permettent de dire — et ce qu’ils ne permettent pas encore d’établir.','État actuel',[
  ('La portée des résultats','Les mesures sont spécifiques aux tâches et aux distributions testées. Ni la couverture prédictive ni la rétention sur un flux expérimental ne constituent une mesure d’intelligence générale.'),
  ('Les hypothèses réfutées','Dans active_summary.json, H2, H3 et H8 sont réfutées ; H1, H4 et H7 sont non concluantes. Ces identifiants appartiennent au protocole de cet artefact, indépendamment des autres documents d’hypothèses.'),
- ('La sensibilité numérique','Deux tests scientifiques produisent encore des résultats différents entre le CPU du Dell et le GEEKOM : une empreinte fondée sur des flottants et une décision de reroutage. Ces écarts ne sont pas masqués en changeant les seuils ou le hash attendu.'),
+ ('La sensibilité numérique','Deux tests scientifiques produisent encore des résultats différents entre deux plateformes CPU : une empreinte fondée sur des flottants et une décision de reroutage. Ces écarts ne sont pas masqués en changeant les seuils ou le hash attendu.'),
  ('La comparaison encore absente','Les artefacts exposés ne démontrent aucune supériorité générale sur les LLM ou les world models. Une comparaison nécessitera tâches communes, budgets transparents, baselines et protocole reproductible.')]),
  ('Limitations & negative results','What current artifacts can support, and what they cannot yet establish.','Current state',[
  ('Scope of the results','Measurements belong to the tested tasks and distributions. Predictive coverage and retention on an experimental stream are not measurements of general intelligence.'),
  ('Refuted hypotheses','In active_summary.json, H2, H3 and H8 are refuted; H1, H4 and H7 are inconclusive. Their identifiers belong to that artifact’s protocol, independently of other hypothesis documents.'),
- ('Numerical sensitivity','Two scientific tests still differ between the Dell CPU and GEEKOM: a floating-point-based fingerprint and a rerouting decision. These differences are not concealed by changing thresholds or the expected hash.'),
+ ('Numerical sensitivity','Two scientific tests still differ between two CPU platforms: a floating-point-based fingerprint and a rerouting decision. These differences are not concealed by changing thresholds or the expected hash.'),
  ('The missing comparison','Published artifacts do not establish general superiority over LLMs or world models. Such a comparison needs common tasks, visible budgets, baselines and a reproducible protocol.')]),
  ('results/active_summary.json','results/continuum_summary.json','tests/test_generative.py','tests/test_language_core.py'),('/research/discovery','/research/methodology'))
 
@@ -85,12 +85,12 @@ dossier('/vision/now',
  ('Ce qui existe aujourd’hui','Le socle vérifiable de WCE.','État actuel',[
  ('Un moteur opérationnel','Le dépôt contient un moteur symbolique Python, une simulation physique simple, un REPL et le laboratoire web. Les commandes utilisent le même moteur de session.'),
  ('Des expériences consultables','Trois artefacts JSON sont exposés : couverture prédictive, apprentissage continu et découverte active. Les résultats restent spécifiques à leurs protocoles et incluent des limites et des verdicts négatifs.'),
- ('Un environnement local','Le site est construit et exécuté par Docker Compose sur le Dell, sur un unique port réservé. Les composants de recherche existent dans le dépôt ; ils ne sont pas tous chargés par le serveur web.')]),
+ ('Des composants à distinguer','Le moteur symbolique et les expériences neuronales ont des dépendances et des protocoles distincts. Leur présence dans un même dépôt ne signifie pas qu’ils forment déjà un modèle intégré.')]),
  ('What exists now','The verifiable foundation of WCE.','Current state',[
  ('An operational engine','The repository contains a Python symbolic engine, a simple physics simulation, a REPL and the web laboratory. Commands use the same session engine.'),
  ('Inspectable experiments','Three JSON artifacts are exposed: predictive coverage, continual learning and active discovery. Results remain specific to their protocols and include limitations and negative verdicts.'),
- ('A local environment','Docker Compose builds and runs the site on the Dell using one reserved port. Research components exist in the repository; not all are loaded by the web server.')]),
- ('app/session.py','app/repl.py','compose.yaml'),('/architecture','/research'))
+ ('Distinct components','The symbolic engine and neural experiments have distinct dependencies and protocols. Their presence in one repository does not mean they already form an integrated model.')]),
+ ('app/session.py','app/repl.py'),('/architecture','/research'))
 
 dossier('/vision/exploration',
  ('Ce qui est exploré','Définir des questions avant d’annoncer des capacités.','Exploration',[
@@ -106,28 +106,28 @@ dossier('/vision/exploration',
 dossier('/vision/frontier-hub',
  ('Un futur hub d’architectures','Publier les mécanismes, les expériences et les moyens de les prolonger.','Ambition',[
  ('Les ressources du futur hub','Architectures, modèles, datasets et expériences devront disposer de fiches, versions, licences et artefacts. Ces catalogues ne sont pas encore des services collaboratifs disponibles sur ce site.'),
- ('Les comptes et les organisations','Profils, organisations, rôles et permissions nécessitent une authentification maintenue, des sessions durables et des contrôles côté serveur. Le cookie du simulateur n’est pas un compte utilisateur.'),
- ('L’entraînement reproductible','L’objectif est de permettre à chacun d’améliorer, de forker et d’entraîner ses propres modèles. Il faudra des contrats d’entraînement, des données versionnées, des workers isolés et des comparaisons reproductibles.'),
+ ('Une communauté de recherche','L’ambition est de faciliter la discussion des mécanismes, la comparaison des expériences et la transmission de résultats reproductibles. Les fonctionnalités collaboratives restent un objectif.'),
+ ('L’entraînement reproductible','L’objectif est de permettre à chacun d’améliorer, de forker et d’entraîner ses propres modèles, avec des données versionnées et des comparaisons expérimentales vérifiables.'),
  ('Le principe éditorial','Ouvrir l’architecture implique de rendre inspectables les mécanismes autant que les poids. L’ambition de plateforme ne transforme pas les résultats actuels en preuve de supériorité.')]),
  ('A future architecture hub','Publish mechanisms, experiments and the means to extend them.','Ambition',[
  ('Future hub resources','Architectures, models, datasets and experiments will need cards, versions, licences and artifacts. These catalogues are not yet collaborative services available on this site.'),
- ('Accounts and organisations','Profiles, organisations, roles and permissions require maintained authentication, durable sessions and server-side checks. The simulator cookie is not a user account.'),
- ('Reproducible training','The goal is to enable anyone to improve, fork and train their own models. It requires training contracts, versioned data, isolated workers and reproducible comparisons.'),
+ ('A research community','The ambition is to support discussion of mechanisms, comparison of experiments and sharing reproducible results. Collaborative features remain a goal.'),
+ ('Reproducible training','The goal is to enable anyone to improve, fork and train their own models with versioned data and inspectable experimental comparisons.'),
  ('The editorial principle','Opening architecture means making mechanisms as inspectable as weights. Platform ambition does not turn current results into evidence of superiority.')]),
  (),('/open/contribute','/open/reproduce'))
 
 dossier('/open/reproduce',
- ('Reproduire & exécuter','Un parcours web reproductible ; des expériences scientifiques à exécuter dans leur propre environnement.','Disponible localement',[
- ('Démarrer le site','Sur le Dell, depuis le dépôt WCE : make docker-up, puis make docker-ps. L’interface est accessible sur http://127.0.0.1:3018/. Le port est réservé dans la gouvernance ; aucun autre service n’est publié.'),
- ('Reconstruire et observer','make docker-build reconstruit les images ; make docker-logs suit les journaux ; make docker-down arrête la stack. Les sessions de simulation sont réinitialisées après redémarrage, car elles ne sont pas persistantes.'),
- ('Distinguer les environnements','L’image du site ne charge pas PyTorch. Les expériences scientifiques requièrent l’environnement de recherche du dépôt, ses dépendances et ses fixtures. Faire tourner le site n’équivaut pas à reproduire un benchmark.'),
- ('Consigner le contexte','Noter versions, plateforme, graines, budget, script et artefact de sortie. Les deux divergences numériques connues entre le Dell et le GEEKOM sont conservées dans la documentation.')]),
- ('Reproduce & run','A reproducible web pathway; scientific experiments run in their own research environment.','Available locally',[
- ('Start the site','On the Dell, from the WCE repository: make docker-up, then make docker-ps. Open http://127.0.0.1:3018/. This port is reserved in the governance registry; no other service is published.'),
- ('Rebuild and observe','make docker-build rebuilds images; make docker-logs follows logs; make docker-down stops the stack. Simulation sessions reset on restart because they are not persistent.'),
- ('Separate the environments','The website image does not load PyTorch. Scientific experiments require the repository’s research environment, dependencies and fixtures. Running the site does not reproduce a benchmark.'),
- ('Record context','Record versions, platform, seeds, budget, script and output artifact. The two known numerical differences between the Dell and GEEKOM remain documented.')]),
- ('Makefile','Dockerfile','compose.yaml','requirements-research.txt'),('/research/methodology','/lab/limits'))
+ ('Reproduire & exécuter','Relier le code scientifique, les conditions expérimentales et les résultats.','Protocole de reproduction',[
+ ('Exécuter le moteur','Le moteur symbolique et son REPL fonctionnent avec Python : python -m app.repl. Vérifier ce parcours avec python -m unittest tests.test_wce. Cette vérification ne valide pas les expériences neuronales.'),
+ ('Préparer la recherche','Les expériences utilisant PyTorch nécessitent leurs dépendances, fixtures et protocoles propres. Identifier le script, le jeu de données et le budget avant de lancer une expérience.'),
+ ('Comparer sans modifier les critères','Conserver graines, baselines, seuils et hypothèses préenregistrées. Comparer les mesures avec leurs intervalles et publier également les échecs et résultats non concluants.'),
+ ('Consigner le contexte','Documenter version du code, dépendances, plateforme, précision numérique, graines et empreinte des artefacts. Deux écarts numériques inter-plateformes restent connus ; une reproduction exacte n’est pas garantie pour tous les tests scientifiques.')]),
+ ('Reproduce & run','Connect scientific code, experimental conditions and results.','Reproduction protocol',[
+ ('Run the engine','The symbolic engine and REPL run with Python: python -m app.repl. Check this pathway with python -m unittest tests.test_wce. This check does not validate neural experiments.'),
+ ('Prepare research','PyTorch experiments require their own dependencies, fixtures and protocols. Identify the script, dataset and budget before starting an experiment.'),
+ ('Compare without changing criteria','Preserve seeds, baselines, thresholds and preregistered hypotheses. Compare measurements with their intervals and report failures and inconclusive results too.'),
+ ('Record context','Document code version, dependencies, platform, numerical precision, seeds and artifact hashes. Two cross-platform numerical discrepancies remain known; exact reproduction is not guaranteed for every scientific test.')]),
+ ('app/repl.py','tests/test_wce.py'),('/research/methodology','/research/limitations'))
 
 dossier('/open/source',
  ('Code source & artefacts','Relier le mécanisme, le protocole et le résultat.','Disponible localement',[
@@ -162,33 +162,63 @@ dossier('/lab/guide',
  ('Observe','French: “Où est la balle ?”. English: “Where is the ball?”. The answer reads the current state; a new session begins with the ball on the ground.'),
  ('Advance','French: “Avance le temps de 1 seconde”. English: “Advance time by 1 second”. Duration must be non-negative and cannot exceed 60 seconds per request.'),
  ('Stay within scope','English support in the laboratory is an adapter for these three command families. It is not a new language model or a general English grammar.')]),
- ('language/command.py','app/localization.py'),('/lab','/lab/protocol'))
+ ('language/command.py',),('/lab','/lab/protocol'))
 
 dossier('/lab/protocol',
  ('Protocole interactif','Une expérience minimale pour vérifier les transitions et l’isolation des sessions.','Opérationnel',[
- ('Étape 01 — état initial','Ouvrir le laboratoire dans une nouvelle session et demander la position de la balle. Elle doit se trouver sur le sol avant toute action.'),
- ('Étape 02 — transformation','Soulever la balle à 2 mètres, puis lire à nouveau sa position. Le résultat attendu est une hauteur de 2 mètres ; les deux commandes utilisent le même cookie de session.'),
- ('Étape 03 — simulation','Faire progresser le temps puis observer l’état. Le changement provient des lois du moteur physique. Cette manipulation montre un mécanisme explicite, pas une découverte autonome de physique.'),
- ('Étape 04 — isolation','Une autre session de navigateur doit retrouver un monde initial indépendant. Un redémarrage du service réinitialise toutes les sessions ; ce comportement est documenté et testé.')]),
+ ('Étape — état initial','Ouvrir le laboratoire dans une nouvelle session et demander la position de la balle. Elle doit se trouver sur le sol avant toute action.'),
+ ('Étape — transformation','Soulever la balle à 2 mètres, puis lire à nouveau sa position. Le résultat attendu est une hauteur de 2 mètres ; les deux commandes utilisent le même cookie de session.'),
+ ('Étape — simulation','Faire progresser le temps puis observer l’état. Le changement provient des lois du moteur physique. Cette manipulation montre un mécanisme explicite, pas une découverte autonome de physique.'),
+ ('Étape — isolation','Une autre session de navigateur doit retrouver un monde initial indépendant. Un redémarrage du service réinitialise toutes les sessions ; ce comportement est documenté et testé.')]),
  ('Interactive protocol','A minimal experiment to inspect transitions and session isolation.','Operational',[
- ('Step 01 — initial state','Open the laboratory in a new session and ask for the ball’s position. It should be on the ground before any action.'),
- ('Step 02 — transformation','Lift the ball to 2 metres, then ask for its position again. Expected result: a height of 2 metres; both commands use the same session cookie.'),
- ('Step 03 — simulation','Advance time and observe the state. The change comes from the physics engine’s laws. This demonstrates an explicit mechanism, not autonomous discovery of physics.'),
- ('Step 04 — isolation','A separate browser session should have an independent initial world. Restarting the service resets all sessions; this behaviour is documented and tested.')]),
- ('tests/test_web.py','tests/test_wce.py','app/session.py'),('/lab','/lab/limits'))
+ ('Step — initial state','Open the laboratory in a new session and ask for the ball’s position. It should be on the ground before any action.'),
+ ('Step — transformation','Lift the ball to 2 metres, then ask for its position again. Expected result: a height of 2 metres; both commands use the same session cookie.'),
+ ('Step — simulation','Advance time and observe the state. The change comes from the physics engine’s laws. This demonstrates an explicit mechanism, not autonomous discovery of physics.'),
+ ('Step — isolation','A separate browser session should have an independent initial world. Restarting the service resets all sessions; this behaviour is documented and tested.')]),
+ ('tests/test_wce.py','app/session.py'),('/lab','/lab/limits'))
 
 dossier('/lab/limits',
  ('Limites du laboratoire','Comprendre le périmètre avant d’interpréter une démonstration.','État actuel',[
  ('Un monde réduit','Le laboratoire manipule une balle et un support. Il ne représente pas un environnement réel complet ni un système entraînable de bout en bout.'),
- ('Une interface bornée','Les requêtes sont limitées à 4 096 octets, les commandes à 500 caractères et la simulation à 60 secondes par requête. Les entrées sont validées côté serveur et les origines navigateur sont contrôlées.'),
- ('Pas de compte utilisateur','Le cookie isole une session de simulation en mémoire. Il n’est pas une identité, un profil ou un espace personnel durable. Le futur hub devra fournir ces services séparément.'),
- ('Une exposition locale','La stack est accessible sur localhost du Dell. Aucun tunnel public ou port de base de données n’est publié. Cette configuration ne constitue pas un déploiement Internet multi-utilisateur.')]),
+ ('Une interface bornée','La démonstration accepte des commandes de 500 caractères au maximum et des étapes de simulation de 60 secondes au maximum. Ces limites bornent la démonstration, pas les capacités d’un modèle général.'),
+ ('Un état temporaire','Le monde de démonstration est temporaire. Il ne constitue pas un espace de recherche durable ni une archive de résultats.'),
+ ('Interpréter avec prudence','La démonstration applique des lois définies à l’avance. Elle n’établit ni une découverte autonome des lois ni une supériorité sur les architectures dominantes.')]),
  ('Laboratory limitations','Understand scope before interpreting a demonstration.','Current state',[
  ('A reduced world','The laboratory manipulates a ball and a support. It does not represent a complete real-world environment or an end-to-end trainable system.'),
- ('A bounded interface','Requests are limited to 4,096 bytes, commands to 500 characters and simulation to 60 seconds per request. Inputs are validated on the server and browser origins are checked.'),
- ('Not a user account','The cookie isolates an in-memory simulation session. It is not an identity, profile or durable workspace. A future hub must provide these services separately.'),
- ('Local exposure','The stack is accessible on the Dell’s localhost. No public tunnel or database port is published. This is not an Internet deployment for multiple users.')]),
- ('app/web.py','compose.yaml'),('/lab/guide','/vision/frontier-hub'))
+ ('A bounded interface','The demonstration accepts commands of up to 500 characters and simulation steps of up to 60 seconds. These limits bound the demo, not the capabilities of a general model.'),
+ ('Temporary state','The demonstration world is temporary. It is not a durable research workspace or a results archive.'),
+ ('Interpret with care','The demonstration applies predefined laws. It establishes neither autonomous law discovery nor superiority over dominant architectures.')]),
+ ('app/session.py','physics/engine.py'),('/lab/guide','/vision/frontier-hub'))
+
+
+# Reviewed against the implementations, not inferred from module names.
+from app.research_catalog import FAMILIES
+for family in FAMILIES:
+    fr_title, fr_intro, _, fr_sections = family['fr']
+    en_title, en_intro, _, en_sections = family['en']
+    dossier(family['route'],
+            (fr_title, fr_intro, 'Opérationnel · laboratoire' if family['status']=='web' else 'Prototype de recherche', fr_sections),
+            (en_title, en_intro, 'Operational · laboratory' if family['status']=='web' else 'Research prototype', en_sections),
+            family['sources'] + family['tests'],
+            ('/lab', '/research/methodology') if family['status']=='web' else ('/architecture', '/research/limitations'))
+
+
+
+# Reading relationships, not claims of integration between scientific modules.
+RELATED_MECHANISMS = {
+ '/architecture/primitives': ('/architecture/world-state','/architecture/planning'),
+ '/architecture/world-state': ('/architecture/primitives','/lab/protocol'),
+ '/architecture/planning': ('/architecture/primitives','/architecture/branching'),
+ '/architecture/language': ('/architecture/world-state','/architecture/planning'),
+ '/architecture/measurement': ('/architecture/evidence','/research/measurement'),
+ '/architecture/evidence': ('/architecture/measurement','/architecture/certificates'),
+ '/architecture/certificates': ('/architecture/learning','/research/continual'),
+ '/architecture/learning': ('/architecture/certificates','/research/continual'),
+ '/architecture/discovery': ('/architecture/primitives','/research/discovery'),
+ '/architecture/branching': ('/architecture/primitives','/architecture/learning'),
+}
+for route, related in RELATED_MECHANISMS.items():
+    DOSSIERS[route]['related'] = related
 
 
 def render_dossier(route, language):
@@ -197,9 +227,13 @@ def render_dossier(route, language):
     category='/' + route.split('/')[1]
     labels={'fr':('Sommaire','Points d’entrée dans le dépôt','Pour poursuivre','Retour à la rubrique'), 'en':('On this page','Repository entry points','Continue exploring','Back to the section')}[language]
     toc=''.join(f'<a href="#section-{i}">{escape(name)}</a>' for i,(name,_) in enumerate(sections,1))
-    article=''.join(f'<section id="section-{i}"><span class="eyebrow">0{i}</span><h2>{escape(name)}</h2><p>{escape(text)}</p></section>' for i,(name,text) in enumerate(sections,1))
+    article=''.join(f'<section id="section-{i}"><!-- section {i} --><h2>{escape(name)}</h2><p>{escape(text)}</p></section>' for i,(name,text) in enumerate(sections,1))
     sources=''.join(f'<li><code>{escape(source)}</code></li>' for source in record['sources'])
     resources=f'<section class="dossier-sources"><h2>{labels[1]}</h2><ul>{sources}</ul></section>' if sources else ''
     from app.site import page_title
-    related=''.join(f'<a href="{localized_path(url,language)}">{escape(page_title(url,language))} ↗</a>' for url in record['related'])
-    return f'<section class="page-head"><p class="eyebrow">WCE / {escape(status)}</p><h1>{escape(title)}</h1><p class="lead">{escape(intro)}</p><a class="text-link" href="{localized_path(category,language)}">← {labels[3]}</a></section><div class="dossier-layout"><aside class="dossier-toc"><p class="eyebrow">{labels[0]}</p>{toc}</aside><article class="dossier-body">{article}{resources}<section class="dossier-related"><h2>{labels[2]}</h2>{related}</section></article></div>'
+    from app.presentation import render_route_cards
+    from app.diagrams import render_mechanism
+    from app.understanding import mechanism_scope
+    mechanism=render_mechanism(route,language)+mechanism_scope(route,language)
+    related=render_route_cards(record['related'],language)
+    return f'<section class="page-head"><p class="eyebrow">WCE / {escape(status)}</p><h1>{escape(title)}</h1><p class="lead">{escape(intro)}</p><a class="text-link" href="{localized_path(category,language)}">← {labels[3]}</a></section>{mechanism}<div class="dossier-layout"><aside class="dossier-toc"><p class="eyebrow">{labels[0]}</p>{toc}</aside><article class="dossier-body">{article}{resources}<section class="dossier-related"><h2>{labels[2]}</h2>{related}</section></article></div>'

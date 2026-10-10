@@ -15,9 +15,9 @@ TEMPLATES = Path(__file__).with_name("templates")
 PAGES = {
     "/": ("index.html", "Open architecture research"),
     "/research": ("research.html", "Recherche"),
-    "/architecture": ("architecture.html", "Architecture"),
+    "/architecture": (None, "Architecture"),
     "/vision": ("vision.html", "Vision"),
-    "/open": ("open.html", "Open research"),
+    "/open": ("open.html", "Recherche ouverte"),
     "/lab": ("lab.html", "Laboratoire"),
     "/research/measurement": ("measurement.html", "Mesure et incertitude"),
     "/research/continual": ("continual.html", "Apprentissage continu"),
@@ -38,7 +38,7 @@ NAVIGATION = [
      ["/research", "/research/measurement", "/research/continual", "/research/discovery", "/research/methodology", "/research/limitations"]),
     ("/architecture", ("Architecture", "Architecture"),
      ("Inspecter les mécanismes du prototype.", "Inspect the mechanisms of the prototype."),
-     ["/architecture", "/architecture/primitives", "/architecture/world-state", "/architecture/learning", "/architecture/planning"]),
+     ["/architecture", "/architecture/primitives", "/architecture/world-state", "/architecture/learning", "/architecture/planning", "/architecture/language", "/architecture/measurement", "/architecture/evidence", "/architecture/certificates", "/architecture/discovery", "/architecture/branching"]),
     ("/vision", ("Vision", "Vision"),
      ("L’état actuel, l’exploration et l’ambition.", "Current state, exploration and ambition."),
      ["/vision", "/vision/now", "/vision/exploration", "/vision/frontier-hub"]),
@@ -69,8 +69,22 @@ def navigation_html(route, language):
             aria = ' aria-current="page"' if child == route else ''
             links.append(f'<a href="{localized_path(child,language)}"{aria}>{escape(label)} <span aria-hidden="true">↗</span></a>')
         sublabel=('Sous-pages : ' if language == 'fr' else 'Subpages: ') + name
-        pieces.append(f'<div class="nav-group" data-section="{slug}"><div class="nav-top"><a class="nav-heading" href="{localized_path(category,language)}"'+(' aria-current="page"' if current else '')+f'>{name}</a><button class="nav-toggle" aria-expanded="false" aria-controls="nav-{slug}" aria-label="{escape(sublabel,quote=True)}"><span aria-hidden="true">⌄</span></button></div><div class="nav-panel" id="nav-{slug}" hidden><div class="nav-intro"><p class="eyebrow">WCE / {name}</p><h2>{escape(descriptions[index])}</h2></div><div class="nav-links">'+''.join(links)+'</div></div></div>')
+        pieces.append(f'<div class="nav-group" data-section="{slug}"><div class="nav-top"><a class="nav-heading" href="{localized_path(category,language)}"'+(' aria-current="page"' if route == category else '')+(' data-current-section="true"' if current else '')+f'>{name}</a><button class="nav-toggle" aria-expanded="false" aria-controls="nav-{slug}" aria-label="{escape(sublabel,quote=True)}"><span aria-hidden="true">⌄</span></button></div><div class="nav-panel" id="nav-{slug}" hidden><div class="nav-intro"><p class="eyebrow">WCE / {name}</p><h2>{escape(descriptions[index])}</h2></div><div class="nav-links">'+''.join(links)+'</div></div></div>')
     return ''.join(pieces)
+
+def footer_directory(language):
+    sections=[
+      ('/research',('/research/measurement','/research/methodology','/research/limitations')),
+      ('/architecture',('/architecture/primitives','/architecture/learning','/architecture/measurement')),
+      ('/vision',('/vision/now','/vision/exploration','/vision/frontier-hub')),
+      ('/open',('/open/source','/open/reproduce','/open/contribute')),
+      ('/lab',('/lab/guide','/lab/protocol','/lab/limits')),
+    ]
+    groups=[]
+    for category, routes in sections:
+        links=''.join(f'<a href="{localized_path(route,language)}">{escape(page_title(route,language))}</a>' for route in routes)
+        groups.append(f'<div><a class="footer-section-title" href="{localized_path(category,language)}">{escape(page_title(category,language))}</a>{links}</div>')
+    return '<nav class="footer-directory" aria-label="'+('Explorer WCE' if language=='fr' else 'Explore WCE')+'">'+''.join(groups)+'</nav>'
 
 SOCIALS = [
     ("GitHub", "WCE_GITHUB_URL", {"github.com", "www.github.com"}, '<path d="M9 19c-4 1-4-2-6-2m12 4v-4c0-1-.3-1.8-1-2.2 3-.3 6-1.5 6-5.5 0-1.5-.5-2.7-1.5-3.7.2-.9.2-2-.2-3.1-1.5 0-3 1.1-3.5 1.5-2-.6-4-.6-6 0C8.8 3.6 7.3 2.5 5.8 2.5c-.4 1.1-.4 2.2-.2 3.1C4.6 6.6 4 7.8 4 9.3c0 4 3 5.2 6 5.5-.7.4-1 1.2-1 2.2v4"/>'),
@@ -114,12 +128,64 @@ def render_page(route: str, language='fr') -> bytes:
     if language not in ('fr', 'en'):
         raise ValueError('Unsupported language')
     filename, _ = PAGES[route]
-    content = render_dossier(route,language) if route in DOSSIERS else translate_content((TEMPLATES / 'pages' / filename).read_text(),language)
+    from app.presentation import render_architecture, render_section_directory
+    from app.research_catalog import render_atlas
+    from app.understanding import introduction, glossary, research_question
+    if route == '/architecture':
+        content = render_architecture(language)
+    else:
+        content = render_dossier(route,language) if route in DOSSIERS else translate_content((TEMPLATES / 'pages' / filename).read_text(),language)
+    if route == '/':
+        # Keep the home concise; deep mechanism dossiers live in the architecture atlas.
+        from app.understanding import research_preview
+        start=content.index('<section class="section">')
+        end=content.index('<section class="status-strip">',start)
+        content=content[:start]+research_preview(language)+content[end:]
+    if route == '/':
+        from app.diagrams import render_configuration
+        start=content.index('<div class="field"')
+        end=content.index('</section><section class="manifesto">',start)
+        content=content[:start]+render_configuration(language)+content[end:]
+    if route == '/':
+        boundary=content.index('<section class="manifesto">')
+        content=content[:boundary]+introduction(language)+content[boundary:]
+    if route == '/architecture':
+        content += glossary(language)
+    if route in ('/research/measurement','/research/continual','/research/discovery'):
+        from app.evidence import render_evidence
+        # Replace the hand-entered metric teaser; the evidence view reads the source JSON.
+        if route == '/research/measurement':
+            content=re.sub(r'<div class="metrics">.*?</div></div>', '', content)
+        boundary=content.index('</section>')+len('</section>')
+        content=content[:boundary]+research_question(route,language)+render_evidence(route,language)+content[boundary:]
+    if route in ('/open','/open/source'):
+        from app.understanding import public_release_state
+        content += public_release_state(language)
+    if route == '/open/contribute':
+        from app.understanding import contribution_brief
+        content += contribution_brief(language)
+    if route == '/open/source':
+        from app.presentation import render_inventory
+        content += render_inventory(language)
+    if route in ('/research','/vision','/open','/lab'):
+        content += render_section_directory(route,language)
     if route == '/open':
         from app.public_identity import research_context
         content += research_context(language)
-    if language == 'en' and re.search(r'href="/research/[^"]+\.md"',content):
-        content += '<p class="section source-language-note note">Source documents are currently in French. Scientific JSON artifacts are unchanged.</p>'
+    if re.search(r'href="/research/[^"]+\.md"',content):
+        source_language_note = (
+            'Le code source, la documentation et les artefacts scientifiques publics seront en anglais par défaut. Le site reste multilingue.'
+            if language == 'fr' else
+            'Public source code, research documentation and scientific artifacts will use English by default. The website remains multilingual.'
+        )
+        content += '<p class="section source-language-note note">'+source_language_note+'</p>'
+    if route != '/':
+        parent='/' + route.strip('/').split('/')[0]
+        crumbs=f'<a href="/">{("Accueil" if language == "fr" else "Home")}</a>'
+        if parent != route and parent in PAGES:
+            crumbs += f'<span aria-hidden="true">/</span><a href="{parent}">{escape(page_title(parent,language))}</a>'
+        crumbs += f'<span aria-hidden="true">/</span><span aria-current="page">{escape(page_title(route,language))}</span>'
+        content='<nav class="breadcrumbs" aria-label="'+('Fil d’Ariane' if language == 'fr' else 'Breadcrumb')+'">'+crumbs+'</nav>'+content
     # Localise page links only. Source documents, JSON and exported assets keep stable URLs.
     def page_link(match):
         target=match.group(1)
@@ -132,8 +198,8 @@ def render_page(route: str, language='fr') -> bytes:
     from app.public_identity import metadata, footer_links, DESCRIPTIONS
     ui['description']=DESCRIPTIONS[language]
     return Template((TEMPLATES / 'layout.html').read_text()).substitute(
-        **ui,public_metadata=metadata(route,language,page_title(route,language)),official_links=footer_links(language),language=language,title=escape(page_title(route,language)),navigation=navigation_html(route,language),socials=social_links(language),
+        **ui,public_metadata=metadata(route,language,page_title(route,language)),official_links=footer_links(language),footer_directory=footer_directory(language),language=language,title=escape(page_title(route,language)),navigation=navigation_html(route,language),socials=social_links(language),
         home=localized_path('/',language),open_url=localized_path('/open',language),fr_url=localized_path(route,'fr'),en_url=localized_path(route,'en'),
         fr_current=' aria-current="true"' if language == 'fr' else '',en_current=' aria-current="true"' if language == 'en' else '',
-        page_script='<script type="module" src="/app.js"></script>' if route == '/lab' else '',content=content,
+        page_script=('<script type="module" src="/app.js"></script>' if route == '/lab' else '') + ('<script type="module" src="/frontier.js"></script>' if route in ('/','/research/measurement','/research/continual','/research/discovery') else ''),content=content,
     ).encode()

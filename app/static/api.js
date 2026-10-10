@@ -13,6 +13,6 @@ export async function requestJSON(path, {method = 'GET', body, signal} = {}) {
   if (!response.ok) throw new Error(result.error || `HTTP ${response.status}`);
   return result;
 }
-export const executeCommand = command => requestJSON('/api/command', {
-  method: 'POST', body: {command}
+export const executeCommand = (command, {signal} = {}) => requestJSON('/api/command', {
+  method: 'POST', body: {command}, signal
 });

@@ -45,3 +45,9 @@ Aucune URL officielle n'a été trouvée dans les fichiers `.env*` audités sur 
 ## Contenu et préférences
 
 `app/content.py` contient les dossiers bilingues structurés ; `app/i18n.py` centralise les URL et traductions. Ces couches peuvent alimenter de futures vues sans dupliquer la navigation. Les préférences de langue et de thème restent distinctes de toute identité utilisateur. Les comptes, catalogues et entraînements communautaires restent des extensions à développer.
+
+## Catalogue de mécanismes
+
+`app/research_catalog.py` définit des fiches bilingues (route, maturité, description, sections, sources, tests). `app/presentation.py` compose les cartes et annuaires des rubriques à partir du même registre. Cette structure fournit un premier format de contenu pour un futur catalogue d’architectures, sans annoncer des comptes ou fonctions de publication déjà disponibles.
+
+`app/backend_inventory.json` est un export statique de symboles publics du backend. Régénérer avec `python3 tools/build_backend_inventory.py` depuis le dépôt cible avant un build lorsque ses sources diffèrent. L’image utilise cet export sans introspection du serveur en production.

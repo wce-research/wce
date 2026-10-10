@@ -1,0 +1,3223 @@
+[
+  {
+    "path": "core/action.py",
+    "group": "core",
+    "classes": [
+      "Action",
+      "LiftAction",
+      "PushAction",
+      "ImpulseAction"
+    ],
+    "functions": []
+  },
+  {
+    "path": "core/active_benchmark.py",
+    "group": "core",
+    "classes": [],
+    "functions": [
+      "run_job",
+      "aggregate",
+      "hypotheses",
+      "sealed_job"
+    ]
+  },
+  {
+    "path": "core/active_credit.py",
+    "group": "core",
+    "classes": [
+      "CausePrior"
+    ],
+    "functions": [
+      "m_query_score",
+      "m_model_acc",
+      "m_routing",
+      "m_unit",
+      "m_sensor_ref",
+      "m_lexicon",
+      "m_source",
+      "m_prior",
+      "m_threshold",
+      "observe_all",
+      "simulate_outcomes",
+      "observability_matrix",
+      "distinguishable",
+      "identifiability",
+      "minimal_diagnostic_set",
+      "silent_failure_analysis",
+      "cheap_signs",
+      "active_diagnosis",
+      "active_credit_benchmark"
+    ]
+  },
+  {
+    "path": "core/active_experiments.py",
+    "group": "core",
+    "classes": [],
+    "functions": [
+      "acc",
+      "metrics",
+      "run_variant",
+      "main_tasks",
+      "main_job",
+      "query_policy_job",
+      "discovered_programs",
+      "family_job",
+      "candidate_rules",
+      "anchor_job",
+      "stability_job",
+      "residual_job",
+      "capacity_job",
+      "identifiability_job",
+      "cross_domain_job",
+      "noise_sweep_job"
+    ]
+  },
+  {
+    "path": "core/active_structure.py",
+    "group": "core",
+    "classes": [
+      "EquivalenceSignature",
+      "FunctionalEquivalenceClass",
+      "StructuralPosterior",
+      "SearchPolicy",
+      "DiscoveryResult",
+      "ActiveStructuralDiscovery",
+      "NoiseAwareTruthAnchor",
+      "OrbitFamily"
+    ],
+    "functions": [
+      "grid",
+      "components",
+      "canonical_frame",
+      "canonical_signature",
+      "program_signature",
+      "functional_clusters",
+      "query_type",
+      "identifiability",
+      "minimal_distinguishing_set",
+      "version_space",
+      "expansion_key",
+      "fit_extension",
+      "train_policy",
+      "simplify",
+      "fit_from",
+      "noise_aware_stability",
+      "sequential_truth_test",
+      "gated_residual",
+      "induce_orbit_families",
+      "induce_ast_families",
+      "reuse_family"
+    ]
+  },
+  {
+    "path": "core/active_world.py",
+    "group": "core",
+    "classes": [],
+    "functions": [
+      "make_active_instance",
+      "balanced_instances",
+      "transformed",
+      "noisy_task",
+      "sealed_spec",
+      "sealed_hash",
+      "train_deep_instance",
+      "train_tasks"
+    ]
+  },
+  {
+    "path": "core/algebra.py",
+    "group": "core",
+    "classes": [
+      "Expression",
+      "Number",
+      "Symbol",
+      "Binary",
+      "Add",
+      "Subtract",
+      "Multiply",
+      "Divide",
+      "Power",
+      "Equation",
+      "AlgebraTransformation",
+      "_BothSides",
+      "AddBothSides",
+      "SubtractBothSides",
+      "MultiplyBothSides",
+      "DivideBothSides",
+      "Simplify",
+      "Substitute",
+      "AssumeSolution",
+      "MathState"
+    ],
+    "functions": [
+      "as_expression",
+      "simplify",
+      "substitute",
+      "solve_linear_equation_macro"
+    ]
+  },
+  {
+    "path": "core/boundary_benchmark.py",
+    "group": "core",
+    "classes": [],
+    "functions": [
+      "main_tasks",
+      "run_job",
+      "aggregate",
+      "hypotheses",
+      "sealed_eval"
+    ]
+  },
+  {
+    "path": "core/boundary_experiments.py",
+    "group": "core",
+    "classes": [],
+    "functions": [
+      "task",
+      "induce_family_library",
+      "family_reuse_experiment",
+      "discovery_recall",
+      "active_identification",
+      "truth_anchor_experiment",
+      "train_expert",
+      "crystallization_experiment",
+      "residual_experiment",
+      "shared_basis_experiment",
+      "hard_budget_stream",
+      "novelty_detection",
+      "symbolic_overfitting",
+      "program_stability",
+      "confidence_calibration",
+      "primitive_ablation",
+      "search_depth_study"
+    ]
+  },
+  {
+    "path": "core/boundary_methods.py",
+    "group": "core",
+    "classes": [],
+    "functions": [
+      "knn_predict",
+      "train_mlp",
+      "mlp_logits",
+      "mlp_params",
+      "train_residual",
+      "split",
+      "stable_search",
+      "active_refine",
+      "run_shared",
+      "run_method",
+      "evaluate_task",
+      "evaluate_all"
+    ]
+  },
+  {
+    "path": "core/boundary_program.py",
+    "group": "core",
+    "classes": [
+      "BNode",
+      "ProgramEquivalence",
+      "SearchResult",
+      "BoundaryProgramSearch",
+      "ProgramPosterior",
+      "ParameterizedBoundaryMacro",
+      "BoundaryFamilyHypothesis"
+    ],
+    "functions": [
+      "render",
+      "evaluate",
+      "predict",
+      "complexity",
+      "mdl_score",
+      "canonical",
+      "structure_hash",
+      "program_hash",
+      "fit",
+      "atoms",
+      "anti_unify_programs",
+      "induce_families",
+      "explain",
+      "evidence_graph"
+    ]
+  },
+  {
+    "path": "core/boundary_world.py",
+    "group": "core",
+    "classes": [
+      "FamilyInstance"
+    ],
+    "functions": [
+      "make_instance",
+      "observed",
+      "sample_task",
+      "in_region",
+      "out_region",
+      "full_region",
+      "balanced",
+      "instances",
+      "sealed_spec",
+      "sealed_hash",
+      "inst_sig",
+      "composed_instance",
+      "double_held_out",
+      "balanced_inst"
+    ]
+  },
+  {
+    "path": "core/branching.py",
+    "group": "core",
+    "classes": [
+      "IncrementalSnapshot"
+    ],
+    "functions": [
+      "shared_branch",
+      "branch_memory",
+      "delta_summary",
+      "adopt",
+      "tensors_close"
+    ]
+  },
+  {
+    "path": "core/compositional_benchmark.py",
+    "group": "core",
+    "classes": [],
+    "functions": [
+      "sealed_streams",
+      "sealed_hash",
+      "multi_seed",
+      "sealed_eval"
+    ]
+  },
+  {
+    "path": "core/compositional_plasticity.py",
+    "group": "core",
+    "classes": [
+      "AddAdapter",
+      "ProgramStep",
+      "AdaptationProgram",
+      "PlannerConfig",
+      "PlasticityPlanner",
+      "ParameterizedAdaptationMacro",
+      "StrategyLibrary"
+    ],
+    "functions": [
+      "train_adapter",
+      "coupling",
+      "equivalent_modules",
+      "manage_capacity",
+      "anti_unify_args",
+      "anti_unify",
+      "induce_macros",
+      "regenerate"
+    ]
+  },
+  {
+    "path": "core/constraint.py",
+    "group": "core",
+    "classes": [
+      "Constraint"
+    ],
+    "functions": []
+  },
+  {
+    "path": "core/continuous_world.py",
+    "group": "core",
+    "classes": [
+      "Rule",
+      "Regime"
+    ],
+    "functions": [
+      "rule_eval",
+      "random_rule",
+      "drift_rule",
+      "apply_noise",
+      "stream",
+      "superseded"
+    ]
+  },
+  {
+    "path": "core/continuum.py",
+    "group": "core",
+    "classes": [
+      "Config",
+      "Ctx",
+      "ContinuumSystem",
+      "Monolithic"
+    ],
+    "functions": [
+      "new_expert",
+      "nparams",
+      "train",
+      "fit_halfspace",
+      "fit_ellipsoid",
+      "fit_sector",
+      "fit_box",
+      "discover_rule",
+      "train_adapter",
+      "mono_init",
+      "make",
+      "ece",
+      "run_stream",
+      "checkpoint_metrics"
+    ]
+  },
+  {
+    "path": "core/continuum_benchmark.py",
+    "group": "core",
+    "classes": [],
+    "functions": [
+      "seed_run",
+      "forward_transfer",
+      "sealed_streams",
+      "sealed_hash",
+      "sealed_eval",
+      "aggregate",
+      "hypotheses"
+    ]
+  },
+  {
+    "path": "core/continuum_experiments.py",
+    "group": "core",
+    "classes": [
+      "_StructGenerator"
+    ],
+    "functions": [
+      "capacity_both",
+      "capacity_experiment",
+      "run_stream_cfg",
+      "regeneration_experiment",
+      "adversarial_experiment",
+      "novelty_classification",
+      "latent_factors",
+      "cross_domain_certificates",
+      "fit_growth",
+      "lifetime_cost",
+      "reuse_law"
+    ]
+  },
+  {
+    "path": "core/curvature.py",
+    "group": "core",
+    "classes": [
+      "StabilityEllipsoid"
+    ],
+    "functions": [
+      "mlp",
+      "flat",
+      "unflat",
+      "margin_fn",
+      "jacobian",
+      "directional_second",
+      "predicted_margins",
+      "low_rank_curvature",
+      "ellipsoid",
+      "null_projector",
+      "safe_step",
+      "actual_flips"
+    ]
+  },
+  {
+    "path": "core/deep_bo_report.py",
+    "group": "core",
+    "classes": [],
+    "functions": [
+      "load_rows",
+      "calibration",
+      "summarize",
+      "aggregate",
+      "show",
+      "report",
+      "smoke",
+      "tune",
+      "chain_smoke"
+    ]
+  },
+  {
+    "path": "core/deep_boundary.py",
+    "group": "core",
+    "classes": [
+      "Uncertainty",
+      "CompatibleFamilies",
+      "BoundaryModel",
+      "Decision"
+    ],
+    "functions": [
+      "split_holdout",
+      "sig_holdout_ppc",
+      "sig_residual_clustering",
+      "knn_loo_error",
+      "sig_nonparametric_gap",
+      "sig_mdl_bits",
+      "sig_parameter_instability",
+      "sig_depth_improvement",
+      "sig_temporal_drift",
+      "sig_precise",
+      "repeat_noise",
+      "sig_repeat_noise_excess",
+      "decide",
+      "decision_cost",
+      "tune_thresholds",
+      "auroc",
+      "auprc",
+      "suggest_missing_primitive"
+    ]
+  },
+  {
+    "path": "core/deep_compose.py",
+    "group": "core",
+    "classes": [
+      "CellSpace",
+      "ObservationalEquivalenceClass",
+      "Level",
+      "Table",
+      "CompositionResult",
+      "PartialStructure"
+    ],
+    "functions": [
+      "tree_size",
+      "tree_atoms",
+      "tree_depth",
+      "tree_eval",
+      "tree_form",
+      "tree_render",
+      "to_program",
+      "from_program",
+      "tree_shape",
+      "bottom_up",
+      "profiled_ll",
+      "class_scores",
+      "order_by",
+      "select",
+      "rank_of",
+      "propagate",
+      "top_down",
+      "scaling"
+    ]
+  },
+  {
+    "path": "core/deep_compose_exp.py",
+    "group": "core",
+    "classes": [],
+    "functions": [
+      "task_at",
+      "compose_row",
+      "ref_row",
+      "trace_row",
+      "subunits"
+    ]
+  },
+  {
+    "path": "core/deep_dc_report.py",
+    "group": "core",
+    "classes": [],
+    "functions": [
+      "load_rows",
+      "summarize",
+      "aggregate",
+      "show",
+      "report",
+      "smoke"
+    ]
+  },
+  {
+    "path": "core/deep_down_report.py",
+    "group": "core",
+    "classes": [],
+    "functions": [
+      "load_rows",
+      "calibration",
+      "aggregate",
+      "report"
+    ]
+  },
+  {
+    "path": "core/deep_downstream.py",
+    "group": "core",
+    "classes": [
+      "TracedSearch",
+      "BestCandidateTrajectory"
+    ],
+    "functions": [
+      "score_components",
+      "fitter_comparison",
+      "trace_task"
+    ]
+  },
+  {
+    "path": "core/deep_e2e.py",
+    "group": "core",
+    "classes": [
+      "PrimitiveHypothesis",
+      "WideSpace",
+      "Finalization",
+      "EndToEnd"
+    ],
+    "functions": [
+      "load_config",
+      "hypotheses_from",
+      "floor_errors",
+      "reduce",
+      "wide_compose",
+      "with_complements",
+      "compose",
+      "hierarchical",
+      "finalize",
+      "knn_errors",
+      "decide",
+      "discover",
+      "run_chain"
+    ]
+  },
+  {
+    "path": "core/deep_e2e_exp.py",
+    "group": "core",
+    "classes": [],
+    "functions": [
+      "task_at",
+      "ooc_task",
+      "atom_recall",
+      "chain_ab",
+      "chain_c",
+      "source_literals",
+      "source_row",
+      "reduce_rows",
+      "robust_atoms",
+      "robust_row",
+      "boundary_row",
+      "subunits"
+    ]
+  },
+  {
+    "path": "core/deep_ee_report.py",
+    "group": "core",
+    "classes": [],
+    "functions": [
+      "load_rows",
+      "summarize",
+      "aggregate",
+      "show",
+      "report",
+      "tune",
+      "smoke"
+    ]
+  },
+  {
+    "path": "core/deep_equivalence.py",
+    "group": "core",
+    "classes": [
+      "StructuralIdentifiability",
+      "ObservationalEquivalenceClass",
+      "HypothesisPool",
+      "ActiveResult"
+    ],
+    "functions": [
+      "identifiability",
+      "score_class_split",
+      "score_structural_ig",
+      "score_disagreement",
+      "score_efa",
+      "active_identification"
+    ]
+  },
+  {
+    "path": "core/deep_experiments.py",
+    "group": "core",
+    "classes": [
+      "DeepConfig"
+    ],
+    "functions": [
+      "evaluate_program",
+      "truth_fate",
+      "run_new",
+      "run_baseline",
+      "profile_subunits",
+      "load_config",
+      "dev_grid",
+      "dev_tasks",
+      "dev_subunits",
+      "gen_task",
+      "run_generation",
+      "mechanics",
+      "gen_subunits",
+      "cover_task",
+      "cover_exhaustive",
+      "cover_strategy",
+      "cover_subunits",
+      "prim_proposer",
+      "prim_scene",
+      "prim_active",
+      "prim_chain",
+      "prim_subunits",
+      "neural_train_scenes",
+      "neural_subunits",
+      "down_task",
+      "down_subunits",
+      "vo_subunits",
+      "opt_subunits",
+      "obj_subunits",
+      "e2e_subunits",
+      "resid_subunits",
+      "rp_subunits",
+      "po_subunits",
+      "ft_subunits",
+      "bo_subunits",
+      "dc_subunits",
+      "ee_subunits",
+      "lp_subunits",
+      "hp_subunits",
+      "subunit_ids",
+      "run_subunit"
+    ]
+  },
+  {
+    "path": "core/deep_fit.py",
+    "group": "core",
+    "classes": [
+      "FitData",
+      "FitCounter",
+      "FitTransaction"
+    ],
+    "functions": [
+      "compile_skeleton",
+      "forward",
+      "predict_batch",
+      "loglik_batch",
+      "profiled_loglik",
+      "fit_batch",
+      "heuristic_inits",
+      "best_of",
+      "approx_evidence",
+      "separation_fit",
+      "fit_criterion",
+      "decide",
+      "validated_fit"
+    ]
+  },
+  {
+    "path": "core/deep_fragments.py",
+    "group": "core",
+    "classes": [
+      "BoundaryFragment",
+      "FragmentGraph",
+      "CompatibleFragmentAssignments",
+      "OcclusionOwnership",
+      "TypeHypothesis",
+      "Inference"
+    ],
+    "functions": [
+      "type_of",
+      "fit_fragment",
+      "make_fragment",
+      "group_points",
+      "extract_fragments",
+      "build_graph",
+      "assignments",
+      "ownership",
+      "signals_of",
+      "fuse",
+      "type_hypotheses",
+      "rank_by_group",
+      "reassign",
+      "infer_types",
+      "typed_labels",
+      "flat_types",
+      "literals"
+    ]
+  },
+  {
+    "path": "core/deep_fragments_exp.py",
+    "group": "core",
+    "classes": [],
+    "functions": [
+      "scene_at",
+      "true_sources",
+      "pair_scores",
+      "group_rows",
+      "restrict",
+      "run_variant",
+      "type_row",
+      "oracle_row",
+      "own_row",
+      "sector_row",
+      "geometry_of",
+      "active_row",
+      "chain",
+      "subunits"
+    ]
+  },
+  {
+    "path": "core/deep_ft_report.py",
+    "group": "core",
+    "classes": [],
+    "functions": [
+      "load_rows",
+      "summarize",
+      "aggregate",
+      "show",
+      "report",
+      "smoke",
+      "chain_smoke"
+    ]
+  },
+  {
+    "path": "core/deep_gen_report.py",
+    "group": "core",
+    "classes": [],
+    "functions": [
+      "reachability",
+      "enumerate_forms",
+      "coverage",
+      "fragments",
+      "cover_aggregate",
+      "load_rows",
+      "aggregate",
+      "report"
+    ]
+  },
+  {
+    "path": "core/deep_generation.py",
+    "group": "core",
+    "classes": [
+      "GeoPrimitive",
+      "Literal",
+      "Table",
+      "Hole",
+      "PartialStructure",
+      "SignatureSynthesizer",
+      "Generation"
+    ],
+    "functions": [
+      "well_typed",
+      "boundary_points",
+      "detect_primitives",
+      "discover_atoms_by_separation",
+      "literals_from",
+      "build_tables",
+      "pair_errors",
+      "make_hole",
+      "select_literals",
+      "tree_to_program",
+      "generate_candidates"
+    ]
+  },
+  {
+    "path": "core/deep_hp.py",
+    "group": "core",
+    "classes": [
+      "ResidualMorphology",
+      "PrimitiveEstimate",
+      "SetImprovement",
+      "HPRecovery"
+    ],
+    "functions": [
+      "load_config",
+      "strip",
+      "families",
+      "type_name",
+      "spacing",
+      "extract_lines",
+      "extract_circles",
+      "assemble",
+      "curve_pool",
+      "evaluate_batch",
+      "bits_of",
+      "cell_code",
+      "floor_batch",
+      "set_floor",
+      "floor_prediction",
+      "cv_floor",
+      "joint_refine",
+      "residual_morphology",
+      "sample_params",
+      "birth",
+      "prune",
+      "describe",
+      "consensus",
+      "transfer_errors",
+      "transfer_error",
+      "improve_set",
+      "hp_pool",
+      "recover"
+    ]
+  },
+  {
+    "path": "core/deep_hp_exp.py",
+    "group": "core",
+    "classes": [],
+    "functions": [
+      "task_at",
+      "rel_error",
+      "family_errors",
+      "atom_precision",
+      "chain_rows",
+      "single_rows",
+      "perturb",
+      "sens_rows",
+      "birth_rows",
+      "subunits"
+    ]
+  },
+  {
+    "path": "core/deep_hp_report.py",
+    "group": "core",
+    "classes": [],
+    "functions": [
+      "load_rows",
+      "tolerances",
+      "summarize",
+      "aggregate",
+      "show",
+      "report"
+    ]
+  },
+  {
+    "path": "core/deep_lp_report.py",
+    "group": "core",
+    "classes": [],
+    "functions": [
+      "load_rows",
+      "summarize",
+      "aggregate",
+      "show",
+      "report",
+      "tune"
+    ]
+  },
+  {
+    "path": "core/deep_lpr.py",
+    "group": "core",
+    "classes": [
+      "ConditionalUtility",
+      "LatentPrimitiveSetHypothesis",
+      "CompatiblePrimitiveSets",
+      "PrimitiveSetCompleteness",
+      "LatentRecovery"
+    ],
+    "functions": [
+      "load_config",
+      "pool",
+      "utilities",
+      "select_sets",
+      "completeness",
+      "propose_missing",
+      "compose_sets",
+      "strong_downstream",
+      "recover"
+    ]
+  },
+  {
+    "path": "core/deep_lpr_exp.py",
+    "group": "core",
+    "classes": [],
+    "functions": [
+      "task_at",
+      "ooc_task",
+      "atom_visibility",
+      "set_recovery",
+      "atom_name_eq",
+      "frozen_run",
+      "chain_rows",
+      "jitter",
+      "sens_rows",
+      "fp_rows",
+      "complete_rows",
+      "ooc_row",
+      "subunits"
+    ]
+  },
+  {
+    "path": "core/deep_neural_proposer.py",
+    "group": "core",
+    "classes": [
+      "ProposerNet",
+      "NeuralProposer"
+    ],
+    "functions": [
+      "rasterize",
+      "targets",
+      "loss_fn",
+      "train",
+      "decode",
+      "save",
+      "state_to_json",
+      "load"
+    ]
+  },
+  {
+    "path": "core/deep_obj_report.py",
+    "group": "core",
+    "classes": [],
+    "functions": [
+      "load",
+      "outcome",
+      "rates",
+      "tune",
+      "aggregate",
+      "report"
+    ]
+  },
+  {
+    "path": "core/deep_objective.py",
+    "group": "core",
+    "classes": [],
+    "functions": [
+      "candidates_for",
+      "candidate_study",
+      "e2e_run",
+      "residual_case"
+    ]
+  },
+  {
+    "path": "core/deep_optgate.py",
+    "group": "core",
+    "classes": [
+      "OptTrace",
+      "OptimizationDecision"
+    ],
+    "functions": [
+      "make_objective",
+      "hard_errors",
+      "profiled",
+      "optimize",
+      "pattern_search",
+      "signals",
+      "load_gate",
+      "need_for_optimization",
+      "conditional_fit"
+    ]
+  },
+  {
+    "path": "core/deep_ownership.py",
+    "group": "core",
+    "classes": [
+      "Owner",
+      "Occlusion",
+      "BoundaryOwnershipHypothesis",
+      "OwnershipSolution"
+    ],
+    "functions": [
+      "load_config",
+      "candidates",
+      "refit",
+      "find_occlusions",
+      "expected_visibility",
+      "visible_support",
+      "absent_fraction",
+      "chance_support",
+      "energy",
+      "solve",
+      "null_assigned",
+      "ownership_hypotheses",
+      "ownership_from_program",
+      "owned",
+      "filter_by_ownership",
+      "primitives_from"
+    ]
+  },
+  {
+    "path": "core/deep_ownership_exp.py",
+    "group": "core",
+    "classes": [],
+    "functions": [
+      "scene_at",
+      "fragmentation",
+      "compose_small",
+      "ownership_accuracy",
+      "attr_rows",
+      "oracle_row",
+      "vis_row",
+      "sector_row",
+      "chain",
+      "subunits"
+    ]
+  },
+  {
+    "path": "core/deep_partial.py",
+    "group": "core",
+    "classes": [
+      "ObservedBoundary",
+      "ParameterRegion",
+      "Component",
+      "Hypothesis",
+      "LatentBoundary",
+      "PrimitiveNode",
+      "CompositeNode",
+      "Exchange"
+    ],
+    "functions": [
+      "link_fragments",
+      "observe",
+      "circle_kasa",
+      "circle_taubin",
+      "circle_normals",
+      "circle_geometric",
+      "concentric_fit",
+      "line_tls",
+      "parallel_fit",
+      "modes",
+      "geometry",
+      "build",
+      "orient",
+      "segment_profile",
+      "visible_score",
+      "global_score",
+      "circle_sensitivity",
+      "arc_angle",
+      "circle_region",
+      "line_region",
+      "circle_components",
+      "line_components",
+      "render",
+      "complete",
+      "infer",
+      "leaf_paths",
+      "replace_at",
+      "eval_forced",
+      "visible_mask",
+      "occlusion_score",
+      "rendering_errors",
+      "joint_select",
+      "refit_visible",
+      "exchange",
+      "parameter_queries"
+    ]
+  },
+  {
+    "path": "core/deep_partial_exp.py",
+    "group": "core",
+    "classes": [
+      "MaskedScene"
+    ],
+    "functions": [
+      "masked_scene",
+      "true_visible_fraction",
+      "param_errors",
+      "recovered",
+      "functional",
+      "given_of",
+      "estimate",
+      "mask_row",
+      "active_row",
+      "po_literals",
+      "chain",
+      "subunits"
+    ]
+  },
+  {
+    "path": "core/deep_po_report.py",
+    "group": "core",
+    "classes": [],
+    "functions": [
+      "load_rows",
+      "summarize",
+      "aggregate",
+      "show",
+      "report",
+      "smoke",
+      "chain_smoke"
+    ]
+  },
+  {
+    "path": "core/deep_prim_report.py",
+    "group": "core",
+    "classes": [],
+    "functions": [
+      "install",
+      "load_rows",
+      "aggregate",
+      "report"
+    ]
+  },
+  {
+    "path": "core/deep_primitive_eval.py",
+    "group": "core",
+    "classes": [],
+    "functions": [
+      "components",
+      "component_match",
+      "identifiability_of",
+      "primitive_metrics"
+    ]
+  },
+  {
+    "path": "core/deep_primitive_world.py",
+    "group": "core",
+    "classes": [
+      "Scene"
+    ],
+    "functions": [
+      "atom",
+      "make_scene"
+    ]
+  },
+  {
+    "path": "core/deep_primitives.py",
+    "group": "core",
+    "classes": [
+      "Pairs",
+      "PrimitiveCandidate",
+      "PrimitiveClass",
+      "CompatiblePrimitives",
+      "PrimitiveProposal",
+      "GradientProposer",
+      "GeometricProposer",
+      "ContrastProposer",
+      "RefiningProposer",
+      "PrimitiveValidation",
+      "Discovery",
+      "PrimitiveFamily",
+      "BirthProposal",
+      "PrimitiveLibrary"
+    ],
+    "functions": [
+      "atom_name",
+      "basis",
+      "close_pairs",
+      "separates",
+      "contrast",
+      "contrast_fit",
+      "discover",
+      "kinship",
+      "anti_unify_primitives",
+      "merge_redundant",
+      "primitive_query_scores"
+    ]
+  },
+  {
+    "path": "core/deep_primitives2.py",
+    "group": "core",
+    "classes": [
+      "LocalRefiner",
+      "RansacProposer",
+      "HoughProposer",
+      "GridProposer",
+      "Evidence",
+      "RobustValidator",
+      "RobustDiscovery",
+      "UnionProposer",
+      "PrimitiveHypothesisGroup",
+      "CompatiblePrimitiveHypotheses"
+    ],
+    "functions": [
+      "load_config",
+      "null_floor",
+      "line_atom",
+      "disc_atom",
+      "split_pairs",
+      "isolated_points",
+      "clean_pairs",
+      "prune",
+      "split_points",
+      "boundary_elements",
+      "hough_lines",
+      "hough_circles",
+      "clean_midpoints",
+      "local_refit",
+      "boundary_segments",
+      "stability",
+      "null_max_z",
+      "joint_candidates",
+      "sector_exclusive",
+      "joint_fit",
+      "near_boundary",
+      "is_kin",
+      "discover_robust",
+      "literals_of",
+      "borderline",
+      "boundary_query_scores"
+    ]
+  },
+  {
+    "path": "core/deep_reachability.py",
+    "group": "core",
+    "classes": [
+      "Reachability"
+    ],
+    "functions": [
+      "grammar_atom_keys",
+      "leaves",
+      "representable",
+      "flatten",
+      "chain_reachable",
+      "operator_reachable",
+      "strahler",
+      "oracle_path",
+      "parent_closure",
+      "space_size",
+      "forms_of",
+      "parents_used",
+      "first_divergence",
+      "classify",
+      "basis_quality"
+    ]
+  },
+  {
+    "path": "core/deep_robust_prim.py",
+    "group": "core",
+    "classes": [],
+    "functions": [
+      "proposer",
+      "validator",
+      "scene_at",
+      "discover_logged",
+      "run_arm",
+      "arm_row",
+      "audit",
+      "validator_study",
+      "diversity",
+      "active",
+      "oracle_literals",
+      "chain",
+      "subunits"
+    ]
+  },
+  {
+    "path": "core/deep_rp_report.py",
+    "group": "core",
+    "classes": [],
+    "functions": [
+      "paired_ci",
+      "load_rows",
+      "summarize",
+      "aggregate",
+      "show",
+      "report",
+      "smoke",
+      "diagnose",
+      "tune",
+      "chain_smoke",
+      "inspect"
+    ]
+  },
+  {
+    "path": "core/deep_search.py",
+    "group": "core",
+    "classes": [
+      "SearchOutcome",
+      "DeepSearch"
+    ],
+    "functions": [
+      "estimate_noise_nn",
+      "residual_target",
+      "combine"
+    ]
+  },
+  {
+    "path": "core/deep_structure.py",
+    "group": "core",
+    "classes": [
+      "Substructure",
+      "Primitive",
+      "CompositeStructure",
+      "StructureStore",
+      "Var",
+      "StructureFamily",
+      "Fragment",
+      "FragmentLibrary",
+      "WorldHypothesis"
+    ],
+    "functions": [
+      "is_composite",
+      "n_atoms",
+      "skel_key",
+      "algebraic_form",
+      "structurally_equivalent",
+      "description_bits",
+      "subtrees",
+      "normalize",
+      "observational_support",
+      "composite_paths",
+      "anti_unify",
+      "generalization_quality",
+      "description_bits_term",
+      "family_of"
+    ]
+  },
+  {
+    "path": "core/deep_validated.py",
+    "group": "core",
+    "classes": [
+      "_Whole"
+    ],
+    "functions": [
+      "arm_run",
+      "optimize_traced",
+      "local_geometry",
+      "optimizer_diagnosis"
+    ]
+  },
+  {
+    "path": "core/deep_vo_report.py",
+    "group": "core",
+    "classes": [],
+    "functions": [
+      "paired",
+      "load",
+      "arms_block",
+      "opt_block",
+      "aggregate",
+      "report"
+    ]
+  },
+  {
+    "path": "core/deep_world.py",
+    "group": "core",
+    "classes": [
+      "DeepWorld",
+      "NoiseSpec",
+      "DeepTask"
+    ],
+    "functions": [
+      "full_region",
+      "obs_region",
+      "out_region",
+      "atom",
+      "random_tree",
+      "n_atoms",
+      "min_effect",
+      "signature",
+      "is_reserved",
+      "sub_signatures",
+      "make_structure",
+      "corrupt",
+      "make_world",
+      "make_task",
+      "sealed_spec",
+      "sealed_task",
+      "sealed_hash"
+    ]
+  },
+  {
+    "path": "core/deformation.py",
+    "group": "core",
+    "classes": [
+      "Deformation",
+      "StretchDeformation",
+      "IdentityDeformation",
+      "CompositeDeformation"
+    ],
+    "functions": [
+      "compose_deformations",
+      "circle_to_ellipse",
+      "square_to_rectangle"
+    ]
+  },
+  {
+    "path": "core/discourse.py",
+    "group": "core",
+    "classes": [
+      "Mention",
+      "Referent",
+      "Revision",
+      "HypotheticalEntity",
+      "DiscourseState",
+      "EntityIdentityGraph",
+      "DiscourseResolver"
+    ],
+    "functions": []
+  },
+  {
+    "path": "core/discourse_agent.py",
+    "group": "core",
+    "classes": [
+      "DiscourseConfig",
+      "DiscourseAgent"
+    ],
+    "functions": []
+  },
+  {
+    "path": "core/discourse_benchmark.py",
+    "group": "core",
+    "classes": [],
+    "functions": [
+      "lexicon_agent",
+      "run_episode",
+      "reference_metrics",
+      "run_benchmark",
+      "by_key",
+      "long_discourse",
+      "distill_resolver",
+      "observation_pool",
+      "active_vs_passive",
+      "active_entity_learning"
+    ]
+  },
+  {
+    "path": "core/discovery.py",
+    "group": "core",
+    "classes": [
+      "Hypothesis",
+      "LawWorld",
+      "PushOperator"
+    ],
+    "functions": [
+      "rot",
+      "fit_primitive",
+      "apply_chain",
+      "discover_transformation",
+      "memorization_baseline",
+      "transformation_discovery_experiment",
+      "discover_invariants",
+      "hypothesis_space",
+      "expected_entropy",
+      "identify_law",
+      "law_correct",
+      "form_skill",
+      "law_discovery_experiment"
+    ]
+  },
+  {
+    "path": "core/entitlement.py",
+    "group": "core",
+    "classes": [
+      "EpistemicProvenance",
+      "EntitlementPolicy",
+      "ClaimEntitlement"
+    ],
+    "functions": [
+      "evidence_level",
+      "provenance"
+    ]
+  },
+  {
+    "path": "core/epistemic_benchmark.py",
+    "group": "core",
+    "classes": [],
+    "functions": [
+      "lexical_examples",
+      "train_lexical_posterior",
+      "make_system",
+      "prepare",
+      "lexical_p",
+      "evaluate",
+      "score",
+      "knowability_alignment",
+      "audit",
+      "attribute",
+      "error_attribution",
+      "conversion",
+      "pareto",
+      "lexical_coverage",
+      "run_seed",
+      "multi_seed",
+      "curves"
+    ]
+  },
+  {
+    "path": "core/executor.py",
+    "group": "core",
+    "classes": [],
+    "functions": [
+      "execute_action"
+    ]
+  },
+  {
+    "path": "core/generalized_credit.py",
+    "group": "core",
+    "classes": [
+      "Pipeline",
+      "CompositeSystem"
+    ],
+    "functions": [
+      "make_pipeline",
+      "queries",
+      "answer",
+      "pipeline_score",
+      "score",
+      "base_model",
+      "make_system",
+      "inject",
+      "generalized_credit",
+      "gradient_only_cause",
+      "credit_benchmark"
+    ]
+  },
+  {
+    "path": "core/generative_certificate.py",
+    "group": "core",
+    "classes": [
+      "CertificateGenerator",
+      "ContinuousGenerator",
+      "SymbolicGenerator",
+      "TinySurrogate",
+      "GenerativeInvariantCertificate",
+      "StoredProbeCertificate"
+    ],
+    "functions": [
+      "clean_inputs",
+      "damaged",
+      "coverage_experiment"
+    ]
+  },
+  {
+    "path": "core/grounded.py",
+    "group": "core",
+    "classes": [
+      "GroundedLexicon",
+      "ParseHypothesis",
+      "JointGrammarInducer",
+      "RoleStudent",
+      "LexicalHypothesis",
+      "LexicalMemory",
+      "LearningNeed",
+      "GroundedConfig",
+      "GroundedAgent"
+    ],
+    "functions": []
+  },
+  {
+    "path": "core/grounded_benchmark.py",
+    "group": "core",
+    "classes": [],
+    "functions": [
+      "seed_data",
+      "evaluate_agent",
+      "parse_coverage_resolvable",
+      "parse_coverage",
+      "lexical_coverage",
+      "metrics",
+      "run_seed",
+      "summarize_values",
+      "paired",
+      "bootstrap_item_difference",
+      "multi_seed",
+      "abstention_breakdown",
+      "by_group",
+      "correction_report",
+      "learning_needs",
+      "lexical_lifecycle",
+      "coverage_growth",
+      "budget_curve",
+      "structural_distillation",
+      "long_sentence_report",
+      "domain_report",
+      "domain_transfer",
+      "lexical_scale",
+      "geometry_holdout"
+    ]
+  },
+  {
+    "path": "core/guided_search.py",
+    "group": "core",
+    "classes": [
+      "PrimitiveProposer"
+    ],
+    "functions": [
+      "distill_router",
+      "distillation_experiment",
+      "random_program",
+      "teacher_dataset",
+      "train_proposer",
+      "unguided_search",
+      "guided_search",
+      "guided_search_experiment",
+      "language_guided_program"
+    ]
+  },
+  {
+    "path": "core/independent_agent.py",
+    "group": "core",
+    "classes": [
+      "LexiconInducer",
+      "NP",
+      "GrammarInducer",
+      "NeuralLexicon",
+      "Evidence",
+      "BeliefEntry",
+      "SourceReliability",
+      "EvidenceGraph",
+      "BeliefState",
+      "Answer",
+      "AgentConfig",
+      "IndependentAgent",
+      "NeuralOnlyAgent"
+    ],
+    "functions": [
+      "tokenize",
+      "is_number",
+      "to_float",
+      "structure_symbols",
+      "token_class",
+      "put_spec",
+      "affordance"
+    ]
+  },
+  {
+    "path": "core/independent_benchmark.py",
+    "group": "core",
+    "classes": [
+      "Setup",
+      "BPE",
+      "BagModel"
+    ],
+    "functions": [
+      "prepare",
+      "make_agent",
+      "oov_words",
+      "word_cases",
+      "calibrate_geometry",
+      "taxonomy",
+      "run_split",
+      "summarize",
+      "ablations",
+      "correction_benchmark",
+      "verification_costs",
+      "auprc",
+      "ece",
+      "geometry_word_test",
+      "query_level_features",
+      "conditional_geometry",
+      "grammar_accuracy",
+      "grammar_learning_curve",
+      "preposition_table",
+      "induced_classes",
+      "synthetic_lexicon",
+      "representation_comparison",
+      "lexicon_growth",
+      "distillation_report",
+      "scaling",
+      "source_report"
+    ]
+  },
+  {
+    "path": "core/independent_world.py",
+    "group": "core",
+    "classes": [
+      "Obj",
+      "Event",
+      "WorldTruth",
+      "Source",
+      "Observation",
+      "IndependentWorldVerifier",
+      "LanguageGenerator",
+      "Item"
+    ],
+    "functions": [
+      "generate_world",
+      "domain_size",
+      "emit_observations",
+      "ideal_value",
+      "knowable",
+      "captions",
+      "ref_status",
+      "benchmark_items",
+      "command_items",
+      "build_dataset",
+      "split_of"
+    ]
+  },
+  {
+    "path": "core/independent_world_ext.py",
+    "group": "core",
+    "classes": [
+      "ExtWorld",
+      "ExtLanguageGenerator"
+    ],
+    "functions": [
+      "generate_world_ext",
+      "emit_observations_ext",
+      "captions_ext",
+      "extended_items",
+      "build_dataset_ext",
+      "split_worlds"
+    ]
+  },
+  {
+    "path": "core/invariant_algebra.py",
+    "group": "core",
+    "classes": [
+      "CheckedInvariant",
+      "InvariantSet",
+      "InvariantSignature",
+      "DomainTransformation",
+      "DualityIndex",
+      "Stabilizer",
+      "TransformationOrbit",
+      "EquivalenceClass"
+    ],
+    "functions": [
+      "canonical_form",
+      "compression",
+      "eval_expr",
+      "solution_set",
+      "canonical_equation",
+      "algebra_transformations",
+      "linear_equation",
+      "algebra_samples",
+      "algebra_key",
+      "sentence_parts",
+      "language_transformations",
+      "canonical_sentence",
+      "sequence_transformations",
+      "geometry_transformations",
+      "geometry_samples",
+      "canonical_geometry",
+      "run_program",
+      "type_valid",
+      "data_dependencies",
+      "rename_variable",
+      "rename_capture",
+      "constant_fold",
+      "reorder_independent",
+      "reorder_any",
+      "extract_expression",
+      "code_transformations",
+      "canonical_program",
+      "build_index"
+    ]
+  },
+  {
+    "path": "core/invariants.py",
+    "group": "core",
+    "classes": [
+      "Invariant",
+      "InvariantSet"
+    ],
+    "functions": []
+  },
+  {
+    "path": "core/knowledge_boundary.py",
+    "group": "core",
+    "classes": [
+      "Desc",
+      "PublicText",
+      "PublicStructured",
+      "EliminateCandidates",
+      "IdealAgent",
+      "KnowledgeBoundary",
+      "Relabeler"
+    ],
+    "functions": [
+      "public_view",
+      "eliminate",
+      "boundary",
+      "relabel_dataset",
+      "true_reliabilities"
+    ]
+  },
+  {
+    "path": "core/language_bridge.py",
+    "group": "core",
+    "classes": [
+      "Parsed",
+      "Interpretation",
+      "LanguageBridge"
+    ],
+    "functions": [
+      "fall_spec",
+      "rise_spec",
+      "make_world",
+      "apply_spec",
+      "parse",
+      "default_corpus",
+      "observed_transition"
+    ]
+  },
+  {
+    "path": "core/language_core.py",
+    "group": "core",
+    "classes": [
+      "CharCore",
+      "TrainCore",
+      "FastAdaptCore",
+      "RollbackCore",
+      "CorruptCore",
+      "WordCore",
+      "SuffixRule",
+      "MorphologyLearner",
+      "LexicalEvidence",
+      "LexicalConceptMemory",
+      "Clause",
+      "Parsed",
+      "Check",
+      "Interpretation",
+      "ExternalVerifier",
+      "FakeExternalVerifier",
+      "StructuralVerifier",
+      "HallucinationRiskState",
+      "AntiHallucinationPolicy",
+      "Response",
+      "LanguageCore"
+    ],
+    "functions": [
+      "char_ids",
+      "encode_words",
+      "tokenize_fr",
+      "forms_of",
+      "is_number",
+      "is_sequence",
+      "make_scene",
+      "support_of",
+      "place_spec",
+      "lift_spec",
+      "physical_candidate_generator",
+      "apply_spec",
+      "describe",
+      "parse",
+      "goal_for",
+      "build_interpretation",
+      "bootstrap_experiences",
+      "observe_physics_event",
+      "observe_sequence_event",
+      "build_core",
+      "language_stream",
+      "evaluation_set",
+      "oracle",
+      "evaluate",
+      "run_stream",
+      "experiment_matrix",
+      "char_vs_word",
+      "morphology_report",
+      "parameter_scaling"
+    ]
+  },
+  {
+    "path": "core/learned_stabilizer.py",
+    "group": "core",
+    "classes": [
+      "LearnedStabilizerModel"
+    ],
+    "functions": [
+      "built_state",
+      "sample_transformation",
+      "features",
+      "label",
+      "hand_rule",
+      "simulate",
+      "scores",
+      "compare",
+      "hybrid_value",
+      "composition_test",
+      "generalization_experiment"
+    ]
+  },
+  {
+    "path": "core/learning.py",
+    "group": "core",
+    "classes": [
+      "PatternVariable",
+      "GoalPattern",
+      "ProblemPattern",
+      "StepTemplate",
+      "StrategyMatch",
+      "ParameterizedMacroTransformation",
+      "Experience"
+    ],
+    "functions": [
+      "match_structure",
+      "instantiate_structure",
+      "pattern_specificity",
+      "normalize_linear_expression",
+      "generalize_linear_experience",
+      "consolidate",
+      "lift_step"
+    ]
+  },
+  {
+    "path": "core/lexical_calibration.py",
+    "group": "core",
+    "classes": [
+      "LexicalExample",
+      "LexicalPosterior",
+      "LexicalLifecycle",
+      "CalibratedLexicon",
+      "PolysemyPosterior",
+      "SimilarityByBehavior"
+    ],
+    "functions": [
+      "morphology_probability",
+      "features",
+      "examples_from_agent",
+      "entropy",
+      "attach",
+      "behavior_matrix",
+      "class_purity",
+      "stem_lookup",
+      "compose",
+      "calibration_points",
+      "precision_at"
+    ]
+  },
+  {
+    "path": "core/lexical_experiments.py",
+    "group": "core",
+    "classes": [],
+    "functions": [
+      "polysemy_eval",
+      "active_lexical",
+      "unknown_word_candidates",
+      "unknown_word_policy_eval",
+      "morphology_eval",
+      "semantic_classes",
+      "composition_eval"
+    ]
+  },
+  {
+    "path": "core/lifelong.py",
+    "group": "core",
+    "classes": [
+      "TaskSpec",
+      "TaskData",
+      "CorruptModule",
+      "ContextEncoder",
+      "TaskRouter",
+      "NoveltyReport",
+      "NoveltyDetector",
+      "Configuration",
+      "LifelongModel",
+      "Candidate",
+      "TaskDecision",
+      "RepairReport",
+      "MetaController",
+      "NeuralModuleCount",
+      "LifelongRun"
+    ],
+    "functions": [
+      "context_prototypes",
+      "sample_inputs",
+      "make_task",
+      "default_stream",
+      "build_stream",
+      "routing_accuracy",
+      "run_lifelong"
+    ]
+  },
+  {
+    "path": "core/measurement.py",
+    "group": "core",
+    "classes": [
+      "MeasurementInvariant",
+      "FrameError",
+      "UnitError",
+      "ReferenceFrame",
+      "FramedValue",
+      "RepresentationBasis",
+      "BasisTransform",
+      "Observable",
+      "NoiseModel",
+      "MeasurementContext",
+      "MeasurementDistribution",
+      "MeasurementResolution",
+      "MeasurementOutcome",
+      "MeasurementRecord",
+      "MeasurementOperator",
+      "LatentWorldState",
+      "CompatibleStateSet",
+      "MeasurementChoice",
+      "MeasurementPlanner",
+      "MeasurementTradeoff",
+      "MeasurementOp"
+    ],
+    "functions": [
+      "change_frame",
+      "distance",
+      "fuse",
+      "expected_posterior_entropy",
+      "information_gain",
+      "decision_value",
+      "check_invariants",
+      "new_graph",
+      "trace"
+    ]
+  },
+  {
+    "path": "core/measurement_agent.py",
+    "group": "core",
+    "classes": [
+      "RegionOperator",
+      "WeighOperator",
+      "MeasurementAgent"
+    ],
+    "functions": [
+      "fit_training",
+      "fit_calibrators",
+      "evaluate",
+      "metrics",
+      "multi_seed"
+    ]
+  },
+  {
+    "path": "core/measurement_experiments.py",
+    "group": "core",
+    "classes": [],
+    "functions": [
+      "make_signal",
+      "raw_reasoning",
+      "spectral_reasoning",
+      "fourier_experiment",
+      "frame_experiment",
+      "macrostate_set",
+      "macro_left_count",
+      "macrostate_experiment",
+      "tradeoff_experiment"
+    ]
+  },
+  {
+    "path": "core/measurement_language.py",
+    "group": "core",
+    "classes": [
+      "Description",
+      "ParsedMeasurement"
+    ],
+    "functions": [
+      "parse_place",
+      "parse_description",
+      "parse",
+      "parse_question"
+    ]
+  },
+  {
+    "path": "core/measurement_value.py",
+    "group": "core",
+    "classes": [
+      "MeasurementValueLearner",
+      "CounterfactualMeasurement"
+    ],
+    "functions": [
+      "features",
+      "collect",
+      "train_value_learner",
+      "evaluate_policies",
+      "counterfactual_measurement",
+      "online_adaptation_experiment",
+      "multi_seed_policies"
+    ]
+  },
+  {
+    "path": "core/measurement_world.py",
+    "group": "core",
+    "classes": [],
+    "functions": [
+      "np_text",
+      "of_np",
+      "place_text",
+      "episode",
+      "train_episodes",
+      "eval_episodes",
+      "sealed_episodes",
+      "sealed_hash"
+    ]
+  },
+  {
+    "path": "core/model_diagnostics.py",
+    "group": "core",
+    "classes": [
+      "TableOperator"
+    ],
+    "functions": [
+      "inject",
+      "observe",
+      "setup",
+      "learn_tables",
+      "diagnose_and_repair",
+      "direct_repair",
+      "repair_benchmark"
+    ]
+  },
+  {
+    "path": "core/model_state.py",
+    "group": "core",
+    "classes": [
+      "NeuralModule",
+      "Connection",
+      "ModelRelation",
+      "ModelSnapshot",
+      "PlasticityRegion",
+      "ModelState",
+      "ModelTransformationError",
+      "ModuleExists",
+      "ModuleAbsent",
+      "ModuleIsActive",
+      "NodeExists",
+      "ConnectionExists",
+      "DimsCompatible",
+      "NoCycle",
+      "ConnectionBudget",
+      "CapacityBudget",
+      "RegionIsLocal",
+      "SnapshotExists",
+      "SnapshotHasModule",
+      "MinUnits",
+      "ModelTransformationSpec",
+      "AddModule",
+      "ActivateModule",
+      "DeactivateModule",
+      "CloneModule",
+      "MergeModule",
+      "PruneModule",
+      "GrowModule",
+      "PruneUnits",
+      "CreateConnection",
+      "RemoveConnection",
+      "StrengthenConnection",
+      "WeakenConnection",
+      "RerouteConnection",
+      "AdaptWeights",
+      "RestoreModule",
+      "BindRoute",
+      "CommitFastWeights",
+      "ClearFastWeights",
+      "RestoreSnapshot",
+      "LoadFastDelta",
+      "RestoreIncremental"
+    ],
+    "functions": []
+  },
+  {
+    "path": "core/multitask_benchmark.py",
+    "group": "core",
+    "classes": [],
+    "functions": [
+      "mono_init",
+      "mono_forward",
+      "mono_flat",
+      "mono_unflat",
+      "mono_train",
+      "mono_acc",
+      "probes_for",
+      "jac_basis",
+      "run",
+      "refs",
+      "metrics",
+      "benchmark"
+    ]
+  },
+  {
+    "path": "core/perturbation.py",
+    "group": "core",
+    "classes": [
+      "Perturbation",
+      "PerturbationResponse",
+      "DifferentiableSensitivity",
+      "StructuralEdit",
+      "StructuralSensitivity",
+      "Credit"
+    ],
+    "functions": [
+      "magnitudes",
+      "unit_direction",
+      "traced",
+      "new_graph",
+      "model_response",
+      "local_sensitivity",
+      "sensitivity_curve",
+      "belief_sensitivity",
+      "interventional_credit",
+      "gradient_credit"
+    ]
+  },
+  {
+    "path": "core/perturbation_benchmark.py",
+    "group": "core",
+    "classes": [],
+    "functions": [
+      "new_object",
+      "random_program",
+      "ood_transformation",
+      "predict_family",
+      "make_items",
+      "index",
+      "evaluate_items",
+      "sealed_items",
+      "sealed_hash",
+      "compression_experiment",
+      "multi_seed"
+    ]
+  },
+  {
+    "path": "core/perturbation_diagnostics.py",
+    "group": "core",
+    "classes": [],
+    "functions": [
+      "response",
+      "profile",
+      "healthy_reference",
+      "learn_profile_table",
+      "prior_from_profile",
+      "diagnose",
+      "guided_benchmark"
+    ]
+  },
+  {
+    "path": "core/planner.py",
+    "group": "core",
+    "classes": [
+      "SearchStrategy",
+      "UnknownPolicy",
+      "FactConclusionSpec",
+      "StateSignature",
+      "SearchNode",
+      "SearchMetrics",
+      "SearchResult",
+      "StrategyLibrary",
+      "TransformationPlanner"
+    ],
+    "functions": [
+      "algebra_candidate_generator",
+      "lift_candidate_generator"
+    ]
+  },
+  {
+    "path": "core/plasticity.py",
+    "group": "core",
+    "classes": [
+      "ContextExists",
+      "LoadContext",
+      "ConfigurationAmplitude",
+      "ModelHypothesisSet",
+      "CandidatePlan",
+      "PlasticityController",
+      "LoopReport",
+      "MemorySystem"
+    ],
+    "functions": [
+      "all_inputs",
+      "task_a_labels",
+      "task_b_labels",
+      "task_split",
+      "save_context",
+      "build_base_model",
+      "pretrain",
+      "run_learning_loop"
+    ]
+  },
+  {
+    "path": "core/plasticity_experiments.py",
+    "group": "core",
+    "classes": [],
+    "functions": [
+      "probe_synthesis_experiment",
+      "subspace_experiment",
+      "regeneration_experiment",
+      "economy_and_compression",
+      "library_ablation"
+    ]
+  },
+  {
+    "path": "core/program_induction_core.py",
+    "group": "core",
+    "classes": [
+      "Prim",
+      "Prog",
+      "InductionResult",
+      "FamilyHypothesis"
+    ],
+    "functions": [
+      "run",
+      "complexity",
+      "enumerate_programs",
+      "induce",
+      "anti_unify",
+      "instantiate",
+      "domain_algebra",
+      "domain_language",
+      "domain_code",
+      "domain_sequences",
+      "domain_inputs",
+      "random_target",
+      "cross_domain_experiment"
+    ]
+  },
+  {
+    "path": "core/quantity.py",
+    "group": "core",
+    "classes": [
+      "Quantity"
+    ],
+    "functions": [
+      "make_quantity"
+    ]
+  },
+  {
+    "path": "core/reasoning.py",
+    "group": "core",
+    "classes": [
+      "TruthValue",
+      "Condition",
+      "PropertyRef",
+      "Equals",
+      "NotEquals",
+      "GreaterThan",
+      "LessThan",
+      "GreaterThanOrEqual",
+      "LessThanOrEqual",
+      "IsNonZero",
+      "IsPositive",
+      "IsNegative",
+      "HasProperty",
+      "HasRelation",
+      "NotCondition",
+      "Fact",
+      "FactPattern",
+      "Contradiction",
+      "FactBase",
+      "AssumptionSet",
+      "ReasoningContext",
+      "Goal",
+      "Rule",
+      "ReasoningStep",
+      "PreconditionError",
+      "UnknownPrecondition",
+      "RuleEngine"
+    ],
+    "functions": [
+      "apply_world"
+    ]
+  },
+  {
+    "path": "core/reference_world.py",
+    "group": "core",
+    "classes": [
+      "REntity",
+      "Turn",
+      "Episode",
+      "ClarificationSimulator"
+    ],
+    "functions": [
+      "word",
+      "attr_form",
+      "det",
+      "np",
+      "place_phrase",
+      "pron",
+      "cap",
+      "m",
+      "scene",
+      "given_types",
+      "given_attrs",
+      "given_locs",
+      "build",
+      "long_episode",
+      "reference_benchmark",
+      "family_captions"
+    ]
+  },
+  {
+    "path": "core/robust_aggregate.py",
+    "group": "core",
+    "classes": [],
+    "functions": [
+      "load",
+      "ci",
+      "spearman",
+      "aggregate"
+    ]
+  },
+  {
+    "path": "core/robust_experiments.py",
+    "group": "core",
+    "classes": [
+      "_Oracle"
+    ],
+    "functions": [
+      "obs_of",
+      "evaluate_prog",
+      "run_method",
+      "main_task",
+      "main_tasks",
+      "main_subunits",
+      "noise_subunits",
+      "hard_subunits",
+      "repeat_subunits",
+      "rule_cases",
+      "caltrain_subunits",
+      "calibration_subunits",
+      "fit_calibrators",
+      "family_subunits",
+      "capacity_subunits",
+      "identifiability_subunits",
+      "sealed_subunits",
+      "smoke_subunits",
+      "subunit_ids",
+      "run_subunit",
+      "run_job",
+      "sealed_job"
+    ]
+  },
+  {
+    "path": "core/robust_reconstruction.py",
+    "group": "core",
+    "classes": [
+      "MeasurementModel",
+      "Observations",
+      "StructureEntry",
+      "CompatibleStructureSet",
+      "ParameterPosterior",
+      "MeasurementChoice",
+      "RobustMeasurementPlanner",
+      "ReconstructionResult",
+      "RobustStructuralReconstruction",
+      "MeasurementOutcome"
+    ],
+    "functions": [
+      "temporal_weights",
+      "correlated_weights",
+      "membership_prob",
+      "obs_loglik",
+      "outlier_posterior",
+      "fit_robust",
+      "log_evidence",
+      "structure_bits",
+      "mdl",
+      "bic",
+      "aic",
+      "estimate_noise",
+      "attribute_discrepancy",
+      "expected_functional_accuracy_gain",
+      "structural_ig",
+      "functional_ig",
+      "disagreement",
+      "uncertainty",
+      "expected_decision_loss_utility",
+      "expand",
+      "simplify_robust",
+      "platt",
+      "beta_calibration",
+      "isotonic",
+      "calibration_metrics",
+      "posterior_predictive_check",
+      "fourier_reconstruction",
+      "microstate_entropy",
+      "frame_transform",
+      "sensor_tradeoff_choice"
+    ]
+  },
+  {
+    "path": "core/robust_world.py",
+    "group": "core",
+    "classes": [
+      "Sensor",
+      "WorldInstance",
+      "NoiseSpec",
+      "Task"
+    ],
+    "functions": [
+      "random_program",
+      "unrepresentable",
+      "full_region",
+      "in_region",
+      "out_region",
+      "make_world",
+      "corrupt",
+      "make_task",
+      "hard_noise_pair",
+      "sealed_spec",
+      "sealed_tasks",
+      "sealed_hash"
+    ]
+  },
+  {
+    "path": "core/safe_plasticity.py",
+    "group": "core",
+    "classes": [
+      "OldSkillInvariants",
+      "ConsolidationReport"
+    ],
+    "functions": [
+      "task_c_labels",
+      "task_data",
+      "old_model",
+      "train_fast",
+      "load",
+      "changed_parameters",
+      "make_invariants",
+      "safe_consolidate",
+      "parameter_sensitivity",
+      "run_method",
+      "continual_benchmark"
+    ]
+  },
+  {
+    "path": "core/second_order_experiment.py",
+    "group": "core",
+    "classes": [],
+    "functions": [
+      "setup",
+      "run",
+      "summarize"
+    ]
+  },
+  {
+    "path": "core/skillnet.py",
+    "group": "core",
+    "classes": [
+      "Task",
+      "Context",
+      "SkillNet",
+      "InvariantCertificate",
+      "AdaptationTransformation",
+      "ParameterUpdate",
+      "FastWeightUpdate",
+      "RouteChange",
+      "AddConnection",
+      "RemoveConnection",
+      "AddModule",
+      "CloneModule",
+      "SplitModule",
+      "MergeModule",
+      "FreezeSubspace",
+      "AllocateSubspace",
+      "CreateMemory",
+      "DistillSkill",
+      "ReuseSkill",
+      "ComposeSkills",
+      "DefineSkill"
+    ],
+    "functions": [
+      "eval_spec",
+      "combine",
+      "task_stream",
+      "new_expert",
+      "expert_forward",
+      "n_params",
+      "skill_modules",
+      "train_params",
+      "flat",
+      "unflat",
+      "output_jacobian",
+      "null_space_projector",
+      "synthesize_probes",
+      "stability_radius_of",
+      "certify"
+    ]
+  },
+  {
+    "path": "core/source_adversarial.py",
+    "group": "core",
+    "classes": [],
+    "functions": [
+      "episode",
+      "dev_episodes",
+      "sealed_episodes",
+      "sealed_hash"
+    ]
+  },
+  {
+    "path": "core/source_adversarial_eval.py",
+    "group": "core",
+    "classes": [],
+    "functions": [
+      "fit",
+      "answer",
+      "evaluate",
+      "heldout_episodes",
+      "compare"
+    ]
+  },
+  {
+    "path": "core/source_benchmark.py",
+    "group": "core",
+    "classes": [],
+    "functions": [
+      "type_priors",
+      "build",
+      "run_seed",
+      "multi_seed",
+      "reliability_only"
+    ]
+  },
+  {
+    "path": "core/source_calibration.py",
+    "group": "core",
+    "classes": [],
+    "functions": [
+      "key_type",
+      "emissions",
+      "fit_supervised",
+      "fit_parsed_only",
+      "hierarchical_priors",
+      "install",
+      "reliability_points",
+      "source_table",
+      "belief_points",
+      "evaluate_answers",
+      "predictive_coverage"
+    ]
+  },
+  {
+    "path": "core/source_reliability.py",
+    "group": "core",
+    "classes": [
+      "SourceRecord",
+      "SourceReliabilityModel",
+      "_StatsView"
+    ],
+    "functions": [
+      "beta_quantiles",
+      "source_type",
+      "selection_rates",
+      "mnar_audit"
+    ]
+  },
+  {
+    "path": "core/stability.py",
+    "group": "core",
+    "classes": [
+      "InvariantPersistence",
+      "StableRegion",
+      "StructuralResonanceCandidate",
+      "PerturbationInteractionGraph",
+      "TransitionBoundary"
+    ],
+    "functions": [
+      "persistence",
+      "stability_radius",
+      "perturbed_model",
+      "accuracy_invariant",
+      "stability_map",
+      "interaction",
+      "detect_transitions",
+      "routing_transition_observer",
+      "fourier_sensitivity",
+      "frame_perturbation",
+      "algebra_chain_perturbation"
+    ]
+  },
+  {
+    "path": "core/symbolic.py",
+    "group": "core",
+    "classes": [
+      "SequenceTransformation",
+      "NeuralSequenceTransformation",
+      "Family",
+      "ProgramResult",
+      "SymbolTableRefinement"
+    ],
+    "functions": [
+      "encode",
+      "decode",
+      "one_hot",
+      "random_sequences",
+      "primitive",
+      "compose",
+      "components",
+      "build_families",
+      "sample_family",
+      "search_programs",
+      "ambiguity_rate",
+      "sequence_accuracy",
+      "train_expert",
+      "adapt_expert_fast",
+      "induce_refinement"
+    ]
+  },
+  {
+    "path": "core/symbolic_lifelong.py",
+    "group": "core",
+    "classes": [
+      "LearnedContextEncoder",
+      "Skill",
+      "Context",
+      "Thresholds",
+      "SymbolicLifelongSystem",
+      "Segment",
+      "StreamRun",
+      "StaticBaseline"
+    ],
+    "functions": [
+      "pair_features",
+      "default_segments",
+      "small_segments",
+      "stream",
+      "evaluate_family",
+      "run_stream",
+      "change_point_scores",
+      "cluster_purity",
+      "routing_scores",
+      "novelty_scores",
+      "summarize",
+      "run_static",
+      "run_ablations",
+      "label_ablation",
+      "sensitivity",
+      "few_shot_curve",
+      "zero_shot_composition",
+      "token_scores",
+      "pairs_to_disambiguate"
+    ]
+  },
+  {
+    "path": "core/symbolic_plasticity.py",
+    "group": "core",
+    "classes": [
+      "Prim",
+      "Domain",
+      "SymCertificate",
+      "SymbolicSkillLibrary"
+    ],
+    "functions": [
+      "symbolic_stream",
+      "run_domain",
+      "cross_domain"
+    ]
+  },
+  {
+    "path": "core/temporal_belief.py",
+    "group": "core",
+    "classes": [
+      "KeyDynamics",
+      "HazardModel",
+      "Report",
+      "Segment",
+      "TemporalBeliefState",
+      "TemporalMemory",
+      "JointDerivedState",
+      "TemporalTMS"
+    ],
+    "functions": [
+      "classify",
+      "beta_binomial_interval"
+    ]
+  },
+  {
+    "path": "core/temporal_bench.py",
+    "group": "core",
+    "classes": [],
+    "functions": [
+      "episode",
+      "train_episodes",
+      "dev_episodes",
+      "sealed_episodes",
+      "sealed_hash"
+    ]
+  },
+  {
+    "path": "core/temporal_eval.py",
+    "group": "core",
+    "classes": [],
+    "functions": [
+      "fit_training",
+      "build_memory",
+      "derived_height",
+      "answer",
+      "evaluate",
+      "metrics",
+      "compare",
+      "source_interval_coverage",
+      "long_stream",
+      "multi_bench"
+    ]
+  },
+  {
+    "path": "core/temporal_independent.py",
+    "group": "core",
+    "classes": [],
+    "functions": [
+      "learn_change_rate",
+      "temporal_loc",
+      "install_temporal",
+      "loc_belief_points"
+    ]
+  },
+  {
+    "path": "core/third_party_discourse.py",
+    "group": "core",
+    "classes": [],
+    "functions": [
+      "S",
+      "O",
+      "scenarios_main",
+      "scenarios_aveugles",
+      "scenario_genere",
+      "scenarios_generes",
+      "scenarios_trompeurs",
+      "scenarios_commandes",
+      "banc_tiers",
+      "nombre_questions"
+    ]
+  },
+  {
+    "path": "core/third_party_eval.py",
+    "group": "core",
+    "classes": [],
+    "functions": [
+      "new_state",
+      "to_third_party",
+      "run_scenario",
+      "metrics",
+      "run",
+      "by",
+      "answer_calibration",
+      "active_commands",
+      "active_observation",
+      "self_correction",
+      "calibration_bench",
+      "calibrate_on",
+      "memory_scaling",
+      "minimal_self_correction"
+    ]
+  },
+  {
+    "path": "core/third_party_hard.py",
+    "group": "core",
+    "classes": [],
+    "functions": [
+      "S",
+      "O",
+      "dev_set",
+      "dev_generated",
+      "sealed_set",
+      "sealed_hash",
+      "n_questions"
+    ]
+  },
+  {
+    "path": "core/topology.py",
+    "group": "core",
+    "classes": [
+      "TopologyState",
+      "TopologySignature",
+      "TopologyPreservation"
+    ],
+    "functions": [
+      "combine_topologies",
+      "get_topology_preservation_translation",
+      "get_topology_preservation_rotation",
+      "get_topology_preservation_uniform_scale",
+      "get_topology_preservation_shear",
+      "get_topology_preservation_general_scale"
+    ]
+  },
+  {
+    "path": "core/trajectory.py",
+    "group": "core",
+    "classes": [
+      "TrajectoryMonitor",
+      "GeometricRiskEstimator",
+      "AuditCase"
+    ],
+    "functions": [
+      "sliced_w2",
+      "auroc",
+      "audit_cases",
+      "audit_split",
+      "calibrate",
+      "hallucination_audit",
+      "monitor_factory",
+      "evaluation_words"
+    ]
+  },
+  {
+    "path": "core/transform.py",
+    "group": "core",
+    "classes": [
+      "Transform2D"
+    ],
+    "functions": []
+  },
+  {
+    "path": "core/transform_graph.py",
+    "group": "core",
+    "classes": [
+      "TransformRecord",
+      "TransformNode",
+      "TransformGraph"
+    ],
+    "functions": [
+      "create_linear_graph",
+      "create_world_transform_graph"
+    ]
+  },
+  {
+    "path": "core/transformation.py",
+    "group": "core",
+    "classes": [
+      "TransformationSource",
+      "Change",
+      "RelationChange",
+      "Transformation"
+    ],
+    "functions": [
+      "apply"
+    ]
+  },
+  {
+    "path": "core/transformations.py",
+    "group": "core",
+    "classes": [
+      "TransformationDomain",
+      "TransformationSpec",
+      "IdentityTransformation",
+      "CompositeTransformation",
+      "MacroTransformation",
+      "DeclarativeTransformationSpec",
+      "CutTransformation",
+      "MergeTransformation",
+      "ReflectionTransformation",
+      "ShearTransformation",
+      "MatrixTransformation"
+    ],
+    "functions": [
+      "create_translation_transformation",
+      "create_rotation_transformation",
+      "create_scale_transformation",
+      "create_reflection_transformation",
+      "create_shear_transformation"
+    ]
+  },
+  {
+    "path": "core/truth_anchor.py",
+    "group": "core",
+    "classes": [
+      "Anchor",
+      "ObservedTruthAnchor",
+      "BoundaryGenerativeCertificate"
+    ],
+    "functions": [
+      "collect_counterexamples"
+    ]
+  },
+  {
+    "path": "core/unified.py",
+    "group": "core",
+    "classes": [
+      "IdentityEvidence",
+      "IsotonicCalibrator",
+      "RiskPolicy",
+      "Node",
+      "TruthMaintenance",
+      "CandidateClaim",
+      "EpistemicAnswer",
+      "UnifiedCognitiveState"
+    ],
+    "functions": [
+      "identity_posterior",
+      "calibration_report",
+      "calibrate_threshold"
+    ]
+  },
+  {
+    "path": "core/unified_agent.py",
+    "group": "core",
+    "classes": [
+      "UnifiedConfig",
+      "UnifiedAgent"
+    ],
+    "functions": [
+      "identity_accuracy",
+      "belief_accuracy"
+    ]
+  },
+  {
+    "path": "core/unified_benchmark.py",
+    "group": "core",
+    "classes": [],
+    "functions": [
+      "error_class",
+      "evaluate",
+      "lexical_points",
+      "run_seed",
+      "success_conversion",
+      "multi_seed"
+    ]
+  },
+  {
+    "path": "core/unified_distill.py",
+    "group": "core",
+    "classes": [
+      "IdentityStudent"
+    ],
+    "functions": [
+      "pad",
+      "local_features",
+      "collect",
+      "evaluate",
+      "distill"
+    ]
+  },
+  {
+    "path": "core/world.py",
+    "group": "core",
+    "classes": [
+      "Entity",
+      "Relation",
+      "World"
+    ],
+    "functions": []
+  },
+  {
+    "path": "language/answer.py",
+    "group": "language",
+    "classes": [
+      "AnswerError"
+    ],
+    "functions": [
+      "answer_query",
+      "find_relation_object",
+      "format_number",
+      "capitalize"
+    ]
+  },
+  {
+    "path": "language/command.py",
+    "group": "language",
+    "classes": [
+      "CommandParseError",
+      "ActionCommand",
+      "QueryCommand",
+      "AdvanceTimeCommand"
+    ],
+    "functions": [
+      "parse_command"
+    ]
+  },
+  {
+    "path": "language/lexer.py",
+    "group": "language",
+    "classes": [],
+    "functions": [
+      "strip_accents",
+      "normalize",
+      "tokenize"
+    ]
+  },
+  {
+    "path": "language/parser.py",
+    "group": "language",
+    "classes": [
+      "ParseError"
+    ],
+    "functions": [
+      "canonical",
+      "extract_intent",
+      "compile_intent",
+      "parse_action"
+    ]
+  },
+  {
+    "path": "language/qa.py",
+    "group": "language",
+    "classes": [],
+    "functions": [
+      "ask"
+    ]
+  },
+  {
+    "path": "language/query.py",
+    "group": "language",
+    "classes": [
+      "QueryParseError",
+      "Query"
+    ],
+    "functions": [
+      "canonical",
+      "parse_query"
+    ]
+  },
+  {
+    "path": "language/runtime.py",
+    "group": "language",
+    "classes": [],
+    "functions": [
+      "execute_text"
+    ]
+  },
+  {
+    "path": "language/semantics.py",
+    "group": "language",
+    "classes": [
+      "Intent"
+    ],
+    "functions": []
+  },
+  {
+    "path": "physics/colliders.py",
+    "group": "physics",
+    "classes": [
+      "VerticalPlaneCollider",
+      "PlaneCollider",
+      "Material"
+    ],
+    "functions": [
+      "vertical_plane_to_plane_collider"
+    ]
+  },
+  {
+    "path": "physics/constraints.py",
+    "group": "physics",
+    "classes": [],
+    "functions": [
+      "non_negative_height"
+    ]
+  },
+  {
+    "path": "physics/engine.py",
+    "group": "physics",
+    "classes": [],
+    "functions": [
+      "step",
+      "simulate"
+    ]
+  },
+  {
+    "path": "physics/forces.py",
+    "group": "physics",
+    "classes": [
+      "Force",
+      "ForceProvider",
+      "GravityForce",
+      "SupportForce",
+      "ConstantForce",
+      "ExternalForce"
+    ],
+    "functions": [
+      "get_mass",
+      "collect_forces",
+      "net_force",
+      "net_force_y"
+    ]
+  },
+  {
+    "path": "physics/geometry_collision.py",
+    "group": "physics",
+    "classes": [
+      "PlaneCollision"
+    ],
+    "functions": []
+  },
+  {
+    "path": "physics/interactions.py",
+    "group": "physics",
+    "classes": [
+      "GroundCollision",
+      "WallCollision"
+    ],
+    "functions": []
+  },
+  {
+    "path": "physics/laws.py",
+    "group": "physics",
+    "classes": [
+      "Law",
+      "ForceDynamicsLaw",
+      "GravityLaw"
+    ],
+    "functions": []
+  },
+  {
+    "path": "physics/support.py",
+    "group": "physics",
+    "classes": [],
+    "functions": [
+      "is_supported",
+      "add_support",
+      "remove_support"
+    ]
+  },
+  {
+    "path": "app/repl.py",
+    "group": "app",
+    "classes": [],
+    "functions": [
+      "main"
+    ]
+  },
+  {
+    "path": "app/session.py",
+    "group": "app",
+    "classes": [
+      "Session"
+    ],
+    "functions": []
+  }
+]

@@ -8,14 +8,13 @@ FRENCH = {
     'Intelligence,': 'Une intelligence,', 'with its architecture': 'une architecture', 'wide open.': 'grande ouverte.',
     'Make the mechanisms': 'Rendre les mécanismes', 'visible.': 'visibles.',
     'OPEN ARCHITECTURE RESEARCH': 'RECHERCHE EN ARCHITECTURES OUVERTES',
-    '01 / RESEARCH INDEX': '01 / INDEX DE RECHERCHE', '03 / RESEARCH DIRECTION': '03 / DIRECTION DE RECHERCHE',
-    '04 / OPEN RESEARCH': '04 / RECHERCHE OUVERTE', '05 / INTERACTIVE LAB': '05 / LABORATOIRE INTERACTIF',
+    'RESEARCH INDEX': 'INDEX DE RECHERCHE', 'RESEARCH DIRECTION': 'DIRECTION DE RECHERCHE',
+    'OPEN RESEARCH': 'RECHERCHE OUVERTE', 'INTERACTIVE LAB': 'LABORATOIRE INTERACTIF',
     'WHAT EXISTS NOW': 'CE QUI EXISTE AUJOURD’HUI', 'WHAT IS BEING EXPLORED': 'CE QUI EST EXPLORÉ',
     'WHAT WCE AIMS TO BECOME': 'CE QUE WCE AMBITIONNE DE DEVENIR', 'RESEARCH STATUS': 'ÉTAT DE LA RECHERCHE',
-    'RESEARCH NOTE / 001': 'NOTE DE RECHERCHE / 001', 'RESEARCH NOTE / 002': 'NOTE DE RECHERCHE / 002',
-    'RESEARCH NOTE / 003': 'NOTE DE RECHERCHE / 003', 'LOCAL ENGINE': 'MOTEUR LOCAL',
+    'RESEARCH NOTE': 'NOTE DE RECHERCHE', 'LOCAL ENGINE': 'MOTEUR LOCAL',
     'WCE / SYMBOLIC SESSION': 'WCE / SESSION SYMBOLIQUE', 'OBSERVE → STRUCTURE → EXPERIMENT': 'OBSERVER → STRUCTURER → EXPÉRIMENTER',
-    'WCE / FIELD NOTES — 001': 'WCE / NOTES DE TERRAIN — 001', 'Reasoning & world state': 'Raisonnement & état du monde',
+    'WCE / FIELD NOTES': 'WCE / NOTES DE TERRAIN', 'Reasoning & world state': 'Raisonnement & état du monde',
     'Choisissez une commande, puis exécutez-la. Les commandes acceptées utilisent une grammaire française limitée.': 'Choisissez une commande, puis exécutez-la. L’interface accepte une grammaire explicite et limitée, en français ou en anglais.',
 }
 
@@ -42,6 +41,7 @@ def translate_content(content, language):
     if language == 'en':
         for before, after in {
             'placeholder="Où est la balle ?"': 'placeholder="Where is the ball?"',
+            'aria-label="Nombre de caractères"': 'aria-label="Character count"',
             'aria-label="Exécuter la commande"': 'aria-label="Run the command"',
             'aria-label="Filtrer les dossiers"': 'aria-label="Filter research notes"',
             'data-command="Soulève la balle à 2 mètres"': 'data-command="Lift the ball to 2 metres"',

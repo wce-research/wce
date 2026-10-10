@@ -14,10 +14,12 @@ Audit : shell partagé, routes FR/EN, liens sociaux et configuration .env.exampl
 
 - Domaine et organisation centralisés dans app/public_identity.py : https://wcelabs.com et https://github.com/wce-research.
 - PUBLIC_CONTACT_EMAIL : vide par défaut ; seule une adresse sous wcelabs.com valide est affichée. Fournir une vraie boîte avant activation.
-- PUBLIC_WCE_REPO_ENABLED=false : le lien https://github.com/wce-research/wce reste masqué. La vérification publique a retourné HTTP 404 le 10 octobre 2026 ; cela ne préjuge pas de l’existence d’un dépôt privé. Activer seulement après publication et contrôle d’accès anonyme.
+- PUBLIC_WCE_REPO_ENABLED=false : le lien https://github.com/wce-research/wce reste masqué par défaut. Le dépôt est désormais public avec une licence Apache-2.0, selon l’état communiqué par le propriétaire ; le code scientifique local n’a pas encore été poussé. Son existence ne vaut pas publication du code. Toute publication scientifique nécessite un audit préalable.
 - WCE_GITHUB_URL est conservé pour compatibilité Compose ; le frontend utilise l’organisation officielle centralisée. X, LinkedIn et Instagram gardent leur configuration existante.
 
 ## Assets et SEO
+
+La langue canonique future du dépôt scientifique public est l’anglais : code, commentaires et docstrings, README, documentation technique, rapports, hypothèses, artefacts et métadonnées publiques. Le site reste multilingue et pourra traduire cette source canonique. Cette règle ne signifie pas que les documents locaux existants ont déjà été traduits ou publiés.
 
 Sources : tools/build_labs_brand.py, SVG dans app/static/brand. Exports : avatars carrés PNG/SVG clair et sombre, SVG monochrome, logos horizontaux WCE Labs clair/sombre/monochrome, image sociale 1200 × 630. Favicon adaptatif SVG, ICO 16/32/48 et apple-touch-icon 180. La géométrie originale est inchangée. Régénération : python3 tools/build_labs_brand.py (Pillow et police système DejaVu Sans requis ; aucun outil ajouté à l’image de production).
 

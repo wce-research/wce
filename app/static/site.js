@@ -97,3 +97,65 @@ document.querySelectorAll('[data-filter]').forEach(button => {
     });
   });
 });
+
+// Filter the public architecture map locally. All cards remain readable without JS.
+const mechanismSearch = document.querySelector('#mechanism-search');
+if (mechanismSearch) {
+  const controls = mechanismSearch.closest('.atlas-search');
+  const cards = [...document.querySelectorAll('[data-mechanism]')];
+  const count = controls.querySelector('.search-count');
+  const empty = controls.querySelector('.search-empty');
+  const normalise = text => text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase();
+  const index = cards.map(card => ({card, text: normalise(card.textContent)}));
+  function filterMechanisms() {
+    const terms = normalise(mechanismSearch.value.trim()).split(/\s+/).filter(Boolean);
+    let visible = 0;
+    for (const {card, text} of index) {
+      card.hidden = !terms.every(term => text.includes(term));
+      if (!card.hidden) visible++;
+    }
+    count.textContent = `${visible} / ${cards.length} ${count.dataset.countLabel}`;
+    empty.hidden = visible !== 0;
+  }
+  controls.hidden = false;
+  mechanismSearch.addEventListener('input', filterMechanisms);
+  filterMechanisms();
+}
+
+// Search only the public static source inventory; never fetch repository files.
+const sourceSearch = document.querySelector('#source-search');
+if (sourceSearch) {
+  const controls = sourceSearch.closest('.inventory-search');
+  const groups = [...document.querySelectorAll('.inventory-group')];
+  const rows = [...document.querySelectorAll('[data-source-module]')];
+  const fold = value => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  const indexed = rows.map(row => ({row, text: fold(row.textContent)}));
+  const counter = controls.querySelector('.search-count');
+  const empty = controls.querySelector('.search-empty');
+  let initialStates = null;
+  function searchSources() {
+    const terms = fold(sourceSearch.value.trim()).split(/\s+/).filter(Boolean);
+    if (terms.length && !initialStates) {
+      initialStates = new Map([...document.querySelectorAll('.inventory-group, .inventory-symbols')].map(node => [node,node.open]));
+    }
+    let shown = 0;
+    indexed.forEach(({row, text}) => {
+      row.hidden = !terms.every(term => text.includes(term));
+      if (!row.hidden) shown++;
+      if (terms.length && !row.hidden) row.querySelectorAll('.inventory-symbols').forEach(node => {node.open = true;});
+    });
+    groups.forEach(group => {
+      group.hidden = ![...group.querySelectorAll('[data-source-module]')].some(row => !row.hidden);
+      if (terms.length && !group.hidden) group.open = true;
+    });
+    if (!terms.length && initialStates) {
+      initialStates.forEach((open,node) => {node.open = open;});
+      initialStates = null;
+    }
+    counter.textContent = `${shown} / ${rows.length} ${counter.dataset.countLabel}`;
+    empty.hidden = shown !== 0;
+  }
+  controls.hidden = false;
+  sourceSearch.addEventListener('input', searchSources);
+  searchSources();
+}

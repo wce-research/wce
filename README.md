@@ -5,7 +5,7 @@ WCE est un moteur Python de simulation avec une interface web locale. L'applicat
 ## Architecture
 
 - `app/web.py` : serveur HTTP et API `POST /api/command`, plus `GET /healthz`.
-- `app/templates/` : layout partagé et 24 pages, disponibles en français et en anglais ; `app/static/` : CSS et modules ES natifs. Les appels API utilisent des chemins relatifs, sans adresse machine codée en dur.
+- `app/templates/` : layout partagé et 30 pages, disponibles en français et en anglais ; `app/static/` : CSS et modules ES natifs. Les appels API utilisent des chemins relatifs, sans adresse machine codée en dur.
 - Site R&D multipage : accueil `/`, recherche `/research`, trois dossiers expérimentaux, architecture `/architecture`, vision `/vision`, ouverture `/open` et laboratoire `/lab`. Identité ivoire, graphite et cobalt ; assets locaux sans dépendance à un CDN. Les chiffres renvoient aux fichiers JSON et au protocole préenregistré servis sous `/research/` ; les limites sont explicites.
 - [Architecture détaillée](docs/architecture_wce.md) : état opérationnel, modules exploratoires et trajectoire vers un hub ouvert.
 - `app/session.py` : moteur de session déjà présent, également utilisé par le REPL.
@@ -54,7 +54,7 @@ make test PYTHON=.venv/bin/python
 
 Le serveur web n'importe pas PyTorch et son image de production ne l'installe pas. Les tests HTTP ciblés peuvent être lancés avec `python3 -m unittest tests.test_web -v`.
 
-État vérifié : les 3 777 tests ont été exécutés sur le Dell avec PyTorch 2.6.0+cu124 (2 échecs et 1 fichier de calibration manquant, depuis transféré). Les deux échecs ont été rejoués avec PyTorch 2.12.0+cpu dans le venv propre du projet et persistent ; ils sont sensibles à la plateforme. `tests.test_generative.SealedTests.test_hash` hache la représentation textuelle de nombres flottants, qui diffère légèrement entre CPU Dell et GEEKOM. `tests.test_language_core.SelfCorrectionTests.test_geometry_triggers_reroute` aboutit à `REJECT` sur le Dell et à `ACCEPT` sur le GEEKOM. Ces deux écarts ne sont pas contournés en modifiant les seuils ou l'empreinte scellée. Les 163 tests ciblés du moteur et du web passent sur le Dell ; la suite complète passe sur le GEEKOM avec PyTorch 2.12.0+cu130.
+État vérifié : les 3 777 tests ont été exécutés sur le Dell avec PyTorch 2.6.0+cu124 (2 échecs et 1 fichier de calibration manquant, depuis transféré). Les deux échecs ont été rejoués avec PyTorch 2.12.0+cpu dans le venv propre du projet et persistent ; ils sont sensibles à la plateforme. `tests.test_generative.SealedTests.test_hash` hache la représentation textuelle de nombres flottants, qui diffère légèrement entre CPU Dell et GEEKOM. `tests.test_language_core.SelfCorrectionTests.test_geometry_triggers_reroute` aboutit à `REJECT` sur le Dell et à `ACCEPT` sur le GEEKOM. Ces deux écarts ne sont pas contournés en modifiant les seuils ou l'empreinte scellée. Les 168 tests ciblés du moteur et du web passent sur le Dell ; la suite complète passe sur le GEEKOM avec PyTorch 2.12.0+cu130.
 
 Le mode développement utilise `compose.dev.yaml` et Docker Compose Watch. Aucun code source n'est monté dans le conteneur de production. Le build n'intègre ni `.env`, ni clés SSH, ni résultats expérimentaux non sélectionnés (trois artefacts de recherche sont inclus explicitement). Le conteneur est exécuté par un utilisateur non root, en lecture seule, sans capacité Linux et avec une limite de taille des journaux.
 
@@ -81,8 +81,29 @@ Les URL `/fr/` et `/en/` ouvrent les deux langues. Le sélecteur conserve la pag
 
 Le thème suit initialement le système. Le bouton jour/nuit conserve ensuite le choix dans `localStorage` (`wce.theme`). Aucun jeton d’authentification n’y est stocké.
 
-Les cinq rubriques proposent des sous-pages au survol et au clavier sur ordinateur, et des boutons de déploiement sur mobile. Échap ferme le menu. Les 15 nouveaux dossiers détaillent les primitives, l’état du monde, l’apprentissage, la planification, les protocoles, les limites et la trajectoire du hub.
+Les cinq rubriques proposent des sous-pages au survol et au clavier sur ordinateur, et des boutons de déploiement sur mobile. Échap ferme le menu. Les 21 dossiers approfondis détaillent les primitives, l’état du monde, l’apprentissage, la planification, les protocoles, les limites et la trajectoire du hub.
 
 Le footer reprend le symbole WCE et les quatre marques sociales locales de 28 px. Renseigner les URL officielles dans les variables `WCE_*_URL` de `.env` ; sans URL, les marques restent visibles avec « À venir ».
 
 Le laboratoire anglais reconnaît trois familles : `Lift the ball to 2 metres`, `Where is the ball?`, `Advance time by 1 second`. Les limites et validations serveur restent appliquées.
+
+## Carte du backend et présentation éditoriale
+
+L’atlas `/fr/architecture` et `/en/architecture` présente dix familles : transformations, monde, planification, langage hybride, mesure, preuves, certificats, apprentissage, découverte et branches. Chaque carte mène à un dossier présentant mécanismes, périmètre et fichiers sources/tests. Le statut indique si le mécanisme est accessible au laboratoire web ou appartient aux prototypes de recherche.
+
+`app/research_catalog.py` centralise cette carte bilingue ; `app/presentation.py` construit les cartes des rubriques. `/fr/open/source` présente également l’inventaire des modules et de leurs symboles publics. Il est généré sans exécuter les modules scientifiques ni publier leurs contenus :
+
+```bash
+python3 tools/build_backend_inventory.py
+python3 -m unittest tests.test_web tests.test_wce
+```
+
+Les commandes `make docker-up`, `make docker-build` et `make docker-dev` régénèrent l’inventaire avant le build. Après ajout ou modification des symboles d’un module backend, le régénérer également avant les tests. Les tests détectent les références absentes et un inventaire périmé. L’inventaire ne certifie pas la maturité ou les résultats des modules.
+
+## Études visuelles et résultats inspectables
+
+L’accueil propose trois configurations géométriques : primitives, rotation et composition. Le repère et le nombre de primitives restent fixes. Cette illustration interactive n’exécute ni inférence ni expérience scientifique. Les dix familles d’architecture disposent de schémas conceptuels distincts, également présents dans leurs dossiers.
+
+Les pages de recherche lisent les trois JSON déjà servis par le site : couverture par source, neuf métriques pour neuf méthodes continuum et dix verdicts de découverte active. Les moyennes, intervalles à 95 %, effectifs et champs bruts sont inspectables ; chaque vue donne accès au JSON et indique un préfixe SHA-256 (empreinte complète au survol). La rétention et les tableaux restent accessibles sans JavaScript ; le sélecteur des autres métriques utilise `frontier.js`. Ces vues ne calculent pas de nouveaux résultats et ne constituent pas une comparaison générale aux LLM.
+
+`app/evidence.py` construit les vues depuis les artefacts ; `app/diagrams.py` fournit les schémas ; `tests/browser/frontier.cjs` vérifie les interactions, thèmes, neuf métriques et rendus ordinateur/tablette/mobile. Playwright reste un outil de test temporaire, absent de l’image web.

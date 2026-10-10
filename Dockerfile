@@ -12,6 +12,7 @@ COPY --chown=wce:wce core/ core/
 COPY --chown=wce:wce language/ language/
 COPY --chown=wce:wce physics/ physics/
 COPY --chown=wce:wce logic/ logic/
+COPY --chown=wce:wce docs/hypotheses_active_structure.md docs/hypotheses_active_structure.md
 COPY --chown=wce:wce docs/hypotheses_generative_certificates.md docs/hypotheses_generative_certificates.md
 COPY --chown=wce:wce docs/architecture_wce.md docs/architecture_wce.md
 COPY --chown=wce:wce results/predictive_coverage.json results/continuum_summary.json results/active_summary.json results/

@@ -160,6 +160,103 @@ class WebTests(unittest.TestCase):
         self.assertEqual(self.request("POST", "/api/command", "{}", {"Content-Type": "application/json", "Origin": "http://evil.test", "Host": "127.0.0.1"})[0], 403)
         self.assertEqual(self.request("GET", "/missing")[0], 404)
 
+    def test_backend_catalog_sources_and_inventory_are_current(self):
+        from pathlib import Path
+        from app.research_catalog import FAMILIES
+        from tools.build_backend_inventory import inventory
+        root=Path(__file__).resolve().parents[1]
+        for family in FAMILIES:
+            for source in family['sources'] + family['tests']:
+                self.assertTrue((root/source).is_file(),source)
+        self.assertEqual(json.loads((root/'app/backend_inventory.json').read_text()),inventory(),
+                         'Regenerate the source inventory after changing backend modules')
+
+    def test_backend_presentations_and_cards(self):
+        from app.research_catalog import FAMILIES
+        for language in ('fr','en'):
+            status,_,body=self.request('GET',f'/{language}/architecture')
+            self.assertEqual(status,200)
+            html=body.decode()
+            self.assertEqual(html.count('class="engine-card engine-'),10)
+            self.assertIn('language/command.py',html)
+            for family in FAMILIES:
+                self.assertIn(f'href="/{language}{family["route"]}"',html)
+                _,_,page=self.request('GET',f'/{language}{family["route"]}')
+                for source in family['sources']:
+                    self.assertIn(source.encode(),page)
+            _,_,page=self.request('GET',f'/{language}/open/source')
+            self.assertIn(b'core/language_core.py',page)
+            self.assertIn(b'StructuralVerifier',page)
+            self.assertIn(b'core/planner.py',page)
+            self.assertIn(b'TransformationPlanner',page)
+            for section in ('research','vision','open','lab'):
+                _,_,page=self.request('GET',f'/{language}/{section}')
+                self.assertIn(b'class="section-card"',page)
+
+    def test_research_views_follow_the_served_artifacts(self):
+        from html.parser import HTMLParser
+        from app.evidence import METRICS
+        class Records(HTMLParser):
+            def __init__(self):
+                super().__init__(); self.rows=[]
+            def handle_starttag(self,tag,attrs):
+                values=dict(attrs)
+                if any(key in values for key in ('data-source','data-estimate','data-hypothesis')):
+                    self.rows.append(values)
+        for language in ('fr','en'):
+            _,_,raw=self.request('GET','/research/predictive_coverage.json')
+            data=json.loads(raw)
+            _,_,body=self.request('GET',f'/{language}/research/measurement')
+            parser=Records();parser.feed(body.decode())
+            self.assertEqual(len(parser.rows),len(data))
+            for row in parser.rows:
+                record=data[row['data-source']]
+                self.assertEqual(float(row['data-predictive']),record['predictive'])
+                self.assertEqual(float(row['data-credible']),record['credible'])
+                self.assertEqual(int(row['data-n']),record['n'])
+            _,_,raw=self.request('GET','/research/continuum_summary.json')
+            methods=json.loads(raw)['methods']
+            _,_,body=self.request('GET',f'/{language}/research/continual')
+            parser=Records();parser.feed(body.decode())
+            self.assertEqual(len(parser.rows),len(methods)*len(METRICS))
+            for row in parser.rows:
+                record=methods[row['data-method']][row['data-metric']]
+                self.assertEqual(float(row['data-estimate']),record['mean'])
+                self.assertEqual([float(row['data-ci-low']),float(row['data-ci-high'])],record['ci95'])
+                self.assertEqual(int(row['data-n']),record['n'])
+            _,_,raw=self.request('GET','/research/active_summary.json')
+            hypotheses=json.loads(raw)['hypotheses']
+            _,_,body=self.request('GET',f'/{language}/research/discovery')
+            parser=Records();parser.feed(body.decode())
+            self.assertEqual(len(parser.rows),len(hypotheses))
+            for row in parser.rows:
+                self.assertEqual(row['data-verdict'],hypotheses[row['data-hypothesis']]['verdict'])
+
+    def test_evidence_updates_when_artifact_values_change(self):
+        from copy import deepcopy
+        from unittest.mock import patch
+        from app.evidence import artifact,predictive
+        data,digest=artifact('predictive_coverage.json');updated=deepcopy(data)
+        updated['all']['predictive']=0.8123
+        updated['all']['n']=101
+        with patch('app.evidence.artifact',return_value=(updated,digest)):
+            html=predictive('en')
+        self.assertIn('data-predictive="0.8123"',html)
+        self.assertIn('data-n="101"',html)
+        self.assertIn(digest[:12],html)
+
+    def test_configuration_and_diagrams_have_explicit_scope(self):
+        from app.research_catalog import FAMILIES
+        self.assertEqual(self.request('GET','/frontier.js')[0],200)
+        _,_,body=self.request('GET','/en/')
+        self.assertEqual(body.count(b'data-primitive='),3)
+        self.assertEqual(body.count(b'data-configuration='),3)
+        self.assertIn(b'without inference or scientific simulation',body)
+        for family in FAMILIES:
+            _,_,body=self.request('GET','/en'+family['route'])
+            self.assertIn(b'MECHANISM SCHEMATIC',body)
+            self.assertIn(b'neither an execution trace nor a performance measurement',body)
+
 
 if __name__ == "__main__":
     unittest.main()

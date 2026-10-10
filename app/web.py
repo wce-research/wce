@@ -23,6 +23,7 @@ from language.command import AdvanceTimeCommand, parse_command
 
 ASSETS = {
     "/site.webmanifest": ("site.webmanifest", "application/manifest+json"),
+    "/frontier.js": ("frontier.js", "text/javascript; charset=utf-8"),
     "/theme.js": ("theme.js", "text/javascript; charset=utf-8"),
     "/favicon.svg": ("favicon.svg", "image/svg+xml"),
     "/favicon.ico": ("favicon.ico", "image/vnd.microsoft.icon"),
@@ -38,6 +39,7 @@ for asset in ('wce-labs-avatar-light.svg','wce-labs-avatar-dark.svg','wce-labs-a
     ASSETS['/brand/'+asset] = ('brand/'+asset,'image/svg+xml' if asset.endswith('.svg') else 'image/png')
 ROOT = STATIC.parents[1]
 RESEARCH = {
+    "/research/hypotheses_active_structure.md": (ROOT / "docs/hypotheses_active_structure.md", "text/markdown; charset=utf-8"),
     "/research/predictive_coverage.json": (ROOT / "results/predictive_coverage.json", "application/json; charset=utf-8"),
     "/research/continuum_summary.json": (ROOT / "results/continuum_summary.json", "application/json; charset=utf-8"),
     "/research/active_summary.json": (ROOT / "results/active_summary.json", "application/json; charset=utf-8"),

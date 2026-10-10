@@ -18,15 +18,18 @@ help:
 	@echo "  make docker-logs Suit les journaux"
 	@echo "  make docker-dev  Démarre avec synchronisation des changements"
 
-.PHONY: docker-up docker-down docker-build docker-logs docker-ps docker-dev
+.PHONY: docker-up docker-down docker-build docker-logs docker-ps docker-dev backend-inventory
 
-docker-up:
+backend-inventory:
+	$(PYTHON) tools/build_backend_inventory.py
+
+docker-up: backend-inventory
 	docker compose up --build -d
 
 docker-down:
 	docker compose down
 
-docker-build:
+docker-build: backend-inventory
 	docker compose build --no-cache
 
 docker-logs:
@@ -35,7 +38,7 @@ docker-logs:
 docker-ps:
 	docker compose ps
 
-docker-dev:
+docker-dev: backend-inventory
 	docker compose -f compose.yaml -f compose.dev.yaml up --build --watch
 
 test:

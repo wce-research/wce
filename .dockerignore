@@ -15,6 +15,7 @@ results/*
 tests/
 docs/*
 !docs/hypotheses_generative_certificates.md
+!docs/hypotheses_active_structure.md
 !docs/architecture_wce.md
 scripts/
 demos/
