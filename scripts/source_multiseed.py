@@ -1,4 +1,4 @@
-"""16 graines × 6 systèmes (fiabilité des sources, identité L1) -> results/source_multiseed.json"""
+"""16 seeds × 6 systems (source reliability, L1 identity) -> results/source_multiseed.json"""
 import json
 import os
 import sys

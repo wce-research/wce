@@ -1,4 +1,4 @@
-"""Démo : règle fausse + frontière bruitée → observations (répétées si utile) → P(règle fausse) → accepter / rejeter."""
+"""Demo: wrong rule + noisy boundary → observations (repeated if useful) → P(wrong rule) → accept / reject."""
 import os
 import sys
 
@@ -15,4 +15,4 @@ if __name__ == "__main__":
     inst = balanced_instances(["two_lobe"], 3, 1)[0]; g = torch.Generator().manual_seed(0); X, y = noisy_task(inst, 120, g, 0.08)
     for kind, rule, wrong, alts in candidate_rules(inst, X, y, 0.08, 0):
         r = sequential_truth_test(rule, alts, inst.label, full_region, torch.Generator().manual_seed(1), 0.08, budget=16)
-        print(f"{kind:18s} {'FAUSSE ' if wrong else 'correcte'} {render(rule)[:60]:62s} P(fausse)={r['p_wrong']:.3f} -> {r['decision']:9s} ({r['queries']} obs., {r['repeats']} répétitions)")
+        print(f"{kind:18s} {'WRONG   ' if wrong else 'correct '} {render(rule)[:60]:62s} P(wrong)={r['p_wrong']:.3f} -> {r['decision']:9s} ({r['queries']} obs., {r['repeats']} repeats)")

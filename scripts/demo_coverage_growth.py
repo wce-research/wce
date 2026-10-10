@@ -1,4 +1,4 @@
-"""Croissance de la couverture : exemples -> analyse -> lexique -> abstention -> succès -> faux confiants."""
+"""Coverage growth: examples -> parsing -> lexicon -> abstention -> success -> false confident."""
 import os
 import sys
 
@@ -15,42 +15,42 @@ def fmt(s): return f"{s['mean']:.3f} [{s['ci95'][0]:.3f}, {s['ci95'][1]:.3f}]" i
 
 def main(seeds=(0, 1, 2, 3, 4, 5, 6, 7)):
     print("=== WCE COVERAGE GROWTH ===")
-    print("\nExemples (légendes) -> couverture (graine 0) :")
-    print("  légendes  analyse  lexique  abstention  inutiles  succès  faux-sûrs  rôles")
+    print("\nExamples (captions) -> coverage (seed 0):")
+    print("  captions  parse    lexicon  abstention  unneeded  success false-conf roles")
     for n, r in coverage_growth().items():
         print(f"  {n:>8}  {r['parse_coverage']:.3f}    {r['lexical_coverage']:.3f}    {r['abstention']:.3f}       "
               f"{r['unnecessary_abstention']:.3f}     {r['success']:.3f}   {r['false_confident']:.3f}      {r['role_accuracy']:.3f}")
     res = multi_seed(seeds)
-    print(f"\nMulti-graines ({len(seeds)} graines : mondes, langue, bruit, légendes, partition, init. neuronale ; {res['seconds']} s)")
-    print("moyenne [IC95]")
+    print(f"\nMulti-seed ({len(seeds)} seeds: worlds, language, noise, captions, split, neural init.; {res['seconds']} s)")
+    print("mean [CI95]")
     for name, m in res["summary"].items():
         print(f"\n  {name}")
         for k in ("success", "false_confident", "abstention", "unnecessary_abstention", "parse_coverage", "parse_coverage_resolvable",
                   "role_accuracy", "lexical_coverage", "verification_cost", "routing_accuracy", "polysemy_accuracy"):
             print(f"    {k:<28} {fmt(m.get(k))}")
-    print("\nComparaisons appariées (différence par graine a−b, IC95 t ; puis bootstrap sur items) :")
+    print("\nPaired comparisons (per-seed difference a−b, t CI95; then bootstrap over items):")
     for label, c in res["comparisons"].items():
         print(f"\n  {label}")
         for k in ("success", "false_confident", "unnecessary_abstention", "parse_coverage", "role_accuracy", "lexical_coverage", "verification_cost"):
             v = c[k]
-            if v: print(f"    {k:<24} {v['mean']:+.4f} [{v['ci95'][0]:+.4f}, {v['ci95'][1]:+.4f}]  graines +{v['seeds_positive']} / −{v['seeds_negative']}")
-        print(f"    items succès {c['item_bootstrap_success']} ; items faux-sûrs {c['item_bootstrap_false_confident']}")
+            if v: print(f"    {k:<24} {v['mean']:+.4f} [{v['ci95'][0]:+.4f}, {v['ci95'][1]:+.4f}]  seeds +{v['seeds_positive']} / −{v['seeds_negative']}")
+        print(f"    items success {c['item_bootstrap_success']}; items false-confident {c['item_bootstrap_false_confident']}")
     raws = res["raws"]
-    print(f"\nDécomposition des abstentions (grounded_full, toutes graines) : {abstention_breakdown(raws)}")
-    print(f"Auto-correction : {correction_report(raws)}")
-    print(f"LearningNeed les plus fréquents : {learning_needs(raws)}")
-    print(f"Longueur (clauses) : {long_sentence_report(raws)}")
-    print(f"Domaines : {domain_report(raws)}")
-    print(f"Transfert inter-domaines : {domain_transfer()}")
-    print(f"\nDistillation structurelle (rôles) : {structural_distillation()}")
-    print("\nBudget de vérification (graine 0) :")
+    print(f"\nAbstention breakdown (grounded_full, all seeds): {abstention_breakdown(raws)}")
+    print(f"Self-correction: {correction_report(raws)}")
+    print(f"Most frequent LearningNeed: {learning_needs(raws)}")
+    print(f"Length (clauses): {long_sentence_report(raws)}")
+    print(f"Domains: {domain_report(raws)}")
+    print(f"Cross-domain transfer: {domain_transfer()}")
+    print(f"\nStructural distillation (roles): {structural_distillation()}")
+    print("\nVerification budget (seed 0):")
     for k, v in budget_curve().items(): print(f"  {k:<22} {v}")
     sc = lexical_scale()
-    print("\nÉchelle lexicale (acquisition trans-situationnelle, 3 candidats par exposition) :")
-    for n, v in sc["cross_situational"].items(): print(f"  {n:>5} formes : {v['by_exposures']}")
+    print("\nLexical scale (cross-situational acquisition, 3 candidates per exposure):")
+    for n, v in sc["cross_situational"].items(): print(f"  {n:>5} forms: {v['by_exposures']}")
     for n, v in sc["neural_vs_structural"].items():
-        print(f"  {n:>5} (neuronal) : paramètres {v['neural_parameters']}, formes inédites {v['neural_heldout_form_accuracy']}, mémoire structurelle {v['structural_memory_entries']}")
-    print(f"\nGéométrie (mise de côté, n'influence aucune décision) : {geometry_holdout(seeds)}")
+        print(f"  {n:>5} (neural): parameters {v['neural_parameters']}, unseen forms {v['neural_heldout_form_accuracy']}, structural memory {v['structural_memory_entries']}")
+    print(f"\nGeometry (held out, influences no decision): {geometry_holdout(seeds)}")
 
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
-"""Calibration (TRAIN + VALIDATION uniquement) des tolérances de la stabilité fonctionnelle sous bruit :
-pour chaque niveau de bruit, programmes découverts FONCTIONNELLEMENT corrects → 90e centile du désaccord entre
-moitiés et de l'erreur en excès. Écrit results/active_stability_calibration.json (table utilisée ensuite)."""
+"""Calibration (TRAIN + VALIDATION only) of the tolerances of functional stability under noise:
+for each noise level, discovered programs that are FUNCTIONALLY correct → 90th percentile of the disagreement between
+halves and of the excess error. Writes results/active_stability_calibration.json (table used afterwards)."""
 import json
 import os
 import sys

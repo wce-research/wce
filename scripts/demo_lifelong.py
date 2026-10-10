@@ -1,4 +1,4 @@
-"""Modèle lifelong : routage autonome, séquence de tâches, oubli, transfert, réparation."""
+"""Lifelong model: autonomous routing, task sequence, forgetting, transfer, repair."""
 import copy
 import os
 import sys

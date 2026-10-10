@@ -1,4 +1,4 @@
-"""Démo : corruption d'un module → échec du certificat → régénération SANS instantané (certificats génératifs)."""
+"""Demo: corruption of a module → certificate failure → regeneration WITHOUT snapshot (generative certificates)."""
 import os
 import sys
 
@@ -8,5 +8,5 @@ from core.continuum_experiments import regeneration_experiment  # noqa: E402
 if __name__ == "__main__":
     r = regeneration_experiment(1, n=16)
     for m in r["per_module"]:
-        print(f"  {m['module']:16s} avant {m['before']:.3f} | corrompu {m['corrupted']:.3f} (certificat en échec : {m['detected']}) | régénéré {m['regenerated']:.3f} | récupération {m['recovery']:.3f}")
-    print(f"\nRécupération médiane {r['median_recovery']:.3f} ; moyenne {r['mean_recovery']:.3f} ; certificats repassés {r['certificates_pass']:.2f} ; aucun instantané utilisé")
+        print(f"  {m['module']:16s} before {m['before']:.3f} | corrupted {m['corrupted']:.3f} (certificate failing: {m['detected']}) | regenerated {m['regenerated']:.3f} | recovery {m['recovery']:.3f}")
+    print(f"\nMedian recovery {r['median_recovery']:.3f}; mean {r['mean_recovery']:.3f}; certificates passing again {r['certificates_pass']:.2f}; no snapshot used")

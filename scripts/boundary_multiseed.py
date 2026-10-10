@@ -1,5 +1,5 @@
-"""Multi-graines du banc d'induction de frontières, parallélisé (graine × expérience) sur tous les cœurs.
-Usage : python scripts/boundary_multiseed.py [n_graines=16] [processus=12]. Reprise : un fichier par (graine, tâche)."""
+"""Multi-seed run of the boundary induction benchmark, parallelised (seed × experiment) over all cores.
+Usage: python scripts/boundary_multiseed.py [n_seeds=16] [processes=12]. Resume: one file per (seed, task)."""
 import json
 import os
 import sys

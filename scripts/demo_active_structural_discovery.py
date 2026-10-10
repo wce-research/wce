@@ -1,5 +1,5 @@
-"""Démo : candidats → désaccord entre classes → expérience choisie → observation → postérieure → approfondir
-seulement si nécessaire → fonction découverte."""
+"""Demo: candidates → disagreement between classes → chosen experiment → observation → posterior → deepen
+only if necessary → discovered function."""
 import os
 import sys
 
@@ -16,9 +16,9 @@ if __name__ == "__main__":
     inst = balanced_instances(["xor_halfspaces"], 7, 1)[0]; g = torch.Generator().manual_seed(1); X, y = noisy_task(inst, 120, g, 0.05)
     asd = ActiveStructuralDiscovery(pol, budget=16, eps=0.05); asd.eps_world = 0.05
     r = asd.run(X, y, inst.label, full_region, torch.Generator().manual_seed(2))
-    print("Entropie structurelle au fil des requêtes :", [round(e, 2) for e in r.entropy_curve])
-    print("Taille de l'espace des versions          :", r.version_space_curve)
-    print(f"Profondeur atteinte {r.depth} ; requêtes {r.queries} ; évaluations {r.evaluations} ; statut {r.status}")
-    print("Programme :", render(r.program))
+    print("Structural entropy over the queries:", [round(e, 2) for e in r.entropy_curve])
+    print("Size of the version space          :", r.version_space_curve)
+    print(f"Depth reached {r.depth}; queries {r.queries}; evaluations {r.evaluations}; status {r.status}")
+    print("Program:", render(r.program))
     F, O = full_region(3000, g), out_region(2000, g)
-    print(f"Exactitude région complète {float((predict(r.program, F) == inst.label(F)).float().mean()):.3f} ; extrapolation {float((predict(r.program, O) == inst.label(O)).float().mean()):.3f}")
+    print(f"Full-region accuracy {float((predict(r.program, F) == inst.label(F)).float().mean()):.3f}; extrapolation {float((predict(r.program, O) == inst.label(O)).float().mean()):.3f}")

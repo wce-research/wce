@@ -1,5 +1,5 @@
-"""Démo : panne → causes candidates (signes bon marché) → choix actif des interventions (VOI) → diagnostic ;
-identifiabilité / observabilité et ensemble minimal de diagnostics."""
+"""Demo: fault → candidate causes (cheap signs) → active choice of interventions (VOI) → diagnosis;
+identifiability / observability and minimal diagnostic set."""
 import os
 import random
 import sys
@@ -16,10 +16,10 @@ if __name__ == "__main__":
         signs, cost = cheap_signs(sys_); post = prior.posterior(signs)
         top = sorted(post.items(), key=lambda kv: -kv[1])[:3]
         c, n, _ = active_diagnosis(sys_, "voi", prior, base_ref=h)
-        print(f"Panne cachée {fault:16s} score {h:.3f}->{score(sys_):.3f} | signes {signs} (coût {cost:.2f})")
-        print(f"   a priori top-3 : {[(k, round(v, 2)) for k, v in top]} -> {n} intervention(s) -> cause {c}  (toutes : 10 interventions)")
+        print(f"Hidden fault {fault:16s} score {h:.3f}->{score(sys_):.3f} | signs {signs} (cost {cost:.2f})")
+        print(f"   prior top-3: {[(k, round(v, 2)) for k, v in top]} -> {n} intervention(s) -> cause {c}  (all: 10 interventions)")
     d = simulate_outcomes(8)
-    print(f"\nIdentifiabilité avec la mesure courante {CURRENT} : {identifiability(d, CURRENT)['fraction']:.3f} des paires de causes ; "
-          f"avec les {len(MEASUREMENTS)} mesures : {identifiability(d, list(MEASUREMENTS))['fraction']:.3f}")
-    print("Ensemble minimal de diagnostics :", minimal_diagnostic_set(d))
-    print("Pannes silencieuses :", silent_failure_analysis(40, 0))
+    print(f"\nIdentifiability with the current measurement {CURRENT}: {identifiability(d, CURRENT)['fraction']:.3f} of the cause pairs; "
+          f"with the {len(MEASUREMENTS)} measurements: {identifiability(d, list(MEASUREMENTS))['fraction']:.3f}")
+    print("Minimal diagnostic set:", minimal_diagnostic_set(d))
+    print("Silent faults:", silent_failure_analysis(40, 0))

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Démonstration du noyau géométrique WCE.
+Demonstration of the WCE geometry kernel.
 
-Ce script démontre les fonctionnalités du noyau géométrique :
+This script demonstrates the features of the geometry kernel:
 - Transform2D
 - PlaneCollider
 - Topology
@@ -22,13 +22,13 @@ print("=" * 60)
 print()
 
 # 1. Transform2D
-print("1. Transform2D : translation, rotation, scale, compose, inverse")
+print("1. Transform2D: translation, rotation, scale, compose, inverse")
 print("-" * 60)
 
 from core.transform import Transform2D
 
-# Identité
-print(f"Identité: {Transform2D.identity()}")
+# Identity
+print(f"Identity: {Transform2D.identity()}")
 
 # Translation
 print(f"Translation (5,10): {Transform2D.translation(5.0, 10.0)}")
@@ -53,47 +53,47 @@ pt = T.transform_point(*p)
 ptt = T_inv.transform_point(*pt)
 print(f"p={p} -> T(p)={pt} -> T^-1(T(p))={ptt}")
 assert abs(ptt[0] - p[0]) < 1e-5 and abs(ptt[1] - p[1]) < 1e-5
-print("✓ Inverse fonctionne")
+print("✓ Inverse works")
 
 print()
 
 # 2. PlaneCollider
-print("2. PlaneCollider : mur, sol, plan incliné")
+print("2. PlaneCollider: wall, floor, inclined plane")
 print("-" * 60)
 
 from physics.colliders import PlaneCollider
 
-# Mur vertical droit à x=5
+# Right vertical wall at x=5
 wall = PlaneCollider(
     normal_x=1.0,
     normal_y=0.0,
     transform=Transform2D.translation(5.0, 0.0)
 )
-print(f"Mur à x=5 : is_behind(6,0)={wall.is_behind(6.0, 0.0)}, is_behind(4,0)={wall.is_behind(4.0, 0.0)}")
+print(f"Wall at x=5: is_behind(6,0)={wall.is_behind(6.0, 0.0)}, is_behind(4,0)={wall.is_behind(4.0, 0.0)}")
 
-# Sol horizontal à y=0
+# Horizontal floor at y=0
 floor = PlaneCollider(
     normal_x=0.0,
     normal_y=-1.0,
     transform=Transform2D.identity()
 )
-print(f"Sol à y=0 : is_behind(0,1)={floor.is_behind(0.0, 1.0)}, is_behind(0,-1)={floor.is_behind(0.0, -1.0)}")
+print(f"Floor at y=0: is_behind(0,1)={floor.is_behind(0.0, 1.0)}, is_behind(0,-1)={floor.is_behind(0.0, -1.0)}")
 
-# Plan incliné à 45°
+# Plane inclined at 45°
 inclined = PlaneCollider(
     normal_x=0.0,
     normal_y=1.0,
     transform=Transform2D.rotation(pi/4)
 )
 nx, ny = inclined.world_normal()
-print(f"Plan incliné : normale monde=({nx:.3f}, {ny:.3f})")
+print(f"Inclined plane: world normal=({nx:.3f}, {ny:.3f})")
 print(f"  is_behind(0,10)={inclined.is_behind(0.0, 10.0)} (y > x)")
 print(f"  is_behind(10,0)={inclined.is_behind(10.0, 0.0)} (y < x)")
 
 print()
 
 # 3. Topology
-print("3. Topology : signatures et préservation")
+print("3. Topology: signatures and preservation")
 print("-" * 60)
 
 from core.topology import (
@@ -102,17 +102,17 @@ from core.topology import (
     get_topology_preservation_uniform_scale
 )
 
-print(f"Disque : {DISK_TOPOLOGY}")
-print(f"Anneau : {RING_TOPOLOGY}")
-print(f"Segment : {SEGMENT_TOPOLOGY}")
+print(f"Disc: {DISK_TOPOLOGY}")
+print(f"Ring: {RING_TOPOLOGY}")
+print(f"Segment: {SEGMENT_TOPOLOGY}")
 
 rot_pres = get_topology_preservation_rotation()
-print(f"Rotation préserve tout : {rot_pres.preserves_connected_components and rot_pres.preserves_holes and rot_pres.preserves_boundary and rot_pres.preserves_orientation}")
+print(f"Rotation preserves everything: {rot_pres.preserves_connected_components and rot_pres.preserves_holes and rot_pres.preserves_boundary and rot_pres.preserves_orientation}")
 
 print()
 
 # 4. Deformation
-print("4. Deformation : stretch, identity, composite")
+print("4. Deformation: stretch, identity, composite")
 print("-" * 60)
 
 from core.deformation import (
@@ -120,23 +120,23 @@ from core.deformation import (
     circle_to_ellipse, square_to_rectangle
 )
 
-# Étirement
+# Stretch
 stretch = StretchDeformation(stretch_x=2.0, stretch_y=3.0)
-print(f"Stretch (2,3) : {stretch.name}")
-print(f"  Topology : {stretch.topology_preservation}")
+print(f"Stretch (2,3): {stretch.name}")
+print(f"  Topology: {stretch.topology_preservation}")
 
-# Cercle vers ellipse
+# Circle to ellipse
 ellipse = circle_to_ellipse(2.0, 3.0)
-print(f"Circle -> Ellipse : {ellipse.name}")
+print(f"Circle -> Ellipse: {ellipse.name}")
 
 # Composition
 comp = compose_deformations(stretch, IdentityDeformation())
-print(f"Composite : {comp.name}")
+print(f"Composite: {comp.name}")
 
 print()
 
-# 5. Collision avec PlaneCollider
-print("5. Collision avec PlaneCollider")
+# 5. Collision with PlaneCollider
+print("5. Collision with PlaneCollider")
 print("-" * 60)
 
 from core.world import World, Entity
@@ -146,14 +146,14 @@ from physics.geometry_collision import PlaneCollision
 
 world = World()
 
-# Balle
+# Ball
 world.add_entity(Entity(
     name='balle',
     kind='ball',
     properties={'x': 0.0, 'y': 0.0, 'vx': 10.0, 'vy': 0.0, 'm': 1.0}
 ))
 
-# Mur droit avec PlaneCollider
+# Right wall with PlaneCollider
 world.add_entity(Entity(
     name='mur',
     kind='wall',
@@ -167,7 +167,7 @@ world.add_entity(Entity(
     }
 ))
 
-# Déplacer la balle vers la droite
+# Move the ball to the right
 transformation = Transformation(
     name='move',
     changes=[
@@ -182,12 +182,12 @@ resolved = plane_collision.resolve(world, transformation)
 x_final = [c.after for c in resolved.changes if c.property == 'x'][0]
 vx_final = [c.after for c in resolved.changes if c.property == 'vx'][0]
 
-print(f"Collision avec mur à x=5 :")
-print(f"  Position finale : x={x_final:.1f} (attendu: 5.0)")
-print(f"  Vitesse finale : vx={vx_final:.1f} (attendu: 0.0)")
-print(f"  Collision détectée : {'+plane_collision' in resolved.name}")
+print(f"Collision with wall at x=5:")
+print(f"  Final position: x={x_final:.1f} (expected: 5.0)")
+print(f"  Final velocity: vx={vx_final:.1f} (expected: 0.0)")
+print(f"  Collision detected: {'+plane_collision' in resolved.name}")
 
 print()
 print("=" * 60)
-print("✓ Démo géométrie terminée")
+print("✓ Geometry demo finished")
 print("=" * 60)

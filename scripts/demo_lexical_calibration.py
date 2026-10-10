@@ -1,4 +1,4 @@
-"""Démo : mot inconnu -> plusieurs sens -> observations -> posterior -> calibration -> promotion / abstention."""
+"""Demo: unknown word -> several senses -> observations -> posterior -> calibration -> promotion / abstention."""
 import os
 import sys
 
@@ -19,9 +19,9 @@ from core.unified import calibration_report  # noqa: E402
 
 def main():
     post = train_lexical_posterior()
-    print(f"Posterior lexical ajusté sur les graines de CALIBRATION {CAL_SEEDS[0]}–{CAL_SEEDS[-1]} (jamais le test) ;"
-          f" {post.parameter_count} paramètres :")
-    print("  ", {f: round(float(t), 2) for f, t in zip(FEATURES, post.theta.detach())}, "biais NULL", round(float(post.null_bias.detach()), 2))
+    print(f"Lexical posterior fitted on the CALIBRATION seeds {CAL_SEEDS[0]}–{CAL_SEEDS[-1]} (never the test);"
+          f" {post.parameter_count} parameters:")
+    print("  ", {f: round(float(t), 2) for f, t in zip(FEATURES, post.theta.detach())}, "NULL bias", round(float(post.null_bias.detach()), 2))
 
     pool, agent = observation_pool(0)
     word = "rayon"
@@ -29,7 +29,7 @@ def main():
     cal = CalibratedLexicon(post)
     K = len({m for m in agent.lex.lexicon().values() if m})
     saved = agent.lexmem; agent.lexmem = LexicalMemory()
-    print(f"\nMot inconnu « {word} » (sens correct, évaluation seulement : {GOLD_MEANING[word]}) — observations une à une :")
+    print(f"\nUnknown word « {word} » (correct sense, evaluation only: {GOLD_MEANING[word]}) — observations one by one:")
     try:
         for i, it in enumerate(items, 1):
             agent.lexmem.observe(word, it["verdicts"], it["source"], it["weight"], f"w{it['world']}:{it['text']}")
@@ -38,30 +38,30 @@ def main():
             st, c, p = cal.status(agent, word)
             print(f"  {i}. « {it['text']} » ({it['source']}) -> {[(c_, round(p_, 3)) for c_, p_ in top]}"
                   f" H={entropy(d, K):.2f} -> {st}{' : ' + c if c and st != 'UNKNOWN' else ''}")
-        print(f"  historique du cycle de vie : {cal.history[word]}")
+        print(f"  lifecycle history: {cal.history[word]}")
     finally:
         agent.lexmem = saved
 
-    print("\nCalibration sur les graines de TEST 0–7 (confiance native vs posterior calibré) :")
+    print("\nCalibration on the TEST seeds 0–7 (native confidence vs calibrated posterior):")
     native, calib = [], []
     for s in range(8):
         ex, conf = lexical_examples(s)
         native += calibration_points(ex, None, conf); calib += calibration_points(ex, post)
-    for name, pts in (("confiance native", native), ("posterior calibré", calib)):
+    for name, pts in (("native confidence", native), ("calibrated posterior", calib)):
         r = calibration_report([c for c, _ in pts], [y for _, y in pts])
-        print(f"  {name:18s} n={r['n']} ECE={r['ece']} Brier={r['brier']} précision@seuil={precision_at(pts)}")
-        print(f"      diagramme : {[(b['bin'], b['n'], b['accuracy']) for b in r['bins']]}")
+        print(f"  {name:18s} n={r['n']} ECE={r['ece']} Brier={r['brier']} precision@threshold={precision_at(pts)}")
+        print(f"      diagram: {[(b['bin'], b['n'], b['accuracy']) for b in r['bins']]}")
     snap = [e for s in range(8) for e in lexical_examples(s, snapshots=True)[0] if e.gold]
     pts = calibration_points(snap, post); r = calibration_report([c for c, _ in pts], [y for _, y in pts])
-    print(f"  instantanés (peu de preuves) : n={r['n']} ECE={r['ece']} Brier={r['brier']} précision@seuil={precision_at(pts)}")
+    print(f"  snapshots (little evidence): n={r['n']} ECE={r['ece']} Brier={r['brier']} precision@threshold={precision_at(pts)}")
 
-    print("\nPolysémie « range » (P(sens | syntaxe, domaine, type d'entité)) :", {k: v for k, v in polysemy_eval(range(4)).items() if k != "calibration"},
+    print("\nPolysemy « range » (P(sense | syntax, domain, entity type)):", {k: v for k, v in polysemy_eval(range(4)).items() if k != "calibration"},
           "ECE", polysemy_eval(range(4))["calibration"]["ece"])
-    print("Désambiguïsation active (issue prédite sans regarder l'observation) vs passive :", active_lexical(post, budget=12)["summary"])
-    print("Politique des mots inconnus (provenance) :", unknown_word_policy_eval(post, range(2)))
-    print("Incertitude morphologique (pièges inclus) :", {k: v for k, v in morphology_eval(range(2)).items() if k != "calibration"})
-    print("Classes fonctionnelles émergentes (similarité par comportement) :", semantic_classes())
-    print("Composition :", {k: (v["meaning"], v["correct"]) for k, v in composition_eval().items()})
+    print("Active disambiguation (outcome predicted without looking at the observation) vs passive:", active_lexical(post, budget=12)["summary"])
+    print("Unknown-word policy (provenance):", unknown_word_policy_eval(post, range(2)))
+    print("Morphological uncertainty (traps included):", {k: v for k, v in morphology_eval(range(2)).items() if k != "calibration"})
+    print("Emergent functional classes (similarity by behaviour):", semantic_classes())
+    print("Composition:", {k: (v["meaning"], v["correct"]) for k, v in composition_eval().items()})
 
 
 if __name__ == "__main__":

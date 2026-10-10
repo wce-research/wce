@@ -1,4 +1,4 @@
-"""Apprentissage actif : sélection par gain d'information vs flux passif (mots inconnus et entités)."""
+"""Active learning: selection by information gain vs passive stream (unknown words and entities)."""
 import os
 import sys
 
@@ -10,16 +10,16 @@ from core.discourse_benchmark import active_entity_learning, active_vs_passive, 
 def main():
     print("=== WCE ACTIVE LEARNING ===")
     pool, agent = observation_pool(0)
-    print(f"\nRéservoir : {len(pool)} observations textuelles contenant des mots jamais légendés")
-    print("\nMots inconnus : expositions nécessaires (IG = H(avant) − H(après) sur les sens candidats)")
+    print(f"\nPool: {len(pool)} textual observations containing words never captioned")
+    print("\nUnknown words: exposures needed (IG = H(before) − H(after) over the candidate senses)")
     for budget in (4, 8, 12, 20, 40):
         r = active_vs_passive(0, budget=budget, pool=(pool, agent))
-        print(f"  budget {budget:>2} : passif {r['summary']['passive']} | actif {r['summary']['active']}")
+        print(f"  budget {budget:>2}: passive {r['summary']['passive']} | active {r['summary']['active']}")
     detail = active_vs_passive(0, budget=40, pool=(pool, agent))["per_word"]
     for w, v in detail.items():
-        print(f"  « {w} » (réservoir {v['passive']['pool']}) : passif {v['passive']['exposures_to_learn']} expositions, actif {v['active']['exposures_to_learn']}")
-    print(f"\nEntités : demandes d'information choisies au gain d'information : {active_entity_learning()}")
-    print(f"\nDistillation du résolveur (élève propose, WCE vérifie) : {distill_resolver()}")
+        print(f"  '{w}' (pool {v['passive']['pool']}): passive {v['passive']['exposures_to_learn']} exposures, active {v['active']['exposures_to_learn']}")
+    print(f"\nEntities: information requests chosen by information gain: {active_entity_learning()}")
+    print(f"\nResolver distillation (student proposes, WCE verifies): {distill_resolver()}")
 
 
 if __name__ == "__main__":

@@ -1,4 +1,4 @@
-"""Démo : programmes d'AST différents → classe fonctionnelle (repère canonique) → famille (orbite) → réutilisation."""
+"""Demo: programs with different ASTs → functional class (canonical frame) → family (orbit) → reuse."""
 import os
 import random
 import sys
@@ -14,10 +14,10 @@ from core.boundary_world import full_region  # noqa: E402
 
 if __name__ == "__main__":
     pol = train_policy(train_tasks(44, 0.05), eps=0.05); progs = discovered_programs(["crescent", "ring"], 5, 3, pol)
-    for f, p in progs: print("  découvert :", render(p)[:80])
+    for f, p in progs: print("  discovered:", render(p)[:80])
     P = [p for _, p in progs]
-    print("Familles AST :", len(induce_ast_families(P)), "; familles fonctionnelles canoniques :", len(F := induce_orbit_families(P)))
-    for f in F: print("  famille : support", f.support, "représentations AST", len({str(r.skeleton()) for r in f.representations}))
+    print("AST families:", len(induce_ast_families(P)), "; canonical functional families:", len(F := induce_orbit_families(P)))
+    for f in F: print("  family: support", f.support, "AST representations", len({str(r.skeleton()) for r in f.representations}))
     inst = transformed(balanced_instances(["crescent"], 77, 1)[0], random.Random(1)); g = torch.Generator().manual_seed(2); X, y = noisy_task(inst, 120, g, 0.05)
     p, ev = reuse_family(F, X, y); R = full_region(3000, g)
-    print(f"Instance transformée (rotation/échelle/réflexion) via famille : exactitude {float((predict(p, R) == inst.label(R)).float().mean()):.3f} en {ev} évaluations")
+    print(f"Transformed instance (rotation/scale/reflection) via family: accuracy {float((predict(p, R) == inst.label(R)).float().mean()):.3f} in {ev} evaluations")

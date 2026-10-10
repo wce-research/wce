@@ -1,4 +1,4 @@
-"""Évaluation UNIQUE du lot scellé du banc temporel -> results/temporal_sealed.json (ne pas relancer pour régler)."""
+"""SINGLE evaluation of the sealed set of the temporal bench -> results/temporal_sealed.json (do not rerun for tuning)."""
 import json
 import os
 import sys
@@ -8,7 +8,7 @@ from core.temporal_bench import SEALED_SHA256, sealed_episodes, sealed_hash, tra
 from core.temporal_eval import compare  # noqa: E402
 
 if __name__ == "__main__":
-    assert sealed_hash() == SEALED_SHA256, "lot scellé modifié"
+    assert sealed_hash() == SEALED_SHA256, "sealed set modified"
     path = "results/temporal_sealed.json"
     if os.path.exists(path) and "--force" not in sys.argv:
         print(open(path).read()); sys.exit(0)

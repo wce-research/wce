@@ -1,4 +1,4 @@
-"""Démo : deux AST différents → mêmes invariants / même comportement → même classe fonctionnelle (empirique)."""
+"""Demo: two different ASTs → same invariants / same behaviour → same functional class (empirical)."""
 import os
 import sys
 
@@ -13,6 +13,6 @@ if __name__ == "__main__":
     c = P("not", children=(P("and", children=(T(P("pred", "norm", "ge", (0.6,)), (-1.4, 0.0)), T(P("pred", "norm", "ge", (0.6,)), (1.0, 0.3)))),))
     d = T(P("pred", "norm", "le", (1.0,)), (0.0, 0.0))
     for p in (a, b, c, d):
-        s = program_signature(p); print(f"{render(p)[:70]:72s} composantes {s.components} aire {s.area:.3f} symétrie {s.reflection_symmetry:.2f}")
-    cls, idx = functional_clusters([a, b, c, d]); print("Classes :", idx, "; AST distincts dans la classe 0 :", len(cls[0].representations()))
-    print("Même structure AST a/b ?", structure_hash(a) == structure_hash(b))
+        s = program_signature(p); print(f"{render(p)[:70]:72s} components {s.components} area {s.area:.3f} symmetry {s.reflection_symmetry:.2f}")
+    cls, idx = functional_clusters([a, b, c, d]); print("Classes:", idx, "; distinct ASTs in class 0:", len(cls[0].representations()))
+    print("Same AST structure a/b?", structure_hash(a) == structure_hash(b))

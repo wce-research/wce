@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """
-Démonstration du WCE Transformation Algebra.
+Demonstration of the WCE Transformation Algebra.
 
-Ce script démontre les fonctionnalités du noyau de transformation :
-- TransformationSpec comme concept de premier ordre
-- Invariants explicites
-- Composition de transformations
-- Topologie
+This script demonstrates the features of the transformation kernel:
+- TransformationSpec as a first-class concept
+- Explicit invariants
+- Composition of transformations
+- Topology
 - TransformGraph
 - MacroTransformation
 """
@@ -23,24 +23,24 @@ print("=" * 70)
 print()
 
 # ============================================================================
-# PARTIE 1 : Invariants
+# PART 1: Invariants
 # ============================================================================
-print("1. Invariants fondamentaux")
+print("1. Fundamental invariants")
 print("-" * 70)
 
 from core.invariants import Invariant, InvariantSet, TRANSLATION_INVARIANTS, ROTATION_INVARIANTS
 
-# Afficher quelques invariants
-print(f"Invariants de translation : {TRANSLATION_INVARIANTS}")
-print(f"  - Préserve la distance : {TRANSLATION_INVARIANTS.preserves(Invariant.DISTANCE)}")
-print(f"  - Préserve l'angle : {TRANSLATION_INVARIANTS.preserves(Invariant.ANGLE)}")
-print(f"  - Préserve la topologie : {TRANSLATION_INVARIANTS.preserves_topology}")
+# Display a few invariants
+print(f"Translation invariants: {TRANSLATION_INVARIANTS}")
+print(f"  - Preserves distance: {TRANSLATION_INVARIANTS.preserves(Invariant.DISTANCE)}")
+print(f"  - Preserves angle: {TRANSLATION_INVARIANTS.preserves(Invariant.ANGLE)}")
+print(f"  - Preserves topology: {TRANSLATION_INVARIANTS.preserves_topology}")
 print()
 
 # ============================================================================
-# PARTIE 2 : Transformations primitives
+# PART 2: Primitive transformations
 # ============================================================================
-print("2. Transformations primitives")
+print("2. Primitive transformations")
 print("-" * 70)
 
 from core.transformations import (
@@ -53,151 +53,151 @@ from core.transformations import (
     create_scale_transformation,
 )
 
-# Création de transformations primitives
+# Creation of primitive transformations
 identity = IdentityTransformation()
 translation = create_translation_transformation(2.0, 0.0)
 rotation = create_rotation_transformation(pi/4, "rotate(45°)")
 scale_uniform = create_scale_transformation(2.0, 2.0)
 scale_non_uniform = create_scale_transformation(2.0, 3.0)
 
-print(f"Identité : {identity}")
-print(f"  - Invertible : {identity.invertible}")
-print(f"  - Préserve la géométrie : {identity.preserves_geometry()}")
+print(f"Identity: {identity}")
+print(f"  - Invertible: {identity.invertible}")
+print(f"  - Preserves geometry: {identity.preserves_geometry()}")
 print()
 
-print(f"Translation (2, 0) : {translation}")
-print(f"  - Invertible : {translation.invertible}")
-print(f"  - Préserve la géométrie : {translation.preserves_geometry()}")
-print(f"  - Préserve la topologie : {translation.preserves_topology()}")
+print(f"Translation (2, 0): {translation}")
+print(f"  - Invertible: {translation.invertible}")
+print(f"  - Preserves geometry: {translation.preserves_geometry()}")
+print(f"  - Preserves topology: {translation.preserves_topology()}")
 print()
 
-print(f"Rotation (45°) : {rotation}")
-print(f"  - Invertible : {rotation.invertible}")
-print(f"  - Préserve la géométrie : {rotation.preserves_geometry()}")
-print(f"  - Préserve la topologie : {rotation.preserves_topology()}")
+print(f"Rotation (45°): {rotation}")
+print(f"  - Invertible: {rotation.invertible}")
+print(f"  - Preserves geometry: {rotation.preserves_geometry()}")
+print(f"  - Preserves topology: {rotation.preserves_topology()}")
 print()
 
-print(f"Scale uniforme (2, 2) : {scale_uniform}")
-print(f"  - Invertible : {scale_uniform.invertible}")
-print(f"  - Préserve la géométrie : {scale_uniform.preserves_geometry()}")
-print(f"  - Préserve la topologie : {scale_uniform.preserves_topology()}")
+print(f"Uniform scale (2, 2): {scale_uniform}")
+print(f"  - Invertible: {scale_uniform.invertible}")
+print(f"  - Preserves geometry: {scale_uniform.preserves_geometry()}")
+print(f"  - Preserves topology: {scale_uniform.preserves_topology()}")
 print()
 
-print(f"Scale non-uniforme (2, 3) : {scale_non_uniform}")
-print(f"  - Invertible : {scale_non_uniform.invertible}")
-print(f"  - Préserve la géométrie : {scale_non_uniform.preserves_geometry()}")
-print(f"  - Préserve la topologie : {scale_non_uniform.preserves_topology()}")
+print(f"Non-uniform scale (2, 3): {scale_non_uniform}")
+print(f"  - Invertible: {scale_non_uniform.invertible}")
+print(f"  - Preserves geometry: {scale_non_uniform.preserves_geometry()}")
+print(f"  - Preserves topology: {scale_non_uniform.preserves_topology()}")
 print()
 
 # ============================================================================
-# PARTIE 3 : Composition
+# PART 3: Composition
 # ============================================================================
-print("3. Composition de transformations")
+print("3. Composition of transformations")
 print("-" * 70)
 
-# Composition avec l'opérateur @
+# Composition with the @ operator
 composed = translation @ rotation @ scale_uniform
-print(f"Composition : {composed}")
-print(f"  - Nombre de transformations : {composed.get_depth()}")
-print(f"  - Préserve la géométrie : {composed.preserves_geometry()}")
-print(f"  - Préserve la topologie : {composed.preserves_topology()}")
-print(f"  - Invertible : {composed.invertible}")
-print(f"  - Coût total : {composed.cost}")
+print(f"Composition: {composed}")
+print(f"  - Number of transformations: {composed.get_depth()}")
+print(f"  - Preserves geometry: {composed.preserves_geometry()}")
+print(f"  - Preserves topology: {composed.preserves_topology()}")
+print(f"  - Invertible: {composed.invertible}")
+print(f"  - Total cost: {composed.cost}")
 print()
 
-# Tester l'application
+# Test the application
 point = (1.0, 0.0)
-print(f"Point initial : {point}")
-print(f"Après translation : {translation.apply(point)}")
-print(f"Après rotation : {rotation.apply(point)}")
-print(f"Après composition complète : {composed.apply(point)}")
+print(f"Initial point: {point}")
+print(f"After translation: {translation.apply(point)}")
+print(f"After rotation: {rotation.apply(point)}")
+print(f"After full composition: {composed.apply(point)}")
 print()
 
-# Tester l'inverse
-print("Inversion de la composition :")
+# Test the inverse
+print("Inversion of the composition:")
 inverse_composed = composed.get_inverse()
 if inverse_composed:
-    print(f"  - Inverse existe : {inverse_composed.name}")
+    print(f"  - Inverse exists: {inverse_composed.name}")
     transformed = composed.apply(point)
     inverted = inverse_composed.apply(transformed)
-    print(f"  - Original : {point}")
-    print(f"  - Après composition : {transformed}")
-    print(f"  - Après inverse : {inverted}")
-    print(f"  - Retrouvé l'original : {abs(inverted[0] - point[0]) < 1e-5 and abs(inverted[1] - point[1]) < 1e-5}")
+    print(f"  - Original: {point}")
+    print(f"  - After composition: {transformed}")
+    print(f"  - After inverse: {inverted}")
+    print(f"  - Original recovered: {abs(inverted[0] - point[0]) < 1e-5 and abs(inverted[1] - point[1]) < 1e-5}")
 print()
 
 # ============================================================================
-# PARTIE 4 : MacroTransformation
+# PART 4: MacroTransformation
 # ============================================================================
-print("4. Macro-transformation (opération encapsulée)")
+print("4. Macro-transformation (encapsulated operation)")
 print("-" * 70)
 
-# Créer une macro pour "place_on_table"
+# Create a macro for "place_on_table"
 place_on_table_steps = [
-    create_translation_transformation(0.0, 1.0),  # lever
-    create_rotation_transformation(0.0, "reset_rotation"),  # rotation nulle
-    create_translation_transformation(0.0, -1.0),  # descendre sur la table
+    create_translation_transformation(0.0, 1.0),  # lift
+    create_rotation_transformation(0.0, "reset_rotation"),  # null rotation
+    create_translation_transformation(0.0, -1.0),  # lower onto the table
 ]
 
-# Créer la composition de base
+# Create the base composition
 place_on_table_composite = place_on_table_steps[0] @ place_on_table_steps[1] @ place_on_table_steps[2]
 
-# Créer la macro
+# Create the macro
 place_on_table = MacroTransformation(
     name="place_on_table",
     base_transformation=place_on_table_composite,
     description="Place un objet sur la table"
 )
 
-print(f"Macro : {place_on_table}")
-print(f"  - Préserve la topologie : {place_on_table.preserves.preserves_topology}")
-print(f"  - Préserve la géométrie : {place_on_table.preserves.preserves_geometry}")
-print(f"  - Invertible : {place_on_table.invertible}")
+print(f"Macro: {place_on_table}")
+print(f"  - Preserves topology: {place_on_table.preserves.preserves_topology}")
+print(f"  - Preserves geometry: {place_on_table.preserves.preserves_geometry}")
+print(f"  - Invertible: {place_on_table.invertible}")
 print()
 
 # ============================================================================
-# PARTIE 5 : Topologie
+# PART 5: Topology
 # ============================================================================
-print("5. Topologie et transformations topologiques")
+print("5. Topology and topological transformations")
 print("-" * 70)
 
 from core.topology import TopologySignature, DISK_TOPOLOGY, RING_TOPOLOGY, SEGMENT_TOPOLOGY
 from core.transformations import CutTransformation, MergeTransformation
 
-print(f"Disque : {DISK_TOPOLOGY}")
-print(f"  - Est solide : {DISK_TOPOLOGY.is_solid()}")
-print(f"  - Est simple : {DISK_TOPOLOGY.is_simple()}")
+print(f"Disc: {DISK_TOPOLOGY}")
+print(f"  - Is solid: {DISK_TOPOLOGY.is_solid()}")
+print(f"  - Is simple: {DISK_TOPOLOGY.is_simple()}")
 print()
 
-print(f"Anneau : {RING_TOPOLOGY}")
-print(f"  - Est solide : {RING_TOPOLOGY.is_solid()}")
-print(f"  - A des trous : {RING_TOPOLOGY.holes > 0}")
+print(f"Ring: {RING_TOPOLOGY}")
+print(f"  - Is solid: {RING_TOPOLOGY.is_solid()}")
+print(f"  - Has holes: {RING_TOPOLOGY.holes > 0}")
 print()
 
-# Appliquer une découpe à un disque
+# Apply a cut to a disc
 cut = CutTransformation()
 cut_topology = cut.apply(DISK_TOPOLOGY)
-print(f"Disque -> après découpe : {cut_topology}")
-print(f"  - Composantes connexes : {cut_topology.connected_components} (était 1)")
+print(f"Disc -> after cut: {cut_topology}")
+print(f"  - Connected components: {cut_topology.connected_components} (was 1)")
 print()
 
-# Appliquer une fusion
+# Apply a merge
 merge = MergeTransformation()
 merged_topology = merge.apply(cut_topology)
-print(f"Après fusion : {merged_topology}")
-print(f"  - Composantes connexes : {merged_topology.connected_components}")
+print(f"After merge: {merged_topology}")
+print(f"  - Connected components: {merged_topology.connected_components}")
 print()
 
 # ============================================================================
-# PARTIE 6 : TransformGraph
+# PART 6: TransformGraph
 # ============================================================================
-print("6. TransformGraph - Historique et suivi")
+print("6. TransformGraph - History and tracking")
 print("-" * 70)
 
 from core.transform_graph import TransformGraph, TransformNode, create_linear_graph
 from core.topology import DISK_TOPOLOGY
 
-# Créer un graphe linéaire
+# Create a linear graph
 graph = create_linear_graph(
     name="circle",
     transformations=[
@@ -209,38 +209,38 @@ graph = create_linear_graph(
     initial_topology=DISK_TOPOLOGY
 )
 
-print(f"Graphe créé : {graph}")
+print(f"Graph created: {graph}")
 print()
 
-# Afficher l'historique
+# Display the history
 summary = graph.get_history_summary()
-print("Résumé de l'historique :")
+print("History summary:")
 for key, value in summary.items():
-    print(f"  - {key} : {value}")
+    print(f"  - {key}: {value}")
 print()
 
-# Afficher le chemin
+# Display the path
 path_names = graph.current.get_path_names()
-print(f"Chemin des transformations : {' -> '.join(path_names)}")
+print(f"Transformation path: {' -> '.join(path_names)}")
 print()
 
-# Vérifier les invariants
+# Check the invariants
 current_invariants = graph.get_current_invariants()
-print(f"Invariants préservés : {current_invariants}")
-print(f"  - Préserve la topologie : {current_invariants.preserves_topology}")
-print(f"  - Préserve la géométrie : {current_invariants.preserves_geometry}")
+print(f"Preserved invariants: {current_invariants}")
+print(f"  - Preserves topology: {current_invariants.preserves_topology}")
+print(f"  - Preserves geometry: {current_invariants.preserves_geometry}")
 print()
 
 # ============================================================================
-# PARTIE 7 : Démonstration intégrée avec World
+# PART 7: Integrated demonstration with World
 # ============================================================================
-print("7. Intégration avec le système existant")
+print("7. Integration with the existing system")
 print("-" * 70)
 
 from core.world import World, Entity
 from core.transform import Transform2D
 
-# Créer un monde simple
+# Create a simple world
 world = World()
 world.add_entity(Entity(
     name="ball",
@@ -248,72 +248,72 @@ world.add_entity(Entity(
     properties={'x': 0.0, 'y': 0.0, 'vx': 0.0, 'vy': 0.0, 'm': 1.0}
 ))
 
-print(f"Monde créé avec entité : ball")
+print(f"World created with entity: ball")
 print()
 
-# Créer un Transform2D qui est maintenant une transformation de premier ordre
+# Create a Transform2D which is now a first-class transformation
 T = Transform2D.translation(5.0, 0.0).compose(Transform2D.rotation(pi/2))
-print(f"Transform2D : {T}")
+print(f"Transform2D: {T}")
 
-# Appliquer à un point
+# Apply to a point
 p = (1.0, 0.0)
 pt = T.transform_point(*p)
 print(f"Point {p} -> {pt}")
 
-# Vérifier l'inverse
+# Check the inverse
 T_inv = T.inverse()
 ptt = T_inv.transform_point(*pt)
-print(f"Inverse : {ptt} (original : {p})")
-print(f"Précision : {abs(ptt[0] - p[0]) < 1e-10 and abs(ptt[1] - p[1]) < 1e-10}")
+print(f"Inverse: {ptt} (original: {p})")
+print(f"Precision: {abs(ptt[0] - p[0]) < 1e-10 and abs(ptt[1] - p[1]) < 1e-10}")
 print()
 
 # ============================================================================
-# PARTIE 8 : Démonstration conceptuelle - Cercle vers Ellipse
+# PART 8: Conceptual demonstration - Circle to Ellipse
 # ============================================================================
-print("8. Déformation : Cercle -> Ellipse")
+print("8. Deformation: Circle -> Ellipse")
 print("-" * 70)
 
 from core.deformation import StretchDeformation
 
-# Créer une déformation d'étirement
+# Create a stretch deformation
 stretch = StretchDeformation(stretch_x=2.0, stretch_y=3.0)
-print(f"Déformation : {stretch.name}")
-print(f"  - Préserve la topologie : {stretch.topology_preservation.preserves_connected_components}")
-print(f"  - Préserve les trous : {stretch.topology_preservation.preserves_holes}")
-print(f"  - Préserve les distances : False (stretch modifie la géométrie)")
+print(f"Deformation: {stretch.name}")
+print(f"  - Preserves topology: {stretch.topology_preservation.preserves_connected_components}")
+print(f"  - Preserves holes: {stretch.topology_preservation.preserves_holes}")
+print(f"  - Preserves distances: False (stretch modifies the geometry)")
 print()
 
-# Appliquer à un cercle conceptuel
-print("Cercle (r=1) -> Ellipse (via stretch(2,3))")
-print("  - Topologie initiale : DISK (1 composante, 0 trous)")
-print("  - Topologie finale : DISK (inchangée)")
-print("  - Géométrie modifiée : Oui")
-print("  - Invariants préservés : connectivité, trous, dimension")
+# Apply to a conceptual circle
+print("Circle (r=1) -> Ellipse (via stretch(2,3))")
+print("  - Initial topology: DISK (1 component, 0 holes)")
+print("  - Final topology: DISK (unchanged)")
+print("  - Geometry modified: Yes")
+print("  - Preserved invariants: connectivity, holes, dimension")
 print()
 
 # ============================================================================
-# RÉSUMÉ FINAL
+# FINAL SUMMARY
 # ============================================================================
 print("=" * 70)
-print("✓ PROPRIÉTÉS FONDAMENTALES DÉMONTRÉES")
+print("✓ FUNDAMENTAL PROPERTIES DEMONSTRATED")
 print("=" * 70)
 print()
-print("1. Petit ensemble de transformations primitives")
+print("1. Small set of primitive transformations")
 print("   + composition")
-print("   = grand nombre de comportements")
+print("   = large number of behaviours")
 print()
-print("2. Invariants explicites pour chaque transformation")
-print("   → permet de raisonner sur ce qui change et ce qui reste")
+print("2. Explicit invariants for each transformation")
+print("   → makes it possible to reason about what changes and what remains")
 print()
-print("3. Topologie séparée de la géométrie")
-print("   → permet de distinguer les propriétés fondamentales")
+print("3. Topology separated from geometry")
+print("   → makes it possible to distinguish the fundamental properties")
 print()
-print("4. TransformGraph pour suivre l'historique")
-print("   → permet de répondre à : 'Quelles transformations ont produit cet état ?'")
+print("4. TransformGraph to track the history")
+print("   → makes it possible to answer: 'Which transformations produced this state?'")
 print()
-print("5. MacroTransformation pour encapsuler des compositions fréquentes")
-print("   → permet de créer de nouvelles opérations sans modifier le code")
+print("5. MacroTransformation to encapsulate frequent compositions")
+print("   → makes it possible to create new operations without modifying the code")
 print()
 print("=" * 70)
-print("✓ DÉMO TRANSFORMATION ALGEBRA TERMINÉE")
+print("✓ TRANSFORMATION ALGEBRA DEMO COMPLETE")
 print("=" * 70)

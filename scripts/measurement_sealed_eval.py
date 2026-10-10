@@ -1,4 +1,4 @@
-"""Évaluation UNIQUE du lot scellé du monde de mesure -> results/measurement_sealed.json (ne pas relancer pour régler)."""
+"""SINGLE evaluation of the sealed set of the measurement world -> results/measurement_sealed.json (do not rerun for tuning)."""
 import json
 import os
 import sys
@@ -8,7 +8,7 @@ from core.measurement_agent import SYSTEMS_M, evaluate, fit_calibrators, fit_tra
 from core.measurement_world import SEALED_SHA256, sealed_episodes, sealed_hash, train_episodes  # noqa: E402
 
 if __name__ == "__main__":
-    assert sealed_hash() == SEALED_SHA256, "lot scellé modifié"
+    assert sealed_hash() == SEALED_SHA256, "sealed set modified"
     path = "results/measurement_sealed.json"
     if os.path.exists(path) and "--force" not in sys.argv:
         print(open(path).read()); sys.exit(0)

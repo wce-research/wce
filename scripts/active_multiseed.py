@@ -1,5 +1,5 @@
-"""Multi-graines « Active Structural Discovery », parallélisé (graine × expérience), reprise par fichier.
-Usage : python scripts/active_multiseed.py [graines=16] [processus=12] [jobs=tous, séparés par des virgules]"""
+"""Multi-seed "Active Structural Discovery", parallelised (seed × experiment), resumable per file.
+Usage: python scripts/active_multiseed.py [seeds=16] [processes=12] [jobs=all, comma-separated]"""
 import json
 import os
 import sys

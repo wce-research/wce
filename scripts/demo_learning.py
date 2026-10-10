@@ -1,4 +1,4 @@
-"""Expérience -> généralisation -> stratégie paramétrée -> transfert."""
+"""Experience -> generalization -> parameterized strategy -> transfer."""
 import os
 import sys
 

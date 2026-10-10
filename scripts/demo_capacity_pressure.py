@@ -1,4 +1,4 @@
-"""Démo : budget de capacité atteint → élagage / fusion / distillation (neuronale et symbolique) → nouvelle compétence."""
+"""Demo: capacity budget reached → pruning / merging / distillation (neural and symbolic) → new skill."""
 import os
 import sys
 
@@ -14,9 +14,9 @@ if __name__ == "__main__":
     for cap in (None, 400):
         cfg = Config("cap", cert="generative", discovery=False, drift="auto", capacity=cap, capacity_mgmt=cap is not None)
         o, s = run_stream_cfg(cfg, regs, 0); ops = Counter()
-        print(f"\nBudget {cap or 'illimité'} :")
+        print(f"\nBudget {cap or 'unlimited'}:")
         for r in s.log:
             if r.get("capacity"):
-                ops.update(r["capacity"]); print(f"  régime {r['t']:2d} : {r['params_before']:5d} -> {r['params_after']:5d} paramètres ; opérations {r['capacity']}")
-        print(f"  exactitude {o['average_accuracy']:.3f} ; paramètres finaux {s.neural_params()} ; opérations {dict(ops)} ; distillations rejetées (certificats) {s.counters.get('distill_rejected', 0)}")
-        print(f"  dernières acquisitions : {[r['kind'] for r in s.log[-5:]]}")
+                ops.update(r["capacity"]); print(f"  regime {r['t']:2d}: {r['params_before']:5d} -> {r['params_after']:5d} parameters; operations {r['capacity']}")
+        print(f"  accuracy {o['average_accuracy']:.3f}; final parameters {s.neural_params()}; operations {dict(ops)}; rejected distillations (certificates) {s.counters.get('distill_rejected', 0)}")
+        print(f"  latest acquisitions: {[r['kind'] for r in s.log[-5:]]}")

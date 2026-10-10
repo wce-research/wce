@@ -1,4 +1,4 @@
-"""Démonstration transversale de Transformation Algebra sur l'algèbre."""
+"""Cross-cutting demonstration of Transformation Algebra on algebra."""
 import os
 import sys
 

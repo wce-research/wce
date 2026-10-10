@@ -1,4 +1,4 @@
-"""Graines de l'expérience épistémique -> results/epistemic_multiseed[_16].json"""
+"""Seeds of the epistemic experiment -> results/epistemic_multiseed[_16].json"""
 import json
 import os
 import sys

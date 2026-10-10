@@ -1,4 +1,4 @@
-"""Une graine du banc continu -> results/continuum/seed_<s>.json (reprend si déjà présent)."""
+"""One seed of the continuous benchmark -> results/continuum/seed_<s>.json (resumes if already present)."""
 import json
 import os
 import sys
@@ -10,7 +10,7 @@ from core.continuum_benchmark import seed_run  # noqa: E402
 
 if __name__ == "__main__":
     s = int(sys.argv[1]); path = f"results/continuum/seed_{s}.json"
-    if os.path.exists(path): print("déjà fait", path); sys.exit(0)
+    if os.path.exists(path): print("already done", path); sys.exit(0)
     torch.set_num_threads(int(os.environ.get("THREADS", "2")))
     os.makedirs("results/continuum", exist_ok=True); r = seed_run(s)
-    json.dump(r, open(path, "w"), default=str); print("écrit", path)
+    json.dump(r, open(path, "w"), default=str); print("written", path)

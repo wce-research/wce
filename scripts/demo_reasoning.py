@@ -1,4 +1,4 @@
-"""Démonstration du noyau conditionnel transversal."""
+"""Demonstration of the cross-cutting conditional core."""
 import os
 import sys
 

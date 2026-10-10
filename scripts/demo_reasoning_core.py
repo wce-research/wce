@@ -1,4 +1,4 @@
-"""Démonstration d'intégration du noyau de raisonnement WCE."""
+"""Integration demonstration of the WCE reasoning core."""
 from math import pi
 import os
 import sys

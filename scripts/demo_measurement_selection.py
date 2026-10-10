@@ -1,4 +1,4 @@
-"""Démo légère : choix de mesure — gain fonctionnel attendu (EFA) vs IG structurel vs désaccord ; capteurs à compromis."""
+"""Light demo: measurement choice — expected functional gain (EFA) vs structural IG vs disagreement; trade-off sensors."""
 import os, sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import torch
@@ -11,7 +11,7 @@ if __name__ == "__main__":
     r = RobustStructuralReconstruction(planner=None).run(obs); css = r.css
     rr = RobustStructuralReconstruction(planner=RobustMeasurementPlanner("efa", world_noise=0.08), budget=0).run(obs, t.oracle, full_region, full_region(300, g), g); css = rr.css
     css.add_parameter_samples(obs, "contamination", 0.02); pool, probes = full_region(300, g), full_region(300, g)
-    for name, sc in (("EFA", expected_functional_accuracy_gain(css, pool, probes, 0.13)), ("IG structurel", structural_ig(css, pool, 0.13)), ("IG fonctionnel", functional_ig(css, pool, probes, 0.13)), ("désaccord", disagreement(css, pool))):
-        i = int(sc.argmax()); print(f"{name:15s} meilleur point {[round(v, 2) for v in pool[i].tolist()]} score {float(sc[i]):.4f}")
-    ch = sensor_tradeoff_choice(css, pool, probes, 16.0, 0.08); print("Capteur choisi (compromis coût / bruit) :", ch.sensor, "| action :", ch.action, "| utilité", round(ch.utility, 4))
-    print("Entropie des structures compatibles :", round(css.entropy(), 3), "| entropie fonctionnelle :", round(css.functional_entropy(probes), 3))
+    for name, sc in (("EFA", expected_functional_accuracy_gain(css, pool, probes, 0.13)), ("structural IG", structural_ig(css, pool, 0.13)), ("functional IG", functional_ig(css, pool, probes, 0.13)), ("disagreement", disagreement(css, pool))):
+        i = int(sc.argmax()); print(f"{name:15s} best point {[round(v, 2) for v in pool[i].tolist()]} score {float(sc[i]):.4f}")
+    ch = sensor_tradeoff_choice(css, pool, probes, 16.0, 0.08); print("Chosen sensor (cost / noise trade-off):", ch.sensor, "| action:", ch.action, "| utility", round(ch.utility, 4))
+    print("Entropy of the compatible structures:", round(css.entropy(), 3), "| functional entropy:", round(css.functional_entropy(probes), 3))

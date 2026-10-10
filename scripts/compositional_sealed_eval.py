@@ -1,4 +1,4 @@
-"""Évaluation UNIQUE du lot scellé de la plasticité compositionnelle -> results/compositional_sealed.json."""
+"""SINGLE evaluation of the compositional plasticity sealed set -> results/compositional_sealed.json."""
 import json
 import os
 import sys
@@ -7,7 +7,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from core.compositional_benchmark import SEALED_SHA256, sealed_eval, sealed_hash  # noqa: E402
 
 if __name__ == "__main__":
-    assert sealed_hash() == SEALED_SHA256, "lot scellé modifié"
+    assert sealed_hash() == SEALED_SHA256, "sealed set modified"
     path = "results/compositional_sealed.json"
     if os.path.exists(path) and "--force" not in sys.argv:
         print(open(path).read()); sys.exit(0)

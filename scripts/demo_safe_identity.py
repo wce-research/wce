@@ -1,4 +1,4 @@
-"""Démo : faits calibrés -> EliminateCandidates -> identité L1 -> réponse ; même cas avec une source faible -> abstention."""
+"""Demo: calibrated facts -> EliminateCandidates -> L1 identity -> answer; same case with a weak source -> abstention."""
 import os
 import sys
 
@@ -28,24 +28,24 @@ def main():
     agent = UnifiedAgent(UnifiedConfig(identity_mode="l1")); agent.learn_captions(caps); agent.warm_up_sources(splits["train"])
     model = fit_supervised(emissions(agent, splits["train"]), "lower", type_priors(), selection=False)
     install(agent, model)
-    print("Fiabilités effectives calibrées :", {s: round(model.estimate(s), 3) for s in ("sensor_A", "sensor_B", "document_A", "speaker_B")})
-    for title, describer, conf in (("Faits calibrés (capteurs) + description par document_A", "document_A", True),
-                                   ("Faits calibrés + « le cube rouge » attesté par document_A, speaker_A ET speaker_B", ("document_A", "speaker_A", "speaker_B"), True),
-                                   ("Même scène, description par speaker_B (faible)", "speaker_B", True),
-                                   ("Prémisses établies seulement par speaker_B", "document_A", False)):
+    print("Calibrated effective reliabilities:", {s: round(model.estimate(s), 3) for s in ("sensor_A", "sensor_B", "document_A", "speaker_B")})
+    for title, describer, conf in (("Calibrated facts (sensors) + description by document_A", "document_A", True),
+                                   ("Calibrated facts + “the red cube” attested by document_A, speaker_A AND speaker_B", ("document_A", "speaker_A", "speaker_B"), True),
+                                   ("Same scene, description by speaker_B (weak)", "speaker_B", True),
+                                   ("Premises established only by speaker_B", "document_A", False)):
         scene(agent, describer, conf)
         print(f"\n{title}")
         for o in ("o1", "o2", "o3"):
             bb = agent.belief.color(o); print(f"  color({o}) = {bb.value} {bb.status} p={bb.posterior:.3f}")
         rule = agent.explicit_elimination("cube", "red", min_posterior=agent.cfg.l1_min_premise)
-        print(f"  EliminateCandidates(cube, red) : candidats {rule.candidates} exclus {rule.excluded} -> {rule.remaining}"
-              f" (niveau L{rule.level}, confiance {rule.confidence:.3f})")
+        print(f"  EliminateCandidates(cube, red): candidates {rule.candidates} excluded {rule.excluded} -> {rule.remaining}"
+              f" (level L{rule.level}, confidence {rule.confidence:.3f})")
         for ctx, src in (("observation", describer if isinstance(describer, str) else describer[0]), ("query", None)):
             o, p = agent.identity_prob("cube", "red", ctx, src)
             thr = agent.threshold(ctx)
-            verdict = f"identité L1 -> {o} (P={p:.3f} ≥ {thr})" if o and p >= thr else f"abstention (P={p:.3f} < {thr} ou prémisses insuffisantes)"
+            verdict = f"L1 identity -> {o} (P={p:.3f} ≥ {thr})" if o and p >= thr else f"abstention (P={p:.3f} < {thr} or insufficient premises)"
             print(f"  {ctx:11s}: {verdict}")
-    print("\nL'identité L2 (correspondance jointe probabiliste) n'est jamais utilisée en mode L1.")
+    print("\nL2 identity (probabilistic joint matching) is never used in L1 mode.")
 
 
 if __name__ == "__main__":

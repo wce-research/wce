@@ -1,4 +1,4 @@
-"""Micro-corpus français -> mêmes primitives WCE, même mécanisme d'explication/lexique."""
+"""French micro-corpus -> same WCE primitives, same explanation/lexicon mechanism."""
 import os
 import sys
 

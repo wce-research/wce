@@ -1,4 +1,4 @@
-"""Évaluation UNIQUE du lot scellé du banc adversarial des sources -> results/source_sealed.json"""
+"""SINGLE evaluation of the sealed set of the adversarial source bench -> results/source_sealed.json"""
 import json
 import os
 import sys
@@ -8,7 +8,7 @@ from core.source_adversarial import SEALED_SHA256, sealed_episodes, sealed_hash 
 from core.source_adversarial_eval import compare  # noqa: E402
 
 if __name__ == "__main__":
-    assert sealed_hash() == SEALED_SHA256, "lot scellé modifié"
+    assert sealed_hash() == SEALED_SHA256, "sealed set modified"
     path = "results/source_sealed.json"
     if os.path.exists(path) and "--force" not in sys.argv:
         print(open(path).read()); sys.exit(0)

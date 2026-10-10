@@ -1,4 +1,4 @@
-"""Démo : budget strict (400 flottants) → cristalliser / résidu à porte / tête partagée / élaguer → acquérir ou REFUSER."""
+"""Demo: strict budget (400 floats) → crystallize / gated residual / shared head / prune → acquire or REFUSE."""
 import os
 import sys
 

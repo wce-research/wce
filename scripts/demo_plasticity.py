@@ -1,4 +1,4 @@
-"""Modèle neuronal compact auto-transformable, gouverné par WCE."""
+"""Compact self-transforming neural model, governed by WCE."""
 import os
 import sys
 
@@ -100,7 +100,7 @@ def main():
     memory = MemorySystem(new, experiences=[experience])
     memory.learn_skill(skill)
     controller = PlasticityController()
-    for _ in range(3): skill.record_success()  # consolidée sur 3 instances (cf. demo-learning)
+    for _ in range(3): skill.record_success()  # consolidated over 3 instances (cf. demo-learning)
     for acc in (None, 0.7, 0.4):
         decision, why = controller.decide_for_skill(skill, acc)
         print(f"skill={skill.name} detector_accuracy={acc}: {decision} ({why})")

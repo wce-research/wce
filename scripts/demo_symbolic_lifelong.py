@@ -1,4 +1,4 @@
-"""Contexte émergent + séquences symboliques : flux continu sans étiquette."""
+"""Emergent context + symbolic sequences: continuous stream without labels."""
 import os
 import sys
 

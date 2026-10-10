@@ -1,4 +1,4 @@
-"""Expérience recherche -> macro -> réutilisation."""
+"""Search -> macro -> reuse experiment."""
 import os
 import sys
 

@@ -1,4 +1,4 @@
-"""8 graines × 5 systèmes (environnement indépendant) -> results/unified_multiseed.json"""
+"""8 seeds × 5 systems (independent environment) -> results/unified_multiseed.json"""
 import json
 import os
 import sys

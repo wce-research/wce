@@ -1,4 +1,4 @@
-"""Audit : observables géométriques des trajectoires, sorties correctes vs incorrectes."""
+"""Audit: geometric observables of the trajectories, correct vs incorrect outputs."""
 import os
 import sys
 
@@ -13,7 +13,7 @@ def fmt(z): return ", ".join(f"{k}={z[k]:.2f}" for k in OBSERVABLES + ("confiden
 
 def main():
     print("=== WCE HALLUCINATION AUDIT ===")
-    print("Observables = PROXIES (projections aléatoires + sliced-W2 sur passes bruitées) ; pas de W2 exact.")
+    print("Observables = PROXIES (random projections + sliced-W2 over noisy passes); no exact W2.")
     lc = build_core(**SYSTEMS["6_full_self_correction"]); run_stream(lc)
     exclude = evaluation_words()
     report = hallucination_audit(lc, exclude)
@@ -21,36 +21,36 @@ def main():
     lc.attach_monitor(monitor, estimator)
     cases = report["cases"]
     pick = lambda cat, ok: next((c for c in cases if c.category == cat and c.correct == ok), None)
-    for title, case in (("Correct output (forme connue)", pick("known", True)),
-                        ("Correct output (forme inédite)", pick("heldout_forms", True)),
-                        ("Incorrect output (forme inédite)", pick("heldout_forms", False)),
-                        ("Incorrect output (module corrompu)", pick("corrupted_module", False)),
-                        ("Mot inconnu / piège", pick("unknown_or_trap", False) or pick("unknown_or_trap", True)),
+    for title, case in (("Correct output (known form)", pick("known", True)),
+                        ("Correct output (unseen form)", pick("heldout_forms", True)),
+                        ("Incorrect output (unseen form)", pick("heldout_forms", False)),
+                        ("Incorrect output (corrupted module)", pick("corrupted_module", False)),
+                        ("Unknown word / trap", pick("unknown_or_trap", False) or pick("unknown_or_trap", True)),
                         ("Ambiguous output", pick("ambiguous", True) or pick("ambiguous", False)),
-                        ("Mauvais routage forcé", pick("wrong_routing", False))):
+                        ("Forced wrong routing", pick("wrong_routing", False))):
         if case is None: continue
-        print(f"\n{title}: « {case.word} » -> {case.predicted} (vérité {case.truth})")
+        print(f"\n{title}: « {case.word} » -> {case.predicted} (truth {case.truth})")
         print(f"  Z = {fmt(case.z)}")
         print(f"  Geometric risk: {estimator.score(case.z):.2f} ({estimator.level(case.z)})")
-    print("\nPolitique complète sur des phrases :")
+    print("\nFull policy on sentences:")
     for text in ("le cube tombe", "le bloc montait", "le bloc zorphe", "tourne abcde", "le bloc tombe du support",
                  "le cube montagne", "renverse abcde", "la table est en bois"):
         r = lc.process(text, make_scene())
         risk = r.risk
         geo = f"{risk.geometric_level} ({risk.geometric_risk:.2f})" if risk and risk.geometric_risk is not None else "n/a"
         support = f"{risk.structural_support:.2f}" if risk else "n/a"
-        print(f"  « {text} »: structural support {support} | geometric risk {geo} | statut {r.status} -> Final policy: {r.decision}")
-    print(f"\nTest set (disjoint de la calibration) : {report['n_test']} cas, {report['n_incorrect']} erreurs neuronales")
-    print("AUROC pour détecter une erreur neuronale :")
+        print(f"  « {text} »: structural support {support} | geometric risk {geo} | status {r.status} -> Final policy: {r.decision}")
+    print(f"\nTest set (disjoint from calibration): {report['n_test']} cases, {report['n_incorrect']} neural errors")
+    print("AUROC for detecting a neural error:")
     for k, v in report["auroc"].items(): print(f"  {k:<26} {v}")
     nat = report["auroc_natural_errors_only"]
-    print(f"AUROC sur erreurs NATURELLES seulement (sans module corrompu) : {nat}")
-    print(f"Coefficients du GeometricRiskEstimator : {report['coefficients']}")
-    print(f"Mauvais routage forcé : risque moyen {report['wrong_routing_risk_mean']} (trajectoire d'entrée identique -> invisible)")
-    print("\nMoyennes par catégorie :")
+    print(f"AUROC on NATURAL errors only (without corrupted module): {nat}")
+    print(f"GeometricRiskEstimator coefficients: {report['coefficients']}")
+    print(f"Forced wrong routing: mean risk {report['wrong_routing_risk_mean']} (identical input trajectory -> invisible)")
+    print("\nMeans per category:")
     for k, v in report["by_category"].items(): print(f"  {k:<30} {v}")
-    print("\nConclusion prudente : corrélation mesurée sur un corpus jouet, pas une preuve causale ;"
-          " les contradictions structurelles et le mauvais routage restent invisibles à la géométrie d'entrée.")
+    print("\nCautious conclusion: correlation measured on a toy corpus, not a causal proof;"
+          " structural contradictions and wrong routing remain invisible to the input geometry.")
 
 
 if __name__ == "__main__":

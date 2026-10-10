@@ -1,4 +1,4 @@
-"""Démo : transformation candidate → survie prédite des invariants (main / appris / hybride) → survie réelle."""
+"""Demo: candidate transformation → predicted survival of the invariants (hand / learned / hybrid) → actual survival."""
 import os
 import random
 import sys
@@ -13,7 +13,7 @@ if __name__ == "__main__":
     for s in (0, 1): net, certs = built_state(s); train += simulate(net, certs, 200, seed=s)
     model = LearnedStabilizerModel().fit(train)
     net, certs = built_state(3); rng = random.Random(5)
-    print(f"Stabilisateur appris sur {len(train)} observations ; état NOUVEAU (graine 3) avec {len(certs)} compétences certifiées.\n")
+    print(f"Stabilizer learned on {len(train)} observations; NEW state (seed 3) with {len(certs)} certified skills.\n")
     shown = 0
     while shown < 8:
         fam, target, mag, spec = sample_transformation(net, rng, (0.02, 0.6))
@@ -24,5 +24,5 @@ if __name__ == "__main__":
         except Exception: _restore(net, snap); continue
         real = label(net, certs, skill, ctx); _restore(net, snap); net.fast = fast
         for m in [m for m in net.modules if m not in snap[0]]: net.modules.pop(m)
-        print(f"  {fam:17s} cible {str(target):16s} amplitude {mag:.3f} | compétence {skill:28s} -> P(préservé) main {h:.2f} appris {p:.2f} hybride {hybrid_value(h, p, fam):.2f} | réel : {'préservé' if real else 'CASSÉ'}")
+        print(f"  {fam:17s} target {str(target):16s} magnitude {mag:.3f} | skill {skill:28s} -> P(preserved) hand {h:.2f} learned {p:.2f} hybrid {hybrid_value(h, p, fam):.2f} | actual: {'preserved' if real else 'BROKEN'}")
         shown += 1

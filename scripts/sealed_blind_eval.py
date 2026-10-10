@@ -1,4 +1,4 @@
-"""Évaluation UNIQUE du lot scellé du banc tiers difficile -> results/sealed_blind.json (ne pas relancer pour régler)."""
+"""SINGLE evaluation of the sealed set of the hard third-party bench -> results/sealed_blind.json (do not rerun for tuning)."""
 import json
 import os
 import sys
@@ -9,7 +9,7 @@ from core.third_party_eval import SYSTEMS, by, calibrate_on, metrics, run  # noq
 from core.third_party_hard import SEALED_SHA256, n_questions, sealed_hash, sealed_set  # noqa: E402
 
 if __name__ == "__main__":
-    assert sealed_hash() == SEALED_SHA256, "lot scellé modifié"
+    assert sealed_hash() == SEALED_SHA256, "sealed set modified"
     path = "results/sealed_blind.json"
     if os.path.exists(path) and "--force" not in sys.argv:
         print(open(path).read()); sys.exit(0)
