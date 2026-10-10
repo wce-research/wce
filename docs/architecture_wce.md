@@ -1,50 +1,43 @@
-# Architecture WCE — état du prototype
+# WCE — World Configuration Engine
 
-Ce document distingue les fonctions opérationnelles, les modules de recherche et les objectifs. Il décrit le code présent dans ce dépôt au 3 octobre 2026. WCE n'est pas encore un modèle frontier entraînable de bout en bout.
+WCE est un paradigme expérimental alternatif : des primitives, transformations, invariants et compositions pour explorer la construction de structures et de comportements complexes. Ce document décrit les mécanismes scientifiques ; les implémentations du site et du futur hub ne font pas partie de cette publication.
 
-## What exists now
+## What exists now — le socle vérifiable
 
-### Parcours web et moteur symbolique
+Le moteur symbolique suit un parcours explicite :
 
 ```text
-Navigateur → app/static/app.js → POST /api/command → app/web.py
-                                                 → app/session.py
-                                                 → language/command.py
-                                                 → core/world.py + core/executor.py
-                                                 → physics/engine.py + physics/laws.py
-                                                 → language/answer.py → réponse
+language/command.py → core/executor.py → core/world.py
+                                      → physics/engine.py
+                                      → language/answer.py
 ```
 
-- `app/web.py` sert la page, l'API, le contrôle d'origine et la santé. Une session indépendante par cookie reste en mémoire.
-- `app/session.py` instancie un monde avec une balle et un support, applique les commandes et fait progresser la simulation.
-- `language/` analyse les questions et actions ; `core/` représente les entités, relations, contraintes et transformations ; `physics/` applique les lois et interactions.
-- `app/repl.py` donne une autre interface au même moteur.
-- `tests/` contient les tests du moteur, des modules scientifiques et de l'interface HTTP.
-- Les résultats JSON et les hypothèses préenregistrées accessibles depuis la page proviennent de `results/` et `docs/`. Ils sont spécifiques à leurs protocoles ; certains verdicts sont réfutés ou non concluants.
+`app/session.py` assemble un monde réduit avec une balle et un support. `app/repl.py` permet de manipuler ce moteur. Les lois de gravité et de collision sont définies à l’avance : la démonstration ne les découvre pas.
 
-Le service web est volontairement léger et n'importe pas PyTorch. Le code de recherche utilisant PyTorch reste dans `core/` et ses tests.
+Le dépôt comprend également des prototypes scientifiques, des tests et des protocoles. Trois artefacts consultables décrivent la couverture prédictive, l’apprentissage continu et la découverte active. Ils incluent des limites, des hypothèses réfutées et des résultats non concluants. Ils ne constituent pas une comparaison générale avec les LLM ou les modèles du monde.
 
-### Déploiement local
+## What is being explored — les mécanismes
 
-`Dockerfile` crée une image Python 3.12 avec un utilisateur non root. `compose.yaml` publie seulement le port web réservé sur l'interface locale du Dell. Le service n'utilise ni base de données, ni worker, ni proxy. L'état des sessions n'est pas durable : il recommence après un redémarrage.
+- Composition : `core/transformations.py`, `core/invariants.py`, `core/transform_graph.py`.
+- État du monde : `core/world.py`, `core/model_state.py`.
+- Raisonnement et planification : `core/reasoning.py`, `core/planner.py`.
+- Langage ancré : `core/language_core.py`, `core/language_bridge.py`, `core/grounded.py`.
+- Mesure et observation : `core/measurement.py`, `core/source_reliability.py`.
+- Certificats et ancrage : `core/generative_certificate.py`, `core/truth_anchor.py`.
+- Plasticité et rétention : `core/plasticity.py`, `core/safe_plasticity.py`, `core/continuum.py`.
+- Découverte structurelle : `core/active_structure.py`, `core/active_world.py`.
+- Branches et instantanés : `core/branching.py`.
 
-## What is being explored
+La présence de ces modules ne prouve ni leur intégration en un modèle unique ni la confirmation de leurs hypothèses. Chaque résultat doit être relié à son protocole et à son budget.
 
-Le dépôt comporte des modules et expériences autour de :
+## Reproduction
 
-- **Apprentissage structurel** : `core/active_structure.py`, `core/boundary_program.py`, `core/program_induction_core.py`.
-- **Plasticité et mémoire** : `core/plasticity.py`, `core/safe_plasticity.py`, `core/symbolic_lifelong.py`, `core/continuum.py`.
-- **Mesure et observation** : `core/measurement.py`, `core/source_reliability.py`, `core/epistemic_benchmark.py`.
-- **Raisonnement et langage ancré** : `core/grounded.py`, `core/discourse.py`, `core/language_bridge.py`.
-- **État du monde et planification** : `core/world.py`, `core/unified_agent.py`, `core/active_world.py`.
-- **Évaluation** : scripts sous `scripts/`, suites `tests/`, protocoles `docs/hypotheses_*.md`, résultats `results/`.
+Le moteur symbolique se lance avec `python -m app.repl` et se vérifie avec `python -m unittest tests.test_wce`. Les expériences neuronales nécessitent PyTorch, leurs fixtures et leurs scripts propres. Une vérification du moteur ne reproduit pas ces expériences.
 
-Leur présence dans le dépôt n'implique pas qu'ils forment déjà un système intégré ni que les hypothèses associées soient confirmées. Les fichiers de résultats contiennent les mesures détaillées et les verdicts.
+Consigner version du code, versions des dépendances, plateforme, précision numérique, graines, données, budget et empreintes des artefacts. Deux divergences numériques inter-plateformes restent connues dans la suite scientifique ; elles ne sont pas masquées par des changements de critères.
 
 ## What WCE aims to become
 
-L'objectif est un hub ouvert pour architectures d'IA frontier : code source complet, entraînement reproductible sur sa propre machine, poids et configurations publiables, environnements Docker, contributions communautaires, forks, nouveaux modèles et comparaisons expérimentales.
-
-Pour atteindre cet objectif, il reste notamment à intégrer les modules en un parcours d'entraînement commun, définir des interfaces et formats stables, publier des jeux d'évaluation reproductibles, préciser la licence et établir un processus public de contribution. Les résultats actuels ne prouvent pas une supériorité sur les LLM ou sur d'autres modèles du monde.
+Un hub ouvert pour de nouvelles architectures d’IA : code scientifique complet, protocoles inspectables, environnements reproductibles, contributions, forks et comparaisons expérimentales. Les interfaces d’entraînement communes, la licence et le processus public de contribution restent à formaliser. Aucune supériorité sur les architectures dominantes n’est démontrée ici.
 
 **Open weights are not enough. Open the architecture.**

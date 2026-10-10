@@ -40,3 +40,5 @@ docs/identity/boards/exploration-*.png
 !docs/identity/assets/
 docs/identity/assets/*
 !docs/identity/assets/typeface-license.txt
+
+dist/
