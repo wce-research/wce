@@ -7,7 +7,7 @@ services:
     environment:
       WCE_GITHUB_URL: ${WCE_GITHUB_URL:-https://github.com/wce-research}
       PUBLIC_CONTACT_EMAIL: ${PUBLIC_CONTACT_EMAIL:-}
-      PUBLIC_WCE_REPO_ENABLED: ${PUBLIC_WCE_REPO_ENABLED:-false}
+      PUBLIC_WCE_REPO_ENABLED: ${PUBLIC_WCE_REPO_ENABLED:-true}
       WCE_X_URL: ${WCE_X_URL:-}
       WCE_LINKEDIN_URL: ${WCE_LINKEDIN_URL:-}
       WCE_INSTAGRAM_URL: ${WCE_INSTAGRAM_URL:-}

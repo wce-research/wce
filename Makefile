@@ -914,3 +914,12 @@ deep-timing:
 	$(AWSPY) timing
 
 endif
+
+# Dell frontend verification; no scientific training or production deployment.
+.PHONY: frontend-test frontend-browser
+frontend-test:
+	$(PYTHON) -m unittest tests.test_web tests.test_public_identity tests.test_public_source tests.test_wce -q
+
+NODE ?= node
+frontend-browser:
+	$(NODE) tests/browser/frontier.cjs

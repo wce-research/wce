@@ -1,5 +1,7 @@
 import unittest
 import hashlib
+import ipaddress
+import re
 import tempfile
 from tools.prepare_public_source import build
 from tools.prepare_public_source import ROOT, selected_files
@@ -21,8 +23,16 @@ class PublicBoundaryTests(unittest.TestCase):
             for route in PAGES:
                 with self.subTest(route=route, language=language):
                     page = render_page(route, language=language).decode()
-                    for private in ('app/web.py', 'app/localization.py', 'compose.yaml', '127.0.0.1:3018', '192.168.0.12'):
+                    for private in ('app/web.py', 'app/localization.py', 'compose.yaml', '127.0.0.1:3018'):
                         self.assertNotIn(private, page)
+                    for address in re.findall(r"(?<![\d.])(?:\d{1,3}\.){3}\d{1,3}(?![\d.])", page):
+                        try:
+                            parsed = ipaddress.ip_address(address)
+                        except ValueError:
+                            continue
+                        self.assertFalse(parsed.is_private or parsed.is_loopback or parsed.is_link_local,
+                                         "Public pages must not expose private network addresses")
+                    self.assertNotRegex(page, r"/(?:home|Users)/[^/\s<>]+/")
 
     def test_export_is_deterministic_and_manifest_matches(self):
         import json

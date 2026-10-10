@@ -64,7 +64,6 @@
   "La découverte active étudie comment choisir des observations et identifier des structures ou des lois cachées. Les résultats incluent des hypothèses réfutées et non concluantes.": "Active discovery explores how to select observations and identify hidden structures or laws. Results include refuted and inconclusive hypotheses.",
   "La vision de WCE →": "The WCE vision →",
   "Langage ancré, état du monde et planification.": "Grounded language, world state and planning.",
-  "Le code et les protocoles existent dans ce dépôt. La publication publique complète, la licence et le processus de contribution restent à formaliser : aucun hub communautaire opérationnel n’est annoncé à ce stade.": "Code and protocols exist in this repository. Full public release, licensing and the contribution process still need to be formalised: no operational community hub is claimed at this stage.",
   "Le fichier distingue les sources database, sensor, document et speaker. Les valeurs ci-dessus proviennent de la section": "The artifact separates database, sensor, document and speaker sources. The values above come from its",
   "Le laboratoire est prêt.": "The laboratory is ready.",
   "Le laboratoire web et le REPL partagent": "The web laboratory and the REPL share",
@@ -159,7 +158,6 @@
   "Un simulateur symbolique accessible sur le site ; dans le dépôt, des prototypes de langage hybride, de planification, de mesure et d’apprentissage. Les résultats appartiennent à leurs protocoles, et les limites font partie du dossier.": "A symbolic simulator accessible on the website; in the repository, prototypes for hybrid language, planning, measurement and learning. Results belong to their protocols, and limitations are part of the record.",
   "Relier les transformations de modèle, les certificats, la stabilité locale et la découverte active. Étudier les conditions de composition, de consolidation et d’ancrage des décisions ; mesurer ce qui fonctionne et ce qui échoue.": "Connect model transformations, certificates, local stability and active discovery. Study conditions for composition, consolidation and grounded decisions; measure what works and what fails.",
   "Trois dossiers relient les artefacts servis par le site à la couverture prédictive, l’apprentissage continu et la découverte active. Les autres bancs existent dans le dépôt ; leur présence ne signifie pas qu’ils sont tous publiés ou validés ici.": "Three dossiers connect artifacts served by the site to predictive coverage, continual learning and active discovery. Other benchmarks exist in the repository; their presence does not mean they are all published or validated here.",
-  "Un inventaire des modules moteur et scientifiques, leurs symboles et dix dossiers de mécanismes. Le code est disponible dans le dépôt local ; sa publication publique et sa licence restent à formaliser.": "An inventory of engine and research modules, their symbols and ten mechanism dossiers. Code is available in the local repository; public publication and licensing remain to be formalised.",
   "REPRODUCTION SCIENTIFIQUE": "SCIENTIFIC REPRODUCTION",
   "Exécuter. Vérifier. Comparer.": "Run. Verify. Compare.",
   "Le moteur symbolique, les dépendances de recherche et les protocoles expérimentaux sont distingués. Une démonstration ne remplace pas la reproduction d’un benchmark.": "The symbolic engine, research dependencies and experimental protocols are distinguished. A demonstration does not replace reproducing a benchmark.",
@@ -174,5 +172,7 @@
   "Utilisez une commande du guide. La réponse provient du moteur symbolique.": "Use a command from the guide. The response comes from the symbolic engine.",
   "Prêt. Choisissez un exemple ou saisissez une commande acceptée.": "Ready. Choose an example or enter a supported command.",
   "Réponses récentes · les plus récentes en premier · 20 maximum": "Recent responses · newest first · up to 20",
-  "Lire les commandes acceptées ↗": "Read the supported commands ↗"
+  "Lire les commandes acceptées ↗": "Read the supported commands ↗",
+  "Le code scientifique et les protocoles sont publiés sur GitHub sous licence Apache-2.0, avec un guide de contribution. Le hub communautaire sur ce site reste une vision.": "Scientific source and protocols are published on GitHub under Apache-2.0, with contribution guidance. A community hub on this website remains a vision.",
+  "Un inventaire des modules moteur et scientifiques, leurs symboles et dix dossiers de mécanismes. Le code scientifique courant est disponible dans le dépôt GitHub canonique sous licence Apache-2.0.": "An inventory of engine and research modules, their symbols and ten mechanism dossiers. Current scientific source is available in the canonical GitHub repository under Apache-2.0."
 }

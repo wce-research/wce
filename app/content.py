@@ -130,25 +130,25 @@ dossier('/open/reproduce',
  ('app/repl.py','tests/test_wce.py'),('/research/methodology','/research/limitations'))
 
 dossier('/open/source',
- ('Code source & artefacts','Relier le mécanisme, le protocole et le résultat.','Disponible localement',[
+ ('Code source & artefacts','Relier le mécanisme, le protocole et le résultat.','Disponible',[
  ('Lire les mécanismes','Le code du moteur est dans app, core, language et physics. Les points d’entrée de chaque dossier identifient les modules pertinents, plutôt que d’annoncer un nouveau code source parallèle.'),
- ('Lire les résultats','Les fichiers JSON sont servis directement sous /research/. Le document d’architecture et le protocole des certificats sont accessibles comme sources en français. La traduction de l’interface ne modifie pas les artefacts scientifiques.'),
- ('Préparer la publication','L’URL publique officielle du dépôt et la licence restent à formaliser. Le lien GitHub du footer est activé uniquement lorsqu’une URL officielle est configurée ; aucune adresse de projet n’est inventée.')]),
- ('Source code & artifacts','Connect the mechanism, protocol and result.','Available locally',[
+ ('Lire les résultats','Les fichiers JSON sont servis directement sous /research/. Le document d’architecture et les protocoles sont des sources canoniques en anglais. La traduction du site ne modifie pas les artefacts scientifiques.'),
+ ('Dépôt canonique','Le dépôt canonique https://github.com/wce-research/wce publie le code scientifique courant sous licence Apache-2.0. Le lien GitHub du footer ouvre l’organisation officielle WCE Labs.')]),
+ ('Source code & artifacts','Connect the mechanism, protocol and result.','Implemented',[
  ('Read the mechanisms','The engine source lives in app, core, language and physics. Entry points in each note identify relevant modules instead of claiming a parallel implementation.'),
- ('Read the results','JSON files are served directly under /research/. The architecture document and certificates protocol are available as French source documents. Translating the interface does not modify scientific artifacts.'),
- ('Prepare the public release','The official public repository URL and licence still need formalisation. The footer’s GitHub link is activated only when an official URL is configured; no project address is invented.')]),
+ ('Read the results','JSON files are served directly under /research/. The architecture document and protocols are canonical English sources. Website translations do not modify scientific artifacts.'),
+ ('Canonical repository','The canonical repository https://github.com/wce-research/wce publishes the current scientific source under Apache-2.0. The footer’s GitHub link opens the official WCE Labs organisation.')]),
  ('docs/architecture_wce.md','results/predictive_coverage.json','results/continuum_summary.json','results/active_summary.json'),('/research','/open/contribute'))
 
 dossier('/open/contribute',
  ('Contribuer & forker','Construire les conditions d’une collaboration scientifique ouverte.','Trajectoire',[
  ('Une contribution vérifiable','Décrire la question, le mécanisme modifié, la baseline, les coûts et le protocole. Joindre code, tests et artefacts ; une nouvelle capacité doit pouvoir être inspectée et reproduite.'),
  ('Conserver l’historique expérimental','Un fork doit préciser versions, dépendances, données et écarts de comportement. Les résultats négatifs comptent ; ne pas réécrire les critères après avoir observé les mesures.'),
- ('Ce qui reste à formaliser','Licence, dépôt public, guide de contribution, revue des changements et règles de publication sont à établir. Cette page ne prétend pas fournir aujourd’hui un compte, un système de pull requests ou un service d’upload.')]),
+ ('Contribuer via GitHub','Le dépôt GitHub public fournit la licence Apache-2.0 et CONTRIBUTING.md. Les propositions et pull requests suivent ces règles ; le site ne fournit pas de comptes ou de service d’upload.')]),
  ('Contribute & fork','Build the conditions for open scientific collaboration.','Roadmap',[
  ('An inspectable contribution','Describe the question, changed mechanism, baseline, costs and protocol. Include code, tests and artifacts; a new capability must be inspectable and reproducible.'),
  ('Preserve experimental history','A fork should specify versions, dependencies, data and behavioural differences. Negative results matter; do not rewrite criteria after inspecting measurements.'),
- ('Still to formalise','Licensing, a public repository, contribution guidance, change review and publication rules remain to be established. This page does not claim to provide accounts, pull requests or an upload service today.')]),
+ ('Contribute through GitHub','The public GitHub repository provides the Apache-2.0 licence and CONTRIBUTING.md. Proposals and pull requests follow those rules; the website does not provide accounts or an upload service.')]),
  (),('/research/methodology','/vision/frontier-hub'))
 
 dossier('/lab/guide',

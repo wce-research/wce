@@ -96,7 +96,7 @@ SOCIALS = [
 
 def social_links(language='fr') -> str:
     links = []
-    for name, variable, hosts, icon in SOCIALS:
+    for name, variable, hosts, icon in sorted(SOCIALS, key=lambda item: ('GitHub', 'LinkedIn', 'X', 'Instagram').index(item[0])):
         from app.public_identity import GITHUB_ORG
         url = (GITHUB_ORG if name == "GitHub" else os.environ.get(variable, "").strip())
         try:
@@ -174,9 +174,9 @@ def render_page(route: str, language='fr') -> bytes:
         content += research_context(language)
     if re.search(r'href="/research/[^"]+\.md"',content):
         source_language_note = (
-            'Le code source, la documentation et les artefacts scientifiques publics seront en anglais par défaut. Le site reste multilingue.'
+            'Le code source, la documentation et les artefacts scientifiques sont publiés en anglais dans le dépôt canonique. Le site est multilingue ; la version anglaise sert de référence éditoriale.'
             if language == 'fr' else
-            'Public source code, research documentation and scientific artifacts will use English by default. The website remains multilingual.'
+            'Source code, research documentation and scientific artifacts are published in English in the canonical repository. The website is multilingual; its English version is the editorial reference.'
         )
         content += '<p class="section source-language-note note">'+source_language_note+'</p>'
     if route != '/':

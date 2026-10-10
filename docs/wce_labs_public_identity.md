@@ -14,12 +14,12 @@ Audit: shared shell, FR/EN routes, social links and .env.example configuration, 
 
 - Domain and organisation centralised in app/public_identity.py: https://wcelabs.com and https://github.com/wce-research.
 - PUBLIC_CONTACT_EMAIL: empty by default; only a valid address under wcelabs.com is displayed. Provide a real mailbox before activation.
-- PUBLIC_WCE_REPO_ENABLED=false: the link https://github.com/wce-research/wce remains hidden by default. The repository is now public with an Apache-2.0 licence, according to the state communicated by the owner; the local scientific code has not yet been pushed. Its existence does not amount to publication of the code. Any scientific publication requires a prior audit.
+- PUBLIC_WCE_REPO_ENABLED=true by default: the canonical scientific repository is public at https://github.com/wce-research/wce under Apache-2.0. Explicit false still hides the repository link. GitHub is the source of truth.
 - WCE_GITHUB_URL is kept for Compose compatibility; the frontend uses the centralised official organisation. X, LinkedIn and Instagram keep their existing configuration.
 
 ## Assets and SEO
 
-The future canonical language of the public scientific repository is English: code, comments and docstrings, README, technical documentation, reports, hypotheses, artefacts and public metadata. The site remains multilingual and will be able to translate this canonical source. This rule does not mean that the existing local documents have already been translated or published.
+English is the canonical language of source code, scientific documentation, reports, protocols and public artifacts. The multilingual website uses English as its editorial reference and translates it. Existing language adapters are retained; no separate French scientific source is created.
 
 Sources: tools/build_labs_brand.py, SVG files in app/static/brand. Exports: square PNG/SVG avatars light and dark, monochrome SVG, horizontal WCE Labs logos light/dark/monochrome, social image 1200 × 630. Adaptive SVG favicon, ICO 16/32/48 and apple-touch-icon 180. The original geometry is unchanged. Regeneration: python3 tools/build_labs_brand.py (Pillow and the DejaVu Sans system font required; no tool added to the production image).
 
@@ -27,7 +27,7 @@ Each FR/EN page receives a WCE Labs title, a cautious description, a localised c
 
 ## Machines and ports
 
-Development: GEEKOM A6. Execution: Dell dell-host, ~/workspace/wce. Existing SSH <user>@<dell-host> with <ssh-key>; no change of key/configuration.
+Frontend development, Docker and production preparation: Dell canonical GitHub clone. GEEKOM remains the scientific experimentation machine. Existing SSH <user>@<dell-host> with <ssh-key>; no change of key/configuration.
 
 The authority on the GEEKOM is ~/workspace/_machine_registry (effective equivalent of the requested folder). ports.json projects.wce and the README table already reserve web: 3018, binding 127.0.0.1. ./ports check validates the registry. No new reservation needed. The Dell copy ~/workspace/portfolio-port-governance is historical: do not replace the recent authority with this copy.
 

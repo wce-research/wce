@@ -18,15 +18,25 @@ class PublicIdentityTests(unittest.TestCase):
                 self.assertIn('>LABS</span>',page)
                 self.assertNotIn('>RESEARCH</span>',page)
                 self.assertIn('href="https://github.com/wce-research"',page)
-                self.assertNotIn('href="'+GITHUB_REPO+'"',page)
-                self.assertNotIn('mailto:',page)
+                self.assertIn('href="'+GITHUB_REPO+'"',page)
+                self.assertIn('mailto:security@wcelabs.com',page)
+                self.assertEqual(page.count('mailto:'),1)
     def test_contact_validation_and_repo_switch(self):
         with patch.dict(os.environ,{'PUBLIC_CONTACT_EMAIL':'research@wcelabs.com','PUBLIC_WCE_REPO_ENABLED':'true'}):
             page=render_page('/').decode()
             self.assertIn('mailto:research@wcelabs.com',page)
             self.assertIn('href="'+GITHUB_REPO+'"',page)
         for value in ('personal@example.com','a@wcelabs.com?subject=x','a@wcelabs.com\nBcc:x','javascript:alert(1)'):
-            with patch.dict(os.environ,{'PUBLIC_CONTACT_EMAIL':value}):self.assertNotIn('mailto:',render_page('/').decode())
+            with patch.dict(os.environ,{'PUBLIC_CONTACT_EMAIL':value}):self.assertEqual(render_page('/').decode().count('mailto:'),1)
+    def test_canonical_release_and_protocol_language(self):
+        page = render_page('/open/source', 'en').decode()
+        self.assertIn('Apache-2.0', page)
+        self.assertIn('canonical repository', page)
+        self.assertNotIn('French source documents', page)
+        self.assertIn('protocol (English)', render_page('/research/discovery', 'en').decode())
+        with patch.dict(os.environ, {'PUBLIC_WCE_REPO_ENABLED': 'false'}):
+            self.assertNotIn('href="'+GITHUB_REPO+'"', render_page('/').decode())
+
     def test_assets_and_manifest(self):
         from app.web import ASSETS, STATIC
         for route,(path,_) in ASSETS.items():

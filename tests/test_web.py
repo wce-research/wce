@@ -160,6 +160,14 @@ class WebTests(unittest.TestCase):
         self.assertEqual(self.request("POST", "/api/command", "{}", {"Content-Type": "application/json", "Origin": "http://evil.test", "Host": "127.0.0.1"})[0], 403)
         self.assertEqual(self.request("GET", "/missing")[0], 404)
 
+    def test_unexpected_engine_failure_is_a_safe_500(self):
+        from unittest.mock import patch
+        with patch('app.web.Session.execute', side_effect=RuntimeError('internal diagnostic')):
+            status, _, body = self.command('Soulève la balle à 2 mètres')
+        self.assertEqual(status, 500)
+        self.assertNotIn(b'internal diagnostic', body)
+        self.assertIn('error', json.loads(body))
+
     def test_backend_catalog_sources_and_inventory_are_current(self):
         from pathlib import Path
         from app.research_catalog import FAMILIES
