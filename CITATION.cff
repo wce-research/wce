@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+message: "If you use WCE in your research, please cite it as below."
+title: "WCE — World Configuration Engine"
+abstract: >-
+  World Configuration Engine (WCE) is an open research project exploring compact, compositional and verifiable AI
+  architectures based on explicit primitives, transformations, structured world models, adaptive learning and
+  scientific validation.
+type: software
+authors:
+  - family-names: Gueye
+    given-names: Amadou
+    affiliation: WCE Labs
+repository-code: "https://github.com/wce-research/wce"
+url: "https://wcelabs.com"
+license: Apache-2.0
+keywords:
+  - artificial intelligence
+  - world models
+  - compositional AI
+  - neuro-symbolic
+  - continual learning
+  - open research
