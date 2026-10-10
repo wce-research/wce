@@ -41,7 +41,7 @@ def world(i=0):
     x = SPLITS["test"][i]; AGENT.new_world(); AGENT.ingest(x["observations"]); return x
 
 
-# ================================================================ indépendance et environnement étendu
+# ================================================================ independence and extended environment
 
 class IndependenceTests(unittest.TestCase):
     def test_ext_generator_no_wce(self):
@@ -97,7 +97,7 @@ class ExtWorldTests(unittest.TestCase):
     def test_gold_meanings(self): self.assertEqual(GOLD_MEANING["brique"], "type:block")
 
 
-# ================================================================ lexique, alignement, polysémie
+# ================================================================ lexicon, alignment, polysemy
 
 class LexiconTests(unittest.TestCase):
     def test_alignment_contains(self): self.assertEqual(AGENT.lex.meaning("contient"), "rel:in")
@@ -160,7 +160,7 @@ class LexicalHypothesisTests(unittest.TestCase):
     def test_lexical_coverage_metric(self): self.assertGreater(lexical_coverage(AGENT)[0], 0.0)
 
 
-# ================================================================ grammaire jointe
+# ================================================================ joint grammar
 
 class GrammarTests(unittest.TestCase):
     def test_joint_beats_local(self):
@@ -214,7 +214,7 @@ class DistillationTests(unittest.TestCase):
         s = RoleStudent({"a"}, ["subject", "none"]); self.assertGreater(s.parameter_count, 0)
 
 
-# ================================================================ ingestion, preuves, abstentions
+# ================================================================ ingestion, evidence, abstentions
 
 class IngestionTests(unittest.TestCase):
     def test_parse_log(self): world(); self.assertTrue(AGENT.parse_log)
@@ -260,7 +260,7 @@ class CorrectionTests(unittest.TestCase):
         self.assertIn("grammar_ambiguity", {"grammar_ambiguity"})
 
 
-# ================================================================ multi-graines et statistiques
+# ================================================================ multi-seed and statistics
 
 class StatisticsTests(unittest.TestCase):
     def test_summary(self):
@@ -284,7 +284,7 @@ class StatisticsTests(unittest.TestCase):
     def test_joint_grammar_improves_roles(self):
         self.assertGreater(MS["comparisons"]["joint_vs_local_grammar"]["role_accuracy"]["mean"], 0.05)
     def test_grounded_lexicon_improves_success(self):
-        # le gain du lexique ancré passe par l'élimination (ancien régime) ; sans élimination il est ~nul (−1,2 pt, 2 graines)
+        # the gain of the grounded lexicon comes through elimination (old regime); without elimination it is ~zero (−1.2 pt, 2 seeds)
         self.assertGreater(MS["comparisons"]["grounded_vs_static_lexicon_anchored"]["success"]["mean"], 0)
     def test_distillation_cheaper(self):
         self.assertLess(MS["comparisons"]["distilled_vs_teacher"]["verification_cost"]["mean"], 0)
@@ -294,7 +294,7 @@ class StatisticsTests(unittest.TestCase):
     def test_systems_registry(self): self.assertIn("previous", SYSTEMS)
 
 
-# ================================================================ courbes, échelle, domaines
+# ================================================================ curves, scale, domains
 
 class CurveTests(unittest.TestCase):
     def test_coverage_growth(self):

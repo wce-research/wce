@@ -30,7 +30,7 @@ WEDGE = T(P("pred", "angle", "in", (0.0, 0.5)), (0.0, 0.0))
 def X0(n=400, s=0): return torch.rand(n, 2, generator=G(s)) * 4 - 2
 
 
-# ================================================================ AST, évaluation, sérialisation
+# ================================================================ AST, evaluation, serialisation
 
 class ASTTests(unittest.TestCase):
     def test_halfspace_eval(self): X = torch.tensor([[-1.0, 0.0], [1.0, 0.0]]); self.assertEqual(predict(HALF, X).tolist(), [1, 0])
@@ -61,7 +61,7 @@ class ASTTests(unittest.TestCase):
     def test_render_skeleton(self): self.assertIn("θ", render(WEDGE.skeleton()))
 
 
-# ================================================================ complexité, MDL
+# ================================================================ complexity, MDL
 
 class ComplexityTests(unittest.TestCase):
     def test_monotone_size(self): self.assertLess(complexity(HALF), complexity(P("and", children=(HALF, DISC))))
@@ -71,7 +71,7 @@ class ComplexityTests(unittest.TestCase):
     def test_transform_cost(self): self.assertGreater(complexity(DISC), complexity(P("pred", "norm", "le", (1.0,))))
 
 
-# ================================================================ canonisation, hachage, équivalence
+# ================================================================ canonicalisation, hashing, equivalence
 
 class CanonicalTests(unittest.TestCase):
     def test_commutative_and(self): self.assertEqual(program_hash(P("and", children=(DISC, HALF))), program_hash(P("and", children=(HALF, DISC))))
@@ -96,7 +96,7 @@ class CanonicalTests(unittest.TestCase):
     def test_no_general_claim(self): self.assertNotIn("mathematically", inspect.getsource(ProgramEquivalence))
 
 
-# ================================================================ ajustement des paramètres
+# ================================================================ parameter fitting
 
 class FitTests(unittest.TestCase):
     def check(self, truth, skel, thr=0.95):
@@ -113,7 +113,7 @@ class FitTests(unittest.TestCase):
     def test_fit_returns_params(self): p = self.check(HALF, P("pred", "dot", "le")); self.assertIsNotNone(p.params)
 
 
-# ================================================================ recherche
+# ================================================================ search
 
 class SearchTests(unittest.TestCase):
     def run_search(self, truth, n=300, **kw):
@@ -139,7 +139,7 @@ class SearchTests(unittest.TestCase):
     def test_atoms_ablation(self): self.assertTrue(all("angle" not in a.primitives_used() for a in atoms(set(PRIMITIVES) - {"angle"})))
 
 
-# ================================================================ postérieure, ambiguïté, expériences actives
+# ================================================================ posterior, ambiguity, active experiments
 
 class PosteriorTests(unittest.TestCase):
     def post(self):
@@ -163,7 +163,7 @@ class PosteriorTests(unittest.TestCase):
     def test_disagreement(self): p, a, b = self.post(); self.assertTrue(bool((p.disagreement(X0()) >= 0).all()))
 
 
-# ================================================================ anti-unification, familles
+# ================================================================ anti-unification, families
 
 class FamilyTests(unittest.TestCase):
     def test_same_structure_macro(self):
@@ -189,7 +189,7 @@ class FamilyTests(unittest.TestCase):
     def test_family_complexity(self): m, _ = anti_unify_programs([RING, RING]); self.assertGreater(BoundaryFamilyHypothesis(m).complexity(), 0)
 
 
-# ================================================================ explication, preuves
+# ================================================================ explanation, evidence
 
 class ExplanationTests(unittest.TestCase):
     def test_explain_fields(self): e = explain(P("and", children=(RING, HALF))); self.assertEqual(set(e), {"rule", "positive_when", "complexity", "parameters", "depth"})
@@ -200,7 +200,7 @@ class ExplanationTests(unittest.TestCase):
         self.assertEqual(eg[0]["node"], "root"); self.assertGreater(len(eg), 2); self.assertEqual(eg[0]["sources"], {"capteur": 100})
 
 
-# ================================================================ ancres de vérité
+# ================================================================ truth anchors
 
 class TruthAnchorTests(unittest.TestCase):
     def test_anchor_error(self):
@@ -232,7 +232,7 @@ class TruthAnchorTests(unittest.TestCase):
         self.assertGreater(BoundaryGenerativeCertificate(DISC, ContinuousGenerator(k=2).fit(X0())).memory_floats(), 0)
 
 
-# ================================================================ méthodes de base et résidu
+# ================================================================ baseline methods and residual
 
 class MethodTests(unittest.TestCase):
     def test_knn(self): X = X0(); y = predict(DISC, X); self.assertGreater(float((BM.knn_predict(X, y, X0(200, 3), 7) == predict(DISC, X0(200, 3))).float().mean()), 0.85)
@@ -243,10 +243,10 @@ class MethodTests(unittest.TestCase):
         self.assertLess(rp, 20); self.assertGreater(float((f(X) == y).float().mean()), 0.9)
     def test_split(self): a, b, c, d = BM.split(X0(100), torch.zeros(100)); self.assertEqual((len(a), len(c)), (75, 25))
     def test_methods_list(self): self.assertEqual(len(BM.METHODS), 8)
-    def test_stability_threshold_documented(self): self.assertIn("ENTRAÎNEMENT + VALIDATION", inspect.getsource(BM))
+    def test_stability_threshold_documented(self): self.assertIn("TRAINING + VALIDATION", inspect.getsource(BM))
 
 
-# ================================================================ monde du banc, protocole held-out
+# ================================================================ bench world, held-out protocol
 
 class WorldTests(unittest.TestCase):
     def test_splits_disjoint(self):
@@ -277,7 +277,7 @@ for _f in TRAIN + VALIDATION + HELD_OUT + SEALED + PARTIAL + UNREPRESENTABLE:
 def _make_oracle_test(fam):
     def t(self):
         inst = instances([fam], 8, 1)[0]
-        if inst.oracle is None: self.skipTest("pas d'oracle exact")
+        if inst.oracle is None: self.skipTest("no exact oracle")
         X, y = sample_task(inst, 300, G(2), label_noise=0.0); prog, acc = fit(inst.oracle, X, y, steps=200, n_init=4); self.assertGreater(acc, 0.85)
     return t
 
@@ -286,7 +286,7 @@ for _f in TRAIN + VALIDATION + HELD_OUT:
     setattr(WorldTests, f"test_oracle_representable_{_f}", _make_oracle_test(_f))
 
 
-# ================================================================ FUITES (aucune famille dans le chemin d'induction)
+# ================================================================ LEAKS (no family in the induction path)
 
 INDUCTION_MODULES = (BP, BM, TA, PIC)
 FAMILY_NAMES = TRAIN + VALIDATION + HELD_OUT + SEALED + PARTIAL + UNREPRESENTABLE + ("circle", "ellipse", "sector", "box", "annulus", "capsule", "rectangle")
@@ -297,7 +297,7 @@ class LeakageTests(unittest.TestCase):
         for mod in (BP, TA, PIC):
             src = inspect.getsource(mod)
             for name in FAMILY_NAMES:
-                self.assertIsNone(re.search(rf"[\"']{name}[\"']", src), f"{name} dans {mod.__name__}")
+                self.assertIsNone(re.search(rf"[\"']{name}[\"']", src), f"{name} in {mod.__name__}")
     def test_no_family_conditionals(self):
         for mod in INDUCTION_MODULES:
             self.assertIsNone(re.search(r"family\s*==\s*[\"']", inspect.getsource(mod)), mod.__name__)
@@ -307,7 +307,7 @@ class LeakageTests(unittest.TestCase):
         self.assertTrue(all(set(x.strip() for x in i.split(",")) <= {"full_region", "in_region", "out_region"} for i in imp))
     def test_search_has_no_truth_access(self):
         for fn in (BoundaryProgramSearch.run, fit): self.assertNotIn("label", inspect.signature(fn).parameters)
-    def test_oracle_marked_upper_bound(self): self.assertIn("BORNE HAUTE", inspect.getsource(BM))
+    def test_oracle_marked_upper_bound(self): self.assertIn("UPPER BOUND", inspect.getsource(BM))
     def test_stability_calibration_not_on_test(self):
         r = json.load(open("results/boundary_stability_calibration.json")); self.assertTrue({x[0] for x in r} <= set(TRAIN + VALIDATION))
     def test_hypotheses_preregistered(self):
@@ -327,7 +327,7 @@ for _m in (BP, TA, PIC):
         setattr(LeakageTests, f"test_leak_{_m.__name__.split('.')[-1]}_{_n}", _make_leak_test(_m, _n))
 
 
-# ================================================================ cœur inter-domaines
+# ================================================================ cross-domain core
 
 class CrossDomainTests(unittest.TestCase):
     def test_domains(self): self.assertEqual(set(PIC.DOMAINS), {"algebra", "language", "code", "sequences"})
@@ -369,7 +369,7 @@ for _d in ("algebra", "language", "code", "sequences"):
     setattr(CrossDomainTests, f"test_domain_{_d}", _make_domain_test(_d))
 
 
-# ================================================================ canonisation générée
+# ================================================================ generated canonicalisation
 
 def _make_perm_test(i):
     def t(self):

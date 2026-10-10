@@ -27,7 +27,7 @@ def model(n_ok=0, n_bad=0, s="speaker_X", **kw):
     return m
 
 
-# ================================================================ Beta / intervalles
+# ================================================================ Beta / intervals
 
 class BetaTests(unittest.TestCase):
     def test_posterior_update(self):
@@ -159,7 +159,7 @@ class DriftDomainTests(unittest.TestCase):
         self.assertAlmostEqual(m.estimate_for("speaker_X", "loc"), m.effective("speaker_X"))
 
 
-# ================================================================ graphe de preuves : dépendances, conflits, poids
+# ================================================================ evidence graph: dependencies, conflicts, weights
 
 class DependencyTests(unittest.TestCase):
     def test_detect_copier(self):
@@ -209,7 +209,7 @@ class ConflictTests(unittest.TestCase):
         self.assertGreater(g.belief(("color", "o")).posterior, g.belief(("loc", "o", "now")).posterior)
 
 
-# ================================================================ TMS : justifications multiples
+# ================================================================ TMS: multiple justifications
 
 class MultiJustificationTests(unittest.TestCase):
     def tms(self):
@@ -233,7 +233,7 @@ class MultiJustificationTests(unittest.TestCase):
         t = TruthMaintenance(); t.add("B", "derived", justifications=[["X"]]); self.assertEqual(t.nodes["B"].status, UNKNOWN_STATUS)
 
 
-# ================================================================ banc adversarial des sources
+# ================================================================ adversarial source bench
 
 class AdversarialBenchTests(unittest.TestCase):
     def test_stdlib_only(self):
@@ -279,7 +279,7 @@ class PerBehaviorTests(unittest.TestCase):
 for _b in BEHAVIORS: setattr(PerBehaviorTests, f"test_behavior_{_b}_estimated", _per_behavior(_b))
 
 
-# ================================================================ environnement indépendant : calibration, identité L1, droit d'affirmer
+# ================================================================ independent environment: calibration, L1 identity, right to assert
 
 class IndependentEnvTests(unittest.TestCase):
     @classmethod
@@ -439,7 +439,7 @@ def _mode_case(mode, n):
         self.assertTrue(0.0 < v <= 0.995)
         if mode != "mean": self.assertLess(v, m.record("speaker_X").mean)
         bigger = model(int(0.8 * n * 10), n * 10 - int(0.8 * n * 10), mode=mode, global_prior=(1, 1))
-        if mode != "mean": self.assertGreater(bigger.effective("speaker_X"), v)      # plus de données -> pénalité réduite
+        if mode != "mean": self.assertGreater(bigger.effective("speaker_X"), v)      # more data -> reduced penalty
     return t
 
 
@@ -452,14 +452,14 @@ class ResultFilesTests(unittest.TestCase):
     def test_multiseed_summary_shape(self):
         import json
         p = os.path.join(ROOT, "results", "source_multiseed.json")
-        if not os.path.exists(p): self.skipTest("graines non lancées")
+        if not os.path.exists(p): self.skipTest("seeds not run")
         r = json.load(open(p))
         for n in ("em", "beta_lower", "l1_identity"): self.assertIn(n, r["summary"])
         self.assertGreaterEqual(len(r["seeds"]), 16)
     def test_sealed_result_shape(self):
         import json
         p = os.path.join(ROOT, "results", "source_sealed.json")
-        if not os.path.exists(p): self.skipTest("lot scellé non évalué")
+        if not os.path.exists(p): self.skipTest("sealed set not evaluated")
         r = json.load(open(p)); self.assertIn("beta_full", r)
 
 

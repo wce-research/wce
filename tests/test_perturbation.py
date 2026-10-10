@@ -98,7 +98,7 @@ class PerturbationTests(unittest.TestCase):
     def test_unit_direction(self): self.assertAlmostEqual(float(unit_direction((3, 4), 0).norm()), 1.0, places=5)
 
 
-# ================================================================ C/D — réponse, sensibilité locale
+# ================================================================ C/D — response, local sensitivity
 
 class ResponseSensitivityTests(unittest.TestCase):
     def test_response_fields(self):
@@ -130,7 +130,7 @@ class ResponseSensitivityTests(unittest.TestCase):
         S = cubes(); belief_sensitivity(S, 1.0); self.assertAlmostEqual(S.marginal(("e1", "color"))["red"], 0.5)
 
 
-# ================================================================ E/F — autograd, rétropropagation locale
+# ================================================================ E/F — autograd, local backpropagation
 
 class DifferentiableTests(unittest.TestCase):
     @classmethod
@@ -153,7 +153,7 @@ class DifferentiableTests(unittest.TestCase):
         g = gradient_credit(M, XV, YV); self.assertTrue(any(k.startswith("weights:") for k in g)); self.assertTrue(any(k.startswith("routing:") for k in g))
 
 
-# ================================================================ G — sensibilité structurelle
+# ================================================================ G — structural sensitivity
 
 class StructuralTests(unittest.TestCase):
     def test_structural_ranks(self):
@@ -174,7 +174,7 @@ class StructuralTests(unittest.TestCase):
         self.assertLess(pipeline_score(p, s.qs), base)
 
 
-# ================================================================ H/I — crédit généralisé, interventionnel vs observationnel
+# ================================================================ H/I — generalized credit, interventional vs observational
 
 class CreditTests(unittest.TestCase):
     @classmethod
@@ -203,7 +203,7 @@ class CreditTests(unittest.TestCase):
     def test_score_bounds(self): s = make_system(1); self.assertLessEqual(score(s), 1.0)
 
 
-# ================================================================ J/K — invariants et signatures
+# ================================================================ J/K — invariants and signatures
 
 class InvariantTests(unittest.TestCase):
     def test_checked_invariant(self): self.assertTrue(CheckedInvariant("len", "seq", len).holds([1, 2], [3, 4]))
@@ -235,7 +235,7 @@ class InvariantTests(unittest.TestCase):
         m = Perturbation("routing", ("expert_b", "head"), 1.0).apply(OLD); self.assertFalse(INV.check(m)["topology"])
 
 
-# ================================================================ L/M — stabilisateur, dualité (index bidirectionnel), générés par domaine
+# ================================================================ L/M — stabiliser, duality (bidirectional index), generated per domain
 
 class DualityTests(unittest.TestCase):
     @classmethod
@@ -277,7 +277,7 @@ class DualityTests(unittest.TestCase):
     def test_matrix(self): self.assertEqual(len(self.ix["code"].matrix()), 6)
     def test_support(self): self.assertEqual(self.ix["algebra"].support, 6)
     def test_galois_inspired_named(self):
-        src = open("core/invariant_algebra.py").read(); self.assertIn("Galois-inspired", src); self.assertIn("pas de groupe", src)
+        src = open("core/invariant_algebra.py").read(); self.assertIn("Galois-inspired", src); self.assertIn("no group", src)
 
 
 def _make_domain_test(d, tname):
@@ -290,7 +290,7 @@ def _make_domain_test(d, tname):
             for name in ix.preserves(tname):
                 inv = DOMAINS[d][0][name]
                 if d == "algebra" and name == "solution_set" and "Divide" in tname: continue
-                self.assertEqual(inv.signature(y), inv.signature(x), f"{tname} devait préserver {name}")
+                self.assertEqual(inv.signature(y), inv.signature(x), f"{tname} should have preserved {name}")
     return t
 
 
@@ -299,7 +299,7 @@ for _d in DOMAINS:
         setattr(DualityTests, f"test_generalizes_{_d}_{''.join(c if c.isalnum() else '_' for c in _T.name)}", _make_domain_test(_d, _T.name))
 
 
-# ================================================================ N/O/P — orbites, classes, formes canoniques, compression
+# ================================================================ N/O/P — orbits, classes, canonical forms, compression
 
 class OrbitCanonicalTests(unittest.TestCase):
     def test_orbit_sequence_rotation(self):
@@ -345,7 +345,7 @@ class OrbitCanonicalTests(unittest.TestCase):
         for d, v in r.items(): self.assertGreater(v["ratio"], 1.0, d); self.assertEqual(v["faithful"], 1.0, d)
 
 
-# ================================================================ AJ — code mini-domaine
+# ================================================================ AJ — mini-domain code
 
 class CodeTests(unittest.TestCase):
     def test_run(self): self.assertEqual(run_program(CODE_SAMPLES[0]), 14)
@@ -367,7 +367,7 @@ class CodeTests(unittest.TestCase):
     def test_code_transformations(self): self.assertEqual(len(code_transformations()), 6)
 
 
-# ================================================================ Q/R/S — persistance, rayon, carte
+# ================================================================ Q/R/S — persistence, radius, map
 
 class StabilityTests(unittest.TestCase):
     def test_persistence_prob(self): self.assertEqual(persistence(lambda m, s: s % 2 == 0, 0.1, 10).probability, 0.5)
@@ -390,10 +390,10 @@ class StabilityTests(unittest.TestCase):
     def test_stability_map(self):
         mp = stability_map(M, XV, YV, 0.98, grid=(0.01, 2.0), trials=4); self.assertEqual(set(mp), {"enc", "expert_a", "head"}); self.assertEqual(mp["enc"][0.01], 1.0)
     def test_kam_inspired_disclaimer(self):
-        src = open("core/stability.py").read(); self.assertIn("KAM-inspired", src); self.assertIn("AUCUN système hamiltonien", src)
+        src = open("core/stability.py").read(); self.assertIn("KAM-inspired", src); self.assertIn("NO Hamiltonian system", src)
 
 
-# ================================================================ T/U/V — interactions, graphe, transitions
+# ================================================================ T/U/V — interactions, graph, transitions
 
 class InteractionTransitionTests(unittest.TestCase):
     def test_additive_zero(self): self.assertAlmostEqual(interaction(lambda c: float(len(c)), ("a", "b")).interaction, 0.0)
@@ -420,7 +420,7 @@ class InteractionTransitionTests(unittest.TestCase):
         tb = detect_transitions([0, 1], routing_transition_observer(M, XV, YV)); self.assertTrue(any(b.quantity == "branch" for b in tb))
 
 
-# ================================================================ W/X/Y — plasticité sûre, poids rapides, apprentissage continu
+# ================================================================ W/X/Y — safe plasticity, fast weights, continual learning
 
 class SafePlasticityTests(unittest.TestCase):
     @classmethod
@@ -455,7 +455,7 @@ class SafePlasticityTests(unittest.TestCase):
         self.assertEqual(changed_parameters(train_fast(m, ("head",), xb, yb, 10, mask=mask)), 0)
 
 
-# ================================================================ Z–AC — apprentissage de la valeur des mesures, contrefactuel
+# ================================================================ Z–AC — learning the value of measurements, counterfactual
 
 class MeasurementValueTests(unittest.TestCase):
     def rows(self, n=300, seed=0):
@@ -494,7 +494,7 @@ class MeasurementValueTests(unittest.TestCase):
     def test_counterfactual_type(self): self.assertIsInstance(counterfactual_measurement(cubes(), color_op()), CounterfactualMeasurement)
 
 
-# ================================================================ AD — diagnostic guidé par perturbations
+# ================================================================ AD — perturbation-guided diagnosis
 
 class PerturbationDiagnosisTests(unittest.TestCase):
     def test_prior_normalized(self):
@@ -509,7 +509,7 @@ class PerturbationDiagnosisTests(unittest.TestCase):
     def test_probe_cost_positive(self): self.assertGreater(PROBE_COST, 0)
 
 
-# ================================================================ AF/AG/AH — Fourier, référentiels, chaînes algébriques
+# ================================================================ AF/AG/AH — Fourier, reference frames, algebraic chains
 
 class DomainSensitivityTests(unittest.TestCase):
     @classmethod
@@ -524,7 +524,7 @@ class DomainSensitivityTests(unittest.TestCase):
         r = algebra_chain_perturbation(80); self.assertGreater(r["prediction_accuracy"], 0.9); self.assertGreater(r["ood_links"], 0)
 
 
-# ================================================================ AL/AM — banc et lot scellé
+# ================================================================ AL/AM — bench and sealed set
 
 class BenchmarkTests(unittest.TestCase):
     @classmethod

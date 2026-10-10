@@ -1,6 +1,10 @@
 import inspect
 import math
 import unittest
+try:
+    from tests._source import code_only
+except ImportError:
+    from _source import code_only
 
 import numpy as np
 import torch
@@ -77,7 +81,7 @@ class DynamicProgrammingTests(unittest.TestCase):
         for k in range(0, len(m), max(1, len(m) // 40)): t = self.T.tree(int(s[k]), int(i[k])); self.assertEqual(self.sp.mask_of(t), int(m[k])); self.assertEqual(tree_size(t), int(s[k]))
     def test_levels_hold_minimal_sizes(self):
         small = bottom_up(self.sp, 3); ms, ss, _ = small.all(); m, s, _ = self.T.all(); lookup = {int(a): int(b) for a, b in zip(m, s)}
-        for a, b in zip(ms, ss): self.assertEqual(lookup[int(a)], int(b))                                           # une classe atteinte à la taille 3 n'est pas reclassée plus haut
+        for a, b in zip(ms, ss): self.assertEqual(lookup[int(a)], int(b))                                           # a class reached at size 3 is not reclassified higher
     def test_subresults_are_reused(self): self.assertLess(self.T.stats["considered"], 3 ** 4 * 5 ** 5 * 14); self.assertEqual(self.T.stats["considered"], sum(l.considered for l in self.T.levels.values())); self.assertLess(self.T.stats["seconds"], 5.0)
     def test_exhaustive_matches_brute_force_at_size_three(self):
         atoms, X, y = data(("and", ("or", 0, 1), 2), 3); sp = CellSpace(atoms, X, y); T = bottom_up(sp, 3); brute = set(sp.atom_masks)
@@ -124,9 +128,9 @@ class SelectionTests(unittest.TestCase):
 
 class ConstraintTests(unittest.TestCase):
     def test_and(self):
-        t, care, lost = propagate("and", 0b1100, 0b1010, 0b1111, 0b1111); self.assertEqual(care, 0b1100); self.assertEqual(t & care, 0b1000); self.assertEqual(lost, 0b0010)                 # gauche = 0 et cible = 1 : perdu
+        t, care, lost = propagate("and", 0b1100, 0b1010, 0b1111, 0b1111); self.assertEqual(care, 0b1100); self.assertEqual(t & care, 0b1000); self.assertEqual(lost, 0b0010)                 # left = 0 and target = 1: lost
     def test_or(self):
-        t, care, lost = propagate("or", 0b1100, 0b1010, 0b1111, 0b1111); self.assertEqual(care, 0b0011); self.assertEqual(t & care, 0b0010); self.assertEqual(lost, 0b0100)                  # gauche = 1 et cible = 0 : perdu
+        t, care, lost = propagate("or", 0b1100, 0b1010, 0b1111, 0b1111); self.assertEqual(care, 0b0011); self.assertEqual(t & care, 0b0010); self.assertEqual(lost, 0b0100)                  # left = 1 and target = 0: lost
     def test_xor(self): t, care, lost = propagate("xor", 0b1100, 0b1010, 0b1111, 0b1111); self.assertEqual(t, 0b0110); self.assertEqual(care, 0b1111); self.assertEqual(lost, 0)
     def test_solution_satisfies_constraints(self):
         for op in OPS:
@@ -143,7 +147,7 @@ class MeetInTheMiddleTests(unittest.TestCase):
     def test_recovers_chain_from_small_table(self):
         atoms, X, y = data(CHAIN5, 5, n=800); sp = CellSpace(atoms, X, y); R = top_down(sp, bottom_up(sp, 2), 5); self.assertEqual(R.selected.mask, sp.mask_of(CHAIN5)); self.assertEqual(R.selected.errors, 0.0); self.assertLessEqual(R.selected.size, 6)
     def test_may_stop_on_a_quasi_equivalent_structure(self):
-        # Recherche guidée, pas exhaustive : avec une table de taille 3 elle s'arrête ici sur une structure à une erreur près (limite assumée et mesurée).
+        # Guided search, not exhaustive: with a table of size 3 it stops here on a structure within one error (an accepted and measured limit).
         atoms, X, y = data(CHAIN5, 5, n=800); sp = CellSpace(atoms, X, y); R = top_down(sp, bottom_up(sp, 3), 5); self.assertLessEqual(R.selected.errors, 0.005 * len(X)); self.assertGreaterEqual(R.selected.errors, float(sp.errors(bottom_up(sp, 5).all()[0]).min()))
     def test_recovers_balanced(self): atoms, X, y = data(BAL4, 4, n=800); sp = CellSpace(atoms, X, y); R = top_down(sp, bottom_up(sp, 2), 4); self.assertEqual(R.selected.errors, 0.0)
     def test_logs_partial_structures(self):
@@ -155,8 +159,8 @@ class MeetInTheMiddleTests(unittest.TestCase):
     def test_deterministic(self):
         atoms, X, y = data(CHAIN5, 5, rate=0.05); sp = CellSpace(atoms, X, y); f = lambda: tree_render(top_down(sp, bottom_up(sp, 3), 5).selected.tree); self.assertEqual(f(), f())
     def test_no_world_access(self):
-        s = inspect.getsource(DC)
-        for w in ("deep_world", "deep_primitive", "_exp", "truth", "torch.nn"): self.assertNotIn(w, s.replace("vérité", ""))
+        s = code_only(DC)
+        for w in ("deep_world", "deep_primitive", "_exp", "truth", "torch.nn"): self.assertNotIn(w, s)
 
 
 class BenchTests(unittest.TestCase):

@@ -2,6 +2,10 @@ import inspect
 import math
 import random
 import unittest
+try:
+    from tests._source import code_only
+except ImportError:
+    from _source import code_only
 
 import torch
 
@@ -18,7 +22,7 @@ from core.deep_primitives2 import disc_atom, line_atom
 
 G = lambda s=0: torch.Generator().manual_seed(s)
 A0, A1, A2 = disc_atom(-1.0, 0.5, 1.2), line_atom(0.3, 0.1), disc_atom(0.6, -0.8, 1.0)
-XA, XB = line_atom(0.0, 0.0), line_atom(math.pi / 2, 0.0)                      # x ≤ 0 et y ≤ 0 : leur ou exclusif est un damier
+XA, XB = line_atom(0.0, 0.0), line_atom(math.pi / 2, 0.0)                      # x ≤ 0 and y ≤ 0: their exclusive or is a checkerboard
 FAKES = [disc_atom(2.2, 2.2, 0.5), line_atom(1.1, -2.0), disc_atom(-2.3, -2.2, 0.6), line_atom(-0.7, 1.9), disc_atom(1.9, -2.1, 0.5), line_atom(2.6, 2.1), disc_atom(-0.1, 2.4, 0.5), line_atom(0.9, 2.4), disc_atom(2.4, 0.0, 0.4), line_atom(-2.2, 2.2)]
 TRUTH = BNode("xor", children=(BNode("and", children=(A0, A1)), A2))
 XOR = BNode("xor", children=(XA, XB))
@@ -99,8 +103,8 @@ class RecoveryTests(unittest.TestCase):
     def test_deterministic(self):
         f = lambda: recover(self.X, self.y, 0, {"fit": "none"}, D(FAKES[:3] + [A0, A1, A2])); a, b = f(), f(); self.assertEqual(repr(a.program), repr(b.program)); self.assertEqual(a.chosen.indices, b.chosen.indices)
     def test_no_oracle(self):
-        s = inspect.getsource(LP)
-        for w in ("deep_world", "truth", "leaves(", "_exp", "deep_primitive_eval"): self.assertNotIn(w, s.replace("vérité", ""))
+        s = code_only(LP)
+        for w in ("deep_world", "truth", "leaves(", "_exp", "deep_primitive_eval"): self.assertNotIn(w, s)
 
 
 class PoolTests(unittest.TestCase):

@@ -175,7 +175,7 @@ def _row(init, final, best, pi, pf, pb, rz=0.0, gz=0.0):
 class PolicyEvaluationTests(unittest.TestCase):
     def test_never(self): self.assertEqual(OR.outcome(_row(1.0, 0.9, 0.95, -10, -9, -9), "never"), (1.0, "preserve"))
     def test_always(self): self.assertEqual(OR.outcome(_row(1.0, 0.9, 0.95, -10, -9, -9), "always"), (0.9, "optimize"))
-    def test_validated_accepts_on_data_not_truth(self): self.assertEqual(OR.outcome(_row(1.0, 0.9, 0.95, -10, -9, -9), "validated"), (0.9, "accept"))          # plus vraisemblable sur les données → accepté, même si pire en réalité
+    def test_validated_accepts_on_data_not_truth(self): self.assertEqual(OR.outcome(_row(1.0, 0.9, 0.95, -10, -9, -9), "validated"), (0.9, "accept"))          # more likely on the data → accepted, even if worse in reality
     def test_validated_rollback(self): self.assertEqual(OR.outcome(_row(1.0, 0.9, 0.95, -10, -11, -10), "validated"), (1.0, "rollback"))
     def test_validated_equality_rollback(self): self.assertEqual(OR.outcome(_row(1.0, 0.9, 0.95, -10, -10, -10), "validated")[1], "rollback")
     def test_validated_best(self): self.assertEqual(OR.outcome(_row(0.8, 0.7, 0.95, -20, -25, -12), "validated_best"), (0.95, "accept"))

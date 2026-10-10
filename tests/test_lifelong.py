@@ -54,7 +54,7 @@ def task(name):
     return next(t for t in RUN.tasks if t.name == name)
 
 
-# ================================================================ données
+# ================================================================ data
 
 class TaskStreamTests(unittest.TestCase):
     def test_eight_tasks(self): self.assertEqual(len(default_stream()), 8)
@@ -76,7 +76,7 @@ class TaskStreamTests(unittest.TestCase):
         t = task("T1"); self.assertFalse(torch.equal(t.x_train[:10], t.x_test[:10]))
 
 
-# ================================================================ encodeur / routeur
+# ================================================================ encoder / router
 
 class ContextEncoderTests(unittest.TestCase):
     def test_is_model_module(self): self.assertIn(ContextEncoder.MODULE, LifelongModel().state.modules)
@@ -136,12 +136,12 @@ class NoveltyTests(unittest.TestCase):
     def test_unknown(self):
         self.assertEqual(NoveltyDetector().assess(self.router(), torch.ones(20, 3) * 9, {"a": 0.5}, {"a": 0.55}).kind, UNKNOWN)
     def test_reason_explains(self):
-        self.assertIn("accord", NoveltyDetector().assess(self.router(), torch.ones(20, 3) * 9, {"a": 0.5}).reason)
+        self.assertIn("agreement", NoveltyDetector().assess(self.router(), torch.ones(20, 3) * 9, {"a": 0.5}).reason)
     def test_stream_novelty_all_correct(self):
         for d in RUN.decisions: self.assertEqual(d.novelty.kind, task(d.task).spec.expected_novelty, d.task)
 
 
-# ================================================================ routage autonome
+# ================================================================ autonomous routing
 
 class SelfRoutingTests(unittest.TestCase):
     def test_predict_has_no_context_parameter(self):
@@ -203,7 +203,7 @@ class LifelongLoopTests(unittest.TestCase):
     def test_decision_reason(self): self.assertIn("->", RUN.decisions[1].reason)
 
 
-# ================================================================ oubli / transfert
+# ================================================================ forgetting / transfer
 
 class ForgettingTests(unittest.TestCase):
     def test_matrix_shape(self): self.assertEqual(len(RUN.matrix), 8); self.assertEqual(len(RUN.matrix["T1"]), 8)
@@ -237,7 +237,7 @@ class TransferTests(unittest.TestCase):
     def test_reuse_module_for_related(self): self.assertEqual(RUN.decisions[3].module, RUN.decisions[0].module)
 
 
-# ================================================================ capacité / homéostasie
+# ================================================================ capacity / homeostasis
 
 class CapacityTests(unittest.TestCase):
     def test_capacity_bounded(self): self.assertLess(RUN.capacity_trace[-1], 1200)
@@ -272,7 +272,7 @@ class CapacityTests(unittest.TestCase):
         self.assertIn(c._grow("cfg_T7", t.x_train, t.y_train, t.x_val, t.y_val), (True, False))
 
 
-# ================================================================ branches partagées
+# ================================================================ shared branches
 
 class SharedBranchTests(unittest.TestCase):
     def test_fresh_branch_owns_nothing(self):
@@ -360,7 +360,7 @@ class MergeAndAmplitudeTests(unittest.TestCase):
         h, a, b = self.hyp(); h.evaluate(lambda br: 0.5); self.assertEqual(h.evaluations, 2)
 
 
-# ================================================================ dommages / réparation
+# ================================================================ damage / repair
 
 class RepairTests(unittest.TestCase):
     def ctrl(self): return copy.deepcopy(RUN.controller)
@@ -414,7 +414,7 @@ class RepairTests(unittest.TestCase):
         t = task("T1"); self.assertGreaterEqual(float((c.model.predict(t.x_test) == t.y_test).float().mean()), 0.98)
 
 
-# ================================================================ WCE structurel + routage
+# ================================================================ structural WCE + routing
 
 class StructuralRoutingTests(unittest.TestCase):
     @classmethod
@@ -450,7 +450,7 @@ class StructuralRoutingTests(unittest.TestCase):
         self.assertAlmostEqual(float(prior[idx]), 0.1 * math.log1p(m.configs["cfg_T3"].uses), places=5)
 
 
-# ================================================================ méta-contrôleur / métriques
+# ================================================================ meta-controller / metrics
 
 class MetaControllerTests(unittest.TestCase):
     def test_actions_declared(self):

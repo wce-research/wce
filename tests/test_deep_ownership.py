@@ -50,7 +50,7 @@ class OcclusionTests(unittest.TestCase):
     def setUp(self): self.ob = OB(AND(DISC, OCC))
     def test_occluder_found(self):
         occ = find_occlusions([O_DISC, O_OCC], self.ob); d = [o for o in occ if o.occluded == 0]; self.assertEqual(len(d), 1); self.assertIsInstance(d[0], Occlusion); self.assertEqual(d[0].occluder, 1); self.assertGreater(d[0].hidden_fraction, 0.2)
-        P = torch.tensor([[1.3, 0.0]]); self.assertEqual(bool(predict(O_OCC.program(), P)[0]), d[0].side)              # le côté caché est bien celui où x > 0,3
+        P = torch.tensor([[1.3, 0.0]]); self.assertEqual(bool(predict(O_OCC.program(), P)[0]), d[0].side)              # the hidden side is indeed the one where x > 0.3
     def test_no_occlusion_when_fully_visible(self): self.assertEqual([o for o in find_occlusions([O_DISC, O_OCC], OB(DISC)) if o.occluded == 0], [])
     def test_unrelated_curve_is_not_an_occluder(self): self.assertEqual([o for o in find_occlusions([O_DISC, Owner("line", (0.0, 2.9))], self.ob) if o.occluded == 0], [])
     def test_expected_visibility(self):
@@ -75,7 +75,7 @@ class EnergyTests(unittest.TestCase):
         own = [O_DISC, O_OCC]; good = energy(self._labels(own), own, self.ob, CFG)["total"]; none = energy(torch.full((len(self.M),), -1, dtype=torch.long), own, self.ob, CFG)["total"]; one = energy(self._labels([O_DISC]), [O_DISC], self.ob, CFG)["total"]
         self.assertLess(good, one); self.assertLess(one, none); bad = [Owner("circle", (0.5, 0.3, 0.9)), O_OCC]; self.assertLess(good, energy(self._labels(own), bad, self.ob, CFG)["total"])
     def test_complexity_penalises_extra_owner(self):
-        own = [O_DISC, O_OCC]; lab = self._labels(own); extra = own + [Owner("circle", (2.5, 2.5, 0.3))]; self.assertEqual(energy(lab, extra, self.ob, CFG)["total"], energy(lab, own, self.ob, CFG)["total"])                       # une courbe sans milieu ne coûte rien et n'est pas « utilisée »
+        own = [O_DISC, O_OCC]; lab = self._labels(own); extra = own + [Owner("circle", (2.5, 2.5, 0.3))]; self.assertEqual(energy(lab, extra, self.ob, CFG)["total"], energy(lab, own, self.ob, CFG)["total"])                       # a curve without a midpoint costs nothing and is not "used"
         split = lab.clone(); idx = torch.nonzero(lab == 0)[:, 0][:6]; split[idx] = 2; self.assertGreater(energy(split, extra, self.ob, CFG)["total"], energy(lab, own, self.ob, CFG)["total"])
     def test_absent_term_and_occlusion(self):
         own = [O_DISC, O_OCC]; lab = self._labels(own); a = energy(lab, own, self.ob, {**CFG, "gamma": 1.0, "occlusion": True})["absent"]; b = energy(lab, own, self.ob, {**CFG, "gamma": 1.0, "occlusion": False})["absent"]; self.assertGreater(b, a)
@@ -100,14 +100,14 @@ class SolverTests(unittest.TestCase):
         self.assertLessEqual(self.sol.terms["total"], CFG["tau"] * len(self.ob.points))
     def test_bounded_search(self): st = self.sol.stats; self.assertLessEqual(st["assignments_tested"], st["candidates"] * (len(self.sol.owners) + 1) + DEFAULTS["max_iters"]); self.assertLess(st["assignments_tested"], 200)
     def test_long_range_association(self):
-        occ2 = BNode("or", children=(line_atom(0.0, -0.4), line_atom(math.pi, -0.9)))                                    # le disque n'est visible que pour x ≤ −0,4 ou x ≥ 0,9 : deux arcs disjoints
+        occ2 = BNode("or", children=(line_atom(0.0, -0.4), line_atom(math.pi, -0.9)))                                    # the disc is visible only for x ≤ −0.4 or x ≥ 0.9: two disjoint arcs
         ob = OB(AND(DISC, occ2)); far = solve(ob, {**CFG, "long_range": True}); loc = solve(ob, {**CFG, "long_range": False}); arc = lambda s: max((len(o.ids) for o in s.owners if o.kind == "circle" and abs(o.params[2] - 1.2) < 0.3), default=0)
         xs = lambda s: [ob.points[o.ids][:, 0] for o in s.owners if o.kind == "circle" and abs(o.params[2] - 1.2) < 0.3]; self.assertGreater(arc(far), arc(loc)); self.assertTrue(any(float(x.min()) < -0.4 and float(x.max()) > 0.9 for x in xs(far)))
     def test_occlusions_reported(self): s = solve(self.ob, {**CFG, "occlusion": True}); self.assertTrue(all(isinstance(o, Occlusion) and o.occluder != o.occluded for o in s.occlusions)); self.assertEqual(solve(self.ob, {**CFG, "occlusion": False}).occlusions, [])
     def test_no_boundary(self): X, _ = scene(DISC); s = solve(observe(X, torch.zeros(len(X), dtype=torch.long))); self.assertEqual(s.owners, []); self.assertEqual(len(s.labels), 0); self.assertEqual(s.stats["assignments_tested"], 0)
     def test_chance_cost_reduces_attribution_on_random_labels(self):
         X = torch.rand(300, 2, generator=G(5)) * 6 - 3; y = (torch.rand(300, generator=G(6)) < 0.5).long(); ob = observe(X, y); a = float((solve(ob, CFG).labels >= 0).float().mean()); b = float((solve(ob, {**CFG, "chance": 3.0}).labels >= 0).float().mean())
-        self.assertGreater(a, 0.8); self.assertLess(b, a - 0.2)                                                # sans calibration, presque tout est attribué alors qu'aucune frontière n'existe
+        self.assertGreater(a, 0.8); self.assertLess(b, a - 0.2)                                                # without calibration, almost everything is attributed even though no boundary exists
         e = energy(self.sol.labels, self.sol.owners, self.ob, {**CFG, "chance": 3.0}); self.assertGreater(e["chance"], 0.0); self.assertEqual(energy(self.sol.labels, self.sol.owners, self.ob, CFG)["chance"], 0.0)
     def test_null_assigned(self):
         from core.deep_ownership import null_assigned

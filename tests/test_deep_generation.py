@@ -50,7 +50,7 @@ class ReachabilityTests(unittest.TestCase):
         for k in DW.ATOM_TYPES: self.assertTrue(representable(DW.atom(random.Random(1), k))[0], k)
     def test_chain_is_chain_reachable(self): self.assertTrue(chain_reachable(CHAIN4))
     def test_balanced_mixed_ops_not_chain_reachable(self): self.assertFalse(chain_reachable(BAL4))
-    def test_balanced_same_op_is_chain_reachable(self): self.assertTrue(chain_reachable(C("and", C("and", DISC, HALF), C("and", RING, BAND))))       # associativité : ré-associable en chaîne
+    def test_balanced_same_op_is_chain_reachable(self): self.assertTrue(chain_reachable(C("and", C("and", DISC, HALF), C("and", RING, BAND))))       # associativity: re-associable into a chain
     def test_depth3_always_chain(self):
         for s in range(20): self.assertTrue(chain_reachable(DW.random_tree(random.Random(s), 3)))
     def test_operator_sets(self): self.assertEqual(set(OPERATORS), {"baseline", "flat", "bottom_up", "top_down", "bidirectional", "best_first", "factorized"})
@@ -69,7 +69,7 @@ class ReachabilityTests(unittest.TestCase):
     def test_oracle_compose_pair_flag(self): self.assertTrue(oracle_path(BAL4)["needs_compose_pair"]); self.assertFalse(oracle_path(CHAIN4)["needs_compose_pair"])
     def test_oracle_alternatives(self): o = oracle_path(CHAIN4); self.assertTrue(all(s["alternatives"] >= 8 for s in o["steps"])); self.assertGreater(o["alternatives_product_log10"], 4)
     def test_oracle_is_diagnostic_only(self):
-        self.assertIn("diagnostic seulement", inspect.getsource(oracle_path))
+        self.assertIn("diagnostic only", inspect.getsource(oracle_path))
         for m in (DS, DG): self.assertNotIn("deep_reachability", inspect.getsource(m)); self.assertNotIn("oracle_path", inspect.getsource(m))
     def test_inference_never_imports_world(self):
         for m in (DG,): self.assertNotIn("deep_world", inspect.getsource(m)); self.assertNotIn(".truth", inspect.getsource(m))
@@ -88,7 +88,7 @@ class ReachabilityTests(unittest.TestCase):
         b = basis_quality(C("and", RING, BAND)); self.assertEqual((b["atoms"], b["atoms_in_minimal_basis"], b["redundant_atoms"]), (2, 4, 2)); self.assertEqual(basis_quality(C("and", DISC, HALF))["description_inflation"], 1.0)
 
 
-# ================================================================ diagnostic de pruning, taxonomie
+# ================================================================ pruning diagnostic, taxonomy
 
 class TaxonomyTests(unittest.TestCase):
     def cl(self, truth, strategy, gen, ranked=None, sel=None, fit=True, budget=False, cls=()):
@@ -129,15 +129,15 @@ class TaxonomyTests(unittest.TestCase):
 class CanonicalizationTests(unittest.TestCase):
     def test_commutative_same_key(self): self.assertEqual(skel_key(C("and", DISC, HALF)), skel_key(C("and", HALF, DISC)))
     def test_associative_same_form_different_key(self):
-        a, b = C("or", C("or", DISC, HALF), RING), C("or", DISC, C("or", HALF, RING)); self.assertEqual(algebraic_form(a), algebraic_form(b)); self.assertNotEqual(skel_key(a), skel_key(b))       # pas fusionnés pendant la construction
+        a, b = C("or", C("or", DISC, HALF), RING), C("or", DISC, C("or", HALF, RING)); self.assertEqual(algebraic_form(a), algebraic_form(b)); self.assertNotEqual(skel_key(a), skel_key(b))       # not merged during construction
     def test_semantically_equal_syntactically_different(self):
         a, b = C("xor", C("xor", DISC, HALF), RING), C("xor", HALF, C("xor", RING, DISC)); X = X0(); self.assertTrue(torch.equal(predict(a, X), predict(b, X))); self.assertTrue(structurally_equivalent(a, b))
     def test_different_semantics_not_merged(self): self.assertNotEqual(algebraic_form(C("and", C("or", DISC, HALF), RING)), algebraic_form(C("or", DISC, C("and", HALF, RING))))
     def test_normalize_keeps_function(self): p = C("xor", RING, C("and", HALF, DISC)); X = X0(); self.assertTrue(torch.equal(predict(normalize(p), X), predict(p, X)))
     def test_normalize_no_param_rewrite(self):
-        z = T((0.0, 0.0), BNode("pred", "norm", "le", (1.0,))); self.assertEqual(skel_key(normalize(C("and", z, HALF))), skel_key(C("and", DISC, HALF)))       # translate(0,0) n'est PAS supprimé : la clé reste celle du squelette
+        z = T((0.0, 0.0), BNode("pred", "norm", "le", (1.0,))); self.assertEqual(skel_key(normalize(C("and", z, HALF))), skel_key(C("and", DISC, HALF)))       # translate(0,0) is NOT removed: the key remains that of the skeleton
     def test_param_dependent_canonical_would_collapse(self):
-        z = T((0.0, 0.0), BNode("pred", "norm", "le", (1.0,))); self.assertNotEqual(json.dumps(canonical(z).skeleton().to_dict(), sort_keys=True), skel_key(z))                 # d'où le choix de normalize
+        z = T((0.0, 0.0), BNode("pred", "norm", "le", (1.0,))); self.assertNotEqual(json.dumps(canonical(z).skeleton().to_dict(), sort_keys=True), skel_key(z))                 # hence the choice of normalize
     def test_intermediate_not_merged_blocks_descendant(self):
         from core.deep_structure import StructureStore
         st = StructureStore(); a = st.intern(C("or", C("or", A[0], A[3]), A[4])); b = st.intern(C("or", A[0], C("or", A[3], A[4]))); self.assertIsNot(a, b); self.assertIn(st.intern(C("or", A[3], A[4])).key, b.children)
@@ -150,7 +150,7 @@ class CanonicalizationTests(unittest.TestCase):
         X = X0(120); sig = torch.stack([predict(DISC, X).float()] * 2); tabs, _ = build_tables(sig, torch.tensor([5.0, 3.0])); self.assertEqual(float(tabs[0].params[0]), 3.0)
 
 
-# ================================================================ typage, programmes partiels, trous
+# ================================================================ typing, partial programs, holes
 
 class TypedPartialTests(unittest.TestCase):
     def test_types(self): self.assertEqual(TYPES, ("Field", "Region", "Logic", "Transform"))
@@ -170,7 +170,7 @@ class TypedPartialTests(unittest.TestCase):
     def test_hole_exactness(self):
         g = G(2); k = (torch.rand(200, generator=g) < 0.5).float(); y = (torch.rand(200, generator=g) < 0.5).float()
         for op in OPS:
-            h = make_hole(op, k, y, torch.ones(200), 1); fill = h.target; pred = DG._combine(op, k, fill); self.assertEqual(float((pred != y).float().sum()), h.unavoidable)       # remplissage parfait ⇒ seules les erreurs inévitables
+            h = make_hole(op, k, y, torch.ones(200), 1); fill = h.target; pred = DG._combine(op, k, fill); self.assertEqual(float((pred != y).float().sum()), h.unavoidable)       # perfect filling ⇒ only the unavoidable errors
     def test_partial_structure(self): p = PartialStructure("and", ("lit", 0), Hole("Region", torch.zeros(3), torch.ones(3), 2, 1.5)); self.assertEqual(p.lower_bound(), 1.5)
     def test_pair_errors_match_bruteforce(self):
         g = G(1); S = (torch.rand(5, 60, generator=g) < 0.5).float(); Tt = (torch.rand(4, 60, generator=g) < 0.5).float(); y = (torch.rand(60, generator=g) < 0.5).float(); w = torch.rand(60, generator=g); E = pair_errors(S, Tt, y, w)
@@ -199,7 +199,7 @@ def _mk_logic(seed, d):
 for _s, _d in ((0, 2), (1, 2), (2, 3), (3, 3), (4, 4), (5, 4), (6, 5), (7, 5)): setattr(TypedPartialTests, f"test_logic_stage_reaches_truth_d{_d}_s{_s}", _mk_logic(_s, _d))
 
 
-# ================================================================ géométrie, séparation, générateur
+# ================================================================ geometry, separation, generator
 
 class GenerationTests(unittest.TestCase):
     def test_boundary_points(self):
@@ -244,7 +244,7 @@ class GenerationTests(unittest.TestCase):
     def test_ranking_untouched(self): src = inspect.getsource(DeepSearch._run_factorized); self.assertIn("self._fit(", src); self.assertNotIn("approx_evidence", src); self.assertNotIn("profiled_loglik", src)
 
 
-# ================================================================ fragments et anti-unification comme générateurs
+# ================================================================ fragments and anti-unification as generators
 
 class GenerativeLibraryTests(unittest.TestCase):
     def lib(self):
@@ -257,14 +257,14 @@ class GenerativeLibraryTests(unittest.TestCase):
     def test_family_reaches_unseen(self):
         L = self.lib(); fam = [f for f in L.families if len(f.variables) == 1][0]; new = C("and", DISC, T((0.0, 0.0), BNode("pred", "angle", "in", (0.1, 0.5)))); self.assertFalse(L.contains(new)); self.assertIsNotNone(fam.matches(new))
     def test_family_false_candidates_counted(self):
-        L = self.lib(); fam = [f for f in L.families if len(f.variables) == 1][0]; inst = [fam.instantiate({fam.variables[0]: a}) for a in A]; self.assertEqual(len({skel_key(s) for s in inst}), 8)       # 8 schémas proposés pour 3 observés
+        L = self.lib(); fam = [f for f in L.families if len(f.variables) == 1][0]; inst = [fam.instantiate({fam.variables[0]: a}) for a in A]; self.assertEqual(len({skel_key(s) for s in inst}), 8)       # 8 schemas proposed for 3 observed
     def test_exact_fragments_do_not_reach_unseen(self): L = self.lib(); self.assertFalse(L.contains(C("or", DISC, HALF)))
     def test_library_coverage_of_truth(self):
         L = self.lib(); tr = C("xor", C("and", DISC, HALF), RING); cov = sum(L.contains(s) for s in subtrees(tr, 2) if n_atoms(s) == 2); self.assertEqual(cov, 1)
     def test_curriculum_does_not_memorize(self): L = self.lib(); self.assertTrue(all(f.skeleton.params is None for f in L.fragments)); self.assertTrue(all(f.parameterizations >= 2 for f in L.fragments))
 
 
-# ================================================================ expériences du sous-jalon, fuites
+# ================================================================ sub-milestone experiments, leaks
 
 class GenExperimentTests(unittest.TestCase):
     def test_subunits(self): ids = DX.subunit_ids("deepgen", 0); self.assertEqual(len(ids), 6 * 2 * (1 + len(DX.GEN_METHODS))); self.assertEqual(len(ids), len(set(ids)))
@@ -275,7 +275,7 @@ class GenExperimentTests(unittest.TestCase):
     def test_budget_curve(self): self.assertEqual(sorted(b for m, b in DX.GEN_METHODS if m == "factorized"), [50.0, 150.0, 450.0]); self.assertEqual(sorted(b for m, b in DX.GEN_METHODS if m == "bottom_up"), [50.0, 150.0, 450.0])
     def test_reference_budget_kept(self): self.assertIn(("flat", 150.0), DX.GEN_METHODS); self.assertIn(("bidirectional", 150.0), DX.GEN_METHODS)
     def test_tasks_deterministic(self): self.assertEqual(DX.gen_task(2, 4, "rich").world.uid, DX.gen_task(2, 4, "rich").world.uid)
-    def test_mechanics_uses_truth_only_for_diagnosis(self): self.assertIn("diagnostic seulement", inspect.getsource(DX.mechanics)); self.assertIn("ORACLE DE LITTÉRAUX", inspect.getsource(DX.mechanics))
+    def test_mechanics_uses_truth_only_for_diagnosis(self): self.assertIn("diagnostic only", inspect.getsource(DX.mechanics)); self.assertIn("LITERAL ORACLE", inspect.getsource(DX.mechanics))
     def test_run_generation_search_gets_no_truth(self):
         src = inspect.getsource(DX.run_generation); i = src.index("DeepSearch(strat"); j = src.index(".run(data)", i); self.assertNotIn("tr", src[i:j].replace("strat", "")); self.assertNotIn("world", src[i:j])
     def test_make_targets(self):

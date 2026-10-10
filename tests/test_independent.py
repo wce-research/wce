@@ -48,7 +48,7 @@ def world_agent(index=0, split="test"):
     return x
 
 
-# ================================================================ indépendance
+# ================================================================ independence
 
 class IndependenceTests(unittest.TestCase):
     def test_world_imports_no_wce(self):
@@ -71,7 +71,7 @@ class IndependenceTests(unittest.TestCase):
         self.assertFalse(test_seeds & set(range(100000, 101000)))
 
 
-# ================================================================ monde, sources, observations
+# ================================================================ world, sources, observations
 
 class WorldTests(unittest.TestCase):
     def test_world_deterministic(self): self.assertEqual(generate_world(5).loc0, generate_world(5).loc0)
@@ -132,7 +132,7 @@ class OracleTests(unittest.TestCase):
         v = IndependentWorldVerifier(generate_world(1)); v.verify({"kind": "color", "subject": "o1", "value": "red"}); self.assertEqual(v.calls, 1)
 
 
-# ================================================================ générateur de langue et benchmark
+# ================================================================ language generator and benchmark
 
 class LanguageGeneratorTests(unittest.TestCase):
     def test_paraphrases(self):
@@ -173,7 +173,7 @@ def Counter_(xs):
     return Counter(xs)
 
 
-# ================================================================ induction lexicale et grammaticale
+# ================================================================ lexical and grammatical induction
 
 class LexiconTests(unittest.TestCase):
     def test_tokenize_clitics(self): self.assertEqual(tokenize("pose-la sur l'étagère"), ["pose", "-la", "sur", "l'", "étagère"])
@@ -229,7 +229,7 @@ class GrammarTests(unittest.TestCase):
         self.assertTrue(AGENT.grammar.class_plausible("la", "N"))
 
 
-# ================================================================ preuves, sources, croyances
+# ================================================================ evidence, sources, beliefs
 
 class EvidenceTests(unittest.TestCase):
     def graph(self):
@@ -266,7 +266,7 @@ class EvidenceTests(unittest.TestCase):
         self.assertFalse(affordance(kinds, "c", "in", "c")); self.assertFalse(affordance(kinds, "b", "in", "b"))
 
 
-# ================================================================ réponses, références, temporalité
+# ================================================================ answers, references, temporality
 
 class AnswerTests(unittest.TestCase):
     def find(self, pred, split="test"):
@@ -309,7 +309,7 @@ class AnswerTests(unittest.TestCase):
         _, a = self.check(lambda it: it.intent == "color"); self.assertIn("current_state", a.memory)
 
 
-# ================================================================ benchmark : ablations, taxonomie, coûts
+# ================================================================ benchmark: ablations, taxonomy, costs
 
 class BenchmarkTests(unittest.TestCase):
     def test_all_variants(self): self.assertEqual(set(ABL), set(VARIANTS))
@@ -359,7 +359,7 @@ class GeometryTests(unittest.TestCase):
         self.assertTrue(set(oov_words(items, AGENT)) & (HELD_OUT_FORMS | set(NONSENSE)))
 
 
-# ================================================================ lexique, représentations, échelle
+# ================================================================ lexicon, representations, scale
 
 class ScalingTests(unittest.TestCase):
     def test_synthetic_lexicon(self):

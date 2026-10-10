@@ -350,7 +350,7 @@ class SkillInteractionTests(unittest.TestCase):
 
 
 class ForgettingExperimentTests(unittest.TestCase):
-    """Expérience clé Task A -> Task B -> retour A (entraînement réel, calculé une fois)."""
+    """Key experiment Task A -> Task B -> back to A (real training, computed once)."""
     @classmethod
     def setUpClass(cls):
         cls.xa, cls.ya, cls.va, cls.vya = task_split(task_a_labels)

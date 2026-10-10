@@ -29,7 +29,7 @@ def st(key="loc", lam=0.1, dom=None):
     return TemporalBeliefState("ball", key, dom or PLACES, KeyDynamics(key, lam))
 
 
-# ================================================================ état temporel et persistance
+# ================================================================ temporal state and persistence
 
 class TemporalStateTests(unittest.TestCase):
     def test_fields(self):
@@ -236,7 +236,7 @@ class PredictiveIntervalTests(unittest.TestCase):
         c = source_interval_coverage(dev_episodes(6), train_episodes(20)); self.assertGreater(c["predictive"], 0.8)
 
 
-# ================================================================ banc temporel
+# ================================================================ temporal bench
 
 class BenchTests(unittest.TestCase):
     def test_stdlib_only(self):
@@ -415,7 +415,7 @@ class IndependentPredictiveTests(unittest.TestCase):
     def test_result_file(self):
         import json
         p = os.path.join(ROOT, "results", "predictive_coverage.json")
-        if not os.path.exists(p): self.skipTest("non calculé")
+        if not os.path.exists(p): self.skipTest("not computed")
         r = json.load(open(p)); self.assertTrue(0.85 <= r["all"]["predictive"] <= 0.97)
 
 
@@ -434,7 +434,7 @@ class LongStreamTests(unittest.TestCase):
 class ResultIntegrityTests(unittest.TestCase):
     def test_sealed_result_exists_once(self):
         p = os.path.join(ROOT, "results", "temporal_sealed.json")
-        if not os.path.exists(p): self.skipTest("lot scellé non évalué")
+        if not os.path.exists(p): self.skipTest("sealed set not evaluated")
         import json
         r = json.load(open(p)); self.assertIn("temporal", r)
     def test_sealed_script_refuses_rerun(self):

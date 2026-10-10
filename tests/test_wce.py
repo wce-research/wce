@@ -639,7 +639,7 @@ class ForceTests(unittest.TestCase):
         # F = 10 N
         # m = 2 kg
         # a = 5 m/s²
-        # après 1 seconde :
+        # after 1 second:
         # vy = 5 m/s
         self.assertAlmostEqual(
             ball.properties["vy"],
@@ -751,14 +751,14 @@ class PushTests(unittest.TestCase):
 
         ball = world.entities["balle"]
 
-        # Force nette :
+        # Net force:
         # 15 - 9.81 = 5.19 N
         #
         # m = 1 kg
         #
         # a = 5.19 m/s²
         #
-        # après 1 seconde :
+        # after 1 second:
         # vy = 5.19 m/s
         self.assertAlmostEqual(
             ball.properties["vy"],
@@ -833,20 +833,20 @@ class PushTests(unittest.TestCase):
             )
         )
 
-        # Force nette :
+        # Net force:
         # 15 - 9.81 = 5.19 N
         #
         # m = 1 kg
         # a = 5.19 m/s²
         #
-        # après 0.1 s :
+        # after 0.1 s:
         # vy = 0.519 m/s
         self.assertAlmostEqual(
             ball.properties["vy"],
             0.519,
         )
 
-        # Euler semi-implicite :
+        # Semi-implicit Euler:
         # y = 0 + 0.519 * 0.1
         self.assertAlmostEqual(
             ball.properties["y"],
@@ -1018,10 +1018,10 @@ class ImpulseTests(unittest.TestCase):
 
 
 class Physics2DTests(unittest.TestCase):
-    """Tests pour la physique 2D."""
+    """Tests for 2D physics."""
 
     def test_horizontal_force_changes_vx_and_x(self):
-        """Une force horizontale seule modifie vx et x."""
+        """A horizontal force alone modifies vx and x."""
         world = World()
 
         world.add_entity(
@@ -1061,18 +1061,18 @@ class Physics2DTests(unittest.TestCase):
         # Fx = 10 N
         # m = 1 kg
         # ax = 10 m/s²
-        # après 1 seconde :
+        # after 1 second:
         # vx = 10 m/s
         self.assertAlmostEqual(
             ball.properties["vx"],
             10.0,
         )
 
-        # Euler semi-implicite : x(t+dt) = x(t) + v(t+dt)*dt
-        # Après 10 pas de 0.1s : somme de (i*10*0.1 * 0.1) pour i=1..10
+        # Semi-implicit Euler: x(t+dt) = x(t) + v(t+dt)*dt
+        # After 10 steps of 0.1s: sum of (i*10*0.1 * 0.1) for i=1..10
         # = 0.1 * (0.1 + 0.2 + ... + 1.0) * 10
         # = 0.1 * 5.5 * 10 = 5.5
-        # Mais en fait : vx après chaque pas = 1, 2, 3, ..., 10
+        # But in fact: vx after each step = 1, 2, 3, ..., 10
         # x = 0 + 1*0.1 + 2*0.1 + 3*0.1 + ... + 10*0.1
         #   = 0.1 * (1+2+3+...+10) = 0.1 * 55 = 5.5
         self.assertAlmostEqual(
@@ -1081,7 +1081,7 @@ class Physics2DTests(unittest.TestCase):
         )
 
     def test_vertical_force_unchanged_behavior(self):
-        """Une force verticale seule conserve le comportement 1D existant."""
+        """A vertical force alone preserves the existing 1D behaviour."""
         world = World()
 
         world.add_entity(
@@ -1120,15 +1120,15 @@ class Physics2DTests(unittest.TestCase):
         # Fy = 10 N
         # m = 2 kg
         # ay = 5 m/s²
-        # après 1 seconde :
+        # after 1 second:
         # vy = 5 m/s
         self.assertAlmostEqual(
             ball.properties["vy"],
             5.0,
         )
 
-        # Euler semi-implicite : y = somme de (vy_i * dt)
-        # vy après chaque pas = 0.5, 1.0, 1.5, ..., 5.0
+        # Semi-implicit Euler: y = sum of (vy_i * dt)
+        # vy after each step = 0.5, 1.0, 1.5, ..., 5.0
         # y = 0.1 * (0.5 + 1.0 + 1.5 + ... + 5.0)
         #    = 0.1 * 27.5 = 2.75
         self.assertAlmostEqual(
@@ -1136,7 +1136,7 @@ class Physics2DTests(unittest.TestCase):
             2.75,
         )
 
-        # vx et x ne changent pas
+        # vx and x do not change
         self.assertAlmostEqual(
             ball.properties["vx"],
             0.0,
@@ -1148,7 +1148,7 @@ class Physics2DTests(unittest.TestCase):
         )
 
     def test_multiple_2d_forces_sum_correctly(self):
-        """Plusieurs forces 2D se somment correctement."""
+        """Several 2D forces sum correctly."""
         world = World()
 
         world.add_entity(
@@ -1176,7 +1176,7 @@ class Physics2DTests(unittest.TestCase):
         self.assertAlmostEqual(fy_net, 7.0)
 
     def test_gravity_plus_horizontal_force_combined_trajectory(self):
-        """Gravité + force horizontale donnent une trajectoire combinée."""
+        """Gravity + horizontal force give a combined trajectory."""
         world = World()
 
         world.add_entity(
@@ -1227,7 +1227,7 @@ class Physics2DTests(unittest.TestCase):
             places=6,
         )
 
-        # Euler semi-implicite : x = 0.1 * (0.5 + 1.0 + 1.5 + ... + 5.0)
+        # Semi-implicit Euler: x = 0.1 * (0.5 + 1.0 + 1.5 + ... + 5.0)
         # = 0.1 * 27.5 = 2.75
         self.assertAlmostEqual(
             ball.properties["x"],
@@ -1235,7 +1235,7 @@ class Physics2DTests(unittest.TestCase):
         )
 
     def test_horizontal_impulse_changes_vx(self):
-        """Une impulsion horizontale change vx."""
+        """A horizontal impulse changes vx."""
         world = World()
 
         world.add_entity(
@@ -1269,7 +1269,7 @@ class Physics2DTests(unittest.TestCase):
             2.0,
         )
 
-        # vy ne change pas
+        # vy does not change
         self.assertAlmostEqual(
             ball.properties["vy"],
             0.0,
@@ -1277,7 +1277,7 @@ class Physics2DTests(unittest.TestCase):
 
 
 class Language2DTests(unittest.TestCase):
-    """Tests pour le langage naturel 2D."""
+    """Tests for 2D natural language."""
 
     def test_parse_horizontal_push_droite(self):
         """Parse 'Pousse la balle vers la droite à 10 N'."""
@@ -1358,7 +1358,7 @@ class Language2DTests(unittest.TestCase):
         )
 
     def test_parse_vertical_push_unchanged(self):
-        """Parse 'Pousse la balle à 10 N' reste vertical."""
+        """Parse 'Pousse la balle à 10 N' stays vertical."""
         action = parse_action(
             "Pousse la balle à 10 N"
         )
@@ -1384,10 +1384,10 @@ class Language2DTests(unittest.TestCase):
         )
 
     def test_x_position_query(self):
-        """Requête 'Quelle est la position horizontale de la balle ?'."""
+        """Query 'Quelle est la position horizontale de la balle ?'."""
         world = build_supported_ball()
 
-        # Déplacer la balle horizontalement
+        # Move the ball horizontally
         execute_action(
             world,
             PushAction(
@@ -1423,7 +1423,7 @@ class Language2DTests(unittest.TestCase):
             "Quelle est la position horizontale de la balle ?",
         )
 
-        # La balle devrait avoir bougé horizontalement
+        # The ball should have moved horizontally
         self.assertIn(
             "position horizontale",
             answer,
@@ -1435,10 +1435,10 @@ class Language2DTests(unittest.TestCase):
         )
 
     def test_position_2d_query(self):
-        """Requête 'Quelle est la position de la balle ?'."""
+        """Query 'Quelle est la position de la balle ?'."""
         world = build_supported_ball()
 
-        # Lever la balle pour qu'elle ne soit plus sur le support
+        # Lift the ball so that it is no longer on the support
         execute_action(
             world,
             LiftAction(
@@ -1447,7 +1447,7 @@ class Language2DTests(unittest.TestCase):
             ),
         )
 
-        # Déplacer horizontalement
+        # Move horizontally
         execute_action(
             world,
             PushAction(
@@ -1483,7 +1483,7 @@ class Language2DTests(unittest.TestCase):
             "Quelle est la position de la balle ?",
         )
 
-        # Doit contenir x= et y=
+        # Must contain x= and y=
         self.assertIn(
             "x=",
             answer,
@@ -1500,7 +1500,7 @@ class Language2DTests(unittest.TestCase):
         )
 
     def test_position_query_with_supported_entity(self):
-        """Requête position pour une entité sur support."""
+        """Position query for an entity on a support."""
         world = build_supported_ball()
 
         answer = ask(
@@ -1515,10 +1515,10 @@ class Language2DTests(unittest.TestCase):
 
 
 class Action2DTests(unittest.TestCase):
-    """Tests pour les actions 2D via le langage."""
+    """Tests for 2D actions via language."""
 
     def test_horizontal_push_execution(self):
-        """Exécuter une poussée horizontale via parse_action."""
+        """Execute a horizontal push via parse_action."""
         world = build_supported_ball()
 
         action = parse_action(
@@ -1535,7 +1535,7 @@ class Action2DTests(unittest.TestCase):
         )
 
     def test_horizontal_impulse_from_language(self):
-        """Exécuter une impulsion horizontale via langage."""
+        """Execute a horizontal impulse via language."""
         world = build_supported_ball()
 
         action = parse_action(
@@ -1553,13 +1553,13 @@ class Action2DTests(unittest.TestCase):
 
 
 class Velocity2DTests(unittest.TestCase):
-    """Tests pour les requêtes de vitesse 2D."""
+    """Tests for 2D velocity queries."""
 
     def test_vx_query(self):
-        """Requête 'Quelle est la vitesse horizontale de la balle ?'."""
+        """Query 'Quelle est la vitesse horizontale de la balle ?'."""
         world = build_supported_ball()
 
-        # Appliquer une force horizontale
+        # Apply a horizontal force
         execute_action(
             world,
             PushAction(
@@ -1606,10 +1606,10 @@ class Velocity2DTests(unittest.TestCase):
         )
 
     def test_vy_query(self):
-        """Requête 'Quelle est la vitesse verticale de la balle ?'."""
+        """Query 'Quelle est la vitesse verticale de la balle ?'."""
         world = build_supported_ball()
 
-        # Lever et laisser tomber
+        # Lift and drop
         execute_action(
             world,
             LiftAction(
@@ -1650,10 +1650,10 @@ class Velocity2DTests(unittest.TestCase):
         )
 
     def test_velocity_2d_query(self):
-        """Requête 'Quelle est la vitesse de la balle ?'."""
+        """Query 'Quelle est la vitesse de la balle ?'."""
         world = build_supported_ball()
 
-        # Lever et pousser horizontalement
+        # Lift and push horizontally
         execute_action(
             world,
             LiftAction(
@@ -1709,10 +1709,10 @@ class Velocity2DTests(unittest.TestCase):
 
 
 class Advanced2DTests(unittest.TestCase):
-    """Tests pour la 2D avancée."""
+    """Tests for advanced 2D."""
 
     def test_horizontal_impulse_preserves_support(self):
-        """Impulsion purement horizontale ne retire pas le support."""
+        """A purely horizontal impulse does not remove the support."""
         world = build_supported_ball()
 
         execute_action(
@@ -1724,7 +1724,7 @@ class Advanced2DTests(unittest.TestCase):
             ),
         )
 
-        # Le support doit toujours être présent
+        # The support must still be present
         self.assertTrue(
             any(
                 relation.subject == "balle"
@@ -1733,20 +1733,20 @@ class Advanced2DTests(unittest.TestCase):
             )
         )
 
-        # vx doit avoir changé
+        # vx must have changed
         self.assertAlmostEqual(
             world.entities["balle"].properties["vx"],
             5.0,
         )
 
-        # vy ne doit pas avoir changé
+        # vy must not have changed
         self.assertAlmostEqual(
             world.entities["balle"].properties["vy"],
             0.0,
         )
 
     def test_right_impulse_increases_vx(self):
-        """Impulsion vers la droite augmente vx."""
+        """An impulse to the right increases vx."""
         world = build_supported_ball()
 
         action = parse_action(
@@ -1766,7 +1766,7 @@ class Advanced2DTests(unittest.TestCase):
         )
 
     def test_left_impulse_decreases_vx(self):
-        """Impulsion vers la gauche diminue vx."""
+        """An impulse to the left decreases vx."""
         world = build_supported_ball()
 
         action = parse_action(
@@ -1786,7 +1786,7 @@ class Advanced2DTests(unittest.TestCase):
         )
 
     def test_diagonal_force_accelerates_both_axes(self):
-        """Force diagonale accélère sur x et y."""
+        """A diagonal force accelerates along x and y."""
         world = World()
 
         world.add_entity(
@@ -1835,7 +1835,7 @@ class Advanced2DTests(unittest.TestCase):
             20.0,
         )
 
-        # x et y doivent aussi avoir bougé
+        # x and y must also have moved
         self.assertGreater(
             ball.properties["x"],
             0.0,
@@ -1847,7 +1847,7 @@ class Advanced2DTests(unittest.TestCase):
         )
 
     def test_gravity_plus_horizontal_force_independent(self):
-        """Gravité + force horizontale : x et y évoluent indépendamment."""
+        """Gravity + horizontal force: x and y evolve independently."""
         world = World()
 
         world.add_entity(
@@ -1885,13 +1885,13 @@ class Advanced2DTests(unittest.TestCase):
 
         ball = world.entities["balle"]
 
-        # vx doit avoir augmenté (Fx=5, m=1 → ax=5)
+        # vx must have increased (Fx=5, m=1 → ax=5)
         self.assertAlmostEqual(
             ball.properties["vx"],
             5.0,
         )
 
-        # vy doit avoir diminué (Fy=-9.81, m=1 → ay=-9.81)
+        # vy must have decreased (Fy=-9.81, m=1 → ay=-9.81)
         self.assertAlmostEqual(
             ball.properties["vy"],
             -9.81,
@@ -1899,7 +1899,7 @@ class Advanced2DTests(unittest.TestCase):
         )
 
     def test_zero_force_no_acceleration(self):
-        """Absence de force sur un axe = pas d'accélération artificielle."""
+        """Absence of force on an axis = no artificial acceleration."""
         world = World()
 
         world.add_entity(
@@ -1936,7 +1936,7 @@ class Advanced2DTests(unittest.TestCase):
 
         ball = world.entities["balle"]
 
-        # Sans force, vx et vy ne changent pas
+        # Without force, vx and vy do not change
         self.assertAlmostEqual(
             ball.properties["vx"],
             2.0,
@@ -1949,10 +1949,10 @@ class Advanced2DTests(unittest.TestCase):
 
 
 class DiagonalVectorTests(unittest.TestCase):
-    """Tests pour les vecteurs diagonaux via langage naturel."""
+    """Tests for diagonal vectors via natural language."""
 
     def test_push_right_and_up(self):
-        """Pousse avec Fx positif et Fy positif."""
+        """Push with positive Fx and positive Fy."""
         action = parse_action(
             "Pousse la balle avec 10 N vers la droite et 5 N vers le haut"
         )
@@ -1962,7 +1962,7 @@ class DiagonalVectorTests(unittest.TestCase):
         self.assertAlmostEqual(action.force_y, 5.0)
 
     def test_push_left_and_up(self):
-        """Pousse avec Fx négatif et Fy positif."""
+        """Push with negative Fx and positive Fy."""
         action = parse_action(
             "Pousse la balle avec 4 N vers la gauche et 3 N vers le haut"
         )
@@ -1972,7 +1972,7 @@ class DiagonalVectorTests(unittest.TestCase):
         self.assertAlmostEqual(action.force_y, 3.0)
 
     def test_push_right_and_down(self):
-        """Pousse avec Fx positif et Fy négatif."""
+        """Push with positive Fx and negative Fy."""
         action = parse_action(
             "Pousse la balle avec 10 N vers la droite et 5 N vers le bas"
         )
@@ -1982,7 +1982,7 @@ class DiagonalVectorTests(unittest.TestCase):
         self.assertAlmostEqual(action.force_y, -5.0)
 
     def test_impulse_right_and_up(self):
-        """Impulsion avec Δvx > 0 et Δvy > 0."""
+        """Impulse with Δvx > 0 and Δvy > 0."""
         action = parse_action(
             "Impulse la balle avec 6 Ns vers la droite et 2 Ns vers le haut"
         )
@@ -1992,7 +1992,7 @@ class DiagonalVectorTests(unittest.TestCase):
         self.assertAlmostEqual(action.impulse_y, 2.0)
 
     def test_impulse_left_and_down(self):
-        """Impulsion avec Δvx < 0 et Δvy < 0."""
+        """Impulse with Δvx < 0 and Δvy < 0."""
         action = parse_action(
             "Impulse la balle avec 4 Ns vers la gauche et 3 Ns vers le bas"
         )
@@ -2002,7 +2002,7 @@ class DiagonalVectorTests(unittest.TestCase):
         self.assertAlmostEqual(action.impulse_y, -3.0)
 
     def test_different_values(self):
-        """Parser deux valeurs différentes : 10 N en x, 5 N en y."""
+        """Parse two different values: 10 N along x, 5 N along y."""
         action = parse_action(
             "Pousse la balle avec 10 N vers la droite et 5 N vers le haut"
         )
@@ -2012,8 +2012,8 @@ class DiagonalVectorTests(unittest.TestCase):
         self.assertAlmostEqual(action.force_y, 5.0)
 
     def test_missing_component_defaults_to_zero(self):
-        """Une composante absente reste à zéro."""
-        # Ancienne syntaxe horizontale : pas de composante y
+        """An absent component stays at zero."""
+        # Old horizontal syntax: no y component
         action = parse_action(
             "Pousse la balle vers la droite à 10 N"
         )
@@ -2023,7 +2023,7 @@ class DiagonalVectorTests(unittest.TestCase):
         self.assertAlmostEqual(action.force_y, 0.0)
 
     def test_old_vertical_syntax_still_valid(self):
-        """Ancienne syntaxe verticale toujours valide."""
+        """Old vertical syntax still valid."""
         action = parse_action(
             "Pousse la balle à 15 N"
         )
@@ -2033,7 +2033,7 @@ class DiagonalVectorTests(unittest.TestCase):
         self.assertAlmostEqual(action.force_y, 15.0)
 
     def test_old_horizontal_syntax_still_valid(self):
-        """Ancienne syntaxe horizontale toujours valide."""
+        """Old horizontal syntax still valid."""
         action = parse_action(
             "Pousse la balle horizontalement à 10 N"
         )
@@ -2043,17 +2043,17 @@ class DiagonalVectorTests(unittest.TestCase):
         self.assertAlmostEqual(action.force_y, 0.0)
 
     def test_horizontal_impulse_preserves_support(self):
-        """Une composante verticale positive peut casser le support."""
+        """A positive vertical component can break the support."""
         world = build_supported_ball()
 
-        # Impulsion avec composante verticale positive
+        # Impulse with a positive vertical component
         action = parse_action(
             "Impulse la balle avec 0 Ns vers la droite et 5 Ns vers le haut"
         )
 
         execute_action(world, action)
 
-        # Le support doit être retiré car impulse_y > 0
+        # The support must be removed because impulse_y > 0
         self.assertFalse(
             any(
                 relation.subject == "balle"
@@ -2064,10 +2064,10 @@ class DiagonalVectorTests(unittest.TestCase):
 
 
 class DiagonalPhysicsTests(unittest.TestCase):
-    """Tests pour la physique des vecteurs diagonaux."""
+    """Tests for the physics of diagonal vectors."""
 
     def test_diagonal_force_simulation(self):
-        """Force diagonale : vx et vy évoluent correctement."""
+        """Diagonal force: vx and vy evolve correctly."""
         world = World()
 
         world.add_entity(
@@ -2084,7 +2084,7 @@ class DiagonalPhysicsTests(unittest.TestCase):
             )
         )
 
-        # Appliquer une force diagonale via le langage
+        # Apply a diagonal force via language
         action = parse_action(
             "Pousse la balle avec 10 N vers la droite et 20 N vers le haut"
         )
@@ -2107,10 +2107,10 @@ class DiagonalPhysicsTests(unittest.TestCase):
 
 
 class WallCollisionTests(unittest.TestCase):
-    """Tests pour les collisions horizontales avec murs."""
+    """Tests for horizontal collisions with walls."""
 
     def test_no_wall_free_movement(self):
-        """Sans mur : x évolue normalement."""
+        """Without a wall: x evolves normally."""
         world = World()
 
         world.add_entity(
@@ -2147,11 +2147,11 @@ class WallCollisionTests(unittest.TestCase):
 
         ball = world.entities["balle"]
 
-        # Sans mur, x doit être 5.5 m (Euler semi-implicite)
+        # Without a wall, x must be 5.5 m (semi-implicit Euler)
         self.assertAlmostEqual(ball.properties["x"], 5.5)
 
     def test_right_wall_limits_x(self):
-        """Collision mur droit : x limité à max_x."""
+        """Right wall collision: x limited to max_x."""
         world = World()
 
         world.add_entity(
@@ -2195,14 +2195,14 @@ class WallCollisionTests(unittest.TestCase):
 
         ball = world.entities["balle"]
 
-        # x ne doit pas dépasser 5.0
+        # x must not exceed 5.0
         self.assertAlmostEqual(ball.properties["x"], 5.0)
 
-        # vx doit être 0 (restitution=0)
+        # vx must be 0 (restitution=0)
         self.assertAlmostEqual(ball.properties["vx"], 0.0)
 
     def test_left_wall_limits_x(self):
-        """Collision mur gauche : x limité à min_x."""
+        """Left wall collision: x limited to min_x."""
         world = World()
 
         world.add_entity(
@@ -2246,14 +2246,14 @@ class WallCollisionTests(unittest.TestCase):
 
         ball = world.entities["balle"]
 
-        # x ne doit pas être inférieur à -5.0
+        # x must not be less than -5.0
         self.assertAlmostEqual(ball.properties["x"], -5.0)
 
-        # vx doit être 0 (restitution=0)
+        # vx must be 0 (restitution=0)
         self.assertAlmostEqual(ball.properties["vx"], 0.0)
 
     def test_restitution_zero(self):
-        """Restitution 0 : vx devient 0 après collision."""
+        """Restitution 0: vx becomes 0 after collision."""
         world = World()
 
         world.add_entity(
@@ -2301,7 +2301,7 @@ class WallCollisionTests(unittest.TestCase):
         self.assertAlmostEqual(ball.properties["vx"], 0.0)
 
     def test_restitution_one(self):
-        """Restitution 1 : rebond parfaitement élastique."""
+        """Restitution 1: perfectly elastic bounce."""
         world = World()
 
         world.add_entity(
@@ -2345,14 +2345,14 @@ class WallCollisionTests(unittest.TestCase):
 
         ball = world.entities["balle"]
 
-        # x limité à 5.0
+        # x limited to 5.0
         self.assertAlmostEqual(ball.properties["x"], 5.0)
 
-        # vx inversé avec même amplitude
+        # vx reversed with the same amplitude
         self.assertAlmostEqual(ball.properties["vx"], -2.0)
 
     def test_restitution_half(self):
-        """Restitution 0.5 : amplitude réduite de moitié."""
+        """Restitution 0.5: amplitude halved."""
         world = World()
 
         world.add_entity(
@@ -2396,14 +2396,14 @@ class WallCollisionTests(unittest.TestCase):
 
         ball = world.entities["balle"]
 
-        # x limité à 5.0
+        # x limited to 5.0
         self.assertAlmostEqual(ball.properties["x"], 5.0)
 
-        # vx inversé avec amplitude réduite
+        # vx reversed with reduced amplitude
         self.assertAlmostEqual(ball.properties["vx"], -2.0)
 
     def test_horizontal_collision_preserves_y_and_vy(self):
-        """Collision horizontale : y et vy inchangés."""
+        """Horizontal collision: y and vy unchanged."""
         world = World()
 
         world.add_entity(
@@ -2442,15 +2442,15 @@ class WallCollisionTests(unittest.TestCase):
 
         ball = world.entities["balle"]
 
-        # x limité à 5.0
+        # x limited to 5.0
         self.assertAlmostEqual(ball.properties["x"], 5.0)
 
-        # y doit continuer à évoluer normalement sous la gravité
-        # vy devrait être plus négatif
+        # y must keep evolving normally under gravity
+        # vy should be more negative
         self.assertNotAlmostEqual(ball.properties["y"], 10.0)
 
     def test_gravity_and_wall_collision(self):
-        """Gravité + collision mur : mouvement vertical continue."""
+        """Gravity + wall collision: vertical motion continues."""
         world = World()
 
         world.add_entity(
@@ -2489,14 +2489,14 @@ class WallCollisionTests(unittest.TestCase):
 
         ball = world.entities["balle"]
 
-        # x limité à 5.0
+        # x limited to 5.0
         self.assertAlmostEqual(ball.properties["x"], 5.0)
 
-        # y doit avoir diminué à cause de la gravité
+        # y must have decreased because of gravity
         self.assertLess(ball.properties["y"], 10.0)
 
     def test_support_and_wall_coexistence(self):
-        """Support vertical + mur : supported_by reste cohérent."""
+        """Vertical support + wall: supported_by stays consistent."""
         world = World()
 
         world.add_entity(
@@ -2559,10 +2559,10 @@ class WallCollisionTests(unittest.TestCase):
 
         ball = world.entities["balle"]
 
-        # x limité à -5.0
+        # x limited to -5.0
         self.assertAlmostEqual(ball.properties["x"], -5.0)
 
-        # La balle doit toujours être supportée
+        # The ball must still be supported
         self.assertTrue(
             any(
                 relation.subject == "balle"
@@ -2572,7 +2572,7 @@ class WallCollisionTests(unittest.TestCase):
         )
 
     def test_no_wall_crossing_with_high_velocity(self):
-        """Même avec grande vitesse, le mur n'est pas franchi."""
+        """Even at high velocity, the wall is not crossed."""
         world = World()
 
         world.add_entity(
@@ -2616,15 +2616,15 @@ class WallCollisionTests(unittest.TestCase):
 
         ball = world.entities["balle"]
 
-        # x ne doit jamais dépasser 5.0
+        # x must never exceed 5.0
         self.assertAlmostEqual(ball.properties["x"], 5.0)
 
 
 class WallEntityTests(unittest.TestCase):
-    """Tests pour les murs comme entités du World."""
+    """Tests for walls as entities of the World."""
 
     def test_right_wall_as_entity(self):
-        """Mur droit créé comme Entity."""
+        """Right wall created as an Entity."""
         world = World()
 
         world.add_entity(
@@ -2681,7 +2681,7 @@ class WallEntityTests(unittest.TestCase):
         self.assertAlmostEqual(ball.properties["vx"], 0.0)
 
     def test_left_wall_as_entity(self):
-        """Mur gauche créé comme Entity."""
+        """Left wall created as an Entity."""
         world = World()
 
         world.add_entity(
@@ -2738,7 +2738,7 @@ class WallEntityTests(unittest.TestCase):
         self.assertAlmostEqual(ball.properties["vx"], 0.0)
 
     def test_wall_collision_detected_from_world(self):
-        """Collision détectée à partir des entités du World."""
+        """Collision detected from the entities of the World."""
         world = World()
 
         world.add_entity(
@@ -2793,7 +2793,7 @@ class WallEntityTests(unittest.TestCase):
         self.assertAlmostEqual(ball.properties["x"], 5.0)
 
     def test_no_wall_entity_no_collision(self):
-        """Absence de mur dans World : aucune collision artificielle."""
+        """No wall in World: no artificial collision."""
         world = World()
 
         world.add_entity(
@@ -2836,7 +2836,7 @@ class WallEntityTests(unittest.TestCase):
         self.assertAlmostEqual(ball.properties["x"], 5.0)
 
     def test_wall_restitution_from_entity(self):
-        """Restitution définie sur le mur est respectée."""
+        """Restitution defined on the wall is respected."""
         world = World()
 
         world.add_entity(
@@ -2893,7 +2893,7 @@ class WallEntityTests(unittest.TestCase):
         self.assertAlmostEqual(ball.properties["vx"], -5.0)
 
     def test_add_wall_changes_behavior(self):
-        """Ajout d'un mur dans World : le comportement change."""
+        """Adding a wall to World: the behaviour changes."""
         world = World()
 
         world.add_entity(
@@ -2936,7 +2936,7 @@ class WallEntityTests(unittest.TestCase):
         self.assertAlmostEqual(ball.properties["x"], 5.8)
 
     def test_remove_wall_allows_crossing(self):
-        """Suppression d'un mur : la balle peut à nouveau traverser."""
+        """Removing a wall: the ball can pass through again."""
         world = World()
 
         world.add_entity(
@@ -3007,7 +3007,7 @@ class WallEntityTests(unittest.TestCase):
         self.assertAlmostEqual(ball.properties["x"], 6.0)
 
     def test_gravity_independent_of_wall_collision(self):
-        """Gravité continue indépendamment de la collision horizontale."""
+        """Gravity continues independently of the horizontal collision."""
         world = World()
 
         world.add_entity(
@@ -3074,7 +3074,7 @@ class WallEntityTests(unittest.TestCase):
         self.assertAlmostEqual(ball.properties["y"], 9.9019)
 
     def test_support_and_wall_entity_coexistence(self):
-        """Support vertical reste cohérent avec mur comme entité."""
+        """Vertical support stays consistent with a wall as an entity."""
         world = World()
 
         world.add_entity(
@@ -3153,7 +3153,7 @@ class WallEntityTests(unittest.TestCase):
         )
 
     def test_both_walls_as_entities(self):
-        """Les deux murs (gauche et droit) comme entités."""
+        """Both walls (left and right) as entities."""
         world = World()
 
         world.add_entity(
@@ -3220,7 +3220,7 @@ class WallEntityTests(unittest.TestCase):
         self.assertAlmostEqual(ball.properties["x"], 5.0)
 
     def test_legacy_wall_collision_still_works(self):
-        """L'ancienne API WallCollision(min_x, max_x) fonctionne toujours."""
+        """The old API WallCollision(min_x, max_x) still works."""
         world = World()
 
         world.add_entity(
@@ -3266,29 +3266,29 @@ class WallEntityTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-# Ce fichier contient les tests ColliderTests à ajouter à test_wce.py
-# Copie ce contenu avant la ligne "if __name__ == "__main__":
+# This file contains the ColliderTests tests to add to test_wce.py
+# Copy this content before the line "if __name__ == "__main__":
 
 
 class ColliderTests(unittest.TestCase):
-    """Tests pour l'abstraction VerticalPlaneCollider avec Material."""
+    """Tests for the VerticalPlaneCollider abstraction with Material."""
 
     def test_import_collider(self):
-        """VerticalPlaneCollider peut être importé."""
+        """VerticalPlaneCollider can be imported."""
         from physics.colliders import Material, VerticalPlaneCollider
         collider = VerticalPlaneCollider(x=5.0, normal_x=-1.0)
         self.assertEqual(collider.x, 5.0)
         self.assertEqual(collider.normal_x, -1.0)
 
     def test_import_material(self):
-        """Material peut être importé."""
+        """Material can be imported."""
         from physics.colliders import DEFAULT_MATERIAL, Material
         mat = Material(restitution=0.5)
         self.assertEqual(mat.restitution, 0.5)
         self.assertEqual(DEFAULT_MATERIAL.restitution, 0.0)
 
     def test_collider_rejects_invalid_normal(self):
-        """VerticalPlaneCollider refuse une normale invalide."""
+        """VerticalPlaneCollider rejects an invalid normal."""
         from physics.colliders import VerticalPlaneCollider
         with self.assertRaises(ValueError):
             VerticalPlaneCollider(x=5.0, normal_x=0.0)
@@ -3296,7 +3296,7 @@ class ColliderTests(unittest.TestCase):
             VerticalPlaneCollider(x=5.0, normal_x=2.0)
 
     def test_material_rejects_invalid_restitution(self):
-        """Material refuse une restitution invalide."""
+        """Material rejects an invalid restitution."""
         from physics.colliders import Material
         with self.assertRaises(ValueError):
             Material(restitution=-0.1)
@@ -3304,7 +3304,7 @@ class ColliderTests(unittest.TestCase):
             Material(restitution=1.1)
 
     def test_right_wall_collider_no_side(self):
-        """Mur droit défini avec VerticalPlaneCollider sans side."""
+        """Right wall defined with VerticalPlaneCollider without side."""
         from physics.colliders import Material, VerticalPlaneCollider
 
         world = World()
@@ -3354,7 +3354,7 @@ class ColliderTests(unittest.TestCase):
         self.assertAlmostEqual(ball.properties["vx"], 0.0)
 
     def test_left_wall_collider_no_side(self):
-        """Mur gauche défini avec VerticalPlaneCollider sans side."""
+        """Left wall defined with VerticalPlaneCollider without side."""
         from physics.colliders import Material, VerticalPlaneCollider
 
         world = World()
@@ -3403,7 +3403,7 @@ class ColliderTests(unittest.TestCase):
         self.assertAlmostEqual(ball.properties["vx"], 0.0)
 
     def test_normal_direction_deduction(self):
-        """La normale détermine correctement la direction du mur."""
+        """The normal correctly determines the direction of the wall."""
         from physics.colliders import VerticalPlaneCollider
 
         right_collider = VerticalPlaneCollider(x=5.0, normal_x=-1.0)
@@ -3415,7 +3415,7 @@ class ColliderTests(unittest.TestCase):
         self.assertTrue(left_collider.is_left_facing)
 
     def test_right_wall_collision_with_collider(self):
-        """Collision avec mur droit utilisant VerticalPlaneCollider."""
+        """Collision with a right wall using VerticalPlaneCollider."""
         from physics.colliders import Material, VerticalPlaneCollider
 
         world = World()
@@ -3463,7 +3463,7 @@ class ColliderTests(unittest.TestCase):
         self.assertAlmostEqual(ball.properties["x"], 5.0)
 
     def test_left_wall_collision_with_collider(self):
-        """Collision avec mur gauche utilisant VerticalPlaneCollider."""
+        """Collision with a left wall using VerticalPlaneCollider."""
         from physics.colliders import Material, VerticalPlaneCollider
 
         world = World()
@@ -3511,7 +3511,7 @@ class ColliderTests(unittest.TestCase):
         self.assertAlmostEqual(ball.properties["x"], -5.0)
 
     def test_restitution_zero_with_collider_and_material(self):
-        """Restitution 0 avec VerticalPlaneCollider + Material."""
+        """Restitution 0 with VerticalPlaneCollider + Material."""
         from physics.colliders import Material, VerticalPlaneCollider
 
         world = World()
@@ -3560,7 +3560,7 @@ class ColliderTests(unittest.TestCase):
         self.assertAlmostEqual(ball.properties["vx"], 0.0)
 
     def test_restitution_one_with_collider_and_material(self):
-        """Restitution 1 (rebond élastique) avec VerticalPlaneCollider + Material."""
+        """Restitution 1 (elastic bounce) with VerticalPlaneCollider + Material."""
         from physics.colliders import Material, VerticalPlaneCollider
 
         world = World()
@@ -3609,7 +3609,7 @@ class ColliderTests(unittest.TestCase):
         self.assertAlmostEqual(ball.properties["vx"], -10.0)
 
     def test_restitution_half_with_collider_and_material(self):
-        """Restitution 0.5 (rebond amorti) avec VerticalPlaneCollider + Material."""
+        """Restitution 0.5 (damped bounce) with VerticalPlaneCollider + Material."""
         from physics.colliders import Material, VerticalPlaneCollider
 
         world = World()
@@ -3658,7 +3658,7 @@ class ColliderTests(unittest.TestCase):
         self.assertAlmostEqual(ball.properties["vx"], -5.0)
 
     def test_add_collider_changes_behavior(self):
-        """Ajout d'un collider dans World modifie le comportement."""
+        """Adding a collider to World modifies the behaviour."""
         from physics.colliders import Material, VerticalPlaneCollider
 
         world = World()
@@ -3717,7 +3717,7 @@ class ColliderTests(unittest.TestCase):
         self.assertAlmostEqual(ball.properties["x"], 5.0)
 
     def test_no_collider_no_artificial_collision(self):
-        """Aucune collision artificielle sans collider."""
+        """No artificial collision without a collider."""
         from physics.colliders import Material, VerticalPlaneCollider
 
         world = World()
@@ -3754,7 +3754,7 @@ class ColliderTests(unittest.TestCase):
         self.assertAlmostEqual(ball.properties["x"], 5.0)
 
     def test_default_material_used_when_absent(self):
-        """Matériau par défaut utilisé quand material est absent."""
+        """Default material used when material is absent."""
         from physics.colliders import VerticalPlaneCollider
 
         world = World()
@@ -3779,7 +3779,7 @@ class ColliderTests(unittest.TestCase):
                 kind="wall",
                 properties={
                     "collider": VerticalPlaneCollider(x=5.0, normal_x=-1.0),
-                    # Pas de material -> DEFAULT_MATERIAL (restitution=0.0)
+                    # No material -> DEFAULT_MATERIAL (restitution=0.0)
                 },
             )
         )
@@ -3803,7 +3803,7 @@ class ColliderTests(unittest.TestCase):
         self.assertAlmostEqual(ball.properties["vx"], 0.0)
 
     def test_legacy_wall_format_still_works(self):
-        """L'ancien format de mur (avec side) fonctionne toujours via adaptateur."""
+        """The old wall format (with side) still works via an adapter."""
         world = World()
 
         world.add_entity(
@@ -3852,7 +3852,7 @@ class ColliderTests(unittest.TestCase):
         self.assertAlmostEqual(ball.properties["vx"], 0.0)
 
     def test_two_walls_confine_space(self):
-        """Deux murs (gauche et droit) confinent l'espace entre -5 et +5."""
+        """Two walls (left and right) confine the space between -5 and +5."""
         from physics.colliders import Material, VerticalPlaneCollider
 
         world = World()
@@ -3911,7 +3911,7 @@ class ColliderTests(unittest.TestCase):
         self.assertAlmostEqual(ball.properties["x"], 5.0)
 
     def test_modern_collider_with_contradictory_side_ignores_side(self):
-        """Collider moderne + side contradictoire : collider gagne."""
+        """Modern collider + contradictory side: collider wins."""
         from physics.colliders import Material, VerticalPlaneCollider
 
         world = World()
@@ -3960,7 +3960,7 @@ class ColliderTests(unittest.TestCase):
         self.assertAlmostEqual(ball.properties["x"], 5.0)
 
     def test_modern_material_overrides_legacy_restitution(self):
-        """Material moderne a priorité sur restitution legacy."""
+        """Modern Material takes priority over legacy restitution."""
         from physics.colliders import Material, VerticalPlaneCollider
 
         world = World()
@@ -4010,7 +4010,7 @@ class ColliderTests(unittest.TestCase):
         self.assertAlmostEqual(ball.properties["vx"], -10.0)
 
     def test_legacy_walls_with_side_still_work(self):
-        """Legacy murs avec side continuent à fonctionner."""
+        """Legacy walls with side keep working."""
         world = World()
 
         world.add_entity(
@@ -4059,7 +4059,7 @@ class ColliderTests(unittest.TestCase):
         self.assertAlmostEqual(ball.properties["vx"], 0.0)
 
     def test_legacy_left_wall_converts_to_collider(self):
-        """Legacy mur gauche (side=left) converti correctement."""
+        """Legacy left wall (side=left) converted correctly."""
         world = World()
 
         world.add_entity(
@@ -4107,7 +4107,7 @@ class ColliderTests(unittest.TestCase):
         self.assertAlmostEqual(ball.properties["vx"], 0.0)
 
     def test_legacy_right_wall_converts_to_collider(self):
-        """Legacy mur droit (side=right) converti correctement."""
+        """Legacy right wall (side=right) converted correctly."""
         world = World()
 
         world.add_entity(
@@ -4155,7 +4155,7 @@ class ColliderTests(unittest.TestCase):
         self.assertAlmostEqual(ball.properties["vx"], 0.0)
 
     def test_legacy_wall_without_side_deducted_from_x_position(self):
-        """Legacy mur sans side : direction déduite de x (x>=0→droit, x<0→gauche)."""
+        """Legacy wall without side: direction deduced from x (x>=0→right, x<0→left)."""
         world = World()
 
         world.add_entity(
@@ -4202,10 +4202,10 @@ class ColliderTests(unittest.TestCase):
 
 
 class Transform2DTests(unittest.TestCase):
-    """Tests pour Transform2D."""
+    """Tests for Transform2D."""
 
     def test_identity(self):
-        """Transformation identité."""
+        """Identity transformation."""
         from core.transform import Transform2D
         t = Transform2D.identity()
         x, y = t.transform_point(5.0, 3.0)
@@ -4213,7 +4213,7 @@ class Transform2DTests(unittest.TestCase):
         self.assertAlmostEqual(y, 3.0)
 
     def test_translation(self):
-        """Translation : (1,2) -> (4,6)."""
+        """Translation: (1,2) -> (4,6)."""
         from core.transform import Transform2D
         t = Transform2D.translation(3.0, 4.0)
         x, y = t.transform_point(1.0, 2.0)
@@ -4221,7 +4221,7 @@ class Transform2DTests(unittest.TestCase):
         self.assertAlmostEqual(y, 6.0)
 
     def test_rotation_90_degrees(self):
-        """Rotation 90° : (1,0) -> (0,1)."""
+        """Rotation 90°: (1,0) -> (0,1)."""
         from math import pi
         from core.transform import Transform2D
         t = Transform2D.rotation(pi / 2)
@@ -4230,7 +4230,7 @@ class Transform2DTests(unittest.TestCase):
         self.assertAlmostEqual(y, 1.0, places=5)
 
     def test_rotation_minus_90_degrees(self):
-        """Rotation -90° : (0,1) -> (1,0)."""
+        """Rotation -90°: (0,1) -> (1,0)."""
         from math import pi
         from core.transform import Transform2D
         t = Transform2D.rotation(-pi / 2)
@@ -4239,7 +4239,7 @@ class Transform2DTests(unittest.TestCase):
         self.assertAlmostEqual(y, 0.0, places=5)
 
     def test_uniform_scale(self):
-        """Scale uniforme."""
+        """Uniform scale."""
         from core.transform import Transform2D
         t = Transform2D.scale(2.0)
         x, y = t.transform_point(3.0, 4.0)
@@ -4247,7 +4247,7 @@ class Transform2DTests(unittest.TestCase):
         self.assertAlmostEqual(y, 8.0)
 
     def test_non_uniform_scale(self):
-        """Scale non uniforme."""
+        """Non-uniform scale."""
         from core.transform import Transform2D
         t = Transform2D.scale(2.0, 3.0)
         x, y = t.transform_point(1.0, 1.0)
@@ -4255,7 +4255,7 @@ class Transform2DTests(unittest.TestCase):
         self.assertAlmostEqual(y, 3.0)
 
     def test_inverse_translation(self):
-        """Inverse d'une translation."""
+        """Inverse of a translation."""
         from core.transform import Transform2D
         t = Transform2D.translation(5.0, 10.0)
         inv_t = t.inverse()
@@ -4276,19 +4276,19 @@ class Transform2DTests(unittest.TestCase):
             self.assertAlmostEqual(iy, y, places=5)
 
     def test_composition_order(self):
-        """Ordre de composition : T_final(p) = self(other(p))."""
+        """Composition order: T_final(p) = self(other(p))."""
         from core.transform import Transform2D
         t1 = Transform2D.translation(2.0, 0.0)
         t2 = Transform2D.translation(3.0, 0.0)
         
-        # t2 après t1 : translation totale = 5
+        # t2 after t1: total translation = 5
         t_final = t2.compose(t1)
         x, y = t_final.transform_point(0.0, 0.0)
         self.assertAlmostEqual(x, 5.0)
         self.assertAlmostEqual(y, 0.0)
 
     def test_vector_unchanged_by_translation(self):
-        """Translation ne doit pas affecter un vecteur."""
+        """A translation must not affect a vector."""
         from core.transform import Transform2D
         t = Transform2D.translation(10.0, 20.0)
         vx, vy = t.transform_vector(1.0, 2.0)
@@ -4296,7 +4296,7 @@ class Transform2DTests(unittest.TestCase):
         self.assertAlmostEqual(vy, 2.0)
 
     def test_normal_transformed_correctly(self):
-        """Normale transformée correctement (sans scale non-uniforme)."""
+        """Normal transformed correctly (without non-uniform scale)."""
         from math import pi
         from core.transform import Transform2D
         t = Transform2D.rotation(pi / 2)
@@ -4306,17 +4306,17 @@ class Transform2DTests(unittest.TestCase):
 
 
 class PlaneColliderTests(unittest.TestCase):
-    """Tests pour PlaneCollider."""
+    """Tests for PlaneCollider."""
 
     def test_plane_collider_normalization(self):
-        """PlaneCollider normalise la normale."""
+        """PlaneCollider normalises the normal."""
         from physics.colliders import PlaneCollider
         pc = PlaneCollider(normal_x=2.0, normal_y=0.0, offset=0.0)
         self.assertAlmostEqual(pc.normal_x, 1.0)
         self.assertAlmostEqual(pc.normal_y, 0.0)
 
     def test_vertical_plane_collider_conversion_right(self):
-        """VerticalPlaneCollider (droit) converti en PlaneCollider."""
+        """VerticalPlaneCollider (right) converted to PlaneCollider."""
         from math import pi
         from core.transform import Transform2D
         from physics.colliders import VerticalPlaneCollider, vertical_plane_to_plane_collider
@@ -4324,12 +4324,12 @@ class PlaneColliderTests(unittest.TestCase):
         vpc = VerticalPlaneCollider(x=5.0, normal_x=-1.0)
         pc = vertical_plane_to_plane_collider(vpc)
         
-        # Le PlaneCollider doit avoir une translation de (5, 0)
+        # The PlaneCollider must have a translation of (5, 0)
         self.assertAlmostEqual(pc.transform.tx, 5.0)
         self.assertAlmostEqual(pc.transform.ty, 0.0)
 
     def test_vertical_plane_collider_conversion_left(self):
-        """VerticalPlaneCollider (gauche) converti en PlaneCollider."""
+        """VerticalPlaneCollider (left) converted to PlaneCollider."""
         from physics.colliders import VerticalPlaneCollider, vertical_plane_to_plane_collider
         
         vpc = VerticalPlaneCollider(x=-5.0, normal_x=+1.0)
@@ -4339,11 +4339,11 @@ class PlaneColliderTests(unittest.TestCase):
         self.assertAlmostEqual(pc.transform.ty, 0.0)
 
     def test_plane_collider_as_vertical_wall(self):
-        """PlaneCollider utilisé comme mur vertical."""
+        """PlaneCollider used as a vertical wall."""
         from core.transform import Transform2D
         from physics.colliders import PlaneCollider
         
-        # Mur droit à x=5 : normale locale (1,0), transform=translation(5,0)
+        # Right wall at x=5: local normal (1,0), transform=translation(5,0)
         pc = PlaneCollider(
             normal_x=1.0,
             normal_y=0.0,
@@ -4351,21 +4351,21 @@ class PlaneColliderTests(unittest.TestCase):
             transform=Transform2D.translation(5.0, 0.0),
         )
         
-        # Point à x=6 est derrière (côté de la normale)
+        # Point at x=6 is behind (normal side)
         self.assertTrue(pc.is_behind(6.0, 0.0))
         
-        # Point à x=4 n'est pas derrière
+        # Point at x=4 is not behind
         self.assertFalse(pc.is_behind(4.0, 0.0))
         
-        # Point à x=5 est sur le plan
+        # Point at x=5 is on the plane
         self.assertAlmostEqual(pc.signed_distance(5.0, 0.0), 0.0)
 
     def test_plane_collider_as_horizontal_floor(self):
-        """PlaneCollider utilisé comme sol horizontal."""
+        """PlaneCollider used as a horizontal floor."""
         from core.transform import Transform2D
         from physics.colliders import PlaneCollider
         
-        # Sol à y=0 : normale locale (0,-1) pour bloquer y < 0 (sous le sol)
+        # Floor at y=0: local normal (0,-1) to block y < 0 (below the floor)
         pc = PlaneCollider(
             normal_x=0.0,
             normal_y=-1.0,
@@ -4373,22 +4373,22 @@ class PlaneColliderTests(unittest.TestCase):
             transform=Transform2D.identity(),
         )
         
-        # Point à y=-1 est derrière (sous le sol, côté interdit)
+        # Point at y=-1 is behind (below the floor, forbidden side)
         self.assertTrue(pc.is_behind(0.0, -1.0))
         
-        # Point à y=1 n'est pas derrière (au-dessus du sol)
+        # Point at y=1 is not behind (above the floor)
         self.assertFalse(pc.is_behind(0.0, 1.0))
         
-        # Point à y=0 est sur le plan
+        # Point at y=0 is on the plane
         self.assertAlmostEqual(pc.signed_distance(0.0, 0.0), 0.0)
 
     def test_plane_collider_inclined(self):
-        """PlaneCollider utilisé comme plan incliné à 45°."""
+        """PlaneCollider used as a plane inclined at 45°."""
         from math import pi
         from core.transform import Transform2D
         from physics.colliders import PlaneCollider
         
-        # Plan incliné à 45° : normale locale (0,1), rotation de 45°
+        # Plane inclined at 45°: local normal (0,1), rotation of 45°
         pc = PlaneCollider(
             normal_x=0.0,
             normal_y=1.0,
@@ -4396,22 +4396,22 @@ class PlaneColliderTests(unittest.TestCase):
             transform=Transform2D.rotation(pi / 4),
         )
         
-        # Rotation 45° anti-horaire de (0,1) :
+        # 45° counter-clockwise rotation of (0,1):
         # nx = -sin(45°) ≈ -0.707, ny = cos(45°) ≈ 0.707
         nx, ny = pc.world_normal()
         self.assertAlmostEqual(nx, -0.70710678, places=5)
         self.assertAlmostEqual(ny, 0.70710678, places=5)
 
     def test_same_plane_collider_different_transforms(self):
-        """Même PlaneCollider utilisé comme mur, sol et plan incliné avec différents Transform2D."""
+        """Same PlaneCollider used as wall, floor and inclined plane with different Transform2D."""
         from math import pi
         from core.transform import Transform2D
         from physics.colliders import PlaneCollider
         
-        # Même PlaneCollider de base : normale locale (1,0), offset=0
+        # Same base PlaneCollider: local normal (1,0), offset=0
         base_plane = PlaneCollider(normal_x=1.0, normal_y=0.0, offset=0.0)
         
-        # Mur droit : translation à x=5
+        # Right wall: translation to x=5
         wall = base_plane.__class__(
             normal_x=base_plane.normal_x,
             normal_y=base_plane.normal_y,
@@ -4419,7 +4419,7 @@ class PlaneColliderTests(unittest.TestCase):
             transform=Transform2D.translation(5.0, 0.0),
         )
         
-        # Sol horizontal : rotation de 90° pour que la normale pointe vers le haut
+        # Horizontal floor: rotation of 90° so that the normal points upwards
         floor = base_plane.__class__(
             normal_x=0.0,
             normal_y=1.0,
@@ -4427,7 +4427,7 @@ class PlaneColliderTests(unittest.TestCase):
             transform=Transform2D.identity(),
         )
         
-        # Plan incliné : rotation de 45°
+        # Inclined plane: rotation of 45°
         inclined = base_plane.__class__(
             normal_x=0.0,
             normal_y=1.0,
@@ -4435,34 +4435,34 @@ class PlaneColliderTests(unittest.TestCase):
             transform=Transform2D.rotation(pi / 4),
         )
         
-        # Vérifier que chaque plan bloque dans la bonne direction
-        self.assertTrue(wall.is_behind(6.0, 0.0))  # Mur droit bloque x > 5
-        self.assertTrue(floor.is_behind(0.0, 1.0))  # Sol bloque y > 0
-        self.assertTrue(inclined.is_behind(1.0, 1.0))  # Plan incliné bloque du côté de la normale
+        # Check that each plane blocks in the right direction
+        self.assertTrue(wall.is_behind(6.0, 0.0))  # Right wall blocks x > 5
+        self.assertTrue(floor.is_behind(0.0, 1.0))  # Floor blocks y > 0
+        self.assertTrue(inclined.is_behind(1.0, 1.0))  # Inclined plane blocks on the normal side
 
 
 
 class TopologyTests(unittest.TestCase):
-    """Tests pour le module topology."""
+    """Tests for the topology module."""
 
     def test_topology_signature_validation(self):
-        """Validation des attributs de TopologySignature."""
+        """Validation of the TopologySignature attributes."""
         from core.topology import TopologySignature
         
-        # Valide
+        # Valid
         ts = TopologySignature(connected_components=1, holes=0, boundary_components=1)
         self.assertEqual(ts.connected_components, 1)
         
-        # Invalide : connected_components négatif
+        # Invalid: negative connected_components
         with self.assertRaises(ValueError):
             TopologySignature(connected_components=-1, holes=0, boundary_components=1)
         
-        # Invalide : holes négatif
+        # Invalid: negative holes
         with self.assertRaises(ValueError):
             TopologySignature(connected_components=1, holes=-1, boundary_components=1)
     
     def test_topology_signature_is_solid(self):
-        """Test de is_solid()."""
+        """Test of is_solid()."""
         from core.topology import TopologySignature
         
         solid = TopologySignature(connected_components=1, holes=0, boundary_components=1)
@@ -4472,7 +4472,7 @@ class TopologyTests(unittest.TestCase):
         self.assertFalse(ring.is_solid())
     
     def test_topology_signature_is_simple(self):
-        """Test de is_simple()."""
+        """Test of is_simple()."""
         from core.topology import TopologySignature
         
         simple = TopologySignature(connected_components=1, holes=0, boundary_components=1)
@@ -4485,17 +4485,17 @@ class TopologyTests(unittest.TestCase):
         self.assertFalse(ring.is_simple())
     
     def test_combine_topologies(self):
-        """Test de combine_topologies()."""
+        """Test of combine_topologies()."""
         from core.topology import TopologySignature, combine_topologies, DISK_TOPOLOGY
         
-        # Deux disques disjoints
+        # Two disjoint discs
         combined = combine_topologies(DISK_TOPOLOGY, DISK_TOPOLOGY)
         self.assertEqual(combined.connected_components, 2)
         self.assertEqual(combined.holes, 0)
         self.assertEqual(combined.boundary_components, 2)
     
     def test_preserved_topology_constants(self):
-        """Test des constantes de topologie pré-définies."""
+        """Test of the predefined topology constants."""
         from core.topology import (
             SEGMENT_TOPOLOGY, DISK_TOPOLOGY, CIRCLE_TOPOLOGY,
             RING_TOPOLOGY, DISJOINT_TWO_TOPOLOGY, POINT_TOPOLOGY,
@@ -4509,10 +4509,10 @@ class TopologyTests(unittest.TestCase):
 
 
 class TopologyPreservationTests(unittest.TestCase):
-    """Tests pour TopologyPreservation."""
+    """Tests for TopologyPreservation."""
 
     def test_full_preservation(self):
-        """Test de la préservation complète."""
+        """Test of complete preservation."""
         from core.topology import TopologyPreservation
         
         full = TopologyPreservation.full()
@@ -4522,7 +4522,7 @@ class TopologyPreservationTests(unittest.TestCase):
         self.assertTrue(full.preserves_orientation)
     
     def test_continuous_preservation(self):
-        """Test de la préservation continue."""
+        """Test of continuous preservation."""
         from core.topology import TopologyPreservation
         
         continuous = TopologyPreservation.continuous()
@@ -4532,7 +4532,7 @@ class TopologyPreservationTests(unittest.TestCase):
         self.assertTrue(continuous.preserves_orientation)
     
     def test_reflection_preservation(self):
-        """Test de la préservation par réflexion."""
+        """Test of preservation under reflection."""
         from core.topology import TopologyPreservation
         
         reflection = TopologyPreservation.reflection()
@@ -4543,10 +4543,10 @@ class TopologyPreservationTests(unittest.TestCase):
 
 
 class DeformationTests(unittest.TestCase):
-    """Tests pour le module deformation."""
+    """Tests for the deformation module."""
 
     def test_stretch_deformation(self):
-        """Test de StretchDeformation."""
+        """Test of StretchDeformation."""
         from core.deformation import StretchDeformation
         
         stretch = StretchDeformation(stretch_x=2.0, stretch_y=3.0)
@@ -4554,14 +4554,14 @@ class DeformationTests(unittest.TestCase):
         self.assertAlmostEqual(x, 2.0)
         self.assertAlmostEqual(y, 3.0)
         
-        # Vérifier la transformation
+        # Check the transformation
         t = stretch.get_transform()
         x2, y2 = t.transform_point(1.0, 1.0)
         self.assertAlmostEqual(x2, 2.0)
         self.assertAlmostEqual(y2, 3.0)
     
     def test_identity_deformation(self):
-        """Test de IdentityDeformation."""
+        """Test of IdentityDeformation."""
         from core.deformation import IdentityDeformation
         
         identity = IdentityDeformation()
@@ -4570,7 +4570,7 @@ class DeformationTests(unittest.TestCase):
         self.assertAlmostEqual(y, -3.0)
     
     def test_compose_deformations(self):
-        """Test de composition de déformations."""
+        """Test of composition of deformations."""
         from core.deformation import StretchDeformation, compose_deformations
         
         stretch1 = StretchDeformation(stretch_x=2.0, stretch_y=1.0)
@@ -4584,19 +4584,19 @@ class DeformationTests(unittest.TestCase):
         self.assertAlmostEqual(y, 3.0)
     
     def test_stretch_topology_preservation(self):
-        """Test de la préservation topologique pour stretch."""
+        """Test of topological preservation for stretch."""
         from core.deformation import StretchDeformation
         
-        # Stretch positif : préserve tout
+        # Positive stretch: preserves everything
         stretch = StretchDeformation(stretch_x=2.0, stretch_y=3.0)
         self.assertTrue(stretch.topology_preservation.preserves_orientation)
         
-        # Stretch avec un négatif : inverse l'orientation
+        # Stretch with a negative: reverses the orientation
         stretch_neg = StretchDeformation(stretch_x=-2.0, stretch_y=3.0)
         self.assertFalse(stretch_neg.topology_preservation.preserves_orientation)
     
     def test_circle_to_ellipse(self):
-        """Test de la fonction circle_to_ellipse."""
+        """Test of the circle_to_ellipse function."""
         from core.deformation import circle_to_ellipse
         
         ellipse = circle_to_ellipse(2.0, 3.0)
@@ -4606,13 +4606,13 @@ class DeformationTests(unittest.TestCase):
 
 
 class GeometryKernelTests(unittest.TestCase):
-    """Tests d'intégration pour le noyau géométrique."""
+    """Integration tests for the geometric kernel."""
 
     def test_transform2d_all_features(self):
-        """Test de toutes les fonctionnalités de Transform2D."""
+        """Test of all the features of Transform2D."""
         from core.transform import Transform2D
         
-        # Identité
+        # Identity
         t_id = Transform2D.identity()
         self.assertEqual(t_id.tx, 0.0)
         self.assertEqual(t_id.ty, 0.0)
@@ -4640,7 +4640,7 @@ class GeometryKernelTests(unittest.TestCase):
         self.assertAlmostEqual(y, 3.0)
     
     def test_plane_collider_integration(self):
-        """Test d'intégration : PlaneCollider avec WallCollision."""
+        """Integration test: PlaneCollider with WallCollision."""
         from core.transform import Transform2D
         from core.world import World, Entity
         from core.transformation import Transformation, Change
@@ -4649,14 +4649,14 @@ class GeometryKernelTests(unittest.TestCase):
         
         world = World()
         
-        # Ajouter une balle
+        # Add a ball
         world.add_entity(Entity(
             name='balle',
             kind='ball',
             properties={'x': 0.0, 'y': 0.0, 'vx': 10.0, 'vy': 0.0, 'm': 1.0}
         ))
         
-        # Ajouter un mur droit avec PlaneCollider
+        # Add a right wall with PlaneCollider
         world.add_entity(Entity(
             name='mur_droit',
             kind='wall',
@@ -4671,7 +4671,7 @@ class GeometryKernelTests(unittest.TestCase):
             }
         ))
         
-        # Transformation qui déplace la balle vers la droite
+        # Transformation that moves the ball to the right
         transformation = Transformation(
             name='move',
             changes=[
@@ -4680,24 +4680,24 @@ class GeometryKernelTests(unittest.TestCase):
             ]
         )
         
-        # Résoudre les collisions
+        # Resolve the collisions
         wall_collision = WallCollision()
         resolved = wall_collision.resolve(world, transformation)
         
-        # Vérifier que la balle est arrêtée à x=5
+        # Check that the ball is stopped at x=5
         x_change = [c for c in resolved.changes if c.property == 'x'][0]
         self.assertAlmostEqual(x_change.after, 5.0)
         
-        # Vérifier que vx est mis à 0
+        # Check that vx is set to 0
         vx_change = [c for c in resolved.changes if c.property == 'vx'][0]
         self.assertAlmostEqual(vx_change.after, 0.0)
     
     def test_plane_collider_as_floor(self):
-        """Test de PlaneCollider utilisé comme sol horizontal."""
+        """Test of PlaneCollider used as a horizontal floor."""
         from core.transform import Transform2D
         from physics.colliders import PlaneCollider
         
-        # Sol horizontal : normale locale (0,1), pas de transform
+        # Horizontal floor: local normal (0,1), no transform
         floor = PlaneCollider(
             normal_x=0.0,
             normal_y=1.0,
@@ -4705,22 +4705,22 @@ class GeometryKernelTests(unittest.TestCase):
             transform=Transform2D.identity(),
         )
         
-        # Point au-dessus du sol (y=1) est derrière
+        # Point above the floor (y=1) is behind
         self.assertTrue(floor.is_behind(0.0, 1.0))
         
-        # Point sous le sol (y=-1) n'est pas derrière
+        # Point below the floor (y=-1) is not behind
         self.assertFalse(floor.is_behind(0.0, -1.0))
         
-        # Point sur le sol (y=0) a distance 0
+        # Point on the floor (y=0) has distance 0
         self.assertAlmostEqual(floor.signed_distance(0.0, 0.0), 0.0)
     
     def test_plane_collider_inclined(self):
-        """Test de PlaneCollider utilisé comme plan incliné."""
+        """Test of PlaneCollider used as an inclined plane."""
         from math import pi
         from core.transform import Transform2D
         from physics.colliders import PlaneCollider
         
-        # Plan incliné à 45° : normale locale (0,1), rotation de 45°
+        # Plane inclined at 45°: local normal (0,1), rotation of 45°
         inclined = PlaneCollider(
             normal_x=0.0,
             normal_y=1.0,
@@ -4728,9 +4728,9 @@ class GeometryKernelTests(unittest.TestCase):
             transform=Transform2D.rotation(pi / 4),
         )
         
-        # La normale monde devrait être à 45°
+        # The world normal should be at 45°
         nx, ny = inclined.world_normal()
-        # Rotation 45° anti-horaire de (0,1) :
+        # 45° counter-clockwise rotation of (0,1):
         # nx = cos(45°) * 0 - sin(45°) * 1 = -sin(45°) ≈ -0.707
         # ny = sin(45°) * 0 + cos(45°) * 1 = cos(45°) ≈ 0.707
         self.assertAlmostEqual(nx, -0.70710678, places=5)
@@ -4738,10 +4738,10 @@ class GeometryKernelTests(unittest.TestCase):
 
 
 class PlaneCollisionTests(unittest.TestCase):
-    """Tests pour PlaneCollision avec PlaneCollider."""
+    """Tests for PlaneCollision with PlaneCollider."""
 
     def test_plane_collision_vertical_wall(self):
-        """Test de PlaneCollision avec un mur vertical."""
+        """Test of PlaneCollision with a vertical wall."""
         from core.transform import Transform2D
         from core.world import World, Entity
         from core.transformation import Transformation, Change
@@ -4750,20 +4750,20 @@ class PlaneCollisionTests(unittest.TestCase):
         
         world = World()
         
-        # Ajouter une balle
+        # Add a ball
         world.add_entity(Entity(
             name='balle',
             kind='ball',
             properties={'x': 0.0, 'y': 0.0, 'vx': 10.0, 'vy': 0.0, 'm': 1.0}
         ))
         
-        # Ajouter un mur droit avec PlaneCollider
+        # Add a right wall with PlaneCollider
         world.add_entity(Entity(
             name='mur_droit',
             kind='wall',
             properties={
                 'collider': PlaneCollider(
-                    normal_x=1.0,  # Normale locale vers la droite
+                    normal_x=1.0,  # Local normal pointing right
                     normal_y=0.0,
                     offset=0.0,
                     transform=Transform2D.translation(5.0, 0.0)
@@ -4772,7 +4772,7 @@ class PlaneCollisionTests(unittest.TestCase):
             }
         ))
         
-        # Transformation qui déplace la balle vers la droite
+        # Transformation that moves the ball to the right
         transformation = Transformation(
             name='move',
             changes=[
@@ -4781,20 +4781,20 @@ class PlaneCollisionTests(unittest.TestCase):
             ]
         )
         
-        # Résoudre les collisions
+        # Resolve the collisions
         plane_collision = PlaneCollision()
         resolved = plane_collision.resolve(world, transformation)
         
-        # Vérifier que la balle est arrêtée à x=5 (sur le plan)
+        # Check that the ball is stopped at x=5 (on the plane)
         x_change = [c for c in resolved.changes if c.property == 'x'][0]
         self.assertAlmostEqual(x_change.after, 5.0, places=5)
         
-        # Vérifier que vx est mis à 0 (restitution 0)
+        # Check that vx is set to 0 (restitution 0)
         vx_change = [c for c in resolved.changes if c.property == 'vx'][0]
         self.assertAlmostEqual(vx_change.after, 0.0, places=5)
     
     def test_plane_collision_horizontal_floor(self):
-        """Test de PlaneCollision avec un sol horizontal."""
+        """Test of PlaneCollision with a horizontal floor."""
         from core.transform import Transform2D
         from core.world import World, Entity
         from core.transformation import Transformation, Change
@@ -4803,22 +4803,22 @@ class PlaneCollisionTests(unittest.TestCase):
         
         world = World()
         
-        # Ajouter une balle au-dessus du sol
+        # Add a ball above the floor
         world.add_entity(Entity(
             name='balle',
             kind='ball',
             properties={'x': 0.0, 'y': 5.0, 'vx': 0.0, 'vy': -10.0, 'm': 1.0}
         ))
         
-        # Ajouter un sol horizontal avec PlaneCollider
-        # Normale (0,-1) pour bloquer y < 0 (sous le sol)
+        # Add a horizontal floor with PlaneCollider
+        # Normal (0,-1) to block y < 0 (below the floor)
         world.add_entity(Entity(
             name='sol',
             kind='ground',
             properties={
                 'collider': PlaneCollider(
                     normal_x=0.0,
-                    normal_y=-1.0,  # Normale vers le bas
+                    normal_y=-1.0,  # Normal pointing down
                     offset=0.0,
                     transform=Transform2D.identity()
                 ),
@@ -4826,30 +4826,30 @@ class PlaneCollisionTests(unittest.TestCase):
             }
         ))
         
-        # Transformation qui fait tomber la balle
+        # Transformation that makes the ball fall
         transformation = Transformation(
             name='gravity',
             changes=[
-                Change('balle', 'y', 5.0, -5.0),  # Chute à y=-5
+                Change('balle', 'y', 5.0, -5.0),  # Fall to y=-5
                 Change('balle', 'vy', -10.0, -10.0),
             ]
         )
         
-        # Résoudre les collisions
+        # Resolve the collisions
         plane_collision = PlaneCollision()
         resolved = plane_collision.resolve(world, transformation)
         
-        # Vérifier que la balle est arrêtée à y=0 (sur le sol)
+        # Check that the ball is stopped at y=0 (on the floor)
         y_change = [c for c in resolved.changes if c.property == 'y'][0]
         self.assertAlmostEqual(y_change.after, 0.0, places=5)
         
-        # Vérifier que vy rebondit avec restitution 0.5
+        # Check that vy bounces with restitution 0.5
         vy_change = [c for c in resolved.changes if c.property == 'vy'][0]
-        # vy avant = -10, après rebond : +10 * 0.5 = +5
+        # vy before = -10, after bounce: +10 * 0.5 = +5
         self.assertAlmostEqual(vy_change.after, 5.0, places=5)
     
     def test_plane_collision_inclined(self):
-        """Test de PlaneCollision avec un plan incliné à 45°."""
+        """Test of PlaneCollision with a plane inclined at 45°."""
         from math import pi
         from core.transform import Transform2D
         from core.world import World, Entity
@@ -4859,18 +4859,18 @@ class PlaneCollisionTests(unittest.TestCase):
         
         world = World()
         
-        # Ajouter une balle
+        # Add a ball
         world.add_entity(Entity(
             name='balle',
             kind='ball',
             properties={'x': 0.0, 'y': 0.0, 'vx': 0.0, 'vy': 10.0, 'm': 1.0}
         ))
         
-        # Ajouter un plan incliné à 45°
-        # La normale locale est (0,1) (vers le haut local)
-        # Avec rotation de 45°, la normale monde est (-0.707, 0.707)
-        # Le plan passe par l'origine
-        # Le côté interdit est y > x (car -x + y > 0)
+        # Add a plane inclined at 45°
+        # The local normal is (0,1) (local up)
+        # With a rotation of 45°, the world normal is (-0.707, 0.707)
+        # The plane passes through the origin
+        # The forbidden side is y > x (because -x + y > 0)
         world.add_entity(Entity(
             name='plan_incline',
             kind='inclined_plane',
@@ -4885,7 +4885,7 @@ class PlaneCollisionTests(unittest.TestCase):
             }
         ))
         
-        # Transformation qui déplace la balle vers (0, 10) qui est du côté interdit
+        # Transformation that moves the ball to (0, 10), which is on the forbidden side
         transformation = Transformation(
             name='move',
             changes=[
@@ -4896,20 +4896,20 @@ class PlaneCollisionTests(unittest.TestCase):
             ]
         )
         
-        # Résoudre les collisions
+        # Resolve the collisions
         plane_collision = PlaneCollision()
         resolved = plane_collision.resolve(world, transformation)
         
-        # Vérifier que la collision a eu lieu
+        # Check that the collision took place
         self.assertIn("+plane_collision", resolved.name)
-        # Vérifier que la balle est projetée sur le plan y = x
+        # Check that the ball is projected onto the plane y = x
         y_change = [c for c in resolved.changes if c.property == 'y'][0]
         x_change = [c for c in resolved.changes if c.property == 'x'][0]
-        # Sur le plan y = x, donc x = y
+        # On the plane y = x, so x = y
         self.assertAlmostEqual(x_change.after, y_change.after, places=5)
     
     def test_same_plane_collider_as_wall_floor_inclined(self):
-        """Test : même PlaneCollider utilisé comme mur, sol et plan incliné."""
+        """Test: same PlaneCollider used as wall, floor and inclined plane."""
         from math import pi
         from core.transform import Transform2D
         from core.world import World, Entity
@@ -4917,12 +4917,12 @@ class PlaneCollisionTests(unittest.TestCase):
         from physics.colliders import PlaneCollider, Material
         from physics.geometry_collision import PlaneCollision
         
-        # Même PlaneCollider de base : normale locale (0,1), offset=0
+        # Same base PlaneCollider: local normal (0,1), offset=0
         base_plane = PlaneCollider(normal_x=0.0, normal_y=1.0, offset=0.0)
         
-        # Scène 1 : Utilisé comme mur vertical à x=5
-        # Pour bloquer x > 5, normale monde doit être (+1,0)
-        # On peut utiliser normale locale (+1,0) + translation(5,0)
+        # Scene 1: Used as a vertical wall at x=5
+        # To block x > 5, the world normal must be (+1,0)
+        # One can use local normal (+1,0) + translation(5,0)
         world1 = World()
         world1.add_entity(Entity(
             name='balle',
@@ -4934,7 +4934,7 @@ class PlaneCollisionTests(unittest.TestCase):
             kind='wall',
             properties={
                 'collider': PlaneCollider(
-                    normal_x=1.0,  # Normale locale vers la droite
+                    normal_x=1.0,  # Local normal pointing right
                     normal_y=0.0,
                     offset=0.0,
                     transform=Transform2D.translation(5.0, 0.0)
@@ -4956,8 +4956,8 @@ class PlaneCollisionTests(unittest.TestCase):
         x_change1 = [c for c in resolved1.changes if c.property == 'x'][0]
         self.assertAlmostEqual(x_change1.after, 5.0, places=5)
         
-        # Scène 2 : Utilisé comme sol horizontal à y=0
-        # Pour bloquer y < 0, normale doit être (0,-1)
+        # Scene 2: Used as a horizontal floor at y=0
+        # To block y < 0, the normal must be (0,-1)
         world2 = World()
         world2.add_entity(Entity(
             name='balle',
@@ -4970,7 +4970,7 @@ class PlaneCollisionTests(unittest.TestCase):
             properties={
                 'collider': PlaneCollider(
                     normal_x=0.0,
-                    normal_y=-1.0,  # Normale vers le bas pour bloquer y < 0
+                    normal_y=-1.0,  # Normal pointing down to block y < 0
                     offset=0.0,
                     transform=Transform2D.identity()
                 ),
@@ -4990,12 +4990,12 @@ class PlaneCollisionTests(unittest.TestCase):
         y_change2 = [c for c in resolved2.changes if c.property == 'y'][0]
         self.assertAlmostEqual(y_change2.after, 0.0, places=5)
         
-        # Scène 3 : Utilisé comme plan incliné à 45°
-        # Avec normale locale (0,1) et rotation 45°, la normale monde est (-0.707, 0.707)
-        # Le plan passe par l'origine
-        # Le côté interdit est celui où signed_distance > 0, c'est-à-dire :
+        # Scene 3: Used as a plane inclined at 45°
+        # With local normal (0,1) and rotation 45°, the world normal is (-0.707, 0.707)
+        # The plane passes through the origin
+        # The forbidden side is the one where signed_distance > 0, that is:
         #   -0.707 * x + 0.707 * y > 0 => -x + y > 0 => y > x
-        # Donc pour tester la collision, déplaçons la balle vers (0, 10) qui est dans y > x
+        # So to test the collision, let us move the ball to (0, 10), which is in y > x
         world3 = World()
         world3.add_entity(Entity(
             name='balle',
@@ -5008,7 +5008,7 @@ class PlaneCollisionTests(unittest.TestCase):
             properties={
                 'collider': PlaneCollider(
                     normal_x=0.0,
-                    normal_y=1.0,  # Normale locale vers le haut
+                    normal_y=1.0,  # Local normal pointing up
                     offset=0.0,
                     transform=Transform2D.rotation(pi / 4)
                 ),
@@ -5027,15 +5027,15 @@ class PlaneCollisionTests(unittest.TestCase):
         )
         
         resolved3 = plane_collision.resolve(world3, trans3)
-        # Vérifier que la collision a eu lieu
+        # Check that the collision took place
         self.assertIn("+plane_collision", resolved3.name)
-        # Vérifier que la balle est projetée sur le plan y = x
+        # Check that the ball is projected onto the plane y = x
         y_change3 = [c for c in resolved3.changes if c.property == 'y'][0]
         x_change3 = [c for c in resolved3.changes if c.property == 'x'][0]
-        # Sur le plan y = x, donc x = y
+        # On the plane y = x, so x = y
         self.assertAlmostEqual(x_change3.after, y_change3.after, places=5)
         
-        # Vérifier que le même PlaneCollider de base a été utilisé
+        # Check that the same base PlaneCollider was used
         self.assertEqual(base_plane.normal_x, 0.0)
         self.assertEqual(base_plane.normal_y, 1.0)
         self.assertEqual(base_plane.offset, 0.0)

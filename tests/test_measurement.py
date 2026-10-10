@@ -43,7 +43,7 @@ def rec(entity="e1", attr="color", dom=("red", "blue"), value="red", r=0.9, prov
     return MeasurementRecord(o.observable, o.context, MeasurementOutcome(value), prov)
 
 
-# ================================================================ séparation état / observable / opérateur / issue
+# ================================================================ separation state / observable / operator / outcome
 
 class SeparationTests(unittest.TestCase):
     def test_observable_has_no_value(self): self.assertFalse(hasattr(Observable("loc", "b", "loc", ("t",)), "value"))
@@ -92,7 +92,7 @@ class LatentAccessTests(unittest.TestCase):
         w = LatentWorldState({("e1", "color"): "red", ("e1", "loc"): "table"}); w.measure(op()); self.assertEqual(w.peek(("e1", "loc")), "table")
 
 
-# ================================================================ résolution vs incertitude
+# ================================================================ resolution vs uncertainty
 
 class ResolutionTests(unittest.TestCase):
     def test_bin(self): self.assertAlmostEqual(MeasurementResolution(0.1).bin(2.07), 2.0)
@@ -116,7 +116,7 @@ class ResolutionTests(unittest.TestCase):
         L = o.likelihood(MeasurementOutcome(2.0), torch.tensor([2.0, 2.3])); self.assertGreater(float(L[0]), float(L[1]))
 
 
-# ================================================================ référentiels
+# ================================================================ reference frames
 
 class FrameTests(unittest.TestCase):
     def frames(self): return {"A": ReferenceFrame("A", (2.0, 1.0), math.pi / 3), "B": ReferenceFrame("B", (-1.0, 4.0), -math.pi / 4)}
@@ -168,7 +168,7 @@ class FrameExperimentTests(unittest.TestCase):
     def test_coordinates_change(self): self.assertEqual(FRAMES["coordinates_change"], 1.0)
 
 
-# ================================================================ bases de représentation
+# ================================================================ representation bases
 
 class BasisTests(unittest.TestCase):
     def setUp(self): self.bt = BasisTransform(64); self.x = torch.randn(64, dtype=torch.float64, generator=torch.Generator().manual_seed(0))
@@ -203,7 +203,7 @@ class FourierExperimentTests(unittest.TestCase):
         x, _, _ = make_signal(random.Random(2)); s, d = spectral_reasoning(x, BasisTransform(128)); self.assertTrue(s <= set(CANDIDATE_FREQS))
 
 
-# ================================================================ ensemble compatible
+# ================================================================ compatible set
 
 class EnsembleTests(unittest.TestCase):
     def test_product_size(self): self.assertEqual(len(two_cubes()), 16)
@@ -262,7 +262,7 @@ class FusionConflictTests(unittest.TestCase):
     def test_conflicted_constant(self): self.assertEqual(CONFLICTED, "CONFLICTED")
 
 
-# ================================================================ gain d'information, valeur décisionnelle
+# ================================================================ information gain, decision value
 
 class InformationGainTests(unittest.TestCase):
     def test_ig_positive(self): self.assertGreater(information_gain(two_cubes(), op()), 0)
@@ -320,7 +320,7 @@ class PlannerTests(unittest.TestCase):
     def test_policies(self): self.assertEqual(set(MeasurementPlanner.POLICIES), {"random", "fixed", "most_reliable", "max_ig", "max_utility"})
 
 
-# ================================================================ macro / micro, compromis
+# ================================================================ macro / micro, trade-off
 
 class MacrostateTests(unittest.TestCase):
     def test_multiplicity_binomial(self): self.assertEqual(MACRO["multiplicity"], {0: 81, 1: 324, 2: 486, 3: 324, 4: 81})
@@ -343,7 +343,7 @@ class TradeoffTests(unittest.TestCase):
     def test_planner_beats_fixed_velocity(self): self.assertLess(TRADE["velocity"]["planner"], TRADE["velocity"]["fixed_0.5"])
     def test_wrong_goal_bad(self): self.assertGreater(TRADE["position"]["wrong_goal"], TRADE["position"]["planner"] * 10)
     def test_not_quantum_named(self):
-        src = open(os.path.join(ROOT, "core/measurement.py")).read(); self.assertIn("PAS un principe d'incertitude quantique", src)
+        src = open(os.path.join(ROOT, "core/measurement.py")).read(); self.assertIn("NOT a quantum uncertainty principle", src)
 
 
 class InvariantTests(unittest.TestCase):
@@ -370,7 +370,7 @@ class NoQuantumClaimTests(unittest.TestCase):
 
 
 
-# ================================================================ langage conscient de la mesure
+# ================================================================ measurement-aware language
 
 from core.measurement_language import parse, parse_description, parse_place, parse_question
 from core.measurement_world import (
@@ -408,7 +408,7 @@ class LanguageTests(unittest.TestCase):
         ep = episode(321); self.assertTrue(all(parse_question(q["text"]) is not None for q in ep["questions"]))
 
 
-# ================================================================ monde temporel
+# ================================================================ temporal world
 
 class WorldTests(unittest.TestCase):
     @classmethod
@@ -437,7 +437,7 @@ class WorldTests(unittest.TestCase):
     def test_sealed_size(self): self.assertEqual(len(sealed_episodes()), 30)
 
 
-# ================================================================ agent (petit échantillon)
+# ================================================================ agent (small sample)
 
 from core.measurement_agent import SYSTEMS_M, MeasurementAgent, evaluate, fit_training, metrics
 
@@ -472,7 +472,7 @@ class AgentTests(unittest.TestCase):
         self.assertLessEqual(a, b + 1e-9)
 
 
-# ================================================================ diagnostic du modèle
+# ================================================================ model diagnosis
 
 from core.model_diagnostics import CAUSES, DIAGNOSTICS, REPAIR, TableOperator, diagnose_and_repair, direct_repair, inject, learn_tables, observe, setup
 

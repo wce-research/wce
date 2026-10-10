@@ -1,5 +1,5 @@
-"""Sous-jalon High-Precision Primitive Estimation : plancher par cellules, raffinement conjoint, naissance, validation,
-estimateurs spécialisés, incertitude, et garde-fous (rien n'est branché par défaut, lot scellé jamais touché)."""
+"""Sub-milestone High-Precision Primitive Estimation: cell-wise floor, joint refinement, birth, validation,
+specialised estimators, uncertainty, and guardrails (nothing is plugged in by default, sealed set never touched)."""
 import math
 import random
 import unittest
@@ -94,7 +94,7 @@ class ImproveTest(unittest.TestCase):
     def test_rollback_returns_the_initial_set(self):
         g = torch.Generator().manual_seed(1); X = obs_region(300, g); y = (torch.rand(300, generator=g) < 0.5).long(); im = improve_set([HALF, DISC], X, y, 0)
         if not im.committed: self.assertEqual([repr(p) for p in im.programs], [repr(HALF), repr(DISC)]); self.assertEqual(im.provenance, ["initial", "initial"])
-        self.assertFalse(im.committed)                                       # étiquettes aléatoires : rien à gagner hors-échantillon
+        self.assertFalse(im.committed)                                       # random labels: nothing to gain out-of-sample
 
     def test_incomplete_set_is_completed_and_validated(self):
         X, y = scene(XOR, 600, 0.02); im = improve_set([HALF], X, y, 0)

@@ -45,7 +45,7 @@ def run(text, system=None):
     return (system or fresh()).process(text, make_scene())
 
 
-# ================================================================ A. caractères
+# ================================================================ A. characters
 
 class CharacterTests(unittest.TestCase):
     def test_charset_has_french(self):
@@ -87,7 +87,7 @@ class CoreTrainingTests(unittest.TestCase):
         for spec in (TrainCore(), FastAdaptCore(), RollbackCore(), CorruptCore()): self.assertIsInstance(spec, TransformationSpec)
 
 
-# ================================================================ B. morphologie
+# ================================================================ B. morphology
 
 class MorphologyTests(unittest.TestCase):
     def test_forms_er(self): self.assertEqual(forms_of("mont", "er")[:3], ["monte", "monter", "montait"])
@@ -113,7 +113,7 @@ class MorphologyTests(unittest.TestCase):
     def test_some_generalization(self): self.assertGreater(morphology_report(FULL)["correct_generalizations"], 20)
 
 
-# ================================================================ C. mémoire lexicale
+# ================================================================ C. lexical memory
 
 class LexicalTests(unittest.TestCase):
     def test_grounded_from_experience(self): self.assertEqual(FULL.lexicon.lookup("tombe").source, "grounded")
@@ -131,14 +131,14 @@ class LexicalTests(unittest.TestCase):
     def test_cross_situational_learning(self):
         lc = LanguageCore(neural=False)
         lc.learn_physics("place la balle sur la table", *observe_physics_event("place la balle sur la table", "PLACE"))
-        self.assertNotIn("place", lc.lexicon.grounded)                   # RISE et PLACE expliquent encore
+        self.assertNotIn("place", lc.lexicon.grounded)                   # RISE and PLACE still explain
         lc.learn_physics("place le cube sur la table", *observe_physics_event("place le cube sur la table", "PLACE"))
         self.assertEqual(lc.lexicon.lookup("place").concepts.most_common(1)[0][0], "PLACE")
     def test_ambiguous_sequence_observation_not_bound(self):
         lc = LanguageCore(neural=False); self.assertIsNone(lc.learn_sequence("fais bcdea", "abcde"))
 
 
-# ================================================================ D. structure de phrase
+# ================================================================ D. sentence structure
 
 class ParsingTests(unittest.TestCase):
     def test_subject_verb(self):
@@ -160,7 +160,7 @@ class ParsingTests(unittest.TestCase):
         c = parse("monte le bloc sur la table").clauses[0]; self.assertEqual((c.verb, c.entity, c.support), ("monte", "bloc", "table"))
 
 
-# ================================================================ E/F. Goals / programmes
+# ================================================================ E/F. Goals / programs
 
 class GoalProgramTests(unittest.TestCase):
     def clause(self, text): return parse(text).clauses[0]
@@ -193,7 +193,7 @@ class GoalProgramTests(unittest.TestCase):
         w = make_scene(); apply_spec(w, lift_spec("balle", 3.0)); self.assertEqual(w.entities["balle"].properties["y"], 3.0)
 
 
-# ================================================================ G/H. candidats et vérification
+# ================================================================ G/H. candidates and verification
 
 class CandidateVerificationTests(unittest.TestCase):
     def test_multiple_candidates(self): self.assertGreaterEqual(len(run("tourne abcde").candidates), 2)
@@ -218,7 +218,7 @@ class CandidateVerificationTests(unittest.TestCase):
     def test_checks_counted(self): self.assertGreater(run("le cube tombe").checks, 2)
 
 
-# ================================================================ I/M/N. risque, politique, abstention
+# ================================================================ I/M/N. risk, policy, abstention
 
 class RiskPolicyTests(unittest.TestCase):
     policy = AntiHallucinationPolicy()
@@ -255,7 +255,7 @@ class RiskPolicyTests(unittest.TestCase):
         m = MATRIX["6_full_self_correction"]; self.assertGreater(m["correct_abstentions"], 5); self.assertEqual(m["false_confident_rate"], 0.0)
 
 
-# ================================================================ J/K/L. géométrie
+# ================================================================ J/K/L. geometry
 
 class TrajectoryTests(unittest.TestCase):
     def test_observables_present(self):
@@ -293,7 +293,7 @@ class TrajectoryTests(unittest.TestCase):
     def test_geometric_risk_in_risk_state(self): self.assertIsNotNone(run("le cube tombe").risk.geometric_risk)
 
 
-# ================================================================ O. auto-correction
+# ================================================================ O. self-correction
 
 class SelfCorrectionTests(unittest.TestCase):
     def corrupt(self, name):
@@ -329,7 +329,7 @@ class SelfCorrectionTests(unittest.TestCase):
                                 MATRIX["4_neural_wce"]["corrupted_core"]["task_success"])
 
 
-# ================================================================ P/Q. distillation et recherche guidée
+# ================================================================ P/Q. distillation and guided search
 
 class DistillGuidedTests(unittest.TestCase):
     @classmethod
@@ -360,10 +360,10 @@ class DistillGuidedTests(unittest.TestCase):
         r = distillation_experiment(system, sorted({s.family for s in small_segments()[:6]}), n=16)
         self.assertGreaterEqual(r["after"]["neural"], r["before"]["neural"])
         self.assertLessEqual(r["after"]["hybrid_evaluations"], r["before"]["hybrid_evaluations"])
-        self.assertEqual(r["after"]["hybrid"], r["before"]["hybrid"])       # WCE reste l'arbitre
+        self.assertEqual(r["after"]["hybrid"], r["before"]["hybrid"])       # WCE remains the arbiter
 
 
-# ================================================================ R/S/T/U. flux, transferts, zéro-shot
+# ================================================================ R/S/T/U. streams, transfers, zero-shot
 
 class StreamTransferTests(unittest.TestCase):
     def cat(self, name): return [r for r in STREAM if r["type"] == "query" and r["category"] == name]
@@ -392,7 +392,7 @@ class StreamTransferTests(unittest.TestCase):
         self.assertEqual(lc.learn_sequence("inverse abcde", "edcba", label="SWAP"), "REVERSE")
 
 
-# ================================================================ V/W. mémoire et vérification externe
+# ================================================================ V/W. memory and external verification
 
 class MemoryExternalTests(unittest.TestCase):
     def test_memory_attribution_known(self):
@@ -415,7 +415,7 @@ class MemoryExternalTests(unittest.TestCase):
         v = FakeExternalVerifier({("a", "b"): True}); self.assertEqual((v.verify("a", "b"), v.verify("x", "y")), ("SUPPORTED", "UNKNOWN"))
 
 
-# ================================================================ X/Y/Z. matrice, corpus, échelle
+# ================================================================ X/Y/Z. matrix, corpus, scale
 
 class MatrixCorpusScalingTests(unittest.TestCase):
     def test_corpus_size(self): self.assertGreaterEqual(sum(isinstance(c, str) for c in TRUE_CONCEPT.values()), 100)

@@ -1,6 +1,10 @@
 import inspect
 import math
 import unittest
+try:
+    from tests._source import code_only
+except ImportError:
+    from _source import code_only
 
 import torch
 
@@ -109,7 +113,7 @@ class ValidatorTests(unittest.TestCase):
         v = RobustValidator(z_oos=3.0, min_support=0, min_purity=0.0, min_segments=0); e = Evidence(z_in=0.0, z_oos=3.5, support_oos=20, purity_oos=0.9, segments=4, segments_used=5); self.assertTrue(v.accept(e, 1)[0]); self.assertFalse(v.accept(e, 500)[0])
     def test_null_calibration(self):
         z = P2.null_max_z(LocalRefiner(RansacProposer()), trials=3); self.assertEqual(len(z), 3); self.assertTrue(all(v > 0 for v in z)); self.assertEqual(z, P2.null_max_z(LocalRefiner(RansacProposer()), trials=3))
-        self.assertGreater(max(P2.null_max_z(LocalRefiner(RansacProposer()), trials=3, split="none")), 3.0)                      # le « z » n'est pas une normale réduite : un seuil nominal de 3 serait franchi sans aucune frontière
+        self.assertGreater(max(P2.null_max_z(LocalRefiner(RansacProposer()), trials=3, split="none")), 3.0)                      # the "z" is not a standard normal: a nominal threshold of 3 would be crossed without any boundary
     def test_split_points_disjoint(self):
         a, b = P2.split_points(self.X, self.y, 1); self.assertEqual(len(a) + len(b), len(self.X)); self.assertFalse(set(a.tolist()) & set(b.tolist()))
     def test_split_modes(self):
@@ -140,7 +144,7 @@ class SetTests(unittest.TestCase):
         X, y = scene(XOR(DISC2, HALF)); f = lambda: [c.representative.params for c in discover_robust(X, y, LocalRefiner(RansacProposer()), seed=2).primitives.classes]; self.assertEqual(f(), f())
     def test_single_fold_option(self): X, y = scene(DISC); d = discover_robust(X, y, LocalRefiner(RansacProposer()), seed=0, folds=1, rounds=1); self.assertEqual(d.rounds, 1)
     def test_no_world_access(self):
-        src = inspect.getsource(P2); self.assertNotIn("deep_world", src); self.assertNotIn("deep_primitive_world", src); self.assertNotIn("truth", src.replace("vérité", ""))
+        src = inspect.getsource(P2); self.assertNotIn("deep_world", src); self.assertNotIn("deep_primitive_world", src); self.assertNotIn("truth", code_only(P2))
     def test_literals_closed_by_complement(self):
         X, y = scene(XOR(DISC2, HALF)); d = discover_robust(X, y, LocalRefiner(RansacProposer()), seed=0); L = literals_of(d); n = {atom_name(p) for p in L}; self.assertIn("norm.ge", n); self.assertEqual(len(L), 2 * len(d.primitives))
         P = torch.rand(200, 2, generator=G(1)) * 6 - 3; a, b = L[0], L[len(d.primitives)]; self.assertGreater(float((predict(a, P) != predict(b, P)).float().mean()), 0.97)

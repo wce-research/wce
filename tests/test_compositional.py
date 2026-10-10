@@ -45,7 +45,7 @@ def tiny_net():
     return net
 
 
-# ================================================================ tâches et SkillNet
+# ================================================================ tasks and SkillNet
 
 class TaskTests(unittest.TestCase):
     def test_eval_bit(self): self.assertTrue(torch.equal(eval_spec(("bit", 0), ALL_DATA), ALL_DATA[:, 0].long()))
@@ -102,7 +102,7 @@ class SkillNetTests(unittest.TestCase):
         n = tiny_net(); y = n.skill_predict("s", ALL_DATA); self.assertEqual(n.accuracy(ALL_DATA, torch.zeros(256, D_CUE), y), 1.0)
 
 
-# ================================================================ A — transformations d'adaptation
+# ================================================================ A — adaptation transformations
 
 class AdaptationTransformationTests(unittest.TestCase):
     def test_fifteen_families(self): self.assertEqual(len(FAMILIES), 15); self.assertEqual(set(FAMILY_CLASSES), set(FAMILIES))
@@ -153,7 +153,7 @@ class AdaptationTransformationTests(unittest.TestCase):
     def test_counter_transformations(self): self.assertEqual(tiny_net().counters["transformations"], 2)
 
 
-# ================================================================ B/C — stabilisateurs appris
+# ================================================================ B/C — learned stabilisers
 
 class LearnedStabilizerTests(unittest.TestCase):
     @classmethod
@@ -193,12 +193,12 @@ def _make_family_test(fam):
         for _ in range(200):
             f, target, mag, spec = sample_transformation(net, rng)
             if f == fam: break
-        else: self.skipTest("famille non tirée")
+        else: self.skipTest("family not drawn")
         snap = _snapshot(net); fast = {k: dict(v) for k, v in net.fast.items()}; ctx = {c.name: c.skill for c in net.contexts}
         try: spec.execute(net)
         except Exception: pass
         if fam in BY_CONSTRUCTION:
-            for s in certs: self.assertTrue(label(net, certs, s, ctx), f"{fam} devait préserver {s}")
+            for s in certs: self.assertTrue(label(net, certs, s, ctx), f"{fam} was expected to preserve {s}")
         _restore(net, snap); net.fast = fast
         for m in [m for m in net.modules if m not in snap[0]]: net.modules.pop(m)
         self.assertTrue(all(c.check(net)[0] for c in certs.values()))
@@ -209,7 +209,7 @@ for _f in FAMILIES:
     setattr(LearnedStabilizerTests, f"test_family_{_f}_restorable", _make_family_test(_f))
 
 
-# ================================================================ D/E — programmes et planificateur
+# ================================================================ D/E — programs and planner
 
 class ProgramPlannerTests(unittest.TestCase):
     @classmethod
@@ -260,13 +260,13 @@ class ProgramPlannerTests(unittest.TestCase):
         net, certs, pl = fresh_net(3, seed=2); before = {m: {k: v.clone() for k, v in p.items()} for m, p in net.modules.items()}
         t = task_stream(77, 1)[0]; X, C, y = t.sample(128, random.Random(1)); pl.learn(net, X, C, y, certs)
         for m, p in before.items():
-            for k in p: self.assertTrue(torch.equal(p[k], net.modules[m][k]), f"{m}.{k} modifié")
+            for k in p: self.assertTrue(torch.equal(p[k], net.modules[m][k]), f"{m}.{k} modified")
     def test_train_adapter_local(self):
         n = tiny_net(); w = n.modules["m"]["w1"].clone(); train_adapter(n, "m", ALL_DATA[:64], torch.zeros(64, dtype=torch.long), steps=5)
         self.assertTrue(torch.equal(w, n.modules["m"]["w1"]))
 
 
-# ================================================================ G/H/I — certificats, mémoire fonctionnelle, sondes
+# ================================================================ G/H/I — certificates, functional memory, probes
 
 class CertificateProbeTests(unittest.TestCase):
     def test_synthesize_count(self): X, y = synthesize_probes(tiny_net(), "s", 12); self.assertEqual(X.shape, (12, D_DATA))
@@ -300,7 +300,7 @@ class ProbeSynthesisTests(unittest.TestCase):
     def test_new_task_learned(self): self.assertGreater(self.r["k=32"]["synthesized"]["new_B"], 0.85)
 
 
-# ================================================================ J/K — espace nul, gradient projeté
+# ================================================================ J/K — null space, projected gradient
 
 class NullSpaceTests(unittest.TestCase):
     def test_jacobian_shape(self): p = new_expert(4, 0); self.assertEqual(output_jacobian(p, ALL_DATA[:5]).shape, (5, n_params(p)))
@@ -327,7 +327,7 @@ class NullSpaceTests(unittest.TestCase):
     def test_vanilla_forgets(self): self.assertLess(self.sub["vanilla"]["retention_A"], self.sub["structural_growth"]["retention_A"])
 
 
-# ================================================================ M–P / AF–AJ — croissance, réutilisation, capacité, fusion, distillation, élagage, régénération
+# ================================================================ M–P / AF–AJ — growth, reuse, capacity, merging, distillation, pruning, regeneration
 
 class CapacityTests(unittest.TestCase):
     def test_equivalent_modules(self):
@@ -359,7 +359,7 @@ class CapacityTests(unittest.TestCase):
         self.assertEqual(n.skills["x"], ("compose", "and", "s", "s"))
 
 
-# ================================================================ R/S/T — anti-unification, macros, bibliothèque
+# ================================================================ R/S/T — anti-unification, macros, library
 
 class AntiUnificationTests(unittest.TestCase):
     def p(self, *steps): return [ProgramStep(f, a) for f, a in steps]
@@ -392,7 +392,7 @@ class AntiUnificationTests(unittest.TestCase):
     def test_library_reduces_evaluations(self): self.assertLess(self.lib["with_library"]["evaluations"], self.lib["without_library"]["evaluations"])
 
 
-# ================================================================ U/V/W/X/Y — crédit actif, identifiabilité, observabilité
+# ================================================================ U/V/W/X/Y — active credit, identifiability, observability
 
 class ActiveCreditTests(unittest.TestCase):
     @classmethod
@@ -443,7 +443,7 @@ for _c in FAULTS:
     setattr(ActiveCreditTests, f"test_observable_{''.join(ch if ch.isalnum() else '_' for ch in _c)}", _make_cause_test(_c))
 
 
-# ================================================================ AC/AD/AE — banc multi-tâches
+# ================================================================ AC/AD/AE — multi-task bench
 
 class MultiTaskTests(unittest.TestCase):
     @classmethod
@@ -466,7 +466,7 @@ class MultiTaskTests(unittest.TestCase):
     def test_mono_acc_bounds(self): t = self.tasks[0]; self.assertTrue(0 <= mono_acc(mono_init(0), *t.test_set()) <= 1)
 
 
-# ================================================================ AM/AN — transfert inter-domaines, domaine nouveau
+# ================================================================ AM/AN — cross-domain transfer, new domain
 
 class CrossDomainTests(unittest.TestCase):
     @classmethod
@@ -492,7 +492,7 @@ class CrossDomainTests(unittest.TestCase):
     def test_run_domain(self): self.assertEqual(run_domain("code", 1)["domain"], "code")
 
 
-# ================================================================ AO — lot scellé
+# ================================================================ AO — sealed set
 
 class SealedTests(unittest.TestCase):
     def test_hash(self): self.assertEqual(sealed_hash(), SEALED_SHA256)

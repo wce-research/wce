@@ -66,7 +66,7 @@ class BestSoFarTests(unittest.TestCase):
 
 
 class TracedSearchTests(unittest.TestCase):
-    """L'instrumentation ne doit changer AUCUN calcul."""
+    """The instrumentation must change NO computation."""
     def setUp(self): self.d = data_for(TR)
     def run_both(self, **kw): return DeepSearch("factorized", budget=60, max_depth=3, seed=1, **kw).run(self.d), TracedSearch("factorized", budget=60, max_depth=3, seed=1, **kw).run(self.d)
     def test_same_selection(self): a, b = self.run_both(fact_literals=[DISC, HALF], fact_residual=False); self.assertEqual(a.best().program, b.best().program)
@@ -89,7 +89,7 @@ class TracedSearchTests(unittest.TestCase):
 
 
 class PolishTests(unittest.TestCase):
-    """Préservation par polissage : le diagnostic doit VOIR une dégradation quand elle a lieu."""
+    """Preservation under polishing: the diagnostic must SEE a degradation when it occurs."""
     def test_polish_from_truth_measured(self):
         d = data_for(TR, 300, 0.05); p = normalize(TR); th, _ = fit_batch(p.skeleton(), d, torch.tensor([p.param_vector()], dtype=DT), steps=100); q = p.skeleton().with_params(th[0].tolist())
         a, b = score_components(p, d), score_components(q, d); self.assertTrue(math.isfinite(b["likelihood"])); self.assertEqual(a["depth"], b["depth"]); self.assertIsInstance(a["errors"], float)
@@ -101,8 +101,8 @@ class PolishTests(unittest.TestCase):
     def test_degradation_is_quantified(self):
         r = _Once.get(); good = [p for p in r["polish"] if p["accord_before"] >= 0.999]; self.assertTrue(good); self.assertTrue(all(-1e-9 <= p["accord_before"] - p["accord_after"] <= 1.0 for p in good))
     def test_hold_best_never_worse_on_data(self):
-        """Le garde-fou contrefactuel retient, par structure, la version la mieux expliquée PAR LES DONNÉES."""
-        self.assertIn('s["likelihood"] > pool[k][1]["likelihood"]', inspect.getsource(trace_task)); self.assertIn("le pipeline n'est pas modifié", inspect.getsource(trace_task))
+        """The counterfactual safeguard keeps, per structure, the version best explained BY THE DATA."""
+        self.assertIn('s["likelihood"] > pool[k][1]["likelihood"]', inspect.getsource(trace_task)); self.assertIn("the pipeline is not modified", inspect.getsource(trace_task))
     def test_hold_best_uses_no_truth(self):
         src = inspect.getsource(trace_task); i = src.index("pool = {}"); j = src.index("counterfactual = {"); self.assertNotIn("A(", src[i:j]); self.assertNotIn("accord", src[i:j])
 
@@ -155,7 +155,7 @@ class ScoreTests(unittest.TestCase):
     def test_oracle_ranking_fields(self):
         r = _Once.get(); self.assertEqual(set(r["oracle_ranking"]), {"posterior_score", "likelihood", "robust_likelihood", "mdl", "complexity_penalty", "structural_penalty"})
         for v in r["oracle_ranking"].values(): self.assertEqual(set(v), {"spearman", "top1_agreement", "top3_recall", "top5_recall", "top1_accord"})
-    def test_oracle_is_diagnostic_only(self): self.assertNotIn("deep_downstream", inspect.getsource(__import__("core.deep_search", fromlist=["x"]))); self.assertIn("calculé APRÈS coup", inspect.getsource(DD))
+    def test_oracle_is_diagnostic_only(self): self.assertNotIn("deep_downstream", inspect.getsource(__import__("core.deep_search", fromlist=["x"]))); self.assertIn("computed AFTER the fact", inspect.getsource(DD))
     def test_ranking_stable_under_reevaluation(self):
         o = DeepSearch("factorized", budget=40, max_depth=2, fact_literals=[DISC, HALF], fact_residual=False).run(self.d); ev = [score_components(h.program, self.d)["posterior_score"] for h in o.hypotheses[1:]]; self.assertEqual(ev, sorted(ev, reverse=True))
 
@@ -166,7 +166,7 @@ class FitterTests(unittest.TestCase):
         self.assertEqual(set(r), {"n", "max_param_error", "max_score_diff", "max_accord_diff", "same_top1", "same_order", "rank_correlation"})
     def test_same_init_small_difference_short_run(self):
         t = DX.down_task(0, 2, "standard"); r = fitter_comparison([normalize(t.world.truth)], t, lambda p: (1.0, 1.0), steps=5); self.assertLess(r["max_param_error"], 1e-3)
-    def test_reports_ranking_not_only_numbers(self): src = inspect.getsource(fitter_comparison); self.assertIn("same_order", src); self.assertIn("same_top1", src); self.assertIn("ne garantit pas le même classement", src)
+    def test_reports_ranking_not_only_numbers(self): src = inspect.getsource(fitter_comparison); self.assertIn("same_order", src); self.assertIn("same_top1", src); self.assertIn("does not guarantee the same ranking", src)
     def test_empty(self): self.assertEqual(fitter_comparison([], DX.down_task(0, 2, "standard"), lambda p: (1.0, 1.0)), {"n": 0})
 
 
@@ -189,7 +189,7 @@ class TraceTests(unittest.TestCase):
     def test_no_sealed(self):
         for m in (DD, DRP): self.assertNotIn("sealed_task", inspect.getsource(m)); self.assertNotIn("sealed_spec", inspect.getsource(m))
         self.assertEqual(DW.sealed_hash(), DW.SEALED_SHA256)
-    def test_pipeline_code_unchanged_by_diagnostic(self): self.assertIn("le pipeline n'est PAS modifié", inspect.getsource(DD))
+    def test_pipeline_code_unchanged_by_diagnostic(self): self.assertIn("the pipeline is NOT modified", inspect.getsource(DD))
     def test_make_targets(self):
         mk = open("Makefile").read()
         for t in ("deep-run-down:", "deep-down-aggregate:", "deep-down-report:"): self.assertIn(t, mk)

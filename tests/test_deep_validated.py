@@ -44,7 +44,7 @@ class DecisionRuleTests(unittest.TestCase):
     def test_non_finite_before_accepts_finite(self): self.assertEqual(decide(float("nan"), -5.0, True), (True, "non_finite_before"))
     def test_both_non_finite(self): self.assertEqual(decide(float("nan"), float("nan"), True), (False, "non_finite_proposal"))
     def test_deterministic(self): self.assertEqual([decide(-3.0, -2.5, True) for _ in range(3)], [(True, "improved")] * 3)
-    def test_tolerance_documented(self): self.assertEqual(ACCEPT_TOL, 1e-9); self.assertIn("égalité à la tolérance près", inspect.getsource(decide)); self.assertIn("rollback", inspect.getsource(decide))
+    def test_tolerance_documented(self): self.assertEqual(ACCEPT_TOL, 1e-9); self.assertIn("equality up to the tolerance", inspect.getsource(decide)); self.assertIn("rollback", inspect.getsource(decide))
     def test_criteria(self): self.assertEqual(CRITERIA, ("profiled", "surrogate"))
 
 
@@ -84,11 +84,11 @@ class TransactionTests(unittest.TestCase):
         init = torch.tensor(TR.param_vector(), dtype=DT); _, tx = validated_fit(TR.skeleton(), self.d, init, steps=50); ref, _ = fit_batch(TR.skeleton(), self.d, init.reshape(1, -1), steps=50); self.assertEqual(list(tx.proposal), ref[0].tolist())
     def test_budget_charged_even_on_rollback(self): c = FitCounter(); validated_fit(TR.skeleton(), self.d, torch.tensor(TR.param_vector(), dtype=DT), steps=100, counter=c); self.assertEqual(c.fit_equivalents, 1.0)
     def test_propose_evaluate_commit_semantics(self):
-        src = inspect.getsource(validated_fit); self.assertLess(src.index("fit_batch("), src.index("decide(")); self.assertIn("frozen = before.clone()", src); self.assertIn("l'optimiseur a modifié l'état initial en place", src)
+        src = inspect.getsource(validated_fit); self.assertLess(src.index("fit_batch("), src.index("decide(")); self.assertIn("frozen = before.clone()", src); self.assertIn("the optimiser modified the initial state in place", src)
 
 
 class PipelineIsolationTests(unittest.TestCase):
-    """Le garde-fou ne touche QUE l'étape d'ajustement."""
+    """The guardrail touches ONLY the fitting step."""
     def setUp(self): self.d = data_for(TR)
     def kw(self, **k): return dict(budget=60, max_depth=3, seed=1, fact_literals=[DISC, HALF], fact_residual=False, **k)
     def test_default_is_frozen_pipeline(self): self.assertIsNone(DeepSearch("factorized").validated); self.assertIsNone(ARMS["A"]); self.assertEqual(ARMS["B"], "profiled")
@@ -96,11 +96,11 @@ class PipelineIsolationTests(unittest.TestCase):
         a = DeepSearch("factorized", **self.kw()).run(self.d); b = DeepSearch("factorized", **self.kw(validated=None)).run(self.d); self.assertEqual([h.program for h in a.hypotheses], [h.program for h in b.hypotheses]); self.assertEqual(a.stats["transactions"], 0)
     def test_same_candidates_generated(self):
         a = TracedSearch("factorized", **self.kw()); a.run(self.d); b = TracedSearch("factorized", **self.kw(validated="profiled")); b.run(self.d)
-        r0 = lambda s: [f["inits"][0] for f in s.fits if f["origin"] == "factorized_r0"]; self.assertEqual(r0(a), r0(b))                      # le générateur du tour 0 reçoit et produit la même chose
+        r0 = lambda s: [f["inits"][0] for f in s.fits if f["origin"] == "factorized_r0"]; self.assertEqual(r0(a), r0(b))                      # the round-0 generator receives and produces the same thing
     def test_same_fit_cost_per_fit(self):
         a = DeepSearch("factorized", **self.kw()).run(self.d); b = DeepSearch("factorized", **self.kw(validated="profiled")).run(self.d); self.assertGreater(b.stats["transactions"], 0); self.assertEqual(b.stats["commits"] + b.stats["rollbacks"], b.stats["transactions"])
     def test_heuristic_multi_init_fits_not_guarded(self):
-        s = DeepSearch("bottom_up", budget=20, seed=0, validated="profiled"); s._setup(self.d, 0.1); s._fit_atoms(); self.assertEqual(len(s.transactions), 0)             # pas d'état initial à protéger : K initialisations aléatoires
+        s = DeepSearch("bottom_up", budget=20, seed=0, validated="profiled"); s._setup(self.d, 0.1); s._fit_atoms(); self.assertEqual(len(s.transactions), 0)             # no initial state to protect: K random initialisations
     def test_guard_only_in_fit(self):
         import core.deep_search as DS
         src = inspect.getsource(DS); self.assertEqual(src.count("validated_fit("), 1); self.assertIn("validated_fit(", inspect.getsource(DS.DeepSearch._fit))
@@ -132,7 +132,7 @@ class OptimizerDiagnosisTests(unittest.TestCase):
         _, traj, best = optimize_traced(TR.skeleton(), self.d, TR.param_vector(), steps=60); self.assertGreaterEqual(best["profiled"][0], traj[-1]["profiled_loglik"] - 1e-9)
     def test_best_so_far_records_step(self): _, traj, best = optimize_traced(TR.skeleton(), self.d, TR.param_vector(), steps=30); self.assertIn(best["profiled"][2], [t["step"] for t in traj])
     def test_monotone_variant_is_monotone_on_its_criterion(self):
-        _, traj, _ = optimize_traced(TR.skeleton(), self.d, [v + 0.3 for v in TR.param_vector()], steps=40, k_start=24.0, monotone=True, every=1); s = [t["loss"] for t in traj]            # objectif à raideur fixe 24 : le critère que la variante prétend optimiser
+        _, traj, _ = optimize_traced(TR.skeleton(), self.d, [v + 0.3 for v in TR.param_vector()], steps=40, k_start=24.0, monotone=True, every=1); s = [t["loss"] for t in traj]            # objective at fixed stiffness 24: the criterion the variant claims to optimise
         self.assertTrue(all(b <= a + 1e-9 for a, b in zip(s, s[1:])))
     def test_monotone_never_below_initial_surrogate(self):
         th, traj, _ = optimize_traced(TR.skeleton(), self.d, TR.param_vector(), steps=40, k_start=24.0, monotone=True); self.assertLessEqual(traj[-1]["loss"], traj[0]["loss"] + 1e-9)
@@ -141,7 +141,7 @@ class OptimizerDiagnosisTests(unittest.TestCase):
         g = local_geometry(TR.skeleton(), self.d, TR.param_vector()); self.assertEqual(set(g), {"k4", "k24"})
         for f in ("grad_norm", "condition", "min_eig", "negative_eigs", "near_zero_eigs", "cross_atom_coupling", "saturated_fraction", "n_params"): self.assertIn(f, g["k24"])
         self.assertTrue(0.0 <= g["k24"]["cross_atom_coupling"] <= 1.0); self.assertGreater(g["k24"]["saturated_fraction"], g["k4"]["saturated_fraction"])
-    def test_optimizer_not_modified_by_diagnosis(self): self.assertIn("L'optimiseur n'est pas modifié", inspect.getsource(optimizer_diagnosis)); self.assertNotIn("deep_validated", inspect.getsource(DF))
+    def test_optimizer_not_modified_by_diagnosis(self): self.assertIn("The optimizer is not modified", inspect.getsource(optimizer_diagnosis)); self.assertNotIn("deep_validated", inspect.getsource(DF))
     def test_diagnosis_row(self):
         r = optimizer_diagnosis(DX.down_task(0, 2, "standard"), 0); json.dumps(r); s = r["starts"]["true_parameters"]; self.assertEqual(set(r["starts"]), {"true_parameters", "top_candidate"}); self.assertEqual(s["noop"]["accord"], 1.0)
         self.assertEqual(set(s["configs"]), set(CONFIGS)); d = s["configs"]["default"]
@@ -155,7 +155,7 @@ class ExperimentTests(unittest.TestCase):
     def test_arms(self): self.assertEqual(DX.VO_ARMS, ("A", "B", "C")); self.assertEqual(len(DX.subunit_ids("deepvo", 0)), 24); self.assertEqual(len(DX.subunit_ids("deepopt", 0)), 8)
     def test_new_tasks_are_independent(self):
         old = {DX.down_task(k, d, r).world.uid for k in range(16) for d in DX.DOWN_DEPTHS for r in DX.GEN_REGIMES}; new = {DX.down_task(k, d, r).world.uid for k in range(100, 116) for d in DX.DOWN_DEPTHS for r in DX.GEN_REGIMES}
-        self.assertEqual((len(old), len(new)), (64, 64)); self.assertEqual(len(old & new), 0)             # 128 tâches = 64 structures × 2 régimes ; aucune structure commune aux deux jeux
+        self.assertEqual((len(old), len(new)), (64, 64)); self.assertEqual(len(old & new), 0)             # 128 tasks = 64 structures × 2 regimes; no structure shared between the two sets
     def test_regimes_share_structure_not_observations(self):
         a, b = DX.down_task(3, 3, "standard"), DX.down_task(3, 3, "rich"); self.assertEqual(a.world.uid, b.world.uid); self.assertNotEqual(len(a.y), len(b.y))
     def test_new_tasks_are_dev(self): t = DX.down_task(115, 5, "rich"); self.assertEqual(t.split, "dev"); self.assertLess(t.seed, DW.SPLIT_BASE["validation"])

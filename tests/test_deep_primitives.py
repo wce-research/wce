@@ -2,6 +2,10 @@ import inspect
 import json
 import math
 import unittest
+try:
+    from tests._source import code_only
+except ImportError:
+    from _source import code_only
 
 import torch
 
@@ -41,11 +45,11 @@ def scene(prog, n=400, rate=0.05, s=0):
     X = X0(n, s); y = predict(prog, X); f = torch.rand(n, generator=G(s + 1)) < rate; return X, torch.where(f, 1 - y, y)
 
 
-# ================================================================ objets, distinctions
+# ================================================================ objects, distinctions
 
 class ObjectTests(unittest.TestCase):
     def test_primitive_fragment_structure_distinct(self): self.assertEqual(len({Primitive, Fragment, CompositeStructure, PrimitiveCandidate}), 4); self.assertFalse(issubclass(Fragment, Primitive)); self.assertFalse(issubclass(PrimitiveCandidate, Fragment))
-    def test_distinction_documented(self): self.assertIn("Primitive (élément de base)  ≠  Fragment", inspect.getsource(PD))
+    def test_distinction_documented(self): self.assertIn("Primitive (basic element)    ≠  Fragment", inspect.getsource(PD))
     def test_candidate_is_explicit(self):
         c = PrimitiveCandidate(DISC, "x")
         for f in ("type", "params", "domain", "support", "uncertainty", "residual_explained", "description_bits", "invariants", "kin"): self.assertTrue(hasattr(c, f), f)
@@ -53,16 +57,16 @@ class ObjectTests(unittest.TestCase):
     def test_candidate_params(self): self.assertEqual(PrimitiveCandidate(DISC).params, [0.2, 0.0, 1.0]); self.assertEqual(PrimitiveCandidate(DISC).n_params, 3)
     def test_candidate_invariants(self): self.assertIn("rotation_about_center", PrimitiveCandidate(DISC).invariants); self.assertIn("translation_along_boundary", PrimitiveCandidate(HALF).invariants)
     def test_description_bits_grow_with_params(self): self.assertGreater(PrimitiveCandidate(RING).description_bits, PrimitiveCandidate(HALF).description_bits)
-    def test_not_opaque_latent(self): self.assertIn("jamais un vecteur latent opaque", inspect.getsource(PrimitiveCandidate))
+    def test_not_opaque_latent(self): self.assertIn("never an opaque latent vector", inspect.getsource(PrimitiveCandidate))
     def test_basis_rich(self): self.assertEqual(len(basis("rich")), 8)
     def test_basis_minimal(self): self.assertEqual(sorted(atom_name(a) for a in basis("minimal")), ["dot.le", "norm.ge", "norm.le"])
     def test_basis_unknown(self):
         with self.assertRaises(KeyError): basis("x")
     def test_no_world_import(self):
-        for m in (PD, NP): self.assertNotIn("deep_world", inspect.getsource(m)); self.assertNotIn(".truth", inspect.getsource(m)); self.assertNotIn("sealed", inspect.getsource(m))
+        for m in (PD, NP): self.assertNotIn("deep_world", inspect.getsource(m)); self.assertNotIn(".truth", inspect.getsource(m)); self.assertNotIn("sealed", code_only(m))
 
 
-# ================================================================ contraste (signal de validation)
+# ================================================================ contrast (validation signal)
 
 class ContrastTests(unittest.TestCase):
     def setUp(self): self.X, self.y = scene(DISC); self.pairs = close_pairs(self.X, self.y)
@@ -70,26 +74,26 @@ class ContrastTests(unittest.TestCase):
     def test_pairs_are_close(self): self.assertLess(float((self.pairs.P - self.pairs.Q).norm(dim=1).max()), 0.6)
     def test_true_atom_high_contrast(self): self.assertGreater(contrast(DISC, self.pairs)["z"], 6.0)
     def test_wrong_atom_low_contrast(self): self.assertLess(contrast(HALF_FAR, self.pairs)["z"], 3.0)
-    def test_tangent_boundary_is_a_known_false_positive(self): self.assertGreater(contrast(HALF_P, self.pairs)["z"], 3.0)          # limite documentée : une droite tangente au disque sépare de vraies paires opposées
+    def test_tangent_boundary_is_a_known_false_positive(self): self.assertGreater(contrast(HALF_P, self.pairs)["z"], 3.0)          # documented limitation: a line tangent to the disc separates true opposite pairs
     def test_unobserved_atom_no_support(self): self.assertEqual(contrast(T((40.0, 40.0), BNode("pred", "norm", "le", (0.5,))), self.pairs)["separated"], 0.0)
     def test_polarity_free(self): self.assertAlmostEqual(contrast(DISC, self.pairs)["z"], contrast(ANTI, self.pairs)["z"], places=9)
     def test_polarity_free_labels(self): p2 = close_pairs(self.X, 1 - self.y); self.assertAlmostEqual(contrast(DISC, self.pairs)["z"], contrast(DISC, p2)["z"], places=9)
     def test_xor_masked_atom_still_visible(self):
         X, y = scene(XOR(DISC, HALF), 600); p = close_pairs(X, y); self.assertGreater(contrast(DISC, p)["z"], 4.0); self.assertGreater(contrast(HALF, p)["z"], 4.0)
-        self.assertLess(abs(float((predict(DISC, X) == y).float().mean()) - 0.5), 0.25)                       # peu corrélé à la cible, pourtant détecté
+        self.assertLess(abs(float((predict(DISC, X) == y).float().mean()) - 0.5), 0.25)                       # weakly correlated with the target, yet detected
     def test_purity(self): self.assertGreater(contrast(DISC, self.pairs)["purity"], 0.6)
     def test_weights_remove_explained(self):
         s = separates(DISC, self.pairs); self.pairs.weight = torch.where(s & (self.pairs.opposite > 0), torch.zeros_like(self.pairs.weight), self.pairs.weight); self.assertLess(contrast(DISC, self.pairs)["z"], 1.0)
     def test_contrast_fit_refines(self):
         th, obj = contrast_fit(DISC.skeleton(), self.pairs, torch.tensor([[0.5, 0.3, 0.8]], dtype=DT), steps=80); p = DISC.skeleton().with_params(th[0].tolist()); self.assertGreater(contrast(p, self.pairs)["z"], contrast(DISC.skeleton().with_params([0.5, 0.3, 0.8]), self.pairs)["z"])
-    def test_contrast_fit_penalizes_homogeneous(self): self.assertIn("séparer une paire homogène coûte", inspect.getsource(contrast_fit))
+    def test_contrast_fit_penalizes_homogeneous(self): self.assertIn("separating a homogeneous pair costs", inspect.getsource(contrast_fit))
     def test_contrast_fit_counts_budget(self): c = FitCounter(); contrast_fit(DISC.skeleton(), self.pairs, torch.zeros(3, 3, dtype=DT) + 0.5, steps=50, counter=c); self.assertEqual(c.fit_equivalents, 1.5)
     def test_contrast_fit_batch_independent(self):
         i = torch.tensor([[0.5, 0.3, 0.8], [-1.0, 1.0, 0.6]], dtype=DT); a, _ = contrast_fit(DISC.skeleton(), self.pairs, i, steps=20); b, _ = contrast_fit(DISC.skeleton(), self.pairs, i[1:], steps=20); self.assertLess(float((a[1] - b[0]).abs().max()), 1e-9)
     def test_thresholds(self): self.assertEqual((Z_MIN, MIN_SUPPORT, EQUIV_AGREEMENT), (3.0, 5, 0.97))
 
 
-# ================================================================ proposition / validation séparées
+# ================================================================ proposal / validation kept separate
 
 class ProposalValidationTests(unittest.TestCase):
     def setUp(self): self.X, self.y = scene(DISC); self.pairs = close_pairs(self.X, self.y); self.v = PrimitiveValidation()
@@ -118,7 +122,7 @@ class ProposalValidationTests(unittest.TestCase):
         a = GeometricProposer().propose(self.X, self.y, self.pairs, seed=3); b = GeometricProposer().propose(self.X, self.y, self.pairs, seed=3); self.assertEqual([x.program for x in a], [x.program for x in b])
 
 
-# ================================================================ hypothèses multiples, équivalence
+# ================================================================ multiple hypotheses, equivalence
 
 class CompatibleTests(unittest.TestCase):
     def setUp(self): self.X = X0(300); self.cp = CompatiblePrimitives(self.X)
@@ -140,7 +144,7 @@ class CompatibleTests(unittest.TestCase):
     def test_query_scores_complement_aligned(self): self.cp.add(self.c(DISC, 6.0)); self.cp.add(self.c(ANTI, 5.0)); self.assertEqual(float(primitive_query_scores(self.cp, X0(200, 2)).max()), 0.0)
 
 
-# ================================================================ découverte itérative guidée par le résidu
+# ================================================================ iterative discovery guided by the residual
 
 class DiscoveryTests(unittest.TestCase):
     def test_discovers_single_disc(self):
@@ -152,8 +156,8 @@ class DiscoveryTests(unittest.TestCase):
     def test_residual_decreases(self): X, y = scene(XOR(DISC, HALF), 500); d = discover(X, y, GeometricProposer()); self.assertLess(d.residual_left, 1.0); self.assertTrue(all(0 <= l["residual"] <= 1 for l in d.log))
     def test_stops_when_no_structure(self):
         X = X0(300); y = (torch.rand(300, generator=G(5)) < 0.5).long(); d = discover(X, y, GeometricProposer(), rounds=6); self.assertLessEqual(len(d.primitives), 1); self.assertLess(d.rounds, 6); self.assertGreater(d.log[0]["z_threshold"], Z_MIN)
-    def test_multiple_comparison_threshold(self): self.assertIn("Comparaisons multiples", inspect.getsource(discover))
-    def test_residual_is_pairs_not_memory(self): self.assertIn("pas une mémoire de points", inspect.getsource(discover))
+    def test_multiple_comparison_threshold(self): self.assertIn("Multiple comparisons", inspect.getsource(discover))
+    def test_residual_is_pairs_not_memory(self): self.assertIn("not a memory of points", inspect.getsource(discover))
     def test_bounded_classes(self): X, y = scene(XOR(XOR(DISC, HALF), RING), 500); d = discover(X, y, GeometricProposer(), max_classes=3, rounds=6); self.assertLessEqual(len(d.primitives), 3)
     def test_log_rejections(self): X, y = scene(DISC); d = discover(X, y, GeometricProposer(), rounds=1); self.assertIn("rejected", d.log[0]); self.assertEqual(d.log[0]["proposed"], d.proposals)
     def test_first_validated_recorded(self): X, y = scene(DISC, 500); d = discover(X, y, GeometricProposer()); self.assertIsNotNone(d.first_validated_at); self.assertLessEqual(d.first_validated_at, d.proposals)
@@ -169,7 +173,7 @@ class DiscoveryTests(unittest.TestCase):
         self.assertGreater(float((predict(o.best().program, P) == predict(XOR(DISC, HALF), P)).float().mean()), 0.95)
 
 
-# ================================================================ parenté, familles, naissance, fusion, retrait
+# ================================================================ kinship, families, birth, merging, removal
 
 class LibraryTests(unittest.TestCase):
     def test_kinship_parallel(self): self.assertEqual(kinship(HALF, HALF_P), ["parallel"])
@@ -204,7 +208,7 @@ class LibraryTests(unittest.TestCase):
     def test_update_families(self): L = PrimitiveLibrary(); [L.observe(f"t{i}", [T((0.1 * i, 0.0), BNode("pred", "norm", "le", (1.0,)))]) for i in range(4)]; self.assertEqual(len(L.update()), 1)
 
 
-# ================================================================ évaluation (métriques, identifiabilité)
+# ================================================================ evaluation (metrics, identifiability)
 
 class EvalTests(unittest.TestCase):
     def test_components_minimal_basis(self):
@@ -229,7 +233,7 @@ class EvalTests(unittest.TestCase):
     def test_metrics_reported_separately(self): X, y = scene(DISC); m = PE.primitive_metrics([DISC], [DISC_B], X, y, X0(500, 9)); self.assertTrue({"exact", "functional", "equivalence", "component_recall", "precision", "param_error", "equivalence_identifiable", "equivalence_partial", "equivalence_not_identifiable"} <= set(m))
 
 
-# ================================================================ banc atomique
+# ================================================================ atomic bench
 
 class AtomicWorldTests(unittest.TestCase):
     def test_categories(self): self.assertEqual(PW.CATEGORIES, ("single", "two", "multi", "close", "nested", "redundant", "noise", "outliers", "partial")); self.assertEqual(len(PW.OOD_SHIFTS), 5)
@@ -250,10 +254,10 @@ class AtomicWorldTests(unittest.TestCase):
     def test_ood_noise(self): self.assertEqual(PW.make_scene(0, "two", "noise").task.spec.rate, 0.12)
     def test_scene_not_degenerate(self):
         for c in PW.CATEGORIES: m = float(PW.make_scene(0, c).task.y.float().mean()); self.assertTrue(0.03 < m < 0.97, c)
-    def test_no_sealed(self): self.assertNotIn("sealed", inspect.getsource(PW).replace("lot scellé", "")); self.assertEqual(DW.sealed_hash(), DW.SEALED_SHA256)
+    def test_no_sealed(self): self.assertNotIn("sealed", code_only(PW)); self.assertEqual(DW.sealed_hash(), DW.SEALED_SHA256)
 
 
-# ================================================================ proposeur neuronal compact
+# ================================================================ compact neural proposer
 
 class NeuralTests(unittest.TestCase):
     def test_compact(self): n = NP.ProposerNet(); self.assertLess(n.n_params(), 30000); self.assertEqual(n.n_params(), 23881)
@@ -274,13 +278,13 @@ class NeuralTests(unittest.TestCase):
     def test_proposer_emits_grammar_atoms(self):
         X, y = scene(DISC, 200); c = NP.NeuralProposer(NP.ProposerNet()).propose(X, y, None); G0 = {skel_key(a) for a in atoms()}; self.assertTrue(all(skel_key(x.program) in G0 and not x.validated for x in c))
     def test_does_not_predict_structure_or_labels(self):
-        src = inspect.getsource(NP); self.assertIn("ne prédit ni la structure complète ni les étiquettes du monde", src); self.assertNotIn('"and"', src); self.assertNotIn('"xor"', src)
+        src = inspect.getsource(NP); self.assertIn("predicts neither the complete structure nor the labels of the world", src); self.assertNotIn('"and"', src); self.assertNotIn('"xor"', src)
     def test_inference_uses_observations_only(self): self.assertEqual(list(inspect.signature(NP.NeuralProposer.propose).parameters), ["self", "X", "y", "pairs", "seed", "counter"])
     def test_training_scenes_are_dev_train_base(self): self.assertIn("TRAIN_BASE", inspect.getsource(DX.neural_train_scenes)); self.assertIn('split="dev"', inspect.getsource(DX.neural_train_scenes)); self.assertNotIn("sealed", inspect.getsource(DX.neural_train_scenes))
     def test_state_serializable(self): json.dumps(NP.state_to_json(NP.ProposerNet()))
 
 
-# ================================================================ expériences
+# ================================================================ experiments
 
 class PrimExperimentTests(unittest.TestCase):
     def test_methods(self): self.assertEqual(DX.PRIM_METHODS, ("gradient", "geometric", "contrast", "hybrid", "hybrid_minimal", "neural", "neural_hybrid"))

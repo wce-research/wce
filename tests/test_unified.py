@@ -40,7 +40,7 @@ def state(**kw):
     return u
 
 
-# ================================================================ indépendance du banc tiers
+# ================================================================ independence of the third-party bench
 
 class IndependenceTests(unittest.TestCase):
     def _imports(self, path):
@@ -62,7 +62,7 @@ class IndependenceTests(unittest.TestCase):
     def test_unified_does_not_import_worlds(self): self.assertFalse(any("world" in m for m in self._imports("core/unified.py")))
 
 
-# ================================================================ banc tiers : contenu
+# ================================================================ third-party bench: content
 
 class BenchTests(unittest.TestCase):
     def test_main_scenarios_count(self): self.assertGreaterEqual(len(scenarios_main()), 25)
@@ -86,7 +86,7 @@ class BenchTests(unittest.TestCase):
     def test_non_engagement_classes(self): self.assertEqual(set(NON_ENGAGEMENT), {"?", "présupposé", "conflit"})
 
 
-# ================================================================ formule d'identité
+# ================================================================ identity formula
 
 class PosteriorTests(unittest.TestCase):
     def P(self, compat, support=None, temporal=None, r=1.0, prior=None):
@@ -145,7 +145,7 @@ class IdentityTests(unittest.TestCase):
     def test_same_resolver_for_query(self):
         u = state(); u.observe("capteur", ("color", "e2"), "blue"); u.say("alice", "Le cube rouge est sur la table.")
         n = len(u.state.mentions); u.query("Où est le cube rouge ?")
-        self.assertGreater(len(u.state.mentions), n)            # la question passe par le même DiscourseResolver
+        self.assertGreater(len(u.state.mentions), n)            # the question goes through the same DiscourseResolver
     def test_query_does_not_create_claims(self):
         u = state(); n = len(u.claims); u.query("Le cube rouge est-il sur la table ?"); self.assertEqual(len(u.claims), n)
     def test_single_clock(self):
@@ -180,7 +180,7 @@ class CalibrationTests(unittest.TestCase):
     def test_query_threshold_floor(self): self.assertGreaterEqual(CAL["thresholds"]["query"], 0.9)
 
 
-# ================================================================ décision par risque attendu
+# ================================================================ decision by expected risk
 
 class RiskTests(unittest.TestCase):
     def test_thresholds_ordered(self):
@@ -202,7 +202,7 @@ class RiskTests(unittest.TestCase):
         r = RiskPolicy().risks(0.9, "query"); self.assertAlmostEqual(r[ANSWER], 0.1 * 20, places=3)
 
 
-# ================================================================ maintenance de vérité
+# ================================================================ truth maintenance
 
 class TMSTests(unittest.TestCase):
     def test_premise_justified(self):
@@ -232,7 +232,7 @@ class TMSTests(unittest.TestCase):
         self.assertEqual(t.nodes["b"].status, DEFEATED)
 
 
-# ================================================================ dépendances de croyances et révision
+# ================================================================ belief dependencies and revision
 
 class BeliefDependencyTests(unittest.TestCase):
     def setUp(self):
@@ -311,7 +311,7 @@ class TruthMaintenanceStateTests(unittest.TestCase):
         self.assertEqual(u.query("Où est la balle ?").reason, CONFLICTED)
 
 
-# ================================================================ questions épistémiques
+# ================================================================ epistemic questions
 
 class QueryTests(unittest.TestCase):
     def setUp(self):
@@ -355,7 +355,7 @@ class QueryTests(unittest.TestCase):
         _, c = u.say("alice", "Le rouge est sur la table."); self.assertEqual(c[0].entity, "e1")
 
 
-# ================================================================ observation active, auto-correction
+# ================================================================ active observation, self-correction
 
 class ActiveObservationTests(unittest.TestCase):
     def test_information_request(self):
@@ -385,7 +385,7 @@ class SelfCorrectionTests(unittest.TestCase):
         self.assertGreater(r["correction_recall"], 0.8); self.assertEqual(r["harmful"], 0); self.assertEqual(r["correction_precision"], 1.0)
 
 
-# ================================================================ évaluation sur le banc tiers
+# ================================================================ evaluation on the third-party bench
 
 class ThirdPartyTests(unittest.TestCase):
     def test_success(self): self.assertGreater(TP["success"], 0.85)
@@ -451,7 +451,7 @@ class VariationTests(unittest.TestCase):
 for _v in VARIATIONS: setattr(VariationTests, f"test_variation_{_v}_no_false_confident", _variation_case(_v))
 
 
-# ================================================================ mémoire, distillation
+# ================================================================ memory, distillation
 
 class MemoryTests(unittest.TestCase):
     @classmethod
@@ -496,7 +496,7 @@ if __name__ == "__main__":
     unittest.main()
 
 
-# ================================================================ agent unifié (environnement indépendant)
+# ================================================================ unified agent (independent environment)
 
 class UnifiedAgentTests(unittest.TestCase):
     @classmethod
@@ -546,7 +546,7 @@ class UnifiedAgentTests(unittest.TestCase):
     def test_calibration_prefers_conservative_on_ties(self):
         a = self.UA(self.UC(calibrate=True)); a.learn_captions(self.caps); a.warm_up_sources(self.splits["train"])
         a.GRID = {"observation_threshold": (0.5, 1.01), "query_threshold": (0.5, 1.01)}
-        c = a.calibrate([{"observations": [], "items": [], "world": None}])      # aucun item : risques égaux
+        c = a.calibrate([{"observations": [], "items": [], "world": None}])      # no item: equal risks
         self.assertEqual((c["observation_threshold"], c["query_threshold"]), (1.01, 1.01))
     def test_uncalibrated_returns_empty(self): self.assertEqual(self.agent.calibrate([]), {})
     def test_answer_identity_feature(self):

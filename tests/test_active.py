@@ -31,7 +31,7 @@ LOBES_XOR = P("xor", children=LOBES_OR.children)
 def X0(n=300, s=0): return torch.rand(n, 2, generator=G(s)) * 4 - 2
 
 
-# ================================================================ signatures et équivalence
+# ================================================================ signatures and equivalence
 
 class SignatureTests(unittest.TestCase):
     def test_components_one(self): self.assertEqual(program_signature(DISC).components, 1)
@@ -73,7 +73,7 @@ class ClusteringTests(unittest.TestCase):
     def test_topology_required(self): cls, idx = functional_clusters([LOBES_OR, DISC], threshold=1.0); self.assertNotEqual(idx[0], idx[1])
 
 
-# ================================================================ postérieure structurelle
+# ================================================================ structural posterior
 
 class PosteriorTests(unittest.TestCase):
     def post(self, eps=0.05): return StructuralPosterior([LOBES_OR, LOBES_XOR, DISC, HALF], eps)
@@ -116,7 +116,7 @@ class QueryTests(unittest.TestCase):
         p = StructuralPosterior([DISC], 0.1); X = X0(); y = predict(DISC, X); y[:5] = 1 - y[:5]; self.assertEqual(len(version_space(p, X, y)), 1)
 
 
-# ================================================================ politique et recherche
+# ================================================================ policy and search
 
 class PolicyTests(unittest.TestCase):
     def test_score_prior(self): self.assertAlmostEqual(SearchPolicy().score(("x",)), 0.5)
@@ -149,7 +149,7 @@ class DiscoveryTests(unittest.TestCase):
             s = StructuralPosterior([DISC, HALF], 0.05); self.assertEqual(len(ActiveStructuralDiscovery(query_policy=qp)._query_scores(s, X0(50))), 50)
 
 
-# ================================================================ bruit : stabilité et ancres
+# ================================================================ noise: stability and anchors
 
 class NoiseTests(unittest.TestCase):
     def test_stability_accepts_correct(self):
@@ -192,7 +192,7 @@ for _n in NOISE_LEVELS:
     setattr(NoiseTests, f"test_correct_rule_not_rejected_noise_{int(_n * 100)}", _make_noise_anchor_test(_n))
 
 
-# ================================================================ résidu à porte, familles
+# ================================================================ gated residual, families
 
 class ResidualTests(unittest.TestCase):
     @classmethod
@@ -225,7 +225,7 @@ class FamilyTests(unittest.TestCase):
         p, ev = AS.reuse_family(f, X, y); self.assertGreater(float((predict(p, X) == y).float().mean()), 0.9)
 
 
-# ================================================================ monde, protocole
+# ================================================================ world, protocol
 
 class WorldTests(unittest.TestCase):
     def test_sealed_hash(self): self.assertEqual(sealed_hash(), SEALED_SHA256)
@@ -250,7 +250,7 @@ for _f in DEPTH_FAMILIES + HARD_NEGATIVES + MULTI_SYNTAX + SEALED_ACTIVE:
 
 def _make_depth_test(f):
     def t(self):
-        """Profondeur 2 insuffisante : la meilleure combinaison de 2 atomes reste sous l'exactitude quasi parfaite (au moins sur une instance)."""
+        """Depth 2 insufficient: the best combination of 2 atoms stays below near-perfect accuracy (on at least one instance)."""
         from core.boundary_program import BoundaryProgramSearch
         worst = 1.0
         for s in range(2):
@@ -276,7 +276,7 @@ for _f in HARD_NEGATIVES:
     setattr(WorldTests, f"test_hard_negative_{_f}", _make_hardneg_test(_f))
 
 
-# ================================================================ FUITES
+# ================================================================ LEAKS
 
 FAMILY_NAMES = DEPTH_FAMILIES + HARD_NEGATIVES + MULTI_SYNTAX + SEALED_ACTIVE + TRAIN + VALIDATION + ("crescent", "xor_halfspaces", "capsule", "wedge_ring", "sine5", "checker", "sector", "ellipse", "circle", "box")
 
@@ -310,7 +310,7 @@ for _n in FAMILY_NAMES:
     setattr(LeakageTests, f"test_leak_{_n}", _make_leak(_n))
 
 
-# ================================================================ inter-domaines et expériences
+# ================================================================ cross-domain and experiments
 
 class CrossDomainTests(unittest.TestCase):
     @classmethod

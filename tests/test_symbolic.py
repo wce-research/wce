@@ -34,7 +34,7 @@ def setUpModule():
 def seqs(*texts): return torch.stack([encode(t) for t in texts])
 
 
-# ================================================================ représentation
+# ================================================================ representation
 
 class RepresentationTests(unittest.TestCase):
     def test_alphabet(self): self.assertEqual(ALPHABET, "abcdefgh")
@@ -128,7 +128,7 @@ class NeuralCoreTests(unittest.TestCase):
         spec = train_expert(s, "id", x, y, steps=50); self.assertEqual(spec.apply(x).shape, (64, L))
 
 
-# ================================================================ encodeur appris
+# ================================================================ learned encoder
 
 class ContextEncoderTests(unittest.TestCase):
     def test_features_relational(self):
@@ -154,7 +154,7 @@ class ContextEncoderTests(unittest.TestCase):
         self.assertTrue(all(c.prototype is not None for c in FULL.system.contexts.values()))
 
 
-# ================================================================ flux continu
+# ================================================================ continuous stream
 
 class StreamTests(unittest.TestCase):
     def test_stream_no_labels_needed(self):
@@ -214,7 +214,7 @@ class FewShotTests(unittest.TestCase):
         kinds = {c.skill.kind for c in FULL.system.contexts.values()}; self.assertIn("refinement", kinds)
 
 
-# ================================================================ routage hybride / commandes
+# ================================================================ hybrid routing / commands
 
 class RoutingTests(unittest.TestCase):
     @classmethod
@@ -249,7 +249,7 @@ class CommandTests(unittest.TestCase):
         self.assertEqual([e["token"] for e in seg], ["REV", "REV", "REV", None, None, None])
 
 
-# ================================================================ capacité / mémoire / snapshots
+# ================================================================ capacity / memory / snapshots
 
 class CapacityTests(unittest.TestCase):
     def test_experts_much_fewer_than_families(self): self.assertLessEqual(len(FULL.system.state.modules), 5)
@@ -257,7 +257,7 @@ class CapacityTests(unittest.TestCase):
     def test_sublinear_capacity(self):
         curve = FULL.system.capacity_curve
         per_family = curve[-1]["total_parameters"] / curve[-1]["contexts"]
-        self.assertLess(per_family, 5224)   # moins qu'un expert complet par famille
+        self.assertLess(per_family, 5224)   # less than one full expert per family
     def test_capacity_curve_monotone_contexts(self):
         c = [x["contexts"] for x in FULL.system.capacity_curve]; self.assertEqual(c, sorted(c))
     def test_structural_skills_add_no_parameters(self):
@@ -299,7 +299,7 @@ class IncrementalSnapshotTests(unittest.TestCase):
         m = summarize(FULL); self.assertLess(m["snapshot_bytes_incremental"], m["snapshot_bytes_full"] / 3)
 
 
-# ================================================================ ablations / sensibilité
+# ================================================================ ablations / sensitivity
 
 class AblationTests(unittest.TestCase):
     def test_static_baseline_fails(self): self.assertLess(run_static(small_segments())["final_accuracy"], 0.3)
@@ -315,7 +315,7 @@ class AblationTests(unittest.TestCase):
         th = Thresholds(change_errors=3); self.assertEqual(SymbolicLifelongSystem(thresholds=th).th.change_errors, 3)
 
 
-# ================================================================ pont langue
+# ================================================================ language bridge
 
 class LanguageBridgeTests(unittest.TestCase):
     def bridge(self):

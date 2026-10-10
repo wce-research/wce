@@ -1,6 +1,10 @@
 import inspect
 import math
 import unittest
+try:
+    from tests._source import code_only
+except ImportError:
+    from _source import code_only
 
 import numpy as np
 import torch
@@ -125,8 +129,8 @@ class ChainTests(unittest.TestCase):
         for k in ("literals", "hypotheses", "kept", "classes", "considered", "seconds", "reduction"): self.assertIn(k, e.stats)
         self.assertLessEqual(e.stats["kept"], 6)
     def test_no_oracle_in_system_module(self):
-        s = inspect.getsource(EE)
-        for w in ("deep_world", "truth", "leaves(", "_exp", "deep_primitive_eval"): self.assertNotIn(w, s.replace("vérité", ""))
+        s = code_only(EE)
+        for w in ("deep_world", "truth", "leaves(", "_exp", "deep_primitive_eval"): self.assertNotIn(w, s)
         self.assertIn("flat_types", inspect.getsource(EE.discover))
     def test_real_discovery_runs(self): X, y = data(BNode("xor", children=(A0, A1)), n=400, rate=0.03); e = run_chain(X, y); self.assertIsNotNone(e.program); self.assertGreater(e.stats["literals"], 3); self.assertIn(e.label, (KNOWN, UNKNOWN, NONE_OF_THE_ABOVE))
     def test_deterministic(self):

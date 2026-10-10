@@ -4,6 +4,10 @@ import math
 import random
 import re
 import unittest
+try:
+    from tests._source import code_only
+except ImportError:
+    from _source import code_only
 
 import torch
 
@@ -34,7 +38,7 @@ def data_for(prog, n=240, rate=0.05, s=0):
     X = X0(n, s); y = predict(prog, X); f = torch.rand(n, generator=G(s + 1)) < rate; return FitData.build(X, torch.where(f, 1 - y, y), 0.10)
 
 
-# ================================================================ monde
+# ================================================================ world
 
 class WorldTests(unittest.TestCase):
     def test_depths(self): self.assertEqual(DW.DEPTHS, (1, 2, 3, 4, 5, 6))
@@ -97,7 +101,7 @@ for _d in DW.DEPTHS: setattr(WorldTests, f"test_depth_{_d}_controlled", _mk_dept
 for _c in DW.OOC_CATEGORIES: setattr(WorldTests, f"test_ooc_{_c}", _mk_ooc(_c))
 
 
-# ================================================================ hiérarchie
+# ================================================================ hierarchy
 
 class HierarchyTests(unittest.TestCase):
     def setUp(self): self.s = StructureStore(); self.p = [self.s.nodes[k] for k in self.s.primitives]
@@ -200,7 +204,7 @@ class FragmentTests(unittest.TestCase):
         L.observe(C("or", ab(0.0), RING), "t1"); L.observe(C("xor", ab(1.0), HALF), "t2"); L.observe(C("or", ab(2.0), RING), "t3"); L.promote(); return L, ab
     def test_promotion_needs_support(self): L = FragmentLibrary(); L.observe(C("and", DISC, HALF), "t1"); self.assertEqual(L.promote(), [])
     def test_promotion_needs_distinct_parameterizations(self):
-        L = FragmentLibrary(); L.observe(C("and", DISC, HALF), "t1"); L.observe(C("and", DISC, HALF), "t2"); self.assertEqual(L.promote(), [])     # même instance = mémorisation
+        L = FragmentLibrary(); L.observe(C("and", DISC, HALF), "t1"); L.observe(C("and", DISC, HALF), "t2"); self.assertEqual(L.promote(), [])     # same instance = memorisation
     def test_promoted(self): L, ab = self.lib(); self.assertTrue(L.contains(ab(5.0)))
     def test_frequency(self): L, ab = self.lib(); self.assertEqual(L.fragments[L.index_of(ab(0.0))].frequency, 3)
     def test_fragment_is_parameter_free(self): L, _ = self.lib(); self.assertTrue(all(f.skeleton.params is None and all(s.params is None for s in subtrees(f.skeleton)) for f in L.fragments))
@@ -224,7 +228,7 @@ class FragmentTests(unittest.TestCase):
         L, ab = self.lib(); s = DeepSearch("bottom_up", library=L); s._setup(data_for(DISC), 0.1); self.assertTrue(all(k == "atom" for _, k in s._operand_skeletons(1)))
 
 
-# ================================================================ moteur d'ajustement (optimisation de performance)
+# ================================================================ fitting engine (performance optimisation)
 
 class FitTests(unittest.TestCase):
     def test_forward_matches_reference(self):
@@ -258,7 +262,7 @@ class FitTests(unittest.TestCase):
     def test_evidence_penalizes(self): self.assertGreater(approx_evidence(2, 1, -50.0, 200), approx_evidence(6, 3, -50.0, 200))
     def test_fitdata_add(self): d = data_for(DISC, 50).add(X0(3, 5), torch.ones(3), 0.02); self.assertEqual(len(d.X), 53); self.assertAlmostEqual(float(d.flip[-1]), 0.02)
     def test_not_claimed_numerically_equivalent(self):
-        src = inspect.getsource(DF); self.assertIn("AUTRE IMPLÉMENTATION", src); self.assertIn("H10(b)", src); self.assertIn("RÉFUTÉE", src); self.assertIn("n'est PAS\nnumériquement équivalent", src); self.assertNotIn("pas changement scientifique", src)
+        src = inspect.getsource(DF); self.assertIn("ANOTHER IMPLEMENTATION", src); self.assertIn("H10(b)", src); self.assertIn("REFUTED", src); self.assertIn("is NOT\nnumerically equivalent", src); self.assertNotIn("not a scientific change", src)
     def test_same_optimizer_schedule(self): src = inspect.getsource(fit_batch); self.assertIn("4.0 + 20.0 * t / steps", src); self.assertIn("torch.optim.Adam", src)
 
 
@@ -273,7 +277,7 @@ def _mk_fwd(i):
 for _i in range(15): setattr(FitTests, f"test_compiled_random_tree_{_i}", _mk_fwd(_i))
 
 
-# ================================================================ recherche
+# ================================================================ search
 
 class SearchTests(unittest.TestCase):
     def test_strategies(self): self.assertEqual(STRATEGIES, ("flat", "bottom_up", "top_down", "bidirectional", "best_first", "factorized"))
@@ -289,10 +293,10 @@ class SearchTests(unittest.TestCase):
     def test_residual_consistency(self):
         g = G(3); a = (torch.rand(200, generator=g) < 0.5).double(); y = (torch.rand(200, generator=g) < 0.5).double()
         for comb in COMBINATORS:
-            r, w, u = residual_target(comb, a, y); c = combine(comb, a, r); self.assertAlmostEqual(float((c != y).double().mean()), u, places=9)     # R parfait ⇒ seules les erreurs inévitables restent
+            r, w, u = residual_target(comb, a, y); c = combine(comb, a, r); self.assertAlmostEqual(float((c != y).double().mean()), u, places=9)     # perfect R ⇒ only the unavoidable errors remain
     def test_profiled_loglik_prefers_fewer_errors(self):
         d = data_for(DISC, 200, 0.0); good = predict(DISC, d.X.float()).double(); bad = good.clone(); bad[:40] = 1 - bad[:40]; self.assertGreater(profiled_loglik(good, d), profiled_loglik(bad, d))
-    def test_profiled_loglik_no_known_noise(self): self.assertNotIn("flip", inspect.getsource(profiled_loglik))
+    def test_profiled_loglik_no_known_noise(self): self.assertNotIn("flip", code_only(profiled_loglik))
     def test_noise_nn_bounds(self): d = data_for(DISC, 200, 0.0); e = estimate_noise_nn(d.X, d.y); self.assertTrue(0.02 <= e <= 0.30)
     def test_noise_nn_increases(self): a = data_for(DISC, 300, 0.0, 1); b = data_for(DISC, 300, 0.2, 1); self.assertGreater(estimate_noise_nn(b.X, b.y), estimate_noise_nn(a.X, a.y))
     def test_run_depth1(self):
@@ -314,7 +318,7 @@ class SearchTests(unittest.TestCase):
         d = data_for(C("or", DISC, RING), 200, 0.05); a = DeepSearch("bottom_up", budget=40, seed=1).run(d); b = DeepSearch("bottom_up", budget=40, seed=1).run(d); self.assertEqual(a.best().program, b.best().program); self.assertEqual(a.stats["generated"], b.stats["generated"])
     def test_flat_has_no_hierarchy(self): self.assertFalse(DeepSearch("flat").hierarchy); self.assertTrue(DeepSearch("bottom_up").hierarchy)
     def test_compact_budget(self): o = DeepSearch("bottom_up", budget=40).run(data_for(DISC)); self.assertTrue(all(h.within_compact_budget() for h in o.hypotheses))
-    def test_no_true_noise_needed(self): self.assertIn("aucun bruit vrai n'est requis", inspect.getsource(DeepSearch.run))
+    def test_no_true_noise_needed(self): self.assertIn("no true noise is required", inspect.getsource(DeepSearch.run))
     def test_search_signature_has_no_truth(self): self.assertEqual(list(inspect.signature(DeepSearch.run).parameters), ["self", "data", "noise"])
 
 
@@ -328,7 +332,7 @@ def _mk_strategy(s):
 for _s in STRATEGIES: setattr(SearchTests, f"test_strategy_{_s}", _mk_strategy(_s))
 
 
-# ================================================================ classes d'équivalence, identifiabilité, mesures actives
+# ================================================================ equivalence classes, identifiability, active measurements
 
 import core.deep_boundary as DB
 import core.deep_equivalence as DQ
@@ -344,8 +348,8 @@ def hyp(prog, ev=0.0): return WorldHypothesis(skel_key(prog) + str(prog.params),
 
 
 LEFT = BNode("pred", "dot", "le", (0.0, 0.0))                    # x ≤ 0
-LEFT2 = BNode("pred", "dot", "le", (0.0, 1.5))                   # x ≤ 1,5 : identique à LEFT sur des points x < 0 ou x > 1,5
-BIG = BNode("translate", params=(-8.0, 0.0), children=(BNode("pred", "norm", "le", (8.0,)),))    # grand disque ≈ demi-plan x ≤ 0 localement
+LEFT2 = BNode("pred", "dot", "le", (0.0, 1.5))                   # x ≤ 1.5: identical to LEFT on points x < 0 or x > 1.5
+BIG = BNode("translate", params=(-8.0, 0.0), children=(BNode("pred", "norm", "le", (8.0,)),))    # large disc ≈ half-plane x ≤ 0 locally
 
 
 def left_data(n=120, s=0):
@@ -356,12 +360,12 @@ class EquivalenceTests(unittest.TestCase):
     def setUp(self): self.d = left_data(); self.pool_pts = X0(300, 5); self.hp = HypothesisPool([hyp(LEFT), hyp(LEFT2), hyp(DISC)], self.d, self.pool_pts)
     def test_policies(self): self.assertEqual(POLICIES, ("class_split", "structural_ig", "disagreement", "random", "efa"))
     def test_indistinguishable_grouped(self): c = self.hp.best_class(); self.assertEqual(len(c.members), 2); self.assertIsInstance(c, ObservationalEquivalenceClass)
-    def test_same_form_counts_once(self): self.assertEqual(self.hp.best_class().size, 1)                 # LEFT et LEFT2 : même forme algébrique
+    def test_same_form_counts_once(self): self.assertEqual(self.hp.best_class().size, 1)                 # LEFT and LEFT2: same algebraic form
     def test_distinct_forms_counted(self):
         hp = HypothesisPool([hyp(LEFT), hyp(BIG)], FitData.build(X0(60, 1)[:20] * 0.2, predict(LEFT, X0(60, 1)[:20] * 0.2), 0.1), self.pool_pts); self.assertEqual(hp.best_class().size, 2)
     def test_wrong_structure_excluded(self): self.assertNotIn(hyp(DISC).key, self.hp.best_class().keys())
     def test_masses_normalized(self): self.assertAlmostEqual(float(self.hp.mass.sum()), 1.0, places=9)
-    def test_breakable_positive(self): self.assertGreater(self.hp.breakable(), 0.0)                        # LEFT et LEFT2 diffèrent sur 0 < x < 1,5
+    def test_breakable_positive(self): self.assertGreater(self.hp.breakable(), 0.0)                        # LEFT and LEFT2 differ on 0 < x < 1.5
     def test_measurement_breaks_class(self):
         x = torch.tensor([[0.7, 0.0]]); self.hp.add(x, predict(LEFT, x), 0.02)
         for _ in range(6): self.hp.add(x + 0.01 * torch.randn(1, 2, generator=G(1)), predict(LEFT, x), 0.02)
@@ -405,13 +409,13 @@ def _mk_active(policy):
 for _p in POLICIES: setattr(EquivalenceTests, f"test_active_policy_{_p}", _mk_active(_p))
 
 
-# ================================================================ frontière de classe de modèles
+# ================================================================ model-class boundary
 
 class BoundaryTests(unittest.TestCase):
     def test_signals_listed(self): self.assertEqual(len(SIGNALS), 11); self.assertEqual(len(set(SIGNALS)), 11)
-    def test_labels_never_confused(self): self.assertNotEqual(UNKNOWN, NONE_OF_THE_ABOVE); self.assertIn("information insuffisante", inspect.getsource(DB)); self.assertIn("incompatibles", inspect.getsource(DB))
+    def test_labels_never_confused(self): self.assertNotEqual(UNKNOWN, NONE_OF_THE_ABOVE); self.assertIn("insufficient information", inspect.getsource(DB)); self.assertIn("observations incompatible", inspect.getsource(DB))
     def test_decide_none(self): self.assertEqual(decide(0.9, 1, 0.99), NONE_OF_THE_ABOVE)
-    def test_decide_none_even_if_identified(self): self.assertEqual(decide(0.95, 1, 1.0), NONE_OF_THE_ABOVE)       # meilleure vraisemblance relative ≠ structure valide
+    def test_decide_none_even_if_identified(self): self.assertEqual(decide(0.95, 1, 1.0), NONE_OF_THE_ABOVE)       # best relative likelihood ≠ valid structure
     def test_decide_known(self): self.assertEqual(decide(0.05, 1, 0.9), KNOWN)
     def test_decide_unknown_class(self): self.assertEqual(decide(0.05, 3, 0.9), UNKNOWN)
     def test_decide_unknown_mass(self): self.assertEqual(decide(0.05, 1, 0.3), UNKNOWN)
@@ -464,11 +468,11 @@ class BoundaryTests(unittest.TestCase):
     def test_suggestion_types(self):
         d = data_for(DISC, 200, 0.05); self.assertEqual(suggest_missing_primitive(hyp(DISC), d, drift_z=5.0)["missing"], "observable"); self.assertEqual(suggest_missing_primitive(hyp(DISC), d, depth_improvement=0.05)["missing"], "combinaison")
         self.assertEqual(suggest_missing_primitive(hyp(DISC), d, precise_out_z=5.0)["missing"], "relation"); self.assertIn(suggest_missing_primitive(hyp(HALF), d)["missing"], ("transformation", "indéterminé"))
-    def test_suggestion_is_controlled(self): self.assertIn("jamais une génération ouverte", inspect.getsource(suggest_missing_primitive))
-    def test_signals_not_fused_opaquely(self): self.assertIn("SÉPARÉMENT", inspect.getsource(DB)); self.assertIn("poids\nlisibles", inspect.getsource(DB).replace("poids\n", "poids\n")) if False else self.assertIn("lisibles", inspect.getsource(DB))
+    def test_suggestion_is_controlled(self): self.assertIn("never an open generation", inspect.getsource(suggest_missing_primitive))
+    def test_signals_not_fused_opaquely(self): self.assertIn("SEPARATELY", inspect.getsource(DB)); self.assertIn("poids\nlisibles", inspect.getsource(DB).replace("poids\n", "poids\n")) if False else self.assertIn("readable weights", inspect.getsource(DB))
 
 
-# ================================================================ expériences : métriques, devenir de la vraie structure, sous-unités
+# ================================================================ experiments: metrics, fate of the true structure, sub-units
 
 class ExperimentTests(unittest.TestCase):
     def test_budgets_preregistered(self): self.assertEqual((DX.QUERY_BUDGET, DX.PRECISE_BUDGET, DX.REPEAT_BUDGET), (16, 24, 24))
@@ -495,9 +499,9 @@ class ExperimentTests(unittest.TestCase):
     def test_dev_uses_dev_split(self): self.assertTrue(all(t.split == "dev" for _, t in DX.dev_tasks(0)))
     def test_dev_tasks_deterministic(self): self.assertEqual([t.world.uid for _, t in DX.dev_tasks(3)], [t.world.uid for _, t in DX.dev_tasks(3)])
     def test_no_sealed_in_dev_or_profile(self):
-        for fn in (DX.profile_subunits, DX.dev_subunits, DX.dev_tasks, DX.dev_grid): self.assertNotIn("sealed", inspect.getsource(fn))
+        for fn in (DX.profile_subunits, DX.dev_subunits, DX.dev_tasks, DX.dev_grid): self.assertNotIn("sealed", code_only(fn))
     def test_baseline_is_frozen_class(self):
-        src = inspect.getsource(DX.run_baseline); self.assertIn("RobustStructuralReconstruction", src); self.assertIn("super()._fit(skel, obs, init)", src); self.assertIn("sans changer aucun calcul", src)
+        src = inspect.getsource(DX.run_baseline); self.assertIn("RobustStructuralReconstruction", src); self.assertIn("super()._fit(skel, obs, init)", src); self.assertIn("without changing any computation", src)
     def test_baseline_gets_true_noise_new_does_not(self): self.assertIn("task.spec.rate", inspect.getsource(DX.run_baseline)); self.assertNotIn("spec.rate", inspect.getsource(DX.run_new))
     def test_new_system_never_gets_truth(self):
         src = inspect.getsource(DX.run_new); i = src.index("ev = evaluate_program"); self.assertNotIn("world.truth", src[:i]); self.assertNotIn("world.label", src[:i])
@@ -520,18 +524,18 @@ class ExperimentTests(unittest.TestCase):
         self.assertEqual(a["program"], b["program"]); self.assertEqual(a["signals"], b["signals"]); self.assertEqual(a["generated"], b["generated"])
 
 
-# ================================================================ pré-enregistrement, fuites
+# ================================================================ preregistration, leaks
 
 class PreregistrationTests(unittest.TestCase):
     def setUp(self): self.t = open("docs/hypotheses_deep_compositional_discovery.md").read()
     def test_hypotheses_present(self):
         for i in range(1, 14): self.assertIn(f"| H{i} |", self.t)
-    def test_failure_conditions(self): self.assertIn("Conditions d'échec", self.t); self.assertIn("Réfutée si", self.t)
+    def test_failure_conditions(self): self.assertIn("Failure conditions", self.t); self.assertIn("Refuted if", self.t)
     def test_sealed_hash_recorded(self): self.assertIn(DW.SEALED_SHA256, self.t)
-    def test_old_sealed_forbidden(self): self.assertIn("consommé", self.t)
+    def test_old_sealed_forbidden(self): self.assertIn("consumed", self.t)
     def test_post_hoc_marker(self): self.assertIn("POST-HOC / EXPLORATORY", self.t)
-    def test_matched_budget(self): self.assertIn("apparié", self.t); self.assertIn("équivalent-ajustement", self.t)
-    def test_stopping_rules(self): self.assertIn("Critères d'arrêt", self.t)
+    def test_matched_budget(self): self.assertIn("matched budget", self.t); self.assertIn("fit-equivalent", self.t)
+    def test_stopping_rules(self): self.assertIn("Stopping and reduction criteria", self.t)
     def test_inference_never_reads_sealed(self):
         for m in (ST, DF, DS, DQ, DB): self.assertNotIn("sealed", inspect.getsource(m))
     def test_previous_sealed_not_used(self):

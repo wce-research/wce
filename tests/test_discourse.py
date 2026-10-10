@@ -46,7 +46,7 @@ def resolve(texts, attrs=True, locs=False):
     return r, out
 
 
-# ================================================================ indépendance et générateur
+# ================================================================ independence and generator
 
 class IndependenceTests(unittest.TestCase):
     def test_reference_world_no_wce(self):
@@ -85,7 +85,7 @@ class GeneratorTests(unittest.TestCase):
         sim = ClarificationSimulator(Episode("physical", "c", ENTS, given(), [])); self.assertEqual(sim.reveal(("attr", "e1")), "red")
 
 
-# ================================================================ représentations
+# ================================================================ representations
 
 class RepresentationTests(unittest.TestCase):
     def test_mention_fields(self):
@@ -121,7 +121,7 @@ class RepresentationTests(unittest.TestCase):
     def test_revision_dataclass(self): self.assertEqual(Revision("d1", "A", "B", 0.5, 0.9, 2, "x").after, "B")
 
 
-# ================================================================ résolution
+# ================================================================ resolution
 
 class ResolutionTests(unittest.TestCase):
     def test_trivial_unique_type(self):
@@ -172,7 +172,7 @@ class ResolutionTests(unittest.TestCase):
         r = resolver(); ids = []
         for t in ("Il y a deux cubes.", "Le rouge est là.", "Prends-le.", "Pose-le encore."):
             ms = r.process(t); ids += [r.mention_resolution(m.id) for m in ms if m.kind in ("adj", "pron")]
-        self.assertEqual(ids[-3:], ["e1", "e1", "e1"])      # « Il y a » explétif reste non engagé (jamais faux)
+        self.assertEqual(ids[-3:], ["e1", "e1", "e1"])      # expletive « Il y a » remains uncommitted (never false)
         self.assertNotIn("e2", ids)
     def test_plural_group_distinct(self):
         r = resolver(); r.process("Il y a deux cubes.")
@@ -255,7 +255,7 @@ class ActiveTests(unittest.TestCase):
         self.assertEqual(r["summary"]["active"]["wrong"], 0)
 
 
-# ================================================================ métriques et benchmark
+# ================================================================ metrics and benchmark
 
 class MetricsTests(unittest.TestCase):
     def test_metric_keys(self):
@@ -291,7 +291,7 @@ class MetricsTests(unittest.TestCase):
         self.assertLess(d["checks_student_then_verify"], d["checks_teacher"]); self.assertGreater(d["student_agreement_with_teacher"], 0.6)
 
 
-# ================================================================ agent de discours dans l'environnement indépendant
+# ================================================================ discourse agent in the independent environment
 
 class DiscourseAgentTests(unittest.TestCase):
     @classmethod
@@ -325,7 +325,7 @@ class DiscourseAgentTests(unittest.TestCase):
         self.assertTrue(any("|elim" in s for s in srcs) or not self.agent.identity_log)
 
 
-# ================================================================ tests générés : catégorie × domaine, longueurs, bruit
+# ================================================================ generated tests: category × domain, lengths, noise
 
 class PerCategoryDomainTests(unittest.TestCase):
     pass
@@ -334,7 +334,7 @@ class PerCategoryDomainTests(unittest.TestCase):
 def _make_cat(cat, dom):
     def t(self):
         rows = [r for r in ROWS if r["category"] == cat and r["domain"] == dom]
-        if not rows: self.skipTest("catégorie absente pour ce domaine")
+        if not rows: self.skipTest("category absent for this domain")
         m = reference_metrics(rows)
         self.assertEqual(m["false_identity_commitment"], 0.0)
     return t

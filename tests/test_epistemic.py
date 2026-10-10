@@ -59,7 +59,7 @@ def ideal(votes=None, inv=None, rel=None):
     return a
 
 
-# ================================================================ indépendance et intégrité
+# ================================================================ independence and integrity
 
 class IndependenceTests(unittest.TestCase):
     def test_ideal_agent_no_system_imports(self):
@@ -92,7 +92,7 @@ class IndependenceTests(unittest.TestCase):
         self.assertTrue(all("refs" in it.meta and "ungated" in it.meta for it in cmds))
 
 
-# ================================================================ vue publique et agent idéal
+# ================================================================ public view and ideal agent
 
 class PublicViewTests(unittest.TestCase):
     def setUp(self): self.x = SPLITS["test"][0]; self.inv, self.st, self.tx = public_view(self.x["world"], self.x["observations"])
@@ -130,7 +130,7 @@ class IdealAgentTests(unittest.TestCase):
         o, lvl, rule = a.resolve(Desc("cube", "red")); self.assertEqual((o, lvl), ("o2", L1)); self.assertTrue(rule.conclusive)
     def test_resolve_match_L0(self):
         a = ideal({("color", "o1"): {"s1": ("red", L0, "c"), "s2": ("red", L0, "c")}, ("color", "o2"): {"s1": ("blue", L0, "c"), "s2": ("blue", L0, "c")}})
-        self.assertEqual(a.resolve(Desc("cube", "red"))[:2], ("o1", L1))       # unicité établie par exclusion de o2
+        self.assertEqual(a.resolve(Desc("cube", "red"))[:2], ("o1", L1))       # uniqueness established by exclusion of o2
     def test_resolve_unknown_others_fails(self): self.assertIsNone(ideal().resolve(Desc("cube", "red"))[0])
     def test_observe_text_descriptor_vote(self):
         a = IdealAgent({"s1": 0.95})
@@ -190,7 +190,7 @@ class RelabelTests(unittest.TestCase):
                 v = rl.knowable(key); self.assertTrue(v is None or v == x["world"].facts()[key])
 
 
-# ================================================================ droit d'affirmer
+# ================================================================ right to assert
 
 def prov(level=L0, p=0.99, idu=0.0, lin=0.0, div=2):
     return EpistemicProvenance("x", level, belief_probability=p, identity_uncertainty=idu, linguistic_uncertainty=lin, source_diversity=div)
@@ -250,7 +250,7 @@ class ProvenanceTests(unittest.TestCase):
         r = self.agent.explicit_elimination("cube", "red"); self.assertIsInstance(r, EliminateCandidates)
 
 
-# ================================================================ calibration lexicale
+# ================================================================ lexical calibration
 
 class LexicalPosteriorTests(unittest.TestCase):
     def test_features_dim(self):
@@ -360,7 +360,7 @@ class CompositionTests(unittest.TestCase):
     def test_composition_eval(self): self.assertGreaterEqual(sum(v["correct"] for v in composition_eval().values()), 3)
 
 
-# ================================================================ banc épistémique
+# ================================================================ epistemic bench
 
 def R(**kw):
     base = {"category": "correct", "intent": "where", "orig": "on:table", "ideal": "on:table", "relabeled": True, "raw": "on:table",
@@ -423,7 +423,7 @@ class SystemIntegrationTests(unittest.TestCase):
             if r["level"] == L2: self.assertNotEqual(r["decision"], ASSERTED)
 
 
-# ================================================================ discours : incertitudes séparées, révision minimale
+# ================================================================ discourse: separate uncertainties, minimal revision
 
 class DiscourseEpistemicTests(unittest.TestCase):
     @classmethod

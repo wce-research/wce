@@ -24,7 +24,7 @@ HALF = line_atom(0.3, 0.1)
 RING = T((-0.3, 0.2), BNode("pred", "norm", "in", (0.7, 1.6)))
 BAND = BNode("pred", "dot", "in", (1.0, -0.6, 0.6))
 SECTOR = T((-0.5, 0.0), BNode("pred", "angle", "in", (0.4, 0.8)))
-OCC = line_atom(0.0, 0.3)                                   # garde x ≤ 0,3 : cache la partie droite de DISC
+OCC = line_atom(0.0, 0.3)                                   # keeps x ≤ 0.3: hides the right part of DISC
 AND = lambda a, b: BNode("and", children=(a, b))
 SK = lambda p: p.skeleton()
 
@@ -105,7 +105,7 @@ class ScoreTests(unittest.TestCase):
     def test_occlusion_score_separates_hidden_from_visible(self):
         o = occlusion_score(AND(DISC, OCC), (0,), self.ob.pairs); self.assertGreater(o["z_visible"], 5.0); self.assertLess(o["z_hidden"], 1.0); self.assertGreater(o["hidden_pairs"], 0); self.assertLess(o["visible_fraction"], 1.0)
     def test_wrong_primitive_differs_from_hidden_primitive(self):
-        wrong = disc_atom(-1.5, 1.5, 0.6); o = occlusion_score(AND(wrong, OCC), (0,), self.ob.pairs); self.assertGreater(o["visible_pairs"], 0); self.assertLess(o["z_visible"], 3.0)          # visible mais sans contraste : fausse, pas cachée
+        wrong = disc_atom(-1.5, 1.5, 0.6); o = occlusion_score(AND(wrong, OCC), (0,), self.ob.pairs); self.assertGreater(o["visible_pairs"], 0); self.assertLess(o["z_visible"], 3.0)          # visible but without contrast: false, not hidden
     def test_rendering_prefers_true_parameters(self): self.assertLess(rendering_errors(AND(DISC, OCC), self.X, self.y), rendering_errors(AND(disc_atom(0.2, 0.0, 0.8), OCC), self.X, self.y))
 
 
@@ -147,7 +147,7 @@ class InferenceTests(unittest.TestCase):
     def test_joint_uses_shared_constraint(self):
         X, y = scene(RING, n=900); ob = observe(X, y); self.assertIn("concentric_joint", {h.source for h in infer(SK(RING), ob, 5, joint=True)}); self.assertNotIn("concentric_joint", {h.source for h in infer(SK(RING), ob, 5, joint=False)})
     def test_deterministic(self):
-        # Même graine → mêmes hypothèses, à la précision machine près : l'algèbre linéaire multi-fil (lstsq, eigh) peut différer de 1e-16 d'un appel à l'autre.
+        # Same seed → same hypotheses, up to machine precision: multi-threaded linear algebra (lstsq, eigh) can differ by 1e-16 from one call to the next.
         X, y = scene(AND(RING, OCC)); f = lambda: [h.program.param_vector() for h in infer(SK(RING), observe(X, y), 5, seed=3)]; a, b = f(), f(); self.assertEqual(len(a), len(b)); self.assertTrue(a)
         for p, q in zip(a, b): self.assertEqual(len(p), len(q)); self.assertTrue(all(abs(u - v) < 1e-9 for u, v in zip(p, q)))
     def test_no_boundary_no_hypothesis(self): X, _ = scene(DISC); self.assertEqual(infer(SK(DISC), observe(X, torch.zeros(len(X), dtype=torch.long)), 5), [])

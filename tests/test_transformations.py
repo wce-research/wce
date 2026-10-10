@@ -1,7 +1,7 @@
 """
-Tests pour le WCE Transformation Algebra.
+Tests for the WCE Transformation Algebra.
 
-Ce module teste les nouvelles abstractions :
+This module tests the new abstractions:
 - TransformationSpec
 - InvariantSet
 - CompositeTransformation
@@ -15,7 +15,7 @@ import sys
 import os
 from math import pi, isclose
 
-# Ajouter le répertoire parent au path
+# Add the parent directory to the path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from core.invariants import (
@@ -37,30 +37,30 @@ from core.invariants import (
 
 
 class TestInvariantSet(unittest.TestCase):
-    """Tests pour InvariantSet."""
+    """Tests for InvariantSet."""
     
     def test_preserves_single(self):
-        """Test de préservation d'un seul invariant."""
+        """Test preservation of a single invariant."""
         inv_set = InvariantSet({Invariant.DISTANCE, Invariant.ANGLE})
         self.assertTrue(inv_set.preserves(Invariant.DISTANCE))
         self.assertTrue(inv_set.preserves(Invariant.ANGLE))
         self.assertFalse(inv_set.preserves(Invariant.ORIENTATION))
     
     def test_preserves_all(self):
-        """Test de préservation de plusieurs invariants."""
+        """Test preservation of several invariants."""
         inv_set = InvariantSet({Invariant.DISTANCE, Invariant.ANGLE, Invariant.ORIENTATION})
         self.assertTrue(inv_set.preserves_all({Invariant.DISTANCE, Invariant.ANGLE}))
         self.assertFalse(inv_set.preserves_all({Invariant.DISTANCE, Invariant.MASS}))
     
     def test_preserves_any(self):
-        """Test de préservation d'au moins un invariant."""
+        """Test preservation of at least one invariant."""
         inv_set = InvariantSet({Invariant.DISTANCE, Invariant.ANGLE})
         self.assertTrue(inv_set.preserves_any({Invariant.DISTANCE, Invariant.MASS}))
         self.assertTrue(inv_set.preserves_any({Invariant.ANGLE, Invariant.MASS}))
         self.assertFalse(inv_set.preserves_any({Invariant.MASS, Invariant.TIME}))
     
     def test_union(self):
-        """Test de l'union d'ensembles d'invariants."""
+        """Test the union of invariant sets."""
         set1 = InvariantSet({Invariant.DISTANCE})
         set2 = InvariantSet({Invariant.ANGLE})
         union = set1.union(set2)
@@ -68,7 +68,7 @@ class TestInvariantSet(unittest.TestCase):
         self.assertTrue(union.preserves(Invariant.ANGLE))
     
     def test_intersection(self):
-        """Test de l'intersection d'ensembles d'invariants."""
+        """Test the intersection of invariant sets."""
         set1 = InvariantSet({Invariant.DISTANCE, Invariant.ANGLE})
         set2 = InvariantSet({Invariant.DISTANCE, Invariant.ORIENTATION})
         intersection = set1.intersection(set2)
@@ -77,7 +77,7 @@ class TestInvariantSet(unittest.TestCase):
         self.assertFalse(intersection.preserves(Invariant.ORIENTATION))
     
     def test_lost(self):
-        """Test des invariants perdus."""
+        """Test the lost invariants."""
         original = InvariantSet({Invariant.DISTANCE, Invariant.ANGLE, Invariant.ORIENTATION})
         current = InvariantSet({Invariant.ANGLE, Invariant.ORIENTATION})
         lost = current.lost(original)
@@ -85,17 +85,17 @@ class TestInvariantSet(unittest.TestCase):
         self.assertFalse(lost.preserves(Invariant.ANGLE))
     
     def test_preserves_geometry(self):
-        """Test de la propriété preserves_geometry."""
-        # Translation préserve la géométrie
+        """Test the preserves_geometry property."""
+        # Translation preserves geometry
         self.assertTrue(TRANSLATION_INVARIANTS.preserves_geometry)
-        # Rotation préserve la géométrie
+        # Rotation preserves geometry
         self.assertTrue(ROTATION_INVARIANTS.preserves_geometry)
-        # Scale non-uniforme ne préserve pas la géométrie
+        # Non-uniform scale does not preserve geometry
         self.assertFalse(NON_UNIFORM_SCALE_INVARIANTS.preserves_geometry)
     
     def test_preserves_topology(self):
-        """Test de la propriété preserves_topology."""
-        # Toutes ces transformations préservent la topologie
+        """Test the preserves_topology property."""
+        # All these transformations preserve topology
         self.assertTrue(TRANSLATION_INVARIANTS.preserves_topology)
         self.assertTrue(ROTATION_INVARIANTS.preserves_topology)
         self.assertTrue(UNIFORM_SCALE_INVARIANTS.preserves_topology)
@@ -103,10 +103,10 @@ class TestInvariantSet(unittest.TestCase):
 
 
 class TestTransformationSpec(unittest.TestCase):
-    """Tests pour TransformationSpec et ses sous-classes."""
+    """Tests for TransformationSpec and its subclasses."""
     
     def test_identity_transformation(self):
-        """Test de la transformation identité."""
+        """Test the identity transformation."""
         from core.transformations import IdentityTransformation
         
         identity = IdentityTransformation()
@@ -121,19 +121,19 @@ class TestTransformationSpec(unittest.TestCase):
         self.assertIsInstance(inv, IdentityTransformation)
     
     def test_identity_preserves_all(self):
-        """Test que l'identité préserve tous les invariants."""
+        """Test that the identity preserves all invariants."""
         from core.transformations import IdentityTransformation
         identity = IdentityTransformation()
-        # IDENTITY_INVARIANTS contient beaucoup d'invariants
+        # IDENTITY_INVARIANTS contains many invariants
         self.assertTrue(identity.preserves_geometry())
         self.assertTrue(identity.preserves_topology)
 
 
 class TestTranslationTransformation(unittest.TestCase):
-    """Tests pour les transformations de translation."""
+    """Tests for translation transformations."""
     
     def test_create_translation(self):
-        """Test de création d'une translation."""
+        """Test creation of a translation."""
         from core.transformations import create_translation_transformation
         
         t = create_translation_transformation(2.0, 3.0)
@@ -141,7 +141,7 @@ class TestTranslationTransformation(unittest.TestCase):
         self.assertTrue(t.invertible)
     
     def test_translation_apply(self):
-        """Test de l'application d'une translation."""
+        """Test application of a translation."""
         from core.transformations import create_translation_transformation
         
         t = create_translation_transformation(2.0, 3.0)
@@ -150,7 +150,7 @@ class TestTranslationTransformation(unittest.TestCase):
         self.assertEqual(t.apply((-1, -1)), (1.0, 2.0))
     
     def test_translation_inverse(self):
-        """Test de l'inverse d'une translation."""
+        """Test the inverse of a translation."""
         from core.transformations import create_translation_transformation
         
         t = create_translation_transformation(2.0, 3.0)
@@ -158,7 +158,7 @@ class TestTranslationTransformation(unittest.TestCase):
         self.assertIsNotNone(inv)
         self.assertEqual(inv.name, "translate(-2.0, -3.0)")
         
-        # Tester que inv(t(p)) = p
+        # Check that inv(t(p)) = p
         p = (5.0, 7.0)
         tp = t.apply(p)
         tpinv = inv.apply(tp)
@@ -166,7 +166,7 @@ class TestTranslationTransformation(unittest.TestCase):
         self.assertAlmostEqual(tpinv[1], p[1])
     
     def test_translation_preserves(self):
-        """Test des invariants préservés par une translation."""
+        """Test the invariants preserved by a translation."""
         from core.transformations import create_translation_transformation
         
         t = create_translation_transformation(2.0, 0.0)
@@ -177,10 +177,10 @@ class TestTranslationTransformation(unittest.TestCase):
 
 
 class TestRotationTransformation(unittest.TestCase):
-    """Tests pour les transformations de rotation."""
+    """Tests for rotation transformations."""
     
     def test_create_rotation(self):
-        """Test de création d'une rotation."""
+        """Test creation of a rotation."""
         from core.transformations import create_rotation_transformation
         
         r = create_rotation_transformation(pi/2)
@@ -188,24 +188,24 @@ class TestRotationTransformation(unittest.TestCase):
         self.assertTrue(r.invertible)
     
     def test_rotation_90_degrees(self):
-        """Test d'une rotation de 90 degrés."""
+        """Test a 90-degree rotation."""
         from core.transformations import create_rotation_transformation
         
         r = create_rotation_transformation(pi/2)
-        # (1, 0) tourné de 90° -> (0, 1)
+        # (1, 0) rotated by 90° -> (0, 1)
         result = r.apply((1.0, 0.0))
         self.assertAlmostEqual(result[0], 0.0, places=5)
         self.assertAlmostEqual(result[1], 1.0, places=5)
     
     def test_rotation_inverse(self):
-        """Test de l'inverse d'une rotation."""
+        """Test the inverse of a rotation."""
         from core.transformations import create_rotation_transformation
         
         r = create_rotation_transformation(pi/4)
         inv = r.get_inverse()
         self.assertIsNotNone(inv)
         
-        # Tester que inv(r(p)) = p
+        # Check that inv(r(p)) = p
         p = (1.0, 0.0)
         rp = r.apply(p)
         rpinv = inv.apply(rp)
@@ -213,7 +213,7 @@ class TestRotationTransformation(unittest.TestCase):
         self.assertAlmostEqual(rpinv[1], p[1], places=5)
     
     def test_rotation_preserves(self):
-        """Test des invariants préservés par une rotation."""
+        """Test the invariants preserved by a rotation."""
         from core.transformations import create_rotation_transformation
         
         r = create_rotation_transformation(pi/2)
@@ -224,10 +224,10 @@ class TestRotationTransformation(unittest.TestCase):
 
 
 class TestScaleTransformation(unittest.TestCase):
-    """Tests pour les transformations de scale."""
+    """Tests for scale transformations."""
     
     def test_create_uniform_scale(self):
-        """Test de création d'un scale uniforme."""
+        """Test creation of a uniform scale."""
         from core.transformations import create_scale_transformation
         
         s = create_scale_transformation(2.0, 2.0)
@@ -235,7 +235,7 @@ class TestScaleTransformation(unittest.TestCase):
         self.assertTrue(s.invertible)
     
     def test_create_non_uniform_scale(self):
-        """Test de création d'un scale non-uniforme."""
+        """Test creation of a non-uniform scale."""
         from core.transformations import create_scale_transformation
         
         s = create_scale_transformation(2.0, 3.0)
@@ -243,7 +243,7 @@ class TestScaleTransformation(unittest.TestCase):
         self.assertTrue(s.invertible)
     
     def test_scale_apply(self):
-        """Test de l'application d'un scale."""
+        """Test application of a scale."""
         from core.transformations import create_scale_transformation
         
         s = create_scale_transformation(2.0, 3.0)
@@ -251,14 +251,14 @@ class TestScaleTransformation(unittest.TestCase):
         self.assertEqual(s.apply((-1.0, 2.0)), (-2.0, 6.0))
     
     def test_scale_inverse(self):
-        """Test de l'inverse d'un scale."""
+        """Test the inverse of a scale."""
         from core.transformations import create_scale_transformation
         
         s = create_scale_transformation(2.0, 3.0)
         inv = s.get_inverse()
         self.assertIsNotNone(inv)
         
-        # Tester que inv(s(p)) = p
+        # Check that inv(s(p)) = p
         p = (4.0, 6.0)
         sp = s.apply(p)
         spinv = inv.apply(sp)
@@ -266,7 +266,7 @@ class TestScaleTransformation(unittest.TestCase):
         self.assertAlmostEqual(spinv[1], p[1], places=5)
     
     def test_uniform_scale_preserves_angles(self):
-        """Test qu'un scale uniforme préserve les angles."""
+        """Test that a uniform scale preserves angles."""
         from core.transformations import create_scale_transformation
         
         s = create_scale_transformation(2.0, 2.0)
@@ -274,7 +274,7 @@ class TestScaleTransformation(unittest.TestCase):
         self.assertTrue(s.preserves_invariant(Invariant.ORIENTATION))
     
     def test_non_uniform_scale_preserves_topology(self):
-        """Test qu'un scale non-uniforme préserve la topologie."""
+        """Test that a non-uniform scale preserves topology."""
         from core.transformations import create_scale_transformation
         
         s = create_scale_transformation(2.0, 3.0)
@@ -283,10 +283,10 @@ class TestScaleTransformation(unittest.TestCase):
 
 
 class TestCompositeTransformation(unittest.TestCase):
-    """Tests pour CompositeTransformation."""
+    """Tests for CompositeTransformation."""
     
     def test_compose_two(self):
-        """Test de composition de deux transformations."""
+        """Test composition of two transformations."""
         from core.transformations import (
             create_translation_transformation,
             create_rotation_transformation,
@@ -301,7 +301,7 @@ class TestCompositeTransformation(unittest.TestCase):
         self.assertEqual(composed.get_depth(), 2)
     
     def test_matmul_operator(self):
-        """Test de l'opérateur @ pour la composition."""
+        """Test the @ operator for composition."""
         from core.transformations import (
             create_translation_transformation,
             create_rotation_transformation,
@@ -314,22 +314,22 @@ class TestCompositeTransformation(unittest.TestCase):
         self.assertEqual(composed.get_depth(), 2)
     
     def test_compose_order(self):
-        """Test que l'ordre de composition est correct."""
+        """Test that the composition order is correct."""
         from core.transformations import create_translation_transformation
         
         t1 = create_translation_transformation(1.0, 0.0)
         t2 = create_translation_transformation(0.0, 2.0)
         
-        # t1 @ t2 signifie t2 ∘ t1, donc t1 est appliqué en premier
+        # t1 @ t2 means t2 ∘ t1, so t1 is applied first
         composed = t1 @ t2
         
-        # Appliquer à (0, 0): t1 -> (1, 0), t2 -> (1, 2)
+        # Apply to (0, 0): t1 -> (1, 0), t2 -> (1, 2)
         result = composed.apply((0.0, 0.0))
         self.assertAlmostEqual(result[0], 1.0)
         self.assertAlmostEqual(result[1], 2.0)
     
     def test_invariants_intersection(self):
-        """Test que les invariants composés sont l'intersection."""
+        """Test that the composed invariants are the intersection."""
         from core.transformations import (
             create_translation_transformation,
             create_scale_transformation,
@@ -340,15 +340,15 @@ class TestCompositeTransformation(unittest.TestCase):
         
         composed = t @ s
         
-        # Translation préserve la géométrie, scale non-uniforme non
-        # Donc la composition ne préserve pas la géométrie
+        # Translation preserves geometry, non-uniform scale does not
+        # So the composition does not preserve geometry
         self.assertFalse(composed.preserves_geometry())
         
-        # Mais les deux préservent la topologie
+        # But both preserve topology
         self.assertTrue(composed.preserves_topology)
     
     def test_composition_cost(self):
-        """Test que le coût est cumulatif."""
+        """Test that the cost is cumulative."""
         from core.transformations import create_translation_transformation
         
         t1 = create_translation_transformation(1.0, 0.0)
@@ -358,7 +358,7 @@ class TestCompositeTransformation(unittest.TestCase):
         self.assertAlmostEqual(composed.cost, t1.cost + t2.cost)
     
     def test_invertible_composition(self):
-        """Test qu'une composition de transformations inversibles est inversible."""
+        """Test that a composition of invertible transformations is invertible."""
         from core.transformations import create_translation_transformation
         
         t1 = create_translation_transformation(1.0, 0.0)
@@ -371,7 +371,7 @@ class TestCompositeTransformation(unittest.TestCase):
         self.assertIsNotNone(inv)
     
     def test_composition_inverse_application(self):
-        """Test que l'inverse d'une composition fonctionne correctement."""
+        """Test that the inverse of a composition works correctly."""
         from core.transformations import create_translation_transformation
         
         t1 = create_translation_transformation(1.0, 0.0)
@@ -389,10 +389,10 @@ class TestCompositeTransformation(unittest.TestCase):
 
 
 class TestMacroTransformation(unittest.TestCase):
-    """Tests pour MacroTransformation."""
+    """Tests for MacroTransformation."""
     
     def test_macro_creation(self):
-        """Test de création d'une macro-transformation."""
+        """Test creation of a macro-transformation."""
         from core.transformations import (
             create_translation_transformation,
             MacroTransformation,
@@ -409,7 +409,7 @@ class TestMacroTransformation(unittest.TestCase):
         self.assertEqual(macro.description, "Déplace vers la droite")
     
     def test_macro_inherits_properties(self):
-        """Test qu'une macro hérite des propriétés de la transformation de base."""
+        """Test that a macro inherits the properties of the base transformation."""
         from core.transformations import (
             create_translation_transformation,
             MacroTransformation,
@@ -423,7 +423,7 @@ class TestMacroTransformation(unittest.TestCase):
         self.assertEqual(macro.cost, t.cost)
     
     def test_macro_apply(self):
-        """Test de l'application d'une macro."""
+        """Test application of a macro."""
         from core.transformations import (
             create_translation_transformation,
             MacroTransformation,
@@ -435,7 +435,7 @@ class TestMacroTransformation(unittest.TestCase):
         self.assertEqual(macro.apply((0, 0)), (1.0, 0.0))
     
     def test_macro_inverse(self):
-        """Test de l'inverse d'une macro."""
+        """Test the inverse of a macro."""
         from core.transformations import (
             create_translation_transformation,
             MacroTransformation,
@@ -450,7 +450,7 @@ class TestMacroTransformation(unittest.TestCase):
         self.assertIn("inverse", inv.name)
     
     def test_macro_unwrap(self):
-        """Test du déballage d'une macro."""
+        """Test unwrapping of a macro."""
         from core.transformations import (
             create_translation_transformation,
             MacroTransformation,
@@ -463,7 +463,7 @@ class TestMacroTransformation(unittest.TestCase):
         self.assertEqual(unwrapped, t)
     
     def test_nested_macro_unwrap(self):
-        """Test du déballage d'une macro imbriquée."""
+        """Test unwrapping of a nested macro."""
         from core.transformations import (
             create_translation_transformation,
             MacroTransformation,
@@ -478,10 +478,10 @@ class TestMacroTransformation(unittest.TestCase):
 
 
 class TestCutAndMergeTransformations(unittest.TestCase):
-    """Tests pour CutTransformation et MergeTransformation."""
+    """Tests for CutTransformation and MergeTransformation."""
     
     def test_cut_transformation(self):
-        """Test de CutTransformation."""
+        """Test CutTransformation."""
         from core.transformations import CutTransformation
         from core.topology import DISK_TOPOLOGY
         
@@ -493,7 +493,7 @@ class TestCutAndMergeTransformations(unittest.TestCase):
         self.assertEqual(result.connected_components, 2)
     
     def test_merge_transformation(self):
-        """Test de MergeTransformation."""
+        """Test MergeTransformation."""
         from core.transformations import MergeTransformation
         from core.topology import DISK_TOPOLOGY
         
@@ -501,14 +501,14 @@ class TestCutAndMergeTransformations(unittest.TestCase):
         self.assertEqual(merge.name, "merge")
         self.assertFalse(merge.invertible)
         
-        # Appliquer à un état avec 2 composantes
+        # Apply to a state with 2 components
         from core.topology import TopologySignature
         two_disks = TopologySignature(connected_components=2, holes=0, boundary_components=2)
         result = merge.apply(two_disks)
         self.assertEqual(result.connected_components, 1)
     
     def test_cut_merge_roundtrip(self):
-        """Test que cut suivi de merge revient à l'original (en nombre de composantes)."""
+        """Test that cut followed by merge returns to the original (in number of components)."""
         from core.transformations import CutTransformation, MergeTransformation
         from core.topology import DISK_TOPOLOGY
         
@@ -522,10 +522,10 @@ class TestCutAndMergeTransformations(unittest.TestCase):
 
 
 class TestTransformNode(unittest.TestCase):
-    """Tests pour TransformNode."""
+    """Tests for TransformNode."""
     
     def test_root_node(self):
-        """Test d'un nœud racine."""
+        """Test a root node."""
         from core.transform_graph import TransformNode
         from core.transformations import IdentityTransformation
         
@@ -539,7 +539,7 @@ class TestTransformNode(unittest.TestCase):
         self.assertEqual(root.depth, 0)
     
     def test_add_child(self):
-        """Test de l'ajout d'un enfant."""
+        """Test adding a child."""
         from core.transform_graph import TransformNode
         from core.transformations import create_translation_transformation
         
@@ -554,7 +554,7 @@ class TestTransformNode(unittest.TestCase):
         self.assertEqual(child.parent, root)
     
     def test_path(self):
-        """Test du chemin d'un nœud."""
+        """Test the path of a node."""
         from core.transform_graph import TransformNode
         from core.transformations import create_translation_transformation
         
@@ -571,7 +571,7 @@ class TestTransformNode(unittest.TestCase):
         self.assertEqual(path[1].name, "translate(0.0, 1.0)")
     
     def test_invariants_propagation(self):
-        """Test de la propagation des invariants."""
+        """Test the propagation of invariants."""
         from core.transform_graph import TransformNode
         from core.transformations import create_translation_transformation
         from core.invariants import Invariant
@@ -581,11 +581,11 @@ class TestTransformNode(unittest.TestCase):
         
         child = root.add_child(t)
         
-        # La translation préserve beaucoup d'invariants
+        # Translation preserves many invariants
         self.assertTrue(child.invariants.preserves(Invariant.DISTANCE))
     
     def test_can_invert(self):
-        """Test de la vérification d'invertibilité."""
+        """Test the invertibility check."""
         from core.transform_graph import TransformNode
         from core.transformations import (
             create_translation_transformation,
@@ -598,13 +598,13 @@ class TestTransformNode(unittest.TestCase):
         child = root.add_child(t)
         self.assertTrue(child.can_invert())
         
-        # Ajouter une transformation non-inversible
+        # Add a non-invertible transformation
         cut = CutTransformation()
         grandchild = child.add_child(cut)
         self.assertFalse(grandchild.can_invert())
     
     def test_composite_transformation(self):
-        """Test de la création d'une transformation composite depuis un nœud."""
+        """Test the creation of a composite transformation from a node."""
         from core.transform_graph import TransformNode
         from core.transformations import create_translation_transformation
         
@@ -620,10 +620,10 @@ class TestTransformNode(unittest.TestCase):
 
 
 class TestTransformGraph(unittest.TestCase):
-    """Tests pour TransformGraph."""
+    """Tests for TransformGraph."""
     
     def test_graph_creation(self):
-        """Test de la création d'un graphe."""
+        """Test the creation of a graph."""
         from core.transform_graph import TransformNode, TransformGraph
         
         root = TransformNode(name="root")
@@ -633,7 +633,7 @@ class TestTransformGraph(unittest.TestCase):
         self.assertEqual(len(graph.nodes), 1)
     
     def test_apply_transformation(self):
-        """Test de l'application d'une transformation."""
+        """Test application of a transformation."""
         from core.transform_graph import TransformGraph, TransformNode
         from core.transformations import create_translation_transformation
         
@@ -647,7 +647,7 @@ class TestTransformGraph(unittest.TestCase):
         self.assertEqual(graph.current, new_node)
     
     def test_undo(self):
-        """Test de l'undo."""
+        """Test undo."""
         from core.transform_graph import TransformGraph, TransformNode
         from core.transformations import create_translation_transformation
         
@@ -665,7 +665,7 @@ class TestTransformGraph(unittest.TestCase):
         self.assertNotEqual(graph.current, old_current)
     
     def test_undo_at_root(self):
-        """Test que l'undo à la racine échoue."""
+        """Test that undo at the root fails."""
         from core.transform_graph import TransformGraph, TransformNode
         
         root = TransformNode(name="root")
@@ -676,7 +676,7 @@ class TestTransformGraph(unittest.TestCase):
             graph.undo()
     
     def test_reset_to_root(self):
-        """Test de la réinitialisation à la racine."""
+        """Test resetting to the root."""
         from core.transform_graph import TransformGraph, TransformNode
         from core.transformations import create_translation_transformation
         
@@ -691,7 +691,7 @@ class TestTransformGraph(unittest.TestCase):
         self.assertEqual(graph.current, root)
     
     def test_history_summary(self):
-        """Test du résumé de l'historique."""
+        """Test the history summary."""
         from core.transform_graph import TransformGraph, TransformNode
         from core.transformations import create_translation_transformation
         
@@ -710,10 +710,10 @@ class TestTransformGraph(unittest.TestCase):
 
 
 class TestCreateLinearGraph(unittest.TestCase):
-    """Tests pour la fonction create_linear_graph."""
+    """Tests for the create_linear_graph function."""
     
     def test_linear_graph_creation(self):
-        """Test de la création d'un graphe linéaire."""
+        """Test the creation of a linear graph."""
         from core.transform_graph import create_linear_graph
         from core.transformations import create_translation_transformation
         
@@ -728,7 +728,7 @@ class TestCreateLinearGraph(unittest.TestCase):
         self.assertEqual(len(graph.current.transformations), 2)
     
     def test_linear_graph_invariants(self):
-        """Test des invariants dans un graphe linéaire."""
+        """Test the invariants in a linear graph."""
         from core.transform_graph import create_linear_graph
         from core.transformations import create_translation_transformation
         from core.invariants import Invariant
@@ -741,15 +741,15 @@ class TestCreateLinearGraph(unittest.TestCase):
         graph = create_linear_graph("initial", transformations)
         invariants = graph.get_current_invariants()
         
-        # Les translations préservent la distance
+        # Translations preserve distance
         self.assertTrue(invariants.preserves(Invariant.DISTANCE))
 
 
 class TestIntegrationWithExistingSystem(unittest.TestCase):
-    """Tests d'intégration avec le système existant."""
+    """Integration tests with the existing system."""
     
     def test_transform2d_still_works(self):
-        """Test que Transform2D fonctionne toujours."""
+        """Test that Transform2D still works."""
         from core.transform import Transform2D
         from math import pi
         
@@ -765,7 +765,7 @@ class TestIntegrationWithExistingSystem(unittest.TestCase):
         self.assertAlmostEqual(ptt[1], p[1], places=5)
     
     def test_topology_still_works(self):
-        """Test que la topologie fonctionne toujours."""
+        """Test that topology still works."""
         from core.topology import TopologySignature, DISK_TOPOLOGY
         
         disk = TopologySignature(connected_components=1, holes=0, boundary_components=1)
@@ -773,7 +773,7 @@ class TestIntegrationWithExistingSystem(unittest.TestCase):
         self.assertTrue(disk.is_simple())
     
     def test_deformation_still_works(self):
-        """Test que les déformations fonctionnent toujours."""
+        """Test that deformations still work."""
         from core.deformation import StretchDeformation
         
         stretch = StretchDeformation(stretch_x=2.0, stretch_y=3.0)
@@ -781,11 +781,11 @@ class TestIntegrationWithExistingSystem(unittest.TestCase):
         self.assertTrue(stretch.topology_preservation.preserves_connected_components)
     
     def test_plane_collider_integration(self):
-        """Test que PlaneCollider s'intègre avec le nouveau système."""
+        """Test that PlaneCollider integrates with the new system."""
         from core.transform import Transform2D
         from physics.colliders import PlaneCollider
         
-        # Créer un PlaneCollider avec Transform2D
+        # Create a PlaneCollider with Transform2D
         collider = PlaneCollider(
             normal_x=1.0,
             normal_y=0.0,

@@ -46,7 +46,7 @@ def OB(prog, **kw): X, y = scene(prog, **kw); return observe(X, y)
 class FragmentTests(unittest.TestCase):
     def test_fit_prefers_simple_model(self):
         self.assertEqual(fit_fragment(seg((0, 0), (2, 1)))[0], "line"); m, p, rl, rc = fit_fragment(arc(a1=2.0)); self.assertEqual(m, "circle"); self.assertAlmostEqual(p[2], 1.2, places=3); self.assertGreater(rl, rc)
-        self.assertEqual(fit_fragment(arc(r=3.4, a1=0.05, n=8))[0], "line")                                 # arc presque plat : la droite suffit
+        self.assertEqual(fit_fragment(arc(r=3.4, a1=0.05, n=8))[0], "line")                                 # nearly flat arc: the line suffices
     def test_fragment_fields(self):
         ob = OB(DISC); fs = extract_fragments(ob); self.assertTrue(fs); f = fs[0]; self.assertIsInstance(f, BoundaryFragment)
         for k in ("ids", "points", "normals", "model", "params", "curvature", "length", "endpoints", "confidence", "polarity", "neighbors", "uncertainty", "rms_line", "rms_circle"): self.assertTrue(hasattr(f, k), k)
@@ -57,7 +57,7 @@ class FragmentTests(unittest.TestCase):
         pd = [f.polarity for f in extract_fragments(OB(DISC)) if not f.straight and abs(f.params[2] - 1.2) < 0.2 and math.hypot(f.params[0] - 0.2, f.params[1]) < 0.3]; pa = [f.polarity for f in extract_fragments(OB(ANTI)) if not f.straight and abs(f.params[2] - 1.2) < 0.2 and math.hypot(f.params[0] - 0.2, f.params[1]) < 0.3]
         self.assertEqual(pd[0], -1); self.assertEqual(pa[0], 1)
     def test_consensus_fragments_may_overlap(self):
-        fs = extract_fragments(OB(AND(DISC, OCC))); ids = [i for f in fs for i in f.ids.tolist()]; self.assertGreater(len(ids), len(set(ids)))                     # un milieu peut rester compatible avec plusieurs lectures
+        fs = extract_fragments(OB(AND(DISC, OCC))); ids = [i for f in fs for i in f.ids.tolist()]; self.assertGreater(len(ids), len(set(ids)))                     # a middle can remain compatible with several readings
     def test_disjoint_modes_do_not_overlap(self):
         fs = extract_fragments(OB(AND(DISC, OCC)), "tangent"); ids = [i for f in fs for i in f.ids.tolist()]; self.assertEqual(len(ids), len(set(ids)))
     def test_forced_model(self):
@@ -150,7 +150,7 @@ class OwnershipTests(unittest.TestCase):
     def test_wrong_primitive_is_absent(self): o = ownership(disc_atom(-2.0, 2.0, 0.6), OB(AND(DISC, OCC)), [OCC]); self.assertEqual(o.fractions["observed"], 0.0); self.assertIsNone(o.owner)
     def test_negative_evidence_modes(self):
         ob = OB(AND(DISC, OCC)); ids = torch.arange(len(ob.points)); a = signals_of(DISC, ids, ob, others=[OCC], negative="ownership")["absent"]; b = signals_of(DISC, ids, ob, others=[OCC], negative="naive")["absent"]; c = signals_of(DISC, ids, ob, others=[OCC], negative="none")["absent"]
-        self.assertEqual(c, 0.0); self.assertGreater(b, a + 0.2)                                              # compter la partie cachée comme absente pénaliserait une primitive juste
+        self.assertEqual(c, 0.0); self.assertGreater(b, a + 0.2)                                              # counting the hidden part as absent would penalise a correct primitive
     def test_empty_render(self): self.assertEqual(ownership(disc_atom(50.0, 50.0, 0.2), OB(DISC)).labels, [])
 
 

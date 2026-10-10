@@ -50,7 +50,7 @@ def css_of(progs, obs):
     return c
 
 
-# ================================================================ A — modèle de mesure
+# ================================================================ A — measurement model
 
 class MeasurementModelTests(unittest.TestCase):
     def test_fields(self):
@@ -76,7 +76,7 @@ class MeasurementModelTests(unittest.TestCase):
         moved = T(P("pred", "norm", "le", (1.0,)), tuple(frame_transform(torch.tensor([[0.2, 0.0]]), 0.5, (1.0, 0.0))[0].tolist())); self.assertTrue(torch.equal(a, predict(moved, Y)))
 
 
-# ================================================================ B/C — vraisemblances
+# ================================================================ B/C — likelihoods
 
 class LikelihoodTests(unittest.TestCase):
     def setUp(self): self.obs = obs_for(DISC)
@@ -131,7 +131,7 @@ for _k in LIKELIHOODS:
         setattr(LikelihoodTests, f"test_order_{_k}_{_s}", _make_lik_order_test(_k, _s))
 
 
-# ================================================================ E/F — évidence, MDL
+# ================================================================ E/F — evidence, MDL
 
 class EvidenceTests(unittest.TestCase):
     def setUp(self): self.obs = obs_for(DISC)
@@ -145,7 +145,7 @@ class EvidenceTests(unittest.TestCase):
     def test_simple_noise_beats_complex(self):
         cx = P("or", children=(DISC, T(P("pred", "norm", "le", (0.05,)), (1.9, 1.9)))); self.assertLess(mdl(DISC, self.obs)["total"], mdl(cx, self.obs)["total"])
     def test_bic_aic(self): ll = float(obs_loglik(DISC, self.obs)); self.assertGreater(bic(DISC, self.obs, ll), aic(DISC, self.obs, ll) - 1e-9)
-    def test_not_called_bayesian_truth(self): self.assertIn("APPROCHÉE", inspect.getsource(log_evidence))
+    def test_not_called_bayesian_truth(self): self.assertIn("APPROXIMATE", inspect.getsource(log_evidence))
 
 
 class CompatibleSetTests(unittest.TestCase):
@@ -197,7 +197,7 @@ class AttributionTests(unittest.TestCase):
         X = X0(150); y = predict(HALF, X); y[0] = 1 - y[0]; o = Observations.build(X, y, STD); r = RobustStructuralReconstruction().run(o); self.assertEqual(r.css.best().program.size(), 1)
 
 
-# ================================================================ H/I/J/K — gains attendus, planificateur
+# ================================================================ H/I/J/K — expected gains, planner
 
 class GainTests(unittest.TestCase):
     def setUp(self):
@@ -211,7 +211,7 @@ class GainTests(unittest.TestCase):
         x = torch.tensor([[-1.9, 0.0]]); c = css_of([HALF, HALF2], self.obs); self.assertAlmostEqual(float(disagreement(c, x)[0]), 0.0, places=6)
     def test_uncertainty(self): self.assertTrue(bool((uncertainty(self.css, self.pool) >= 0).all()))
     def test_noisier_sensor_less_gain(self):
-        c = css_of([DISC, HALF], Observations.build(X0(2), torch.tensor([1, 0]), STD))   # postérieure ambiguë (2 structures distinctes)
+        c = css_of([DISC, HALF], Observations.build(X0(2), torch.tensor([1, 0]), STD))   # ambiguous posterior (2 distinct structures)
         a = structural_ig(c, self.pool, 0.01).max(); b = structural_ig(c, self.pool, 0.3).max(); self.assertGreater(float(a), float(b))
         a = expected_functional_accuracy_gain(c, self.pool, self.probes, 0.01).max(); b = expected_functional_accuracy_gain(c, self.pool, self.probes, 0.3).max(); self.assertGreaterEqual(float(a), float(b) - 1e-9)
     def test_decision_utility(self): self.assertLess(expected_decision_loss_utility(0.1, 3.0), expected_decision_loss_utility(0.1, 1.0))
@@ -228,7 +228,7 @@ class GainTests(unittest.TestCase):
         ch = RobustMeasurementPlanner("efa", sensors=tuple(SENSOR_MODELS)).choose(self.css, self.pool, None, self.probes, 16.0); self.assertIn(ch.sensor, list(SENSOR_MODELS) + [""])
     def test_planner_does_not_see_answers(self): self.assertNotIn("oracle", inspect.signature(RobustMeasurementPlanner.choose).parameters)
     def test_repeat_informative_under_noise(self):
-        c = css_of([DISC, HALF], Observations.build(X0(2), torch.tensor([1, 0]), STD)); x = torch.tensor([[0.4, 0.0]])   # DISC et HALF s'y opposent
+        c = css_of([DISC, HALF], Observations.build(X0(2), torch.tensor([1, 0]), STD)); x = torch.tensor([[0.4, 0.0]])   # DISC and HALF oppose each other there
         self.assertGreater(float(structural_ig(c, x, 0.2)[0]), 0.0)
 
 
@@ -287,7 +287,7 @@ class CalibrationTests(unittest.TestCase):
         self.assertEqual([sid for sid, _ in RE.caltrain_subunits(5)][-1], "s700059")
 
 
-# ================================================================ T/U — Fourier, micro-états
+# ================================================================ T/U — Fourier, micro-states
 
 class RepresentationTests(unittest.TestCase):
     def sig(self):
@@ -298,10 +298,10 @@ class RepresentationTests(unittest.TestCase):
     def test_direct_space_not_sparse(self): self.assertGreater(int((self.sig().abs() > 0.1).sum()), 60)
     def test_microstate_entropy(self): o = obs_for(DISC, 8); self.assertGreater(RR.microstate_entropy(css_of([DISC, HALF, HALF2], o)), 0)
     def test_no_quantum_claim(self):
-        src = inspect.getsource(RR); self.assertIn("aucune mécanique quantique", src); self.assertNotIn("ħ", src)
+        src = inspect.getsource(RR); self.assertIn("no quantum mechanics", src); self.assertNotIn("ħ", src)
 
 
-# ================================================================ Z — monde
+# ================================================================ Z — world
 
 class WorldTests(unittest.TestCase):
     def test_noise_levels(self): self.assertEqual(NOISE_LEVELS, (0.0, 0.02, 0.05, 0.08, 0.12, 0.15))
@@ -340,7 +340,7 @@ for _d in (1, 2, 3, 4): setattr(WorldTests, f"test_depth_{_d}", _make_depth_test
 for _k in NOISE_KINDS: setattr(WorldTests, f"test_noise_kind_{_k}", _make_kind_test(_k))
 
 
-# ================================================================ AX — fuites
+# ================================================================ AX — leaks
 
 class LeakageTests(unittest.TestCase):
     def test_inference_does_not_import_world(self): self.assertNotIn("robust_world", inspect.getsource(RR)); self.assertNotIn("boundary_world", inspect.getsource(RR))
@@ -348,8 +348,8 @@ class LeakageTests(unittest.TestCase):
     def test_no_family_conditionals(self): self.assertIsNone(re.search(r"family\s*==", inspect.getsource(RR)))
     def test_run_signature_no_labels(self): self.assertNotIn("truth", inspect.signature(RobustStructuralReconstruction.run).parameters)
     def test_monitor_not_used_for_decisions(self):
-        src = inspect.getsource(RobustStructuralReconstruction.run); self.assertNotIn("if monitor(css)", src); self.assertIn("jamais utilisée pour décider", src)
-    def test_oracle_policy_marked(self): self.assertIn("borne haute", inspect.getsource(RE._Oracle))
+        src = inspect.getsource(RobustStructuralReconstruction.run); self.assertNotIn("if monitor(css)", src); self.assertIn("never used to decide", src)
+    def test_oracle_policy_marked(self): self.assertIn("upper bound", inspect.getsource(RE._Oracle))
     def test_task_oracle_goes_through_noise(self): self.assertIn("corrupt", inspect.getsource(RW.Task.oracle))
     def test_prereg_exists(self):
         t = open("docs/hypotheses_robust_reconstruction.md").read()
@@ -362,7 +362,7 @@ class LeakageTests(unittest.TestCase):
     def test_metadata_no_family_name(self): t = make_task(1); self.assertFalse(hasattr(t.world, "family"))
 
 
-# ================================================================ AWS — orchestration pure (aucun appel réseau)
+# ================================================================ AWS — pure orchestration (no network call)
 
 class OrchestrationTests(unittest.TestCase):
     def test_region(self): self.assertEqual(ORC.REGION, "eu-north-1")
@@ -402,7 +402,7 @@ class OrchestrationTests(unittest.TestCase):
         self.assertEqual(c.exception.code, 4)
     def test_guardrails_ok_when_iam_denied(self):
         def fake(*a, **k):
-            if a[0] == "iam": raise ORC.AwsDenied("refusé")
+            if a[0] == "iam": raise ORC.AwsDenied("denied")
             return {"Arn": "arn:aws:sts::1:assumed-role/AWSReservedSSO_WCE-Research-Runner_x/u", "Account": "1"}
         old = ORC.aws; ORC.aws = fake
         try: r = ORC.check_guardrails()
@@ -410,7 +410,7 @@ class OrchestrationTests(unittest.TestCase):
         self.assertEqual(r["guardrails"], "OK")
     def test_guardrails_fail_if_admin(self):
         def fake(*a, **k):
-            if a[0] == "iam": raise ORC.AwsDenied("refusé")
+            if a[0] == "iam": raise ORC.AwsDenied("denied")
             return {"Arn": "arn:aws:sts::1:assumed-role/AWSReservedSSO_AdministratorAccess_x/u", "Account": "1"}
         old = ORC.aws; ORC.aws = fake
         try:
@@ -466,7 +466,7 @@ class AggregateTests(unittest.TestCase):
     def test_budget_preregistered(self): self.assertEqual(RE.BUDGET, 16.0); self.assertEqual((RE.COMPACT_PARAMS, RE.COMPACT_POINTS), (64, 32))
 
 
-# ================================================================ observabilité, checkpoints, reprise
+# ================================================================ observability, checkpoints, resume
 
 class _OutDir:
     def __enter__(self):
@@ -563,7 +563,7 @@ class CheckpointTests(unittest.TestCase):
 
 
 class CacheTests(unittest.TestCase):
-    """La mise en cache de n_params / own_count ne change aucune valeur ni l'identité des nœuds."""
+    """Caching n_params / own_count changes no value and does not change node identity."""
     NODES = [DISC, HALF, HALF2, P("and", children=(DISC, HALF)), P("not", children=(HALF,)), P("pred", "dot", "in", (0.1, -0.2, 0.3)), P("pred", "norm", "in", (0.3, 0.9)),
              P("pred", "angle", "in", (0.2, 0.7)), P("rotate", params=(0.3,), children=(HALF,)), P("scale", params=(1.5,), children=(DISC,)), P("xor", children=(P("or", children=(DISC, HALF)), HALF2))]
     def ref(self, n):

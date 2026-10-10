@@ -34,7 +34,7 @@ def small_p(seed=0, h=8):
     return new_expert(seed, h)
 
 
-# ================================================================ monde continu
+# ================================================================ continuous world
 
 class WorldTests(unittest.TestCase):
     def test_dims(self): self.assertEqual((D, D_CUE), (16, 8))
@@ -100,7 +100,7 @@ for _n in NOISES:
     setattr(WorldTests, f"test_noise_{_n}", _make_noise_test(_n))
 
 
-# ================================================================ générateurs et certificats
+# ================================================================ generators and certificates
 
 class GeneratorTests(unittest.TestCase):
     @classmethod
@@ -129,7 +129,7 @@ class GeneratorTests(unittest.TestCase):
     def test_adversarial_increases_disagreement(self):
         p = train(new_expert(0), self.X, self.r.rule(self.X), 150)
         st = self.gen.sample(64, G(5)); adv = self.gen.sample_adversarial(64, G(5), lambda Z: mlp(p, Z), self.r.rule, start=st.clone())
-        d0 = float((mlp(p, st).argmax(1) != self.r.rule(st)).float().mean()); d1 = float((mlp(p, adv).argmax(1) != self.r.rule(adv)).float().mean()); self.assertGreaterEqual(d1, d0 - 0.1)   # recherche adversariale : pas de garantie d'amélioration (rapporté)
+        d0 = float((mlp(p, st).argmax(1) != self.r.rule(st)).float().mean()); d1 = float((mlp(p, adv).argmax(1) != self.r.rule(adv)).float().mean()); self.assertGreaterEqual(d1, d0 - 0.1)   # adversarial search: no guarantee of improvement (reported)
     def test_memory_much_smaller_than_data(self): self.assertLess(self.gen.memory_bytes() * 10, self.X.numel() * 4)
     def test_no_dataset_stored(self):
         for v in vars(self.gen).values():
@@ -193,7 +193,7 @@ class CoverageTests(unittest.TestCase):
         for k in ("boundary_shift", "rare_region", "local_bump", "global"): self.assertEqual(damaged(r.rule, k, r, g)(torch.randn(5, D)).shape, (5,))
 
 
-# ================================================================ courbure
+# ================================================================ curvature
 
 class CurvatureTests(unittest.TestCase):
     @classmethod
@@ -249,7 +249,7 @@ class SecondOrderExperimentTests(unittest.TestCase):
         f = [r["actual_flip_rate"] for r in self.res[0][0]]; self.assertLessEqual(f[0], f[-1])
 
 
-# ================================================================ découverte de règles et système
+# ================================================================ rule discovery and system
 
 class RuleDiscoveryTests(unittest.TestCase):
     def test_halfspace(self):
@@ -350,7 +350,7 @@ class CapacityRegenerationTests(unittest.TestCase):
     def test_merge_no_crash(self): s = copy.deepcopy(self.s); from collections import Counter; s._merge(Counter())
 
 
-# ================================================================ découverte
+# ================================================================ discovery
 
 class DiscoveryTests(unittest.TestCase):
     def test_fit_rotate(self):
@@ -408,7 +408,7 @@ class ExperimentHelpersTests(unittest.TestCase):
     def test_latent(self): self.assertGreater(latent_factors(0, 3)["factor_recall"], 0.3)
 
 
-# ================================================================ non-énumération, lot scellé, hypothèses
+# ================================================================ non-enumeration, sealed set, hypotheses
 
 class NoEnumerationTests(unittest.TestCase):
     def test_no_enumeration_symbol(self):

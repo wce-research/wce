@@ -78,7 +78,7 @@ print()
 world.show_history()
 
 
-print("\n=== COMMANDE INCONNUE ===")
+print("\n=== UNKNOWN COMMAND ===")
 
 try:
     parse_action(
