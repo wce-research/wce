@@ -22,6 +22,7 @@ from language.command import AdvanceTimeCommand, parse_command
 
 
 ASSETS = {
+    "/site.webmanifest": ("site.webmanifest", "application/manifest+json"),
     "/theme.js": ("theme.js", "text/javascript; charset=utf-8"),
     "/favicon.svg": ("favicon.svg", "image/svg+xml"),
     "/favicon.ico": ("favicon.ico", "image/vnd.microsoft.icon"),
@@ -32,6 +33,9 @@ ASSETS = {
     "/site.js": ("site.js", "text/javascript; charset=utf-8"),
     "/styles.css": ("styles.css", "text/css; charset=utf-8"),
 }
+# Fixed brand allowlist: no arbitrary filesystem serving.
+for asset in ('wce-labs-avatar-light.svg','wce-labs-avatar-dark.svg','wce-labs-avatar-mono.svg','wce-labs-avatar-light.png','wce-labs-avatar-dark.png','wce-labs-logo-light.svg','wce-labs-logo-dark.svg','wce-labs-logo-mono.svg','wce-labs-og.png'):
+    ASSETS['/brand/'+asset] = ('brand/'+asset,'image/svg+xml' if asset.endswith('.svg') else 'image/png')
 ROOT = STATIC.parents[1]
 RESEARCH = {
     "/research/predictive_coverage.json": (ROOT / "results/predictive_coverage.json", "application/json; charset=utf-8"),

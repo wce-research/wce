@@ -78,7 +78,7 @@ class WebTests(unittest.TestCase):
         with patch.dict(os.environ, {"WCE_GITHUB_URL": "https://github.com/wce-test", "WCE_X_URL": "javascript:alert(1)", "WCE_LINKEDIN_URL": "https://linkedin.com.evil.test/wce", "WCE_INSTAGRAM_URL": "https://instagram.com/wce-test"}):
             for route in ("/", "/architecture", "/lab"):
                 body = render_page(route)
-                self.assertIn(b'href="https://github.com/wce-test"', body)
+                self.assertIn(b'href="https://github.com/wce-research"', body)
                 self.assertIn(b'href="https://instagram.com/wce-test"', body)
                 self.assertIn(b'rel="noopener noreferrer"', body)
                 self.assertNotIn(b'javascript:', body)

@@ -1,0 +1,19 @@
+{
+  "name": "WCE Labs",
+  "short_name": "WCE Labs",
+  "description": "World Configuration Engine \u2014 experimental architecture research",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "browser",
+  "background_color": "#f4f2ec",
+  "theme_color": "#f4f2ec",
+  "icons": [
+    {
+      "src": "/brand/wce-labs-avatar-light.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

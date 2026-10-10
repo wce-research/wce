@@ -83,7 +83,8 @@ SOCIALS = [
 def social_links(language='fr') -> str:
     links = []
     for name, variable, hosts, icon in SOCIALS:
-        url = os.environ.get(variable, "").strip()
+        from app.public_identity import GITHUB_ORG
+        url = (GITHUB_ORG if name == "GitHub" else os.environ.get(variable, "").strip())
         try:
             parsed = urlsplit(url)
             valid = (parsed.scheme == "https" and parsed.hostname in hosts
@@ -114,6 +115,9 @@ def render_page(route: str, language='fr') -> bytes:
         raise ValueError('Unsupported language')
     filename, _ = PAGES[route]
     content = render_dossier(route,language) if route in DOSSIERS else translate_content((TEMPLATES / 'pages' / filename).read_text(),language)
+    if route == '/open':
+        from app.public_identity import research_context
+        content += research_context(language)
     if language == 'en' and re.search(r'href="/research/[^"]+\.md"',content):
         content += '<p class="section source-language-note note">Source documents are currently in French. Scientific JSON artifacts are unchanged.</p>'
     # Localise page links only. Source documents, JSON and exported assets keep stable URLs.
@@ -122,11 +126,13 @@ def render_page(route: str, language='fr') -> bytes:
         return f'href="{localized_path(target,language)}"' if target in PAGES else match.group(0)
     content=re.sub(r'href="([^"]+)"',page_link,content)
     ui = {
-      'fr': dict(skip='Aller au contenu',home_label='WCE, accueil',menu_open='Menu +',menu_close='Fermer −',nav_label='Navigation principale',theme_dark='Mode nuit',theme_light='Mode jour',language_label='Langue',footer_message='Une architecture à explorer.<br>Une recherche à partager.',prototype='Prototype expérimental · 2026',open_research='Ouvrir la recherche',follow='SUIVRE WCE',social_label='Réseaux sociaux WCE',description='WCE explore des architectures alternatives d’intelligence artificielle. Architecture explicite, résultats mesurés et recherche ouverte.'),
-      'en': dict(skip='Skip to content',home_label='WCE, home',menu_open='Menu +',menu_close='Close −',nav_label='Main navigation',theme_dark='Dark mode',theme_light='Light mode',language_label='Language',footer_message='An architecture to explore.<br>Research to share.',prototype='Experimental prototype · 2026',open_research='Open the research',follow='FOLLOW WCE',social_label='WCE social profiles',description='WCE explores alternative AI architectures. Explicit mechanisms, measured results and open research.'),
+      'fr': dict(skip='Aller au contenu',home_label='WCE Labs, accueil',menu_open='Menu +',menu_close='Fermer −',nav_label='Navigation principale',theme_dark='Mode nuit',theme_light='Mode jour',language_label='Langue',footer_message='Une architecture à explorer.<br>Une recherche à partager.',prototype='Prototype expérimental · 2026',open_research='Ouvrir la recherche',follow='SUIVRE WCE',social_label='Réseaux sociaux WCE',description='WCE explore des architectures alternatives d’intelligence artificielle. Architecture explicite, résultats mesurés et recherche ouverte.'),
+      'en': dict(skip='Skip to content',home_label='WCE Labs, home',menu_open='Menu +',menu_close='Close −',nav_label='Main navigation',theme_dark='Dark mode',theme_light='Light mode',language_label='Language',footer_message='An architecture to explore.<br>Research to share.',prototype='Experimental prototype · 2026',open_research='Open the research',follow='FOLLOW WCE',social_label='WCE social profiles',description='WCE explores alternative AI architectures. Explicit mechanisms, measured results and open research.'),
     }[language]
+    from app.public_identity import metadata, footer_links, DESCRIPTIONS
+    ui['description']=DESCRIPTIONS[language]
     return Template((TEMPLATES / 'layout.html').read_text()).substitute(
-        **ui,language=language,title=escape(page_title(route,language)),navigation=navigation_html(route,language),socials=social_links(language),
+        **ui,public_metadata=metadata(route,language,page_title(route,language)),official_links=footer_links(language),language=language,title=escape(page_title(route,language)),navigation=navigation_html(route,language),socials=social_links(language),
         home=localized_path('/',language),open_url=localized_path('/open',language),fr_url=localized_path(route,'fr'),en_url=localized_path(route,'en'),
         fr_current=' aria-current="true"' if language == 'fr' else '',en_current=' aria-current="true"' if language == 'en' else '',
         page_script='<script type="module" src="/app.js"></script>' if route == '/lab' else '',content=content,
