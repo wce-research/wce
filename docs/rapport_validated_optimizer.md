@@ -1,314 +1,314 @@
-# Rapport — WCE Validated Optimizer
+# Report — WCE Validated Optimizer
 
-Sous-jalon EXPLORATOIRE du jalon « Deep Compositional Structure Discovery & Model-Class Boundary ».
-Données : partition **dev uniquement**, **vrais atomes fournis**. Ni la validation, ni le test confirmatoire, ni le lot
-scellé n'ont été touchés. Tout est `POST-HOC / EXPLORATORY`.
+EXPLORATORY sub-milestone of the milestone "Deep Compositional Structure Discovery & Model-Class Boundary".
+Data: **dev split only**, **true atoms provided**. Neither the validation split, nor the confirmatory test, nor the
+sealed set was touched. Everything is `POST-HOC / EXPLORATORY`.
 
-Le diagnostic qui motive ce sous-jalon (`docs/rapport_downstream_selection_loss.md`) a été commité AVANT la correction
-(commit `3074abe`) et n'a pas été réécrit.
+The diagnosis that motivates this sub-milestone (`docs/rapport_downstream_selection_loss.md`) was committed BEFORE the fix
+(commit `3074abe`) and has not been rewritten.
 
-Sources : `results/deep_validated_summary.json` ; runs AWS `wce-deepvo-20261004-162019` (expérience à deux bras, 768
-sous-unités) et `wce-deepopt-20261004-163055` (diagnostic de l'optimiseur, 64 tâches), aucune unité en erreur.
-Cibles : `make deep-run-arms`, `make deep-run-optimizer`, `make deep-vo-aggregate`, `make deep-vo-report`.
+Sources: `results/deep_validated_summary.json`; AWS runs `wce-deepvo-20261004-162019` (two-arm experiment, 768
+sub-units) and `wce-deepopt-20261004-163055` (optimizer diagnosis, 64 tasks), no unit in error.
+Targets: `make deep-run-arms`, `make deep-run-optimizer`, `make deep-vo-aggregate`, `make deep-vo-report`.
 
-Précision sur les effectifs : chaque jeu de « 128 tâches » contient 64 structures distinctes, chacune observée dans
-deux régimes (standard et riche). Les deux jeux n'ont aucune structure en commun.
+Clarification on sample sizes: each set of "128 tasks" contains 64 distinct structures, each observed in
+two regimes (standard and rich). The two sets have no structure in common.
 
 ## Verdict
 
-| Question | Réponse |
+| Question | Answer |
 |---|---|
-| Mauvais optimiseur (mécanisme) ? | Secondaire. Le pas d'Adam éjecte un bon point en 5 pas, mais réduire le pas ou la douceur ne change pas le point d'arrivée. |
-| Mauvais objectif de substitution ? | **Oui, cause principale.** L'objectif continu s'améliore dans 94 % des cas pendant que l'accord réel se dégrade dans 100 %. |
-| Instabilité numérique ? | Présente, non causale. Les deux ajusteurs et les deux précisions aboutissent à la même issue. |
-| Mauvais critère d'acceptation ? | **Oui, second facteur.** Sans critère : 7 % de récupération ; critère de substitution : 16 % ; vraisemblance profilée : 54 %. |
+| Bad optimizer (mechanism)? | Secondary. Adam's step size ejects a good point in 5 steps, but reducing the step size or the softness does not change the end point. |
+| Bad surrogate objective? | **Yes, main cause.** The continuous objective improves in 94% of cases while the real agreement degrades in 100%. |
+| Numerical instability? | Present, not causal. Both fitters and both precisions reach the same outcome. |
+| Bad acceptance criterion? | **Yes, second factor.** Without a criterion: 7% recovery; surrogate criterion: 16%; profiled likelihood: 54%. |
 
-Le garde-fou généralise et le critère fixé d'avance est atteint. Il ne récupère pas tout : ne pas ajuster du tout ferait
-mieux sur ces tâches où les paramètres de départ sont déjà justes.
+The guardrail generalises and the criterion fixed in advance is met. It does not recover everything: not fitting at all would do
+better on these tasks where the starting parameters are already correct.
 
-## La correction (un seul étage)
+## The fix (a single stage)
 
-`core/deep_fit.py` : `validated_fit` — état initial → proposition de l'optimiseur → évaluation → commit ou rollback.
+`core/deep_fit.py`: `validated_fit` — initial state → optimizer proposal → evaluation → commit or rollback.
 
-- **Périmètre** : uniquement l'ajustement d'un candidat EXISTANT (une initialisation, qui est l'état du candidat). Les
-  ajustements à plusieurs initialisations aléatoires (atomes) n'ont pas d'état initial à protéger et ne sont pas
-  concernés. Générateur, simplification, classement, MDL, métrique, découverte de primitives et politique de mesure sont
-  inchangés ; l'optimiseur lui-même est inchangé.
-- **Critère** : vraisemblance profilée des prédictions dures sur les observations — celle que le système utilise ensuite
-  pour enregistrer et classer. Aucune vérité.
-- **Tolérance** : 1e-9 nat.
-- **Égalité** (écart ≤ tolérance) : rollback — sans preuve d'amélioration, l'état initial est conservé.
-- **NaN / inf** dans les paramètres proposés ou dans leur critère : rollback. Si le critère de l'état initial est non fini
-  et la proposition finie : commit.
-- **Rollback** : l'état initial est un tenseur distinct, jamais modifié en place (vérifié par une assertion) ; revenir en
-  arrière consiste à le rendre tel quel, pas à le reconstruire.
-- Le budget est débité même en cas de rollback (le calcul a eu lieu).
+- **Scope**: only the fit of an EXISTING candidate (one initialisation, which is the candidate's state). Fits
+  with several random initialisations (atoms) have no initial state to protect and are not
+  concerned. Generator, simplification, ranking, MDL, metric, primitive discovery and measurement policy are
+  unchanged; the optimizer itself is unchanged.
+- **Criterion**: profiled likelihood of the hard predictions on the observations — the one the system then uses
+  to record and rank. No truth.
+- **Tolerance**: 1e-9 nat.
+- **Tie** (gap ≤ tolerance): rollback — without evidence of improvement, the initial state is kept.
+- **NaN / inf** in the proposed parameters or in their criterion: rollback. If the criterion of the initial state is non-finite
+  and the proposal is finite: commit.
+- **Rollback**: the initial state is a distinct tensor, never modified in place (checked by an assertion); rolling
+  back consists in returning it as is, not in rebuilding it.
+- The budget is debited even in case of rollback (the computation took place).
 
-## 1. Le garde-fou généralise-t-il sur les 128 nouvelles tâches ?
+## 1. Does the guardrail generalise to the 128 new tasks?
 
-Oui. Critère fixé avant résultat : au moins +20 points de récupération au seuil 0,99, sans baisse d'accord moyen.
+Yes. Criterion fixed before the result: at least +20 points of recovery at threshold 0.99, with no drop in mean agreement.
 
-| | Bras A (pipeline gelé) | Bras B (garde-fou) | Différence appariée | IC 95 % | Taille d'effet |
+| | Arm A (frozen pipeline) | Arm B (guardrail) | Paired difference | 95% CI | Effect size |
 |---|---|---|---|---|---|
-| Récupération ≥ 0,99 | 7,0 % | 53,9 % | **+46,9 points** | [+38,2 ; +55,6] | 0,94 |
-| Accord fonctionnel moyen | 0,958 | 0,972 | +0,013 | [+0,010 ; +0,017] | 0,61 |
+| Recovery ≥ 0.99 | 7.0% | 53.9% | **+46.9 points** | [+38.2, +55.6] | 0.94 |
+| Mean functional agreement | 0.958 | 0.972 | +0.013 | [+0.010, +0.017] | 0.61 |
 
-Critère atteint. Sur les 128 tâches du diagnostic : 9,4 % → 59,4 % (+50,0 points, IC [41,3 ; 58,7]), très proche du
-contrefactuel annoncé (57 %).
+Criterion met. On the 128 tasks of the diagnosis: 9.4% → 59.4% (+50.0 points, CI [41.3, 58.7]), very close to the
+announced counterfactual (57%).
 
-## 2. Combien de récupération est réellement restaurée ?
+## 2. How much recovery is actually restored?
 
-Nouvelles tâches :
+New tasks:
 
-| Seuil | Bras A | Bras B | Différence | IC 95 % |
+| Threshold | Arm A | Arm B | Difference | 95% CI |
 |---|---|---|---|---|
-| ≥ 0,90 | 94,5 % | 94,5 % | 0,0 | [−2,2 ; +2,2] |
-| ≥ 0,95 | 79,7 % | 82,0 % | +2,3 | [−1,7 ; +6,4] |
-| ≥ 0,97 | 53,9 % | 69,5 % | +15,6 | [+9,3 ; +21,9] |
-| ≥ 0,99 | 7,0 % | 53,9 % | +46,9 | [+38,2 ; +55,6] |
+| ≥ 0.90 | 94.5% | 94.5% | 0.0 | [−2.2, +2.2] |
+| ≥ 0.95 | 79.7% | 82.0% | +2.3 | [−1.7, +6.4] |
+| ≥ 0.97 | 53.9% | 69.5% | +15.6 | [+9.3, +21.9] |
+| ≥ 0.99 | 7.0% | 53.9% | +46.9 | [+38.2, +55.6] |
 
-| Nouvelles tâches | Bras A | Bras B |
+| New tasks | Arm A | Arm B |
 |---|---|---|
-| Vraisemblance profilée de la solution retenue | −131,8 | −129,0 |
-| Erreurs sur les observations | 39,6 | 38,4 |
-| Accord en zone observée | 0,959 | 0,975 |
-| Structure exacte / équivalente | 39 % / 51 % | 45 % / 57 % |
-| Nombre d'atomes retenus | 3,05 | 3,05 |
-| Ajustements acceptés / annulés par tâche | — | 6,1 / 5,3 |
-| Équivalents-ajustement | 28,1 | 27,2 |
+| Profiled likelihood of the retained solution | −131.8 | −129.0 |
+| Errors on the observations | 39.6 | 38.4 |
+| Agreement in the observed zone | 0.959 | 0.975 |
+| Exact / equivalent structure | 39% / 51% | 45% / 57% |
+| Number of atoms retained | 3.05 | 3.05 |
+| Fits accepted / rolled back per task | — | 6.1 / 5.3 |
+| Fit-equivalents | 28.1 | 27.2 |
 
-Le gain est concentré au sommet de l'échelle : le garde-fou ne change rien aux seuils 0,90 et 0,95, il transforme des
-solutions « presque bonnes » en solutions exactes. Tableau croisé au seuil 0,99 : 60 tâches récupérées par B seul, 9 par
-les deux, 59 par aucun, **0 par A seul**. Près de la moitié des ajustements (46 %) sont annulés.
+The gain is concentrated at the top of the scale: the guardrail changes nothing at thresholds 0.90 and 0.95, it turns
+"almost good" solutions into exact solutions. Cross table at threshold 0.99: 60 tasks recovered by B only, 9 by
+both, 59 by neither, **0 by A only**. Nearly half of the fits (46%) are rolled back.
 
-Plafond : sans aucun ajustement, le candidat classé premier avant ajustement atteint 0,99 dans 86 à 89 % des tâches. Le
-garde-fou restaure donc environ 60 % de ce qui est restaurable.
+Ceiling: without any fit, the candidate ranked first before fitting reaches 0.99 in 86 to 89% of the tasks. The
+guardrail therefore restores about 60% of what is restorable.
 
-## 3. Dégrade-t-il certaines tâches ?
+## 3. Does it degrade some tasks?
 
-Oui, rarement. Sur les nouvelles tâches : accord amélioré dans 59,4 % des tâches, inchangé dans 35,9 %, **dégradé dans
-4,7 %** (6 tâches). Sur les tâches du diagnostic : 61,7 % / 35,9 % / 2,3 %.
+Yes, rarely. On the new tasks: agreement improved in 59.4% of the tasks, unchanged in 35.9%, **degraded in
+4.7%** (6 tasks). On the tasks of the diagnosis: 61.7% / 35.9% / 2.3%.
 
-Pires cas : 0,964 → 0,854 et 0,900 → 0,872 (nouvelles tâches, standard, profondeur 4) ; 0,951 → 0,841 (diagnostic,
-standard, profondeur 4). Aucune de ces tâches n'était au-dessus de 0,99 dans le bras A : le garde-fou n'a fait perdre
-aucune récupération. Le mécanisme n'a pas été analysé en détail ; l'explication la plus probable est que conserver un
-candidat différent change les atomes réinjectés aux tours suivants, et donc la structure finalement classée première.
+Worst cases: 0.964 → 0.854 and 0.900 → 0.872 (new tasks, standard, depth 4); 0.951 → 0.841 (diagnosis,
+standard, depth 4). None of these tasks was above 0.99 in arm A: the guardrail caused no
+loss of recovery. The mechanism has not been analysed in detail; the most probable explanation is that keeping a
+different candidate changes the atoms reinjected in the following rounds, and therefore the structure finally ranked first.
 
-## 4. Le bénéfice est-il stable par profondeur et régime ?
+## 4. Is the benefit stable across depth and regime?
 
-Par profondeur, oui. Par régime, non.
+Across depth, yes. Across regime, no.
 
-Nouvelles tâches, récupération ≥ 0,99 :
+New tasks, recovery ≥ 0.99:
 
-| | Bras A | Bras B | Différence | IC 95 % | Δ accord moyen | Améliorées / dégradées |
+| | Arm A | Arm B | Difference | 95% CI | Δ mean agreement | Improved / degraded |
 |---|---|---|---|---|---|---|
-| d2 | 25,0 % | 81,3 % | +56,3 | [+38,4 ; +74,1] | +0,013 | 78 % / 0 % |
-| d3 | 0,0 % | 62,5 % | +62,5 | [+45,1 ; +79,9] | +0,018 | 63 % / 0 % |
-| d4 | 3,1 % | 40,6 % | +37,5 | [+20,1 ; +54,9] | +0,007 | 47 % / 13 % |
-| d5 | 0,0 % | 31,3 % | +31,3 | [+14,6 ; +47,9] | +0,016 | 50 % / 6 % |
-| Standard | 1,6 % | 37,5 % | +35,9 | [+24,0 ; +47,9] | +0,011 | 47 % / 8 % |
-| Riche | 12,5 % | 70,3 % | +57,8 | [+45,5 ; +70,1] | +0,016 | 72 % / 2 % |
+| d2 | 25.0% | 81.3% | +56.3 | [+38.4, +74.1] | +0.013 | 78% / 0% |
+| d3 | 0.0% | 62.5% | +62.5 | [+45.1, +79.9] | +0.018 | 63% / 0% |
+| d4 | 3.1% | 40.6% | +37.5 | [+20.1, +54.9] | +0.007 | 47% / 13% |
+| d5 | 0.0% | 31.3% | +31.3 | [+14.6, +47.9] | +0.016 | 50% / 6% |
+| Standard | 1.6% | 37.5% | +35.9 | [+24.0, +47.9] | +0.011 | 47% / 8% |
+| Rich | 12.5% | 70.3% | +57.8 | [+45.5, +70.1] | +0.016 | 72% / 2% |
 
-Par cellule (16 tâches chacune) :
+Per cell (16 tasks each):
 
-| Nouvelles tâches | d2 | d3 | d4 | d5 |
+| New tasks | d2 | d3 | d4 | d5 |
 |---|---|---|---|---|
-| Standard, A → B | 6 % → 75 % | 0 % → 56 % | 0 % → 13 % | 0 % → 6 % |
-| Riche, A → B | 44 % → 88 % | 0 % → 69 % | 6 % → 69 % | 0 % → 56 % |
+| Standard, A → B | 6% → 75% | 0% → 56% | 0% → 13% | 0% → 6% |
+| Rich, A → B | 44% → 88% | 0% → 69% | 6% → 69% | 0% → 56% |
 
-| Tâches du diagnostic | d2 | d3 | d4 | d5 |
+| Tasks of the diagnosis | d2 | d3 | d4 | d5 |
 |---|---|---|---|---|
-| Standard, A → B | 6 % → 56 % | 0 % → 44 % | 0 % → 31 % | 0 % → 13 % |
-| Riche, A → B | 50 % → 81 % | 19 % → 75 % | 0 % → 88 % | 0 % → 88 % |
+| Standard, A → B | 6% → 56% | 0% → 44% | 0% → 31% | 0% → 13% |
+| Rich, A → B | 50% → 81% | 19% → 75% | 0% → 88% | 0% → 88% |
 
-Le garde-fou préserve aussi les structures profondes en régime riche (56 à 88 % à la profondeur 5). En régime standard,
-le bénéfice s'éteint aux profondeurs 4 et 5 sur les nouvelles tâches : +12,5 points [−5,7 ; +30,7] et +6,3 points
-[−7,1 ; +19,6], intervalles incluant zéro, et un accord moyen qui ne progresse pas à la profondeur 4 (−0,003
-[−0,021 ; +0,016]). C'est là aussi que se trouvent les dégradations.
+The guardrail also preserves deep structures in the rich regime (56 to 88% at depth 5). In the standard regime,
+the benefit vanishes at depths 4 and 5 on the new tasks: +12.5 points [−5.7, +30.7] and +6.3 points
+[−7.1, +19.6], intervals including zero, and a mean agreement that does not progress at depth 4 (−0.003
+[−0.021, +0.016]). This is also where the degradations are found.
 
-## 5. Pourquoi l'optimiseur déplace-t-il des solutions déjà bonnes ?
+## 5. Why does the optimizer move solutions that are already good?
 
-Diagnostic sur 64 tâches, deux points de départ quasi parfaits : la vraie structure aux vrais paramètres (accord 1,000)
-et le candidat classé premier avant ajustement (accord 0,996). L'optimiseur n'a pas été modifié ; les variantes
-ci-dessous sont des mesures. La trace reproduit `fit_batch` exactement (écart nul).
+Diagnosis on 64 tasks, two near-perfect starting points: the true structure at the true parameters (agreement 1.000)
+and the candidate ranked first before fitting (agreement 0.996). The optimizer was not modified; the variants
+below are measurements. The trace reproduces `fit_batch` exactly (zero gap).
 
-### Trajectoire moyenne depuis les vrais paramètres
+### Mean trajectory from the true parameters
 
-| Pas | Raideur | Accord réel | Erreurs sur les données | Objectif continu (vraisemblance robuste) | Vraisemblance profilée | Norme du gradient | Déplacement max |
+| Step | Steepness | Real agreement | Errors on the data | Continuous objective (robust likelihood) | Profiled likelihood | Gradient norm | Max displacement |
 |---|---|---|---|---|---|---|---|
-| 0 | 4 | 1,000 | 37,9 | −137,0 | −128,7 | 40,1 | 0,00 |
-| 5 | 5 | 0,926 | 61,3 | −165,7 | −176,8 | 25,0 | 0,22 |
-| 10 | 6 | 0,937 | 54,4 | −154,4 | −163,4 | 19,8 | 0,33 |
-| 20 | 8 | 0,952 | 47,8 | −142,5 | −150,3 | 17,0 | 0,39 |
-| 40 | 12 | 0,960 | 43,2 | −136,5 | −140,6 | 9,9 | 0,47 |
-| 60 | 16 | 0,963 | 41,4 | −134,9 | −136,7 | 6,7 | 0,52 |
-| 80 | 20 | 0,963 | 40,3 | −134,0 | −134,1 | 11,5 | 0,59 |
-| 100 | 24 | 0,964 | 39,8 | −133,8 | −132,8 | — | 0,61 |
+| 0 | 4 | 1.000 | 37.9 | −137.0 | −128.7 | 40.1 | 0.00 |
+| 5 | 5 | 0.926 | 61.3 | −165.7 | −176.8 | 25.0 | 0.22 |
+| 10 | 6 | 0.937 | 54.4 | −154.4 | −163.4 | 19.8 | 0.33 |
+| 20 | 8 | 0.952 | 47.8 | −142.5 | −150.3 | 17.0 | 0.39 |
+| 40 | 12 | 0.960 | 43.2 | −136.5 | −140.6 | 9.9 | 0.47 |
+| 60 | 16 | 0.963 | 41.4 | −134.9 | −136.7 | 6.7 | 0.52 |
+| 80 | 20 | 0.963 | 40.3 | −134.0 | −134.1 | 11.5 | 0.59 |
+| 100 | 24 | 0.964 | 39.8 | −133.8 | −132.8 | — | 0.61 |
 
-La solution se dégrade **dans les 5 premiers pas, dans 100 % des tâches**. Les vrais paramètres ne sont pas un point
-stationnaire de l'objectif continu (norme du gradient 40 à la raideur 4, 80 à la raideur 24) ; or Adam avance d'environ
-un pas d'apprentissage par itération quelle que soit la taille du gradient : en 5 pas, chaque paramètre a bougé
-d'environ 0,22. L'optimiseur remonte ensuite vers un optimum de l'objectif continu qui est **meilleur que le point de
-départ pour cet objectif** (−133,8 contre −137,0) mais **moins bon pour le monde** (accord 0,964) et moins bon sur les
-données discrètes (39,8 erreurs contre 37,9).
+The solution degrades **within the first 5 steps, in 100% of the tasks**. The true parameters are not a stationary
+point of the continuous objective (gradient norm 40 at steepness 4, 80 at steepness 24); yet Adam advances by about
+one learning rate per iteration whatever the size of the gradient: in 5 steps, each parameter has moved
+by about 0.22. The optimizer then climbs back towards an optimum of the continuous objective that is **better than the
+starting point for this objective** (−133.8 versus −137.0) but **worse for the world** (agreement 0.964) and worse on the
+discrete data (39.8 errors versus 37.9).
 
-### Hypothèses A à J
+### Hypotheses A to J
 
-| Hypothèse | Mesure | Conclusion |
+| Hypothesis | Measurement | Conclusion |
 |---|---|---|
-| A. Frontière initialement trop adoucie | raideur constante 24 : accord final 0,973 (contre 0,964), récupération 12,5 % (contre 12,5 %) | effet faible ; n'explique pas la perte |
-| B. Pas d'apprentissage trop élevé | pas 0,02 : 0,969 ; pas 0,005 : 0,974 ; récupération 12,5 % | effet faible ; réduit le déplacement (0,61 → 0,16), pas la dégradation |
-| A + B | raideur 24 et pas 0,005 : accord 0,975, récupération 12,5 % | les deux réglages ensemble ne restaurent rien |
-| C. Mauvais conditionnement | conditionnement médian de la hessienne à la raideur 24 : 151 ; supérieur à 10⁴ dans 9 % des tâches | modéré ; pas la cause générale |
-| D. Gradient aligné sur une approximation | objectif continu amélioré dans 94 % des cas, accord dégradé dans 100 % ; gradient non nul aux vrais paramètres | **soutenue** |
-| E. Saturation | 18 % des points saturés à la raideur 4, 75 % à la raideur 24 | mesurée ; pas d'effet propre isolé |
-| F. Paramètres non identifiables | direction plate dans 8 à 13 % des tâches ; courbure négative aux vrais paramètres dans 48 % | contribue : la vérité n'est pas un minimum local de l'objectif dans la moitié des tâches |
-| G. Interaction entre atomes | 1,5 à 3,4 % de la masse de la hessienne est hors des blocs par atome | faible ; rejetée |
-| H. Mauvais calendrier de raideur | calendrier inversé : 0,936 ; constant ≈ croissant | le calendrier actuel n'est pas le problème |
-| I. Optimum continu ≠ optimum fonctionnel | meilleur état selon l'objectif continu : accord 0,968 ; l'objectif monte et la vraisemblance profilée baisse dans 58 % des cas | **soutenue — cause principale** |
-| J. Instabilité numérique | simple contre double précision : accord différent de plus de 0,002 dans 1,6 % des tâches (maximum 0,004) | présente, négligeable |
+| A. Boundary initially too softened | constant steepness 24: final agreement 0.973 (versus 0.964), recovery 12.5% (versus 12.5%) | weak effect; does not explain the loss |
+| B. Learning rate too high | learning rate 0.02: 0.969; learning rate 0.005: 0.974; recovery 12.5% | weak effect; reduces the displacement (0.61 → 0.16), not the degradation |
+| A + B | steepness 24 and learning rate 0.005: agreement 0.975, recovery 12.5% | the two settings together restore nothing |
+| C. Poor conditioning | median conditioning of the Hessian at steepness 24: 151; greater than 10⁴ in 9% of the tasks | moderate; not the general cause |
+| D. Gradient aligned with an approximation | continuous objective improved in 94% of cases, agreement degraded in 100%; non-zero gradient at the true parameters | **supported** |
+| E. Saturation | 18% of the points saturated at steepness 4, 75% at steepness 24 | measured; no isolated effect of its own |
+| F. Non-identifiable parameters | flat direction in 8 to 13% of the tasks; negative curvature at the true parameters in 48% | contributes: the truth is not a local minimum of the objective in half of the tasks |
+| G. Interaction between atoms | 1.5 to 3.4% of the mass of the Hessian lies outside the per-atom blocks | weak; rejected |
+| H. Bad steepness schedule | reversed schedule: 0.936; constant ≈ increasing | the current schedule is not the problem |
+| I. Continuous optimum ≠ functional optimum | best state according to the continuous objective: agreement 0.968; the objective rises and the profiled likelihood falls in 58% of cases | **supported — main cause** |
+| J. Numerical instability | single versus double precision: agreement differing by more than 0.002 in 1.6% of the tasks (maximum 0.004) | present, negligible |
 
-Toutes les variantes de l'optimiseur dégradent l'accord dans 100 % des tâches, sauf la descente monotone (section 8).
+All the variants of the optimizer degrade the agreement in 100% of the tasks, except monotone descent (section 8).
 
-## 6. L'objectif continu est-il mal aligné avec la qualité discrète ?
+## 6. Is the continuous objective misaligned with discrete quality?
 
-Oui. Depuis les vrais paramètres, configuration par défaut :
+Yes. From the true parameters, default configuration:
 
 | | |
 |---|---|
-| L'objectif continu s'améliore | 94 % des tâches |
-| L'accord réel se dégrade | 100 % |
-| L'objectif continu s'améliore ET l'accord se dégrade | 94 % |
-| L'objectif continu s'améliore ET la vraisemblance profilée (discrète) se dégrade | 58 % |
-| La vraisemblance profilée s'améliore | 23 % |
-| Corrélation de rang, le long de la trajectoire, entre objectif continu et accord | 0,51 en moyenne ; négative dans 16 % des tâches |
-| … entre vraisemblance profilée et accord | 0,57 |
-| … entre la perte optimisée (à raideur courante) et accord | 0,37 |
+| The continuous objective improves | 94% of the tasks |
+| The real agreement degrades | 100% |
+| The continuous objective improves AND the agreement degrades | 94% |
+| The continuous objective improves AND the profiled (discrete) likelihood degrades | 58% |
+| The profiled likelihood improves | 23% |
+| Rank correlation, along the trajectory, between continuous objective and agreement | 0.51 on average; negative in 16% of the tasks |
+| … between profiled likelihood and agreement | 0.57 |
+| … between the optimized loss (at current steepness) and agreement | 0.37 |
 
-La corrélation moyenne est positive parce que les deux quantités chutent ensemble au début puis remontent ensemble ; ce
-qui diverge, c'est le point d'arrivée. C'est un problème d'objectif de substitution : l'optimiseur fait ce qu'on lui
-demande, et ce qu'on lui demande n'est pas la qualité fonctionnelle.
+The mean correlation is positive because the two quantities fall together at the beginning and then rise together; what
+diverges is the end point. This is a surrogate-objective problem: the optimizer does what it is
+asked, and what it is asked is not functional quality.
 
-Le critère discret lui-même n'est pas parfaitement aligné : quand la vraisemblance profilée s'améliore (23 % des cas),
-l'accord baisse quand même. Avec 300 à 600 observations bruitées, un état peut mieux expliquer les données que la vérité
-tout en étant fonctionnellement moins bon. C'est ce qui limite le garde-fou.
+The discrete criterion itself is not perfectly aligned: when the profiled likelihood improves (23% of cases),
+the agreement drops anyway. With 300 to 600 noisy observations, a state can explain the data better than the truth
+while being functionally worse. This is what limits the guardrail.
 
-## 7. L'ancien et le nouveau fitter ont-ils des comportements scientifiquement différents ?
+## 7. Do the old and the new fitter have scientifically different behaviours?
 
-Numériquement oui, scientifiquement non.
+Numerically yes, scientifically no.
 
-| Même point de départ, 100 pas | Vrais paramètres (64 tâches) | Premier candidat (64 tâches) | Candidats du diagnostic aval (128 tâches) |
+| Same starting point, 100 steps | True parameters (64 tasks) | First candidate (64 tasks) | Candidates of the downstream diagnosis (128 tasks) |
 |---|---|---|---|
-| Écart de paramètres > 1e-6 | 33 % | 36 % | — |
-| Écart de paramètres > 1e-3 | 4,7 % | 1,6 % | 28 % |
-| Écart maximal de paramètres | 0,13 | 0,0014 | 1,01 |
-| Écart maximal d'accord | 0,0075 | 0,0005 | 0,035 |
-| Accord moyen, ancien / nouveau | 0,9640 / 0,9639 | 0,9629 / 0,9629 | — |
-| Erreurs sur les données, ancien / nouveau | 39,66 / 39,75 | 40,31 / 40,31 | — |
-| Même issue au seuil 0,99 | 100 % | 100 % | — |
-| Même premier classé / même ordre complet | — | — | 98,4 % / 86,7 % |
-| Temps par ajustement isolé, ancien / nouveau | 0,200 s / 0,181 s | 0,192 s / 0,176 s | — |
+| Parameter gap > 1e-6 | 33% | 36% | — |
+| Parameter gap > 1e-3 | 4.7% | 1.6% | 28% |
+| Maximum parameter gap | 0.13 | 0.0014 | 1.01 |
+| Maximum agreement gap | 0.0075 | 0.0005 | 0.035 |
+| Mean agreement, old / new | 0.9640 / 0.9639 | 0.9629 / 0.9629 | — |
+| Errors on the data, old / new | 39.66 / 39.75 | 40.31 / 40.31 | — |
+| Same outcome at threshold 0.99 | 100% | 100% | — |
+| Same first-ranked / same complete order | — | — | 98.4% / 86.7% |
+| Time per isolated fit, old / new | 0.200 s / 0.181 s | 0.192 s / 0.176 s | — |
 
-L'origine de l'écart est l'arrondi de l'initialisation en simple précision dans l'ancien ajusteur (≈ 1e-7), amplifié par
-100 pas d'optimisation. Les deux ajusteurs dégradent autant et aboutissent à la même issue.
+The origin of the gap is the rounding of the initialisation to single precision in the old fitter (≈ 1e-7), amplified by
+100 optimization steps. The two fitters degrade as much and reach the same outcome.
 
-**H10(b) (écart ≤ 1e-6) est réfutée sur les composites.** L'ajusteur par lots n'est plus qualifié de numériquement
-équivalent : c'est une autre implémentation, avec un compromis mesuré — environ 7 fois plus rapide par lot de 8
-initialisations, 1,1 fois pour un ajustement isolé, même premier classé dans 98 % des tâches, même ordre complet dans
-87 %. La documentation de `core/deep_fit.py` a été corrigée en ce sens.
+**H10(b) (gap ≤ 1e-6) is refuted on the composites.** The batch fitter is no longer described as numerically
+equivalent: it is another implementation, with a measured trade-off — about 7 times faster per batch of 8
+initialisations, 1.1 times for an isolated fit, same first-ranked in 98% of the tasks, same complete order in
+87%. The documentation of `core/deep_fit.py` has been corrected accordingly.
 
-## 8. Un best-so-far ou un early stopping suffit-il ?
+## 8. Is a best-so-far or an early stopping sufficient?
 
-Non, pas mieux que de ne pas optimiser.
+No, not better than not optimizing.
 
-| Départ aux vrais paramètres | Accord moyen | Récupération ≥ 0,99 |
+| Start at the true parameters | Mean agreement | Recovery ≥ 0.99 |
 |---|---|---|
-| Sans optimiser (baseline « no-op ») | 1,000 | 100 % |
-| État final de l'optimiseur | 0,964 | 12,5 % |
-| Meilleur état rencontré selon l'objectif continu | 0,968 | 19 % |
-| Meilleur état rencontré selon la vraisemblance profilée | 0,988 | 70 % |
-| Arrêt précoce (dès que la vraisemblance profilée passe sous sa valeur initiale) | 1,000 | 100 % |
-| Descente monotone à raideur fixe | 0,998 | 94 % |
+| Without optimizing ("no-op" baseline) | 1.000 | 100% |
+| Final state of the optimizer | 0.964 | 12.5% |
+| Best state encountered according to the continuous objective | 0.968 | 19% |
+| Best state encountered according to the profiled likelihood | 0.988 | 70% |
+| Early stopping (as soon as the profiled likelihood falls below its initial value) | 1.000 | 100% |
+| Monotone descent at fixed steepness | 0.998 | 94% |
 
-| Départ au premier candidat | Accord moyen | Récupération ≥ 0,99 |
+| Start at the first candidate | Mean agreement | Recovery ≥ 0.99 |
 |---|---|---|
-| Sans optimiser | 0,996 | 86 % |
-| État final | 0,963 | 11 % |
-| Meilleur état selon l'objectif continu | 0,967 | 17 % |
-| Meilleur état selon la vraisemblance profilée | 0,987 | 63 % |
-| Arrêt précoce | 0,996 | 86 % |
-| Descente monotone | 0,994 | 80 % |
+| Without optimizing | 0.996 | 86% |
+| Final state | 0.963 | 11% |
+| Best state according to the continuous objective | 0.967 | 17% |
+| Best state according to the profiled likelihood | 0.987 | 63% |
+| Early stopping | 0.996 | 86% |
+| Monotone descent | 0.994 | 80% |
 
-- **Bénéfice de l'optimisation : nul. Dommage : −0,036 d'accord et −75 à −88 points de récupération.** Sur ces points de
-  départ, l'optimisation n'apporte rien et détruit.
-- L'arrêt précoce s'arrête au pas 0 dans toutes les tâches : il équivaut à ne pas optimiser.
-- Le meilleur état selon la vraisemblance profilée est l'état initial dans 64 à 67 % des cas ; sinon c'est un état un peu
-  plus vraisemblable et fonctionnellement moins bon.
-- **Monotonie** : l'optimiseur peut être rendu monotone par rapport à l'objectif qu'il prétend optimiser (un pas n'est
-  gardé que s'il l'améliore). Mais il ne bouge alors presque plus (déplacement 0,009) : la descente monotone « réussit »
-  en étant un quasi no-op. Et si elle avançait, elle irait vers l'optimum de l'objectif continu, qui est le mauvais
-  endroit. Forcer la monotonie sur un critère mal aligné ne résout rien.
+- **Benefit of the optimization: none. Damage: −0.036 of agreement and −75 to −88 points of recovery.** On these
+  starting points, the optimization brings nothing and destroys.
+- Early stopping stops at step 0 in all the tasks: it is equivalent to not optimizing.
+- The best state according to the profiled likelihood is the initial state in 64 to 67% of cases; otherwise it is a state slightly
+  more likely and functionally worse.
+- **Monotonicity**: the optimizer can be made monotone with respect to the objective it claims to optimize (a step is
+  kept only if it improves it). But it then hardly moves any more (displacement 0.009): monotone descent "succeeds"
+  by being a near no-op. And if it did advance, it would go towards the optimum of the continuous objective, which is the wrong
+  place. Forcing monotonicity on a misaligned criterion solves nothing.
 
-## 9. Le vrai problème est-il le mécanisme d'optimisation ou l'objectif optimisé ?
+## 9. Is the real problem the optimization mechanism or the optimized objective?
 
-L'objectif.
+The objective.
 
-- Mécanisme : changer le pas, la raideur ou le calendrier ne change pas la récupération (12,5 % dans toutes les
-  variantes). Le mécanisme explique la brutalité de la chute initiale, pas le point d'arrivée.
-- Objectif : l'optimum de l'objectif continu est à un accord de 0,964 à 0,975, quelle que soit la façon d'y aller.
-- Critère d'acceptation, mesuré par le bras C (même garde-fou, mais critère = objectif continu) :
+- Mechanism: changing the learning rate, the steepness or the schedule does not change the recovery (12.5% in all the
+  variants). The mechanism explains the brutality of the initial drop, not the end point.
+- Objective: the optimum of the continuous objective is at an agreement of 0.964 to 0.975, whatever the way of getting there.
+- Acceptance criterion, measured by arm C (same guardrail, but criterion = continuous objective):
 
-| Nouvelles tâches | Récupération ≥ 0,99 | Accord moyen | Ajustements acceptés / annulés |
+| New tasks | Recovery ≥ 0.99 | Mean agreement | Fits accepted / rolled back |
 |---|---|---|---|
-| A — aucun critère | 7,0 % | 0,958 | — |
-| C — critère de substitution | 16,4 % | 0,962 | 11,6 / 0,6 |
-| B — vraisemblance profilée | 53,9 % | 0,972 | 6,1 / 5,3 |
+| A — no criterion | 7.0% | 0.958 | — |
+| C — surrogate criterion | 16.4% | 0.962 | 11.6 / 0.6 |
+| B — profiled likelihood | 53.9% | 0.972 | 6.1 / 5.3 |
 
-Le critère de substitution accepte presque tout (95 % des propositions), puisque c'est ce que l'optimiseur améliore. Un
-garde-fou n'a de valeur que si son critère est celui qui compte.
+The surrogate criterion accepts almost everything (95% of the proposals), since that is what the optimizer improves. A
+guardrail has value only if its criterion is the one that matters.
 
-## 10. Le Validated Transformation Principle est-il soutenu expérimentalement ici ?
+## 10. Is the Validated Transformation Principle supported experimentally here?
 
-Oui, pour l'ajustement paramétrique, avec une condition.
+Yes, for parametric fitting, with one condition.
 
-**Principe** : toute transformation interne susceptible de modifier un état (paramètres, structure, croyance, fragment,
-primitive, stratégie, poids, code) suit `State → Transformation Proposal → Evaluation → Accept / Reject → Commit /
-Rollback`. Une transformation ne peut pas détruire silencieusement un état déjà meilleur selon les critères disponibles.
+**Principle**: any internal transformation liable to modify a state (parameters, structure, belief, fragment,
+primitive, strategy, weights, code) follows `State → Transformation Proposal → Evaluation → Accept / Reject → Commit /
+Rollback`. A transformation cannot silently destroy a state that is already better according to the available criteria.
 
-**Ce qui est démontré** : appliqué à un seul étage, il restaure +47 points de récupération sur des tâches jamais vues
-(IC [+38 ; +56]), sans coût de calcul supplémentaire, en ne dégradant que 4,7 % des tâches et aucune récupération.
+**What is demonstrated**: applied to a single stage, it restores +47 points of recovery on never-seen tasks
+(CI [+38, +56]), with no additional computation cost, while degrading only 4.7% of the tasks and no recovery.
 
-**La condition** : le critère d'évaluation doit être aligné avec ce qui compte. Le même mécanisme avec le critère de
-substitution ne restaure que 9 points. Le principe protège contre la destruction selon le critère choisi ; il ne corrige
-pas un mauvais critère.
+**The condition**: the evaluation criterion must be aligned with what matters. The same mechanism with the surrogate
+criterion restores only 9 points. The principle protects against destruction according to the chosen criterion; it does not
+correct a bad criterion.
 
-**Ce qui n'est pas démontré** : sa valeur hors de l'ajustement paramétrique, avec des atomes découverts plutôt que
-fournis, ou en test confirmatoire. Il n'est implémenté qu'ici (`validated_fit`), conformément à la consigne.
+**What is not demonstrated**: its value outside parametric fitting, with discovered rather than
+provided atoms, or in a confirmatory test. It is implemented only here (`validated_fit`), in accordance with the instruction.
 
-### Extension possible (proposition, non réalisée)
+### Possible extension (proposal, not carried out)
 
-Par ordre de proximité avec ce qui est mesuré : (1) la simplification, qui retire un atome nécessaire dans 1,6 % des
-tâches et remplacerait sa règle par la même transaction ; (2) les tours de réinjection des atomes polis ; (3) la
-promotion de fragments et de primitives dans les bibliothèques ; (4) les mises à jour de croyance après mesure active.
-Chaque extension demanderait son propre critère observable et sa propre expérience à deux bras.
+In order of proximity to what is measured: (1) simplification, which removes a necessary atom in 1.6% of the
+tasks and would replace its rule with the same transaction; (2) the rounds of reinjection of the polished atoms; (3) the
+promotion of fragments and primitives into the libraries; (4) belief updates after active measurement.
+Each extension would require its own observable criterion and its own two-arm experiment.
 
-### Lien avec l'auto-évolution future (implication architecturale, pas capacité démontrée)
+### Link with future self-evolution (architectural implication, not a demonstrated capability)
 
-La même mécanique pourrait servir d'invariant à des transformations plus ambitieuses : apprentissage structurel,
-consolidation, naissance et retrait de primitives, plasticité neuronale, auto-programmation, évolution architecturale.
-Dans chacun de ces cas, le système modifierait son propre état et aurait besoin de ne pas perdre un état meilleur. Rien
-de cela n'est démontré ici : le seul résultat est qu'un étage d'optimisation qui détruisait près de neuf bonnes solutions sur dix
-cesse de le faire quand ses sorties passent par une validation. La leçon transposable est double — conserver l'état
-avant de le transformer, et choisir un critère d'acceptation qui mesure réellement ce qu'on veut préserver.
+The same mechanics could serve as an invariant for more ambitious transformations: structural learning,
+consolidation, birth and retirement of primitives, neural plasticity, self-programming, architectural evolution.
+In each of these cases, the system would modify its own state and would need not to lose a better state. None
+of this is demonstrated here: the only result is that an optimization stage that was destroying nearly nine good solutions out of ten
+stops doing so when its outputs go through a validation. The transferable lesson is twofold — keep the state
+before transforming it, and choose an acceptance criterion that really measures what one wants to preserve.
 
-## Ce que ce sous-jalon ne résout pas
+## What this sub-milestone does not solve
 
-- L'optimisation elle-même reste inutile sur des candidats déjà justes : le garde-fou atteint 54 à 59 %, le no-op 86 à
-  89 %. La correction suivante, à tester SEULE, porterait sur l'objectif optimisé (ou sur la décision de ne pas optimiser
-  un candidat issu de la synthèse), pas sur le mécanisme.
-- En régime standard aux profondeurs 4–5, le gain n'est pas établi.
-- Tout repose sur des atomes fournis. Avec des atomes découverts, approximatifs, l'optimisation peut être nécessaire et
-  le bilan différent : non mesuré.
-- 16 tâches par cellule, 64 structures par jeu.
-- Rien ici n'est confirmatoire. L'hypothèse pré-enregistrée H10(b) est réfutée sur les composites ; H10(a) (vitesse)
-  n'est soutenue que pour les ajustements par lots (≈ 7× par lot de 8, d'après une mesure locale ponctuelle du début du jalon ; 1,1× mesuré ici pour un ajustement isolé).
+- The optimization itself remains useless on candidates that are already correct: the guardrail reaches 54 to 59%, the no-op 86 to
+  89%. The next fix, to be tested ALONE, would bear on the optimized objective (or on the decision not to optimize
+  a candidate coming from the synthesis), not on the mechanism.
+- In the standard regime at depths 4–5, the gain is not established.
+- Everything rests on provided atoms. With discovered, approximate atoms, the optimization may be necessary and
+  the balance different: not measured.
+- 16 tasks per cell, 64 structures per set.
+- Nothing here is confirmatory. The preregistered hypothesis H10(b) is refuted on the composites; H10(a) (speed)
+  is supported only for batch fits (≈ 7× per batch of 8, according to a one-off local measurement from the start of the milestone; 1.1× measured here for an isolated fit).

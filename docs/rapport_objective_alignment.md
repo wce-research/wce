@@ -1,263 +1,263 @@
-# Rapport — WCE Objective Alignment & Conditional Optimization
+# Report — WCE Objective Alignment & Conditional Optimization
 
-Sous-jalon EXPLORATOIRE du jalon « Deep Compositional Structure Discovery & Model-Class Boundary ».
-Données : partition **dev uniquement**. Ni la validation, ni le test confirmatoire, ni le lot scellé n'ont été touchés.
-Tout est `POST-HOC / EXPLORATORY`.
+EXPLORATORY sub-milestone of the milestone "Deep Compositional Structure Discovery & Model-Class Boundary".
+Data: **dev partition only**. Neither the validation set, nor the confirmatory test, nor the sealed set was touched.
+Everything is `POST-HOC / EXPLORATORY`.
 
-Sources : `results/deep_objective_summary.json` ; runs AWS `wce-deepobj-20261004-165859` (étude par candidat),
-`wce-deepe2e-20261004-170452` (chaîne complète), `wce-deepresid-20261004-172752` (dégradations résiduelles), aucune
-unité en erreur. Cibles : `make deep-run-objectives`, `deep-tune-gate`, `deep-run-e2e`, `deep-run-residual`,
+Sources: `results/deep_objective_summary.json`; AWS runs `wce-deepobj-20261004-165859` (per-candidate study),
+`wce-deepe2e-20261004-170452` (full chain), `wce-deepresid-20261004-172752` (residual degradations), no
+unit in error. Targets: `make deep-run-objectives`, `deep-tune-gate`, `deep-run-e2e`, `deep-run-residual`,
 `deep-obj-aggregate`, `deep-obj-report`.
 
-Jeux de tâches, tous en dev et à structures disjointes entre eux et des jeux précédents : **réglage** de la porte (64
-tâches, 448 candidats) ; **évaluation** (128 tâches, 896 candidats). Chaque jeu de 128 tâches compte 64 structures
-observées dans deux régimes.
+Task sets, all in dev and with structures disjoint from each other and from the previous sets: gate **tuning** (64
+tasks, 448 candidates); **evaluation** (128 tasks, 896 candidates). Each set of 128 tasks contains 64 structures
+observed in two regimes.
 
-## Résumé
+## Summary
 
-- **Quand optimiser** : quand le candidat est approximatif. Le bénéfice est nul ou négatif pour une erreur de paramètres
-  d'environ 0,07, positif à partir d'environ 0,17, et fort au-delà.
-- **Quand ne rien faire** : quand le candidat explique déjà les observations aussi bien que le permet le bruit.
-- **Aucun des six objectifs testés n'est réellement aligné** avec la qualité fonctionnelle sur des candidats déjà bons.
-- **La porte conditionnelle** est la seule politique proche du meilleur dans les trois régimes d'entrée au niveau des
-  candidats. Elle préserve 98 % des bonnes solutions.
-- **Avec des primitives découvertes, le gain ne survit pas** : garde-fou et porte ne font pas mieux, de façon
-  significative, que « toujours optimiser ». Les candidats y sont presque tous mauvais ; il n'y a rien à préserver.
+- **When to optimize**: when the candidate is approximate. The benefit is zero or negative for a parameter error
+  of about 0.07, positive from about 0.17, and strong beyond that.
+- **When to do nothing**: when the candidate already explains the observations as well as the noise allows.
+- **None of the six objectives tested is truly aligned** with functional quality on candidates that are already good.
+- **The conditional gate** is the only policy close to the best in all three input regimes at the candidate
+  level. It preserves 98% of the good solutions.
+- **With discovered primitives, the gain does not survive**: the safeguard and the gate do not do significantly
+  better than "always optimize". The candidates there are almost all bad; there is nothing to preserve.
 
-## Les trois régimes d'entrée
+## The three input regimes
 
-| Régime | Candidats (évaluation) | Accord initial moyen | Candidats déjà ≥ 0,99 |
+| Regime | Candidates (evaluation) | Mean initial agreement | Candidates already ≥ 0.99 |
 |---|---|---|---|
-| A — vrais atomes, vrais paramètres | 128 | 1,000 | 100 % |
-| B — vrais atomes, perturbation faible (σ = 0,03) | 128 | 0,972 | 5 % |
-| B — perturbation moyenne (σ = 0,10) | 128 | 0,924 | 0 % |
-| B — perturbation forte (σ = 0,30) | 128 | 0,804 | 0 % |
-| C — atomes découverts, 3 premiers candidats de la synthèse | 384 | 0,819 | 0 % |
+| A — true atoms, true parameters | 128 | 1.000 | 100% |
+| B — true atoms, weak perturbation (σ = 0.03) | 128 | 0.972 | 5% |
+| B — medium perturbation (σ = 0.10) | 128 | 0.924 | 0% |
+| B — strong perturbation (σ = 0.30) | 128 | 0.804 | 0% |
+| C — discovered atoms, first 3 candidates of the synthesis | 384 | 0.819 | 0% |
 
-## 1. Quand l'optimisation est-elle réellement utile ?
+## 1. When is optimization actually useful?
 
-Courbe « erreur initiale de paramètres → bénéfice attendu de l'optimisation » (variation d'accord, objectif actuel) :
+Curve "initial parameter error → expected benefit of optimization" (change in agreement, current objective):
 
-| Erreur initiale (écart maximal de paramètre) | Accord initial | Toujours optimiser | Garde-fou | Porte conditionnelle |
+| Initial error (maximum parameter deviation) | Initial agreement | Always optimize | Safeguard | Conditional gate |
 |---|---|---|---|---|
-| 0,00 | 1,000 | −0,033 | −0,009 | −0,001 |
-| 0,07 | 0,972 | −0,005 | −0,003 | +0,001 |
-| 0,17 | 0,924 | +0,043 | +0,043 | +0,039 |
-| 0,50 | 0,804 | +0,156 | +0,156 | +0,156 |
+| 0.00 | 1.000 | −0.033 | −0.009 | −0.001 |
+| 0.07 | 0.972 | −0.005 | −0.003 | +0.001 |
+| 0.17 | 0.924 | +0.043 | +0.043 | +0.039 |
+| 0.50 | 0.804 | +0.156 | +0.156 | +0.156 |
 
-Le bénéfice change de signe entre 0,07 et 0,17. Avec des atomes découverts (régime C, accord initial 0,819),
-l'optimisation rapporte +0,019 d'accord par candidat : 73 % des candidats s'améliorent, 17 % se dégradent.
+The benefit changes sign between 0.07 and 0.17. With discovered atoms (regime C, initial agreement 0.819),
+optimization yields +0.019 agreement per candidate: 73% of the candidates improve, 17% degrade.
 
-En chaîne complète avec primitives découvertes, ne jamais optimiser coûte 0,045 d'accord (IC 95 % [0,031 ; 0,058]) et
-fait tomber la récupération à 0,97 de 16 % à 3 %. **Oui : avec des paramètres approximatifs, l'optimisation est utile.**
+In the full chain with discovered primitives, never optimizing costs 0.045 agreement (95% CI [0.031, 0.058]) and
+brings recovery at 0.97 down from 16% to 3%. **Yes: with approximate parameters, optimization is useful.**
 
-## 2. Quand faut-il ne rien faire ?
+## 2. When should nothing be done?
 
-Quand le candidat est déjà bon. En régime A, optimiser détruit 90 à 93 % des bonnes solutions selon l'objectif ; ne rien
-faire les préserve toutes. En chaîne complète avec les vrais atomes (128 tâches) :
+When the candidate is already good. In regime A, optimizing destroys 90 to 93% of the good solutions depending on the
+objective; doing nothing preserves them all. In the full chain with the true atoms (128 tasks):
 
-| Politique | Récupération ≥ 0,99 | ≥ 0,97 | Accord moyen | Équivalents-ajustement | Temps |
+| Policy | Recovery ≥ 0.99 | ≥ 0.97 | Mean agreement | Fit-equivalents | Time |
 |---|---|---|---|---|---|
-| Toujours optimiser | 6,3 % | 58,6 % | 0,963 | 28,3 | 5,6 s |
-| Garde-fou | 57,0 % | 76,6 % | 0,980 | 27,4 | 4,6 s |
-| Porte conditionnelle | 72,7 % | 79,7 % | 0,980 | 19,8 | 2,5 s |
-| Ne jamais optimiser | 88,3 % | 89,1 % | 0,988 | 16,0 | 1,0 s |
+| Always optimize | 6.3% | 58.6% | 0.963 | 28.3 | 5.6 s |
+| Safeguard | 57.0% | 76.6% | 0.980 | 27.4 | 4.6 s |
+| Conditional gate | 72.7% | 79.7% | 0.980 | 19.8 | 2.5 s |
+| Never optimize | 88.3% | 89.1% | 0.988 | 16.0 | 1.0 s |
 
-Signaux observables qui distinguent les cas (calculés avant tout ajustement, moyenne sur les candidats d'évaluation) :
+Observable signals that distinguish the cases (computed before any fit, mean over the evaluation candidates):
 
-| Issue réelle de l'optimisation | Candidats | Taux d'erreur initial | Regroupement spatial du résidu (z) | Écart à la référence locale (z) | Gradient par point |
+| Actual outcome of the optimization | Candidates | Initial error rate | Spatial clustering of the residual (z) | Deviation from the local reference (z) | Gradient per point |
 |---|---|---|---|---|---|
-| A aidé | 567 | 0,18 | 5,7 | +2,6 | 0,44 |
-| Sans effet | 167 | 0,12 | 2,8 | −1,4 | 0,19 |
-| A nui | 162 | 0,14 | 3,1 | −0,8 | 0,25 |
+| Helped | 567 | 0.18 | 5.7 | +2.6 | 0.44 |
+| No effect | 167 | 0.12 | 2.8 | −1.4 | 0.19 |
+| Harmed | 162 | 0.14 | 3.1 | −0.8 | 0.25 |
 
-L'écart à une référence non paramétrique locale (vote de 7 voisins) est le signal le plus net : positif quand
-l'optimisation aide, négatif quand elle nuit ou ne sert à rien. Le « désaccord entre critères » mesuré par un pas
-d'essai ne sépare pas les cas.
+The deviation from a local non-parametric reference (vote of 7 neighbours) is the clearest signal: positive when
+optimization helps, negative when it harms or is of no use. The "disagreement between criteria" measured by a trial
+step does not separate the cases.
 
-## 3. Quel objectif est le mieux aligné avec la qualité réelle ?
+## 3. Which objective is best aligned with actual quality?
 
-Aucun ne l'est sur des candidats déjà bons. Même mécanisme pour tous les objectifs différentiables (Adam, 100 pas) ;
-l'erreur discrète est optimisée par recherche directe.
+None is on candidates that are already good. Same mechanism for all the differentiable objectives (Adam, 100 steps);
+the discrete error is optimized by direct search.
 
-**Régime A (accord initial 1,000)** — où un objectif aligné ne devrait rien abîmer :
+**Regime A (initial agreement 1.000)** — where an aligned objective should damage nothing:
 
-| Objectif | Accord final | Candidats dégradés | L'objectif s'améliore ET l'accord baisse | Corrélation objectif ↔ accord | ≥ 0,99 conservés |
+| Objective | Final agreement | Degraded candidates | The objective improves AND the agreement drops | Correlation objective ↔ agreement | ≥ 0.99 retained |
 |---|---|---|---|---|---|
-| Substitution actuel | 0,968 | 100 % | 89 % | 0,36 | 7 % |
-| Vraisemblance profilée adoucie | 0,955 | 100 % | 84 % | 0,49 | 9 % |
-| Erreur discrète observable | 0,993 | 75 % | 75 % | −0,24 | 72 % |
-| Vraisemblance + a priori sur le déplacement | 0,981 | 99 % | 98 % | 0,27 | 19 % |
-| Local autour des frontières | 0,966 | 100 % | 88 % | 0,43 | 8 % |
-| Robuste aux outliers | 0,967 | 100 % | 90 % | 0,40 | 10 % |
+| Current surrogate | 0.968 | 100% | 89% | 0.36 | 7% |
+| Softened profile likelihood | 0.955 | 100% | 84% | 0.49 | 9% |
+| Observable discrete error | 0.993 | 75% | 75% | −0.24 | 72% |
+| Likelihood + prior on the displacement | 0.981 | 99% | 98% | 0.27 | 19% |
+| Local around the boundaries | 0.966 | 100% | 88% | 0.43 | 8% |
+| Robust to outliers | 0.967 | 100% | 90% | 0.40 | 10% |
 
-**Autres régimes** (accord final ; part où l'objectif s'améliore et l'accord baisse) :
+**Other regimes** (final agreement; share where the objective improves and the agreement drops):
 
-| Objectif | B faible (0,972) | B moyen (0,924) | B fort (0,804) | C découverts (0,819) |
+| Objective | B weak (0.972) | B medium (0.924) | B strong (0.804) | C discovered (0.819) |
 |---|---|---|---|---|
-| Substitution actuel | 0,967 ; 43 % | 0,967 ; 6 % | 0,960 ; 2 % | 0,838 ; 15 % |
-| Vraisemblance profilée adoucie | 0,958 ; 53 % | 0,955 ; 15 % | 0,947 ; 2 % | 0,837 ; 17 % |
-| Erreur discrète observable | 0,977 ; 26 % | 0,967 ; 2 % | 0,894 ; 1 % | 0,824 ; 17 % |
-| Vraisemblance + a priori sur le déplacement | 0,981 ; 16 % | 0,980 ; 0 % | 0,949 ; 0 % | 0,829 ; 10 % |
-| Local autour des frontières | 0,966 ; 44 % | 0,965 ; 9 % | 0,953 ; 2 % | 0,837 ; 14 % |
-| Robuste aux outliers | 0,967 ; 43 % | 0,966 ; 6 % | 0,959 ; 2 % | 0,839 ; 15 % |
+| Current surrogate | 0.967; 43% | 0.967; 6% | 0.960; 2% | 0.838; 15% |
+| Softened profile likelihood | 0.958; 53% | 0.955; 15% | 0.947; 2% | 0.837; 17% |
+| Observable discrete error | 0.977; 26% | 0.967; 2% | 0.894; 1% | 0.824; 17% |
+| Likelihood + prior on the displacement | 0.981; 16% | 0.980; 0% | 0.949; 0% | 0.829; 10% |
+| Local around the boundaries | 0.966; 44% | 0.965; 9% | 0.953; 2% | 0.837; 14% |
+| Robust to outliers | 0.967; 43% | 0.966; 6% | 0.959; 2% | 0.839; 15% |
 
-Lecture :
+Reading:
 
-- **Erreur discrète** : la moins destructrice sur un candidat déjà bon (72 % conservés), mais elle dégrade encore trois
-  candidats sur quatre — réduire les erreurs sur des observations bruitées, c'est s'ajuster au bruit — et elle est la
-  plus faible sur les candidats très perturbés ou découverts.
-- **A priori sur le déplacement** : le mieux aligné pour des perturbations faibles et moyennes (l'accord ne baisse
-  jamais quand l'objectif monte en perturbation moyenne), mais moins bon que l'objectif actuel sur les atomes
-  découverts.
-- **Objectif actuel, local, robuste** : équivalents entre eux à moins de 0,01 près ; les meilleurs sur les candidats très
-  perturbés et découverts.
-- **Vraisemblance profilée adoucie** : jamais la meilleure.
+- **Discrete error**: the least destructive on a candidate that is already good (72% retained), but it still degrades
+  three candidates out of four — reducing the errors on noisy observations means fitting the noise — and it is the
+  weakest on the strongly perturbed or discovered candidates.
+- **Prior on the displacement**: the best aligned for weak and medium perturbations (the agreement never drops
+  when the objective rises under medium perturbation), but worse than the current objective on the discovered
+  atoms.
+- **Current, local, robust objectives**: equivalent to each other to within less than 0.01; the best on the strongly
+  perturbed and discovered candidates.
+- **Softened profile likelihood**: never the best.
 
-Aucun objectif ne domine dans tous les régimes. Le réglage sur le jeu de réglage retient l'objectif robuste, à égalité
-pratique avec l'objectif actuel.
+No objective dominates in all regimes. Tuning on the tuning set retains the robust objective, practically tied
+with the current objective.
 
-## 4. Le gate conditionnel bat-il always / never optimize ?
+## 4. Does the conditional gate beat always / never optimize?
 
-Au niveau des candidats, oui. Porte réglée sur le jeu de réglage uniquement, puis évaluée sur le jeu d'évaluation :
-optimiser si le résidu est spatialement structuré (z ≥ 4) ou si le candidat n'est pas nettement meilleur que la
-référence locale (z ≥ −1) ; sinon préserver ; une proposition n'est acceptée que si elle gagne au moins 2 nats de
-vraisemblance profilée ; l'état retenu est le meilleur état rencontré.
+At the candidate level, yes. Gate tuned on the tuning set only, then evaluated on the evaluation set:
+optimize if the residual is spatially structured (z ≥ 4) or if the candidate is not clearly better than the
+local reference (z ≥ −1); otherwise preserve; a proposal is accepted only if it gains at least 2 nats of
+profile likelihood; the retained state is the best state encountered.
 
-Les quatre taux demandés (896 candidats, 134 bons au départ, 762 mauvais ; objectif robuste retenu par le réglage —
-les chiffres avec l'objectif actuel sont identiques à 0,001 près sur l'accord moyen) :
+The four requested rates (896 candidates, 134 good at the start, 762 bad; robust objective retained by the tuning —
+the figures with the current objective are identical to within 0.001 on the mean agreement):
 
-| Politique | Bonnes solutions préservées | Bonnes détruites | Mauvaises améliorées | Mauvaises non réparées | Mauvaises empirées | Accord moyen | ≥ 0,99 | Candidats optimisés |
+| Policy | Good solutions preserved | Good destroyed | Bad improved | Bad not repaired | Bad worsened | Mean agreement | ≥ 0.99 | Candidates optimized |
 |---|---|---|---|---|---|---|---|---|
-| Toujours optimiser | 10 % | 90 % | 76 % | 24 % | 16 % | 0,911 | 6,0 % | 100 % |
-| Ne jamais optimiser | 100 % | 0 % | 0 % | 100 % | 0 % | 0,880 | 15,0 % | 0 % |
-| Garde-fou | 71 % | 29 % | 73 % | 27 % | 14 % | 0,914 | 15,1 % | 100 % |
-| Garde-fou sur le meilleur état rencontré | 66 % | 34 % | 74 % | 26 % | 15 % | 0,914 | 14,3 % | 100 % |
-| Porte conditionnelle | **98,5 %** | 1,5 % | 64 % | 36 % | 9 % | **0,916** | **18,1 %** | 72 % |
+| Always optimize | 10% | 90% | 76% | 24% | 16% | 0.911 | 6.0% | 100% |
+| Never optimize | 100% | 0% | 0% | 100% | 0% | 0.880 | 15.0% | 0% |
+| Safeguard | 71% | 29% | 73% | 27% | 14% | 0.914 | 15.1% | 100% |
+| Safeguard on the best state encountered | 66% | 34% | 74% | 26% | 15% | 0.914 | 14.3% | 100% |
+| Conditional gate | **98.5%** | 1.5% | 64% | 36% | 9% | **0.916** | **18.1%** | 72% |
 
-Par régime (accord moyen) :
+By regime (mean agreement):
 
-| Politique | A | B faible | B moyen | B fort | C |
+| Policy | A | B weak | B medium | B strong | C |
 |---|---|---|---|---|---|
-| Toujours optimiser | 0,967 | 0,967 | 0,966 | 0,959 | 0,839 |
-| Ne jamais optimiser | 1,000 | 0,972 | 0,924 | 0,804 | 0,819 |
-| Garde-fou | 0,990 | 0,970 | 0,966 | 0,959 | 0,839 |
-| Porte conditionnelle | 0,999 | 0,973 | 0,963 | 0,958 | 0,838 |
+| Always optimize | 0.967 | 0.967 | 0.966 | 0.959 | 0.839 |
+| Never optimize | 1.000 | 0.972 | 0.924 | 0.804 | 0.819 |
+| Safeguard | 0.990 | 0.970 | 0.966 | 0.959 | 0.839 |
+| Conditional gate | 0.999 | 0.973 | 0.963 | 0.958 | 0.838 |
 
-Décisions de la porte : elle préserve 121 candidats sur 128 en régime A, 89 sur 128 en perturbation faible, 21 sur 128 en
-perturbation moyenne, 0 sur 128 en perturbation forte et 17 sur 384 en régime C. Elle apprend donc bien à distinguer
-besoin et danger sur les régimes contrôlés.
+Gate decisions: it preserves 121 candidates out of 128 in regime A, 89 out of 128 under weak perturbation, 21 out of 128 under
+medium perturbation, 0 out of 128 under strong perturbation and 17 out of 384 in regime C. It therefore does learn to distinguish
+need from danger on the controlled regimes.
 
-Son coût : elle répare moins de mauvais candidats (64 % contre 76 %), surtout en perturbation moyenne où elle laisse
-passer 16 % de candidats qui auraient gagné à être optimisés (accord 0,963 contre 0,966).
+Its cost: it repairs fewer bad candidates (64% versus 76%), especially under medium perturbation where it lets
+through 16% of candidates that would have gained from being optimized (agreement 0.963 versus 0.966).
 
-« Garder le meilleur état rencontré » n'apporte rien seul (0,914 dans les deux cas) : le meilleur état selon la
-vraisemblance profilée est souvent un état mieux ajusté au bruit.
+"Keeping the best state encountered" brings nothing on its own (0.914 in both cases): the best state according to the
+profile likelihood is often a state better fitted to the noise.
 
-Aucun composant appris n'a été introduit : la règle à deux seuils suffit à séparer les régimes contrôlés.
+No learned component was introduced: the two-threshold rule is enough to separate the controlled regimes.
 
-## 5. Les 4,7 % de dégradations restantes sont-elles expliquées ?
+## 5. Are the remaining 4.7% of degradations explained?
 
-Oui. Les 9 tâches dégradées par le garde-fou (6 nouvelles, soit 4,7 % ; 3 du diagnostic, soit 2,3 %) ont été rejouées
-avec les deux bras tracés.
+Yes. The 9 tasks degraded by the safeguard (6 new ones, i.e. 4.7%; 3 from the diagnostic, i.e. 2.3%) were replayed
+with both arms traced.
 
-| Explication | Tâches | Ce qui se passe |
+| Explanation | Tasks | What happens |
 |---|---|---|
-| Le chemin de recherche a changé la structure | 5 | La solution du garde-fou est MOINS vraisemblable sur les données et moins bien notée que celle du pipeline gelé, et de structure différente (souvent plus petite : 2 à 4 atomes contre 3 à 5). En annulant des ajustements, le garde-fou réinjecte d'autres atomes dans la synthèse, qui ne produit plus la structure que l'autre bras trouvait. Le critère d'acceptation n'est pas en cause. |
-| Le bruit est exploité par un ajustement accepté | 2 | Un ajustement accepté améliore la vraisemblance profilée et dégrade l'accord réel ; la solution finale du garde-fou explique mieux les données (par exemple −115,9 contre −117,8) et est fonctionnellement moins bonne (0,841 contre 0,951). |
-| Les données préfèrent la moins bonne fonction | 2 | La solution du garde-fou a un meilleur score (pénalité de complexité comprise) ou une meilleure vraisemblance, et un accord plus faible. Le score profilé est insuffisant. |
+| The search path changed the structure | 5 | The safeguard's solution is LESS likely on the data and scored lower than that of the frozen pipeline, and of a different structure (often smaller: 2 to 4 atoms versus 3 to 5). By cancelling fits, the safeguard reinjects other atoms into the synthesis, which no longer produces the structure that the other arm found. The acceptance criterion is not at fault. |
+| The noise is exploited by an accepted fit | 2 | An accepted fit improves the profile likelihood and degrades the actual agreement; the safeguard's final solution explains the data better (for example −115.9 versus −117.8) and is functionally worse (0.841 versus 0.951). |
+| The data prefer the worse function | 2 | The safeguard's solution has a better score (complexity penalty included) or a better likelihood, and a lower agreement. The profile score is insufficient. |
 
-Détail utile : dans ces 9 tâches, 42 des 69 ajustements acceptés par le garde-fou font baisser l'accord réel. Accepter
-un ajustement parce qu'il explique mieux des observations bruitées reste donc risqué ; c'est la raison du gain minimal
-de 2 nats retenu pour la porte. Dans 7 des 9 tâches, aucun des deux bras ne retient la vraie forme ; les écarts d'accord
-vont de 0,001 à 0,110.
+Useful detail: in these 9 tasks, 42 of the 69 fits accepted by the safeguard lower the actual agreement. Accepting
+a fit because it better explains noisy observations therefore remains risky; this is the reason for the minimum gain
+of 2 nats retained for the gate. In 7 of the 9 tasks, neither arm retains the true form; the agreement gaps
+range from 0.001 to 0.110.
 
-## 6. Le gain tient-il avec primitives découvertes ?
+## 6. Does the gain hold with discovered primitives?
 
-**Non.** Chaîne complète `observations → découverte de primitives → composition → politique d'optimisation →
-sélection`, 128 tâches d'évaluation, primitives découvertes par la méthode de référence (ajustement par gradient
-multi-initialisations) :
+**No.** Full chain `observations → primitive discovery → composition → optimisation policy →
+selection`, 128 evaluation tasks, primitives discovered by the reference method (multi-initialization gradient
+fit):
 
-| Politique | ≥ 0,90 | ≥ 0,95 | ≥ 0,97 | ≥ 0,99 | Accord moyen | Différence d'accord avec « toujours » | IC 95 % | Améliorées / dégradées |
+| Policy | ≥ 0.90 | ≥ 0.95 | ≥ 0.97 | ≥ 0.99 | Mean agreement | Agreement difference from "always" | 95% CI | Improved / degraded |
 |---|---|---|---|---|---|---|---|---|
-| Toujours optimiser | 53,9 % | 28,1 % | 16,4 % | 5,5 % | 0,876 | — | — | — |
-| Ne jamais optimiser | 32,0 % | 9,4 % | 3,1 % | 0,0 % | 0,831 | −0,045 | [−0,058 ; −0,031] | 19 % / 76 % |
-| Garde-fou | 53,9 % | 28,9 % | 17,2 % | 5,5 % | 0,877 | +0,001 | [−0,002 ; +0,004] | 9 % / 5 % |
-| Porte conditionnelle | 52,3 % | 22,7 % | 14,1 % | 4,7 % | 0,881 | +0,005 | [−0,003 ; +0,013] | 52 % / 41 % |
+| Always optimize | 53.9% | 28.1% | 16.4% | 5.5% | 0.876 | — | — | — |
+| Never optimize | 32.0% | 9.4% | 3.1% | 0.0% | 0.831 | −0.045 | [−0.058, −0.031] | 19% / 76% |
+| Safeguard | 53.9% | 28.9% | 17.2% | 5.5% | 0.877 | +0.001 | [−0.002, +0.004] | 9% / 5% |
+| Conditional gate | 52.3% | 22.7% | 14.1% | 4.7% | 0.881 | +0.005 | [−0.003, +0.013] | 52% / 41% |
 
-Ni le garde-fou ni la porte ne se distinguent de « toujours optimiser » : les intervalles incluent zéro et la
-récupération à 0,99 ne bouge pas. La porte améliore légèrement l'accord moyen mais fait reculer les seuils 0,95 et 0,97
-(−5,5 et −2,3 points, non significatifs).
+Neither the safeguard nor the gate is distinguishable from "always optimize": the intervals include zero and the
+recovery at 0.99 does not move. The gate slightly improves the mean agreement but pushes back the 0.95 and 0.97 thresholds
+(−5.5 and −2.3 points, not significant).
 
-Par profondeur, porte contre garde-fou (différence d'accord) : −0,006 à d2, −0,009 à d3, **+0,017 [+0,000 ; +0,033]** à
-d4, **+0,015 [+0,001 ; +0,029]** à d5. Un léger avantage aux profondeurs 4 et 5, à la limite de la signification, sur
-32 tâches par profondeur.
+By depth, gate versus safeguard (agreement difference): −0.006 at d2, −0.009 at d3, **+0.017 [+0.000, +0.033]** at
+d4, **+0.015 [+0.001, +0.029]** at d5. A slight advantage at depths 4 and 5, at the edge of significance, on
+32 tasks per depth.
 
-Par régime : standard +0,008 [−0,005 ; +0,021] ; riche +0,002 [−0,008 ; +0,013] pour la porte contre « toujours ».
+By regime: standard +0.008 [−0.005, +0.021]; rich +0.002 [−0.008, +0.013] for the gate versus "always".
 
-Pourquoi le gain ne survit pas : avec des primitives découvertes, les candidats ont un accord initial de 0,82 et aucun
-n'atteint 0,99. Le garde-fou et la porte protègent les bonnes solutions ; il n'y en a pas à protéger. Le facteur
-limitant redevient la découverte de primitives.
+Why the gain does not survive: with discovered primitives, the candidates have an initial agreement of 0.82 and none
+reaches 0.99. The safeguard and the gate protect the good solutions; there are none to protect. The limiting
+factor is once again primitive discovery.
 
-## 7. L'optimisation devient-elle utile quand les paramètres sont approximatifs ?
+## 7. Does optimization become useful when the parameters are approximate?
 
-Oui (section 1) : +0,043 d'accord pour une perturbation moyenne, +0,156 pour une perturbation forte, +0,019 par candidat
-avec des atomes découverts, et +0,045 en chaîne complète par rapport à ne pas optimiser. Dans ces régimes,
-l'optimisation répare 92 à 98 % des candidats perturbés et 73 % des candidats découverts.
+Yes (section 1): +0.043 agreement for a medium perturbation, +0.156 for a strong perturbation, +0.019 per candidate
+with discovered atoms, and +0.045 in the full chain compared with not optimizing. In these regimes,
+optimization repairs 92 to 98% of the perturbed candidates and 73% of the discovered candidates.
 
-Elle ne suffit pas pour autant : après optimisation, 8 à 9 % seulement des candidats perturbés atteignent 0,99, et 2 %
-des candidats découverts. L'optimisation rapproche, elle ne finit pas le travail.
+It is nonetheless not sufficient: after optimization, only 8 to 9% of the perturbed candidates reach 0.99, and 2%
+of the discovered candidates. Optimization brings candidates closer, it does not finish the job.
 
-## 8. Quelle règle doit devenir l'implémentation WCE de référence ?
+## 8. Which rule should become the reference WCE implementation?
 
-**La porte conditionnelle explicite, suivie d'une validation**, avec l'objectif actuel inchangé :
+**The explicit conditional gate, followed by a validation**, with the current objective unchanged:
 
 ```
-candidat → signaux observables → résidu structuré (z ≥ 4) ou candidat pas meilleur que la référence locale (z ≥ −1) ?
-   non → PRESERVE
-   oui → proposition de l'optimiseur → meilleur état rencontré → gain de vraisemblance profilée ≥ 2 nats ?
-            oui → commit        non → rollback
+candidate → observable signals → structured residual (z ≥ 4) or candidate no better than the local reference (z ≥ −1)?
+   no  → PRESERVE
+   yes → optimiser proposal → best state encountered → profiled-likelihood gain ≥ 2 nats?
+            yes → commit        no → rollback
 ```
 
-Justification par les données :
+Justification from the data:
 
-- c'est la seule politique proche du meilleur dans les trois régimes au niveau des candidats (0,999 / 0,958 à 0,973 /
-  0,838), quand « toujours » échoue en A et « jamais » échoue en B et C ;
-- avec les vrais atomes elle récupère 72,7 % à 0,99 contre 57,0 % pour le garde-fou seul, pour 28 % d'équivalents-ajustement en moins ;
-- avec des primitives découvertes elle ne fait pas moins bien que « toujours optimiser » ;
-- elle est interprétable : deux seuils sur deux signaux, une marge d'acceptation, et chaque décision est tracée
+- it is the only policy close to the best in all three regimes at the candidate level (0.999 / 0.958 to 0.973 /
+  0.838), whereas "always" fails in A and "never" fails in B and C;
+- with the true atoms it recovers 72.7% at 0.99 versus 57.0% for the safeguard alone, for 28% fewer fit-equivalents;
+- with discovered primitives it does no worse than "always optimize";
+- it is interpretable: two thresholds on two signals, one acceptance margin, and every decision is traced
   (`OptimizationDecision`).
 
-Réserves, à trancher à la revue :
+Reservations, to be settled at review:
 
-- avec les vrais atomes, « ne jamais optimiser » reste meilleur (88,3 %). La porte est un compromis, pas un optimum par
-  régime ;
-- son avantage en chaîne complète avec primitives découvertes n'est pas établi ;
-- les seuils ont été réglés sur 64 tâches de dev ; ils ne sont validés ni sur la validation ni en confirmatoire ;
-- changer d'objectif n'est pas justifié : aucun n'est aligné, et l'a priori sur le déplacement, le plus prometteur pour
-  les petites perturbations, fait moins bien sur les atomes découverts.
+- with the true atoms, "never optimize" remains better (88.3%). The gate is a compromise, not a per-regime
+  optimum;
+- its advantage in the full chain with discovered primitives is not established;
+- the thresholds were tuned on 64 dev tasks; they are validated neither on the validation set nor in the confirmatory test;
+- changing the objective is not justified: none is aligned, and the prior on the displacement, the most promising for
+  small perturbations, does worse on the discovered atoms.
 
-La porte n'est pas activée par défaut : `DeepSearch(validated="gate")` l'active à l'étape d'ajustement, et nulle part
-ailleurs. Le pipeline par défaut reste le pipeline gelé.
+The gate is not enabled by default: `DeepSearch(validated="gate")` enables it at the fit step, and nowhere
+else. The default pipeline remains the frozen pipeline.
 
 ## Validated Transformation Principle
 
-Formalisé dans `docs/architecture_validated_transformation.md`, comme principe soutenu expérimentalement pour
-l'ajustement paramétrique uniquement. Ce sous-jalon y ajoute un élément : décider de ne pas transformer est une action
-à part entière, et c'est elle qui fait passer la préservation de 71 % à 98,5 %. Le lien avec un WCE auto-évolutif y est
-présenté comme une direction architecturale, pas comme une capacité démontrée.
+Formalized in `docs/architecture_validated_transformation.md`, as a principle supported experimentally for
+parametric fitting only. This sub-milestone adds one element to it: deciding not to transform is an action
+in its own right, and it is what takes preservation from 71% to 98.5%. The link with a self-evolving WCE is
+presented there as an architectural direction, not as a demonstrated capability.
 
-## Limites
+## Limits
 
-- Tout est en dev, exploratoire ; 64 structures par jeu de 128 tâches.
-- La porte et le garde-fou ne font rien pour la découverte de primitives, qui reste le goulot : en chaîne complète,
-  5 % de récupération à 0,99 quelle que soit la politique.
-- Le régime C n'utilise qu'une méthode de découverte (gradient multi-initialisations) et les trois premiers candidats de
-  la synthèse.
-- Les perturbations du régime B sont gaussiennes et indépendantes par paramètre ; des erreurs réelles de découverte
-  peuvent être structurées autrement.
-- L'a priori sur le déplacement (σ = 0,1) et la contamination robuste (γ = 0,2) ont été testés à une seule valeur.
-- Le signal « stabilité » n'a pas été calculé ; « confiance » est mesurée par l'écart à la référence locale, et
-  « distance entre hypothèses » n'est pas un signal de la porte.
-- Dans 5 des 9 dégradations résiduelles, la cause est un effet de chemin dans la synthèse, que ni le garde-fou ni la
-  porte ne traitent.
+- Everything is in dev, exploratory; 64 structures per set of 128 tasks.
+- The gate and the safeguard do nothing for primitive discovery, which remains the bottleneck: in the full chain,
+  5% recovery at 0.99 whatever the policy.
+- Regime C uses only one discovery method (multi-initialization gradient) and the first three candidates of
+  the synthesis.
+- The perturbations of regime B are Gaussian and independent per parameter; real discovery errors
+  may be structured differently.
+- The prior on the displacement (σ = 0.1) and the robust contamination (γ = 0.2) were tested at a single value.
+- The "stability" signal was not computed; "confidence" is measured by the deviation from the local reference, and
+  "distance between hypotheses" is not a gate signal.
+- In 5 of the 9 residual degradations, the cause is a path effect in the synthesis, which neither the safeguard nor the
+  gate addresses.

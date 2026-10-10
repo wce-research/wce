@@ -1,343 +1,343 @@
-# WCE Deep Composition & Final Reconstruction with Oracle Atoms — rapport (dev, exploratoire)
+# WCE Deep Composition & Final Reconstruction with Oracle Atoms — report (dev, exploratory)
 
-Statut : sous-jalon exploratoire, partition **dev** uniquement. Aucun test confirmatoire, aucune campagne 16 graines,
-lot scellé jamais touché. Le pipeline gelé reste la référence officielle ; `flat_scene_k3` reste une baseline
-candidate, tenue à l'écart de ce sous-jalon ; rien n'est branché par défaut.
+Status: exploratory sub-milestone, **dev** partition only. No confirmatory test, no 16-seed campaign,
+sealed set never touched. The frozen pipeline remains the official reference; `flat_scene_k3` remains a candidate
+baseline, kept out of this sub-milestone; nothing is wired in by default.
 
-Dans tout ce sous-jalon les **vrais atomes** (types et paramètres) sont fournis. L'amont est retiré de l'équation.
+Throughout this sub-milestone the **true atoms** (types and parameters) are provided. The upstream is taken out of the equation.
 
-## 0. Pré-enregistrement (écrit avant le lancement des runs AWS)
+## 0. Preregistration (written before the AWS runs were launched)
 
-Mise au point faite uniquement sur la clé de composition 899 (six tâches, une par profondeur). Évaluation sur
-**384 tâches jamais utilisées** : clés 800–831, profondeurs 1 à 6 (nombre d'atomes), régimes standard et rich.
+Tuning done only on composition key 899 (six tasks, one per depth). Evaluation on
+**384 never-used tasks**: keys 800–831, depths 1 to 6 (number of atoms), standard and rich regimes.
 
-Méthode principale : `dp_errors` — programmation dynamique ascendante sur les classes d'équivalence observationnelle
-(masque de cellules), exhaustive jusqu'à la taille de la vérité, classe retenue = moins d'erreurs, puis plus petite ;
-aucun ajustement de paramètres. Référence : `ref_b150` — pipeline existant, mêmes atomes, budget de référence.
+Main method: `dp_errors` — bottom-up dynamic programming over observational equivalence classes
+(cell mask), exhaustive up to the size of the truth, retained class = fewest errors, then smallest;
+no parameter fitting. Reference: `ref_b150` — existing pipeline, same atoms, reference budget.
 
-| # | Hypothèse | Critère |
+| # | Hypothesis | Criterion |
 |---|---|---|
-| DC1 | avec les vrais atomes, la classe de la vraie structure est toujours construite | part des tâches = 1,00, et moins de 10⁶ paires évaluées à la profondeur 6 |
-| DC2 | la composition sur classes récupère mieux que le pipeline existant | récupération ≥ 0,99, `dp_errors` − `ref_b150`, IC 95 % > 0, globalement et à chaque profondeur 2–6 |
-| DC3 | le classement n'est pas le verrou quand on classe par erreurs ; il l'est avec les pénalités actuelles | vraie classe au rang 1 par erreurs dans ≥ 90 % des tâches ; `dp_posterior` − `dp_errors` sur la récupération, IC < 0 |
-| DC4 | l'ambiguïté intrinsèque est petite | masse des cellules jamais observées < 5 % en moyenne ; quand la classe retenue est celle de la vérité, accord ≥ 0,99 dans ≥ 95 % des cas |
-| DC5 | le budget n'est pas le problème du pipeline existant | `ref_b450` − `ref_b150` et `ref_b1500` − `ref_b150` sur l'accord : IC incluant 0 ou effet < 0,01 |
-| DC6 | l'ajustement du composite nuit | accord, C − A : IC < 0, sur la vraie structure ; D (validé) − A : IC incluant 0 ou négatif |
-| DC7 | la rencontre au milieu atteint le résultat exhaustif avec bien moins d'évaluations | `mitm3` égale l'exhaustif dans ≥ 95 % des tâches |
-| DC8 | un faisceau de 100 classes suffit | vraie classe gardée dans ≥ 95 % des tâches |
-| DC9 | la forme de l'arbre ne change rien pour la composition sur classes | récupération chaîne contre équilibré : écart < 0,05 |
-| DC10 | l'espace effectif reste compact | classes cumulées à la profondeur 6 < 10⁵ en moyenne ; moins d'une seconde |
+| DC1 | with the true atoms, the class of the true structure is always built | share of tasks = 1.00, and fewer than 10⁶ pairs evaluated at depth 6 |
+| DC2 | composition over classes recovers better than the existing pipeline | recovery ≥ 0.99, `dp_errors` − `ref_b150`, 95% CI > 0, overall and at each depth 2–6 |
+| DC3 | ranking is not the blocker when ranking by errors; it is with the current penalties | true class at rank 1 by errors in ≥ 90% of tasks; `dp_posterior` − `dp_errors` on recovery, CI < 0 |
+| DC4 | intrinsic ambiguity is small | mass of never-observed cells < 5% on average; when the retained class is that of the truth, agreement ≥ 0.99 in ≥ 95% of cases |
+| DC5 | budget is not the problem of the existing pipeline | `ref_b450` − `ref_b150` and `ref_b1500` − `ref_b150` on agreement: CI including 0 or effect < 0.01 |
+| DC6 | fitting the composite is harmful | agreement, C − A: CI < 0, on the true structure; D (validated) − A: CI including 0 or negative |
+| DC7 | meet in the middle reaches the exhaustive result with far fewer evaluations | `mitm3` equals the exhaustive in ≥ 95% of tasks |
+| DC8 | a beam of 100 classes is enough | true class kept in ≥ 95% of tasks |
+| DC9 | the shape of the tree changes nothing for composition over classes | recovery chain versus balanced: gap < 0.05 |
+| DC10 | the effective space remains compact | cumulative classes at depth 6 < 10⁵ on average; less than one second |
 
-Attente déclarée d'après la mise au point (six tâches) : toutes probables, sauf DC7 incertaine (la recherche guidée
-s'arrête parfois sur une structure quasi équivalente) et DC8 incertaine à la profondeur 6.
+Expectation declared from the tuning (six tasks): all likely, except DC7 uncertain (the guided search
+sometimes stops on a nearly equivalent structure) and DC8 uncertain at depth 6.
 
-Deux limites connues avant lancement :
+Two limits known before launch:
 
-- `dp_errors` reçoit le nombre d'atomes vrais comme taille maximale. La variante « une feuille de plus »
-  (`dp_errors_plus1`, `dp_bic_plus1`) est rapportée à côté pour mesurer ce que vaut cette information.
-- Avec des atomes exacts, « récupérer » signifie choisir la bonne fonction booléenne des atomes ; aucun paramètre
-  n'est estimé. Ce résultat ne dit rien d'atomes imparfaits.
+- `dp_errors` receives the number of true atoms as maximum size. The "one more leaf" variant
+  (`dp_errors_plus1`, `dp_bic_plus1`) is reported alongside to measure what this information is worth.
+- With exact atoms, "recovering" means choosing the right Boolean function of the atoms; no parameter
+  is estimated. This result says nothing about imperfect atoms.
 
-Règle de verdict fixée d'avance. Elle porte sur la composition à atomes donnés, et sur rien d'autre :
+Verdict rule fixed in advance. It bears on composition with given atoms, and on nothing else:
 
-- `DEEP COMPOSITION READY FOR END-TO-END VALIDATION` : DC2 soutenue ET récupération ≥ 0,99 de `dp_errors` au moins
-  égale à 0,80 à chaque profondeur de 2 à 6.
-- `DEEP COMPOSITION IMPROVED BUT INSUFFICIENT` : DC2 soutenue, mais la barre de 0,80 manquée à au moins une profondeur.
-- `DEEP COMPOSITION STILL BLOCKING` : DC2 non soutenue.
+- `DEEP COMPOSITION READY FOR END-TO-END VALIDATION`: DC2 supported AND recovery ≥ 0.99 of `dp_errors` at least
+  equal to 0.80 at each depth from 2 to 6.
+- `DEEP COMPOSITION IMPROVED BUT INSUFFICIENT`: DC2 supported, but the 0.80 bar missed at at least one depth.
+- `DEEP COMPOSITION STILL BLOCKING`: DC2 not supported.
 
-## 1. Protocole exécuté
+## 1. Protocol executed
 
-- Run AWS `wce-deepdc-20261009-212700` (EC2 + SSM, 2 × c6i.xlarge, 28 et 23 min, 2 512 sous-unités, 0 erreur).
-  Commandes : `make deep-run-dc`, `make deep-fetch`, `make deep-dc-aggregate`, `make deep-dc-report`.
-  Résumé : `results/deep_composition_oracle_summary.json`.
-- 384 tâches jamais utilisées : 64 par profondeur (nombre d'atomes) de 1 à 6, moitié standard (300 observations, 5 %
-  de bruit), moitié rich (600 observations, 2 %). Vrais atomes fournis partout.
-- Code : `core/deep_compose.py` (système : reçoit des atomes et des observations, ne voit ni vérité ni monde),
-  `core/deep_compose_exp.py` (évaluation), `core/deep_dc_report.py`. Tests : 56 nouveaux (`make deep-dc-test`) ; suite
-  complète 4 950 tests OK, 7 ignorés ; lot scellé intact.
-- Aucun réglage sur l'évaluation. Une graine par tâche. Aucun guide appris n'a été introduit : les méthodes explicites
-  n'ont pas plafonné.
-- Écart au protocole : aucun. Défaut d'instrumentation relevé après coup : dans la loi d'échelle, la colonne des
-  masques distincts répète celle des classes nouvelles ; elle n'est pas citée.
+- AWS run `wce-deepdc-20261009-212700` (EC2 + SSM, 2 × c6i.xlarge, 28 and 23 min, 2,512 sub-units, 0 errors).
+  Commands: `make deep-run-dc`, `make deep-fetch`, `make deep-dc-aggregate`, `make deep-dc-report`.
+  Summary: `results/deep_composition_oracle_summary.json`.
+- 384 never-used tasks: 64 per depth (number of atoms) from 1 to 6, half standard (300 observations, 5%
+  noise), half rich (600 observations, 2%). True atoms provided everywhere.
+- Code: `core/deep_compose.py` (system: receives atoms and observations, sees neither truth nor world),
+  `core/deep_compose_exp.py` (evaluation), `core/deep_dc_report.py`. Tests: 56 new (`make deep-dc-test`); full
+  suite 4,950 tests OK, 7 skipped; sealed set intact.
+- No tuning on the evaluation. One seed per task. No learned guide was introduced: the explicit methods
+  did not plateau.
+- Deviation from the protocol: none. Instrumentation defect noted after the fact: in the scaling law, the column of
+  distinct masks repeats that of the new classes; it is not cited.
 
-### Principe du moteur
+### Principle of the engine
 
-Avec des atomes fixés, une composition booléenne est entièrement décrite par sa valeur sur les **cellules** : les
-groupes d'observations qui ont le même vecteur de valeurs d'atomes. Six atomes donnent au plus 64 cellules, dont 21
-sont occupées en moyenne à la profondeur 6. Une composition se résume à un masque de 64 bits. Ce masque sert à la fois
-de signature fonctionnelle, de clé de classe d'équivalence observationnelle et de moyen de compter les erreurs sans
-exécuter le programme.
+With fixed atoms, a Boolean composition is entirely described by its value on the **cells**: the
+groups of observations that have the same vector of atom values. Six atoms give at most 64 cells, of which 21
+are occupied on average at depth 6. A composition reduces to a 64-bit mask. This mask serves at once
+as functional signature, as observational equivalence class key and as a means of counting errors without
+executing the program.
 
-## 2. Résultat principal
+## 2. Main result
 
-Récupération fonctionnelle (accord ≥ 0,99 sur toute la région) :
+Functional recovery (agreement ≥ 0.99 over the whole region):
 
-| Profondeur | Pipeline existant, vrais atomes (`ref_b150`) | Le même sans ajustement | Le même avec garde-fou | Composition sur classes (`dp_errors`) |
+| Depth | Existing pipeline, true atoms (`ref_b150`) | The same without fitting | The same with guardrail | Composition over classes (`dp_errors`) |
 |---|---|---|---|---|
-| 1 | 0,67 | 0,75 | 0,73 | 1,00 |
-| 2 | 0,23 | 0,97 | 0,80 | 1,00 |
-| 3 | 0,06 | 0,94 | 0,58 | 1,00 |
-| 4 | 0,00 | 0,84 | 0,48 | 1,00 |
-| 5 | 0,00 | 0,78 | 0,47 | 0,97 |
-| 6 | 0,00 | 0,72 | 0,38 | 0,95 |
-| toutes | 0,16 | 0,83 | 0,57 | **0,99** |
+| 1 | 0.67 | 0.75 | 0.73 | 1.00 |
+| 2 | 0.23 | 0.97 | 0.80 | 1.00 |
+| 3 | 0.06 | 0.94 | 0.58 | 1.00 |
+| 4 | 0.00 | 0.84 | 0.48 | 1.00 |
+| 5 | 0.00 | 0.78 | 0.47 | 0.97 |
+| 6 | 0.00 | 0.72 | 0.38 | 0.95 |
+| all | 0.16 | 0.83 | 0.57 | **0.99** |
 
-`dp_errors` − `ref_b150`, différence appariée par tâche, IC 95 % : récupération +0,826 [+0,787 ; +0,862] ; accord
-+0,049 [+0,043 ; +0,055] ; accord hors de la région observée +0,057 [+0,046 ; +0,069]. L'intervalle est au-dessus de
-zéro à chaque profondeur, de +0,33 [+0,22 ; +0,45] à la profondeur 1 à +0,95 [+0,89 ; +1,00] à la profondeur 6.
+`dp_errors` − `ref_b150`, paired difference per task, 95% CI: recovery +0.826 [+0.787, +0.862]; agreement
++0.049 [+0.043, +0.055]; agreement outside the observed region +0.057 [+0.046, +0.069]. The interval is above
+zero at each depth, from +0.33 [+0.22, +0.45] at depth 1 to +0.95 [+0.89, +1.00] at depth 6.
 
-Accord moyen : `dp_errors` 0,9996 (0,9994 dans la région observée, 1,0000 hors région) ; `ref_b150` 0,951
-(0,954 / 0,943).
+Mean agreement: `dp_errors` 0.9996 (0.9994 in the observed region, 1.0000 outside the region); `ref_b150` 0.951
+(0.954 / 0.943).
 
-## 3. Décomposition par profondeur
+## 3. Decomposition by depth
 
-Composition sur classes, exhaustive jusqu'à la taille de la vérité :
+Composition over classes, exhaustive up to the size of the truth:
 
-| Profondeur | Vraie classe construite | Rang moyen par erreurs | Rang 1 | Arbre exact | Même fonction sur les observations | Fonctionnel | Accord |
+| Depth | True class built | Mean rank by errors | Rank 1 | Exact tree | Same function on the observations | Functional | Agreement |
 |---|---|---|---|---|---|---|---|
-| 1 | 1,00 | 1,00 | 1,00 | 1,00 | 1,00 | 1,00 | 1,0000 |
-| 2 | 1,00 | 1,00 | 1,00 | 0,95 | 1,00 | 1,00 | 0,9999 |
-| 3 | 1,00 | 1,02 | 0,98 | 0,73 | 0,98 | 1,00 | 0,9999 |
-| 4 | 1,00 | 1,09 | 0,94 | 0,64 | 0,94 | 1,00 | 0,9996 |
-| 5 | 1,00 | 1,06 | 0,94 | 0,39 | 0,94 | 0,97 | 0,9994 |
-| 6 | 1,00 | 1,20 | 0,89 | 0,44 | 0,89 | 0,95 | 0,9985 |
+| 1 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.0000 |
+| 2 | 1.00 | 1.00 | 1.00 | 0.95 | 1.00 | 1.00 | 0.9999 |
+| 3 | 1.00 | 1.02 | 0.98 | 0.73 | 0.98 | 1.00 | 0.9999 |
+| 4 | 1.00 | 1.09 | 0.94 | 0.64 | 0.94 | 1.00 | 0.9996 |
+| 5 | 1.00 | 1.06 | 0.94 | 0.39 | 0.94 | 0.97 | 0.9994 |
+| 6 | 1.00 | 1.20 | 0.89 | 0.44 | 0.89 | 0.95 | 0.9985 |
 
-Pipeline existant, mêmes atomes, trace par étape (160 tâches, profondeurs 2 à 6) :
+Existing pipeline, same atoms, per-step trace (160 tasks, depths 2 to 6):
 
-| Profondeur | Bon candidat (≥ 0,99) avant ajustement | Son rang médian | Accord du premier candidat avant ajustement | Accord final | Final ≥ 0,99 | Cause dominante de la perte |
+| Depth | Good candidate (≥ 0.99) before fitting | Its median rank | Agreement of the first candidate before fitting | Final agreement | Final ≥ 0.99 | Dominant cause of the loss |
 |---|---|---|---|---|---|---|
-| 2 | 1,00 | premier | 1,000 | 0,979 | 0,31 | ajustement initial (16 sur 22 pertes) |
-| 3 | 1,00 | premier | 0,999 | 0,970 | 0,03 | ajustement initial (25 sur 31) |
-| 4 | 1,00 | premier | 0,991 | 0,936 | 0,00 | ajustement initial (30 sur 32) |
-| 5 | 1,00 | premier | 0,991 | 0,932 | 0,00 | ajustement initial (32 sur 32) |
-| 6 | 0,97 | premier | 0,979 | 0,907 | 0,00 | ajustement initial (31 sur 32) |
+| 2 | 1.00 | first | 1.000 | 0.979 | 0.31 | initial fitting (16 of 22 losses) |
+| 3 | 1.00 | first | 0.999 | 0.970 | 0.03 | initial fitting (25 of 31) |
+| 4 | 1.00 | first | 0.991 | 0.936 | 0.00 | initial fitting (30 of 32) |
+| 5 | 1.00 | first | 0.991 | 0.932 | 0.00 | initial fitting (32 of 32) |
+| 6 | 0.97 | first | 0.979 | 0.907 | 0.00 | initial fitting (31 of 32) |
 
-Sur les 160 tâches tracées : ajustement initial 134, récupérées 11, seuil trop strict 10, classement 3, autres 2.
-La simplification ne change rien (accord identique avec et sans).
+Over the 160 traced tasks: initial fitting 134, recovered 11, threshold too strict 10, ranking 3, others 2.
+Simplification changes nothing (identical agreement with and without).
 
-Pipeline existant, vivier final (384 tâches) :
+Existing pipeline, final pool (384 tasks):
 
-| Bras | Vraie forme dans le vivier | Bon candidat dans le vivier | Bon candidat trouvé puis non retenu | Arbre exact retenu | Récupération |
+| Arm | True shape in the pool | Good candidate in the pool | Good candidate found then not retained | Exact tree retained | Recovery |
 |---|---|---|---|---|---|
-| `ref_b150` | 0,84 | 0,20 | 0,04 | 0,49 | 0,16 |
-| sans ajustement | 0,83 | 0,98 | 0,15 | 0,58 | 0,83 |
-| avec garde-fou | 0,83 | 0,84 | 0,27 | 0,54 | 0,57 |
+| `ref_b150` | 0.84 | 0.20 | 0.04 | 0.49 | 0.16 |
+| without fitting | 0.83 | 0.98 | 0.15 | 0.58 | 0.83 |
+| with guardrail | 0.83 | 0.84 | 0.27 | 0.54 | 0.57 |
 
-## 4. Espace de composition et loi d'échelle
+## 4. Composition space and scaling law
 
-| Atomes | Cellules occupées | Compositions évaluées | Classes d'équivalence | Temps (s) | Classes quasi équivalentes à la vérité | Classes strictement meilleures que la vérité |
+| Atoms | Occupied cells | Compositions evaluated | Equivalence classes | Time (s) | Classes nearly equivalent to the truth | Classes strictly better than the truth |
 |---|---|---|---|---|---|---|
-| 1 | 2,0 | 1 | 1 | 0,0000 | 1,0 | 0,00 |
-| 2 | 3,9 | 14 | 6 | 0,0002 | 1,1 | 0,00 |
-| 3 | 6,4 | 106 | 28 | 0,0004 | 1,6 | 0,00 |
-| 4 | 10,3 | 1 748 | 276 | 0,0009 | 2,6 | 0,08 |
-| 5 | 15,5 | 26 173 | 4 007 | 0,005 | 4,4 | 0,03 |
-| 6 | 20,7 | 671 588 | 71 257 | 0,11 | 6,5 | 0,17 |
+| 1 | 2.0 | 1 | 1 | 0.0000 | 1.0 | 0.00 |
+| 2 | 3.9 | 14 | 6 | 0.0002 | 1.1 | 0.00 |
+| 3 | 6.4 | 106 | 28 | 0.0004 | 1.6 | 0.00 |
+| 4 | 10.3 | 1,748 | 276 | 0.0009 | 2.6 | 0.08 |
+| 5 | 15.5 | 26,173 | 4,007 | 0.005 | 4.4 | 0.03 |
+| 6 | 20.7 | 671,588 | 71,257 | 0.11 | 6.5 | 0.17 |
 
-Chaque atome supplémentaire multiplie le nombre de classes par un facteur qui croît : 5, 10, 14 puis 18. À la profondeur 6 : 71 000 classes en moyenne,
-337 000 au maximum, 0,6 s au pire. « Compositions évaluées » compte les paires de classes combinées par un opérateur,
-pas des programmes bruts : chaque sous-structure n'est construite qu'une fois.
+Each additional atom multiplies the number of classes by a factor that grows: 5, 10, 14 then 18. At depth 6: 71,000 classes on average,
+337,000 at most, 0.6 s at worst. "Compositions evaluated" counts the pairs of classes combined by an operator,
+not raw programs: each substructure is built only once.
 
-Classes nouvelles par taille, avec six atomes : 6 ; 38 ; 250 ; 1 698 ; 10 510 ; 58 754.
+New classes per size, with six atoms: 6; 38; 250; 1,698; 10,510; 58,754.
 
-Énumération exhaustive aux profondeurs 2 et 3 : 14 et 106 compositions, 6 et 28 classes ; la vraie classe est première
-par erreurs dans 100 % et 98 % des tâches ; 1,1 et 1,6 classe est à moins de 3 % de la vérité sur les observations.
+Exhaustive enumeration at depths 2 and 3: 14 and 106 compositions, 6 and 28 classes; the true class is first
+by errors in 100% and 98% of tasks; 1.1 and 1.6 class is within less than 3% of the truth on the observations.
 
-Signature sur les observations contre signature étendue à toute la région : à la profondeur 5, 4 007 classes contre
-4 867, donc 18 % des classes distinctes ailleurs sont confondues sur les observations. L'effet fonctionnel est
-négligeable : 0,2 % des points de la région tombent dans une cellule jamais observée (0,6 % à la profondeur 6).
+Signature on the observations versus signature extended to the whole region: at depth 5, 4,007 classes versus
+4,867, so 18% of the classes that are distinct elsewhere are conflated on the observations. The functional effect is
+negligible: 0.2% of the points of the region fall in a never-observed cell (0.6% at depth 6).
 
-## 5. Classement
+## 5. Ranking
 
-Même table de classes, cinq sélecteurs (récupération fonctionnelle) :
+Same table of classes, five selectors (functional recovery):
 
-| Sélecteur | Toutes | d4 | d5 | d6 | Rang moyen de la vraie classe |
+| Selector | All | d4 | d5 | d6 | Mean rank of the true class |
 |---|---|---|---|---|---|
-| erreurs, puis taille | 0,987 | 1,00 | 0,97 | 0,95 | 1,06 |
-| vraisemblance profilée | 0,987 | 1,00 | 0,97 | 0,95 | 1,06 |
-| vraisemblance − ½·ln N par feuille | 0,984 | 0,98 | 0,97 | 0,95 | 1,06 |
-| score a posteriori existant | 0,906 | 0,91 | 0,80 | 0,77 | 1,35 |
-| plus petite structure | 0,167 | 0,00 | 0,00 | 0,00 | 2 130 |
+| errors, then size | 0.987 | 1.00 | 0.97 | 0.95 | 1.06 |
+| profiled likelihood | 0.987 | 1.00 | 0.97 | 0.95 | 1.06 |
+| likelihood − ½·ln N per leaf | 0.984 | 0.98 | 0.97 | 0.95 | 1.06 |
+| existing posterior score | 0.906 | 0.91 | 0.80 | 0.77 | 1.35 |
+| smallest structure | 0.167 | 0.00 | 0.00 | 0.00 | 2,130 |
 
-Score a posteriori − erreurs : −0,081 [−0,109 ; −0,055] de récupération. Ses pénalités (structure et paramètres,
-environ 13 nats par atome) font retenir une structure trop petite : taille moyenne 5,4 au lieu de 6 à la profondeur 6.
+Posterior score − errors: −0.081 [−0.109, −0.055] of recovery. Its penalties (structure and parameters,
+about 13 nats per atom) make it retain a structure that is too small: mean size 5.4 instead of 6 at depth 6.
 
-Sans connaître la taille vraie (une feuille de plus autorisée, profondeurs 1 à 5) : 0,991 par erreurs, 0,991 avec la
-pénalité légère. L'information de taille ne compte pas.
+Without knowing the true size (one more leaf allowed, depths 1 to 5): 0.991 by errors, 0.991 with the
+light penalty. The size information does not matter.
 
-## 6. Équivalence
+## 6. Equivalence
 
-| | Part des 384 tâches |
+| | Share of the 384 tasks |
 |---|---|
-| arbre exact (à associativité et commutativité près) | 0,69 |
-| arbre différent, même fonction sur les observations | 0,27 |
-| fonction différente sur les observations, accord ≥ 0,99 | 0,03 |
-| échec fonctionnel | 0,013 (5 tâches) |
-| plus compact que la vérité et fonctionnel | 0,010 (4 tâches) |
+| exact tree (up to associativity and commutativity) | 0.69 |
+| different tree, same function on the observations | 0.27 |
+| different function on the observations, agreement ≥ 0.99 | 0.03 |
+| functional failure | 0.013 (5 tasks) |
+| more compact than the truth and functional | 0.010 (4 tasks) |
 
-Quand la classe retenue est celle de la vérité (368 tâches), l'accord est toujours ≥ 0,9957. Parmi les 118 tâches où
-l'arbre n'est pas exact, 96 % sont fonctionnellement correctes. Les 16 tâches où la classe diffère sont celles où le
-bruit rend une autre fonction aussi bonne ou meilleure sur les observations (11 fois strictement moins d'erreurs que
-la vérité) ; 11 restent fonctionnelles.
+When the retained class is that of the truth (368 tasks), agreement is always ≥ 0.9957. Among the 118 tasks where
+the tree is not exact, 96% are functionally correct. The 16 tasks where the class differs are those where the
+noise makes another function as good or better on the observations (11 times strictly fewer errors than
+the truth); 11 remain functional.
 
-Les 5 échecs : profondeurs 5 et 6, quatre chaînes et un arbre mixte, accords de 0,965 à 0,989. Dans l'un, 7,6 % de la
-région est dans des cellules jamais observées.
+The 5 failures: depths 5 and 6, four chains and one mixed tree, agreements from 0.965 to 0.989. In one of them, 7.6% of the
+region is in never-observed cells.
 
-## 7. Recherches bornées
+## 7. Bounded searches
 
-Faisceau sur les classes (vraie classe gardée) :
+Beam over the classes (true class kept):
 
-| Faisceau | Toutes | d4 | d5 | d6 | Compositions évaluées à d6 |
+| Beam | All | d4 | d5 | d6 | Compositions evaluated at d6 |
 |---|---|---|---|---|---|
-| 10 classes | 0,72 | 0,70 | 0,45 | 0,17 | 2 034 |
-| 100 classes | 0,95 | 1,00 | 0,88 | 0,80 | 62 289 |
-| 1 000 classes | 0,98 | 1,00 | 0,97 | 0,89 | 387 053 |
+| 10 classes | 0.72 | 0.70 | 0.45 | 0.17 | 2,034 |
+| 100 classes | 0.95 | 1.00 | 0.88 | 0.80 | 62,289 |
+| 1,000 classes | 0.98 | 1.00 | 0.97 | 0.89 | 387,053 |
 
-Budget en compositions évaluées (vraie classe atteinte) :
+Budget in compositions evaluated (true class reached):
 
-| Budget | d5 | d6 | Accord moyen à d6 |
+| Budget | d5 | d6 | Mean agreement at d6 |
 |---|---|---|---|
-| 100 | 0,00 | 0,00 | 0,791 |
-| 1 000 | 0,03 | 0,00 | 0,854 |
-| 10 000 | 0,72 | 0,03 | 0,924 |
-| 100 000 | 1,00 | 0,52 | 0,977 |
-| exhaustif | 1,00 | 1,00 | 0,9985 |
+| 100 | 0.00 | 0.00 | 0.791 |
+| 1,000 | 0.03 | 0.00 | 0.854 |
+| 10,000 | 0.72 | 0.03 | 0.924 |
+| 100,000 | 1.00 | 0.52 | 0.977 |
+| exhaustive | 1.00 | 1.00 | 0.9985 |
 
-Rencontre au milieu avec trous contraints :
+Meet in the middle with constrained holes:
 
-| Table | Fonctionnel, toutes | d4 | d5 | d6 | Égale l'exhaustif | Jointures à d6 |
+| Table | Functional, all | d4 | d5 | d6 | Equals the exhaustive | Joins at d6 |
 |---|---|---|---|---|---|---|
-| taille ≤ 2 | 0,92 | 0,97 | 0,83 | 0,72 | 0,91 | 2 051 |
-| taille ≤ 3 | 0,91 | 1,00 | 0,78 | 0,66 | 0,91 | 62 |
+| size ≤ 2 | 0.92 | 0.97 | 0.83 | 0.72 | 0.91 | 2,051 |
+| size ≤ 3 | 0.91 | 1.00 | 0.78 | 0.66 | 0.91 | 62 |
 
-Contre l'exhaustif : −0,068 [−0,094 ; −0,042] et −0,081 [−0,109 ; −0,055] de récupération. L'accord moyen reste à
-0,997 : la recherche guidée s'arrête sur des structures quasi équivalentes.
+Against the exhaustive: −0.068 [−0.094, −0.042] and −0.081 [−0.109, −0.055] of recovery. Mean agreement stays at
+0.997: the guided search stops on nearly equivalent structures.
 
-Forme de l'arbre (`dp_errors` / pipeline existant) : équilibré 1,00 / 0,00 ; chaîne 0,97 / 0,00 ; mixte 0,98 / 0,00.
-Par nombre de OU exclusifs : 1,00 jusqu'à 1 ; 0,99 à 2 ; 0,94 à 3. Un seul opérateur : 1,00 ; opérateurs mêlés : 0,98.
+Shape of the tree (`dp_errors` / existing pipeline): balanced 1.00 / 0.00; chain 0.97 / 0.00; mixed 0.98 / 0.00.
+By number of exclusive ORs: 1.00 up to 1; 0.99 at 2; 0.94 at 3. A single operator: 1.00; mixed operators: 0.98.
 
-## 8. Ajustement du composite
+## 8. Fitting the composite
 
-Départ : la VRAIE structure avec les VRAIS paramètres (accord 1,000).
+Start: the TRUE structure with the TRUE parameters (agreement 1.000).
 
-| Variante | Accord moyen | Récupération ≥ 0,99 | Différence d'accord avec A, IC 95 % |
+| Variant | Mean agreement | Recovery ≥ 0.99 | Difference in agreement with A, 95% CI |
 |---|---|---|---|
-| A — aucun ajustement | 1,000 | 1,00 | — |
-| B — chaque atome ré-ajusté seul | 0,867 | 0,08 | −0,133 [−0,143 ; −0,123] |
-| C — ajustement du composite (actuel) | 0,962 | 0,17 | −0,038 [−0,042 ; −0,035] |
-| D — le même, validé | 0,988 | 0,77 | −0,012 [−0,014 ; −0,009] |
+| A — no fitting | 1.000 | 1.00 | — |
+| B — each atom re-fitted alone | 0.867 | 0.08 | −0.133 [−0.143, −0.123] |
+| C — fitting of the composite (current) | 0.962 | 0.17 | −0.038 [−0.042, −0.035] |
+| D — the same, validated | 0.988 | 0.77 | −0.012 [−0.014, −0.009] |
 
-Mêmes chiffres sur la structure retenue par `dp_errors`. L'ajustement C augmente même les erreurs sur les
-observations (37,5 → 39,3 en moyenne). La version validée accepte 25 % des propositions ; ces acceptations font
-baisser l'accord réel alors que le critère observable monte.
+Same figures on the structure retained by `dp_errors`. Fitting C even increases the errors on the
+observations (37.5 → 39.3 on average). The validated version accepts 25% of the proposals; these acceptances make
+the real agreement drop while the observable criterion rises.
 
-Le budget du pipeline existant n'est pas un facteur : les résultats à 50, 150, 450 et 1 500 sont identiques tâche par
-tâche. Il s'arrête de lui-même vers 28 équivalents-ajustement, après avoir poli une vingtaine de candidats.
+The budget of the existing pipeline is not a factor: the results at 50, 150, 450 and 1,500 are identical task by
+task. It stops by itself around 28 fit-equivalents, after having polished about twenty candidates.
 
-## 9. Hypothèses pré-enregistrées
+## 9. Preregistered hypotheses
 
-| # | Résultat |
+| # | Result |
 |---|---|
-| DC1 vraie classe toujours construite, moins de 10⁶ paires à d6 | **soutenue** pour la construction (1,00) ; la borne tient en moyenne (0,67 million) et dans 77 % des tâches de profondeur 6, pas au pire (2,0 millions) |
-| DC2 composition sur classes > pipeline existant | **soutenue** : +0,826 [+0,787 ; +0,862], et à chaque profondeur |
-| DC3 classement | **soutenue** : rang 1 par erreurs dans 96 % des tâches ; score existant −0,081 [−0,109 ; −0,055] |
-| DC4 ambiguïté intrinsèque petite | **soutenue** : 0,2 % de masse non observée ; accord ≥ 0,99 dans 100 % des cas où la classe est la bonne |
-| DC5 le budget n'est pas le problème | **soutenue** : différence exactement nulle à 3 × et à 10 × |
-| DC6 l'ajustement du composite nuit | **soutenue** : C − A −0,038 [−0,042 ; −0,035] ; D − A −0,012 [−0,014 ; −0,009] |
-| DC7 rencontre au milieu = exhaustif dans ≥ 95 % | **non soutenue** : 0,91 (0,63 à la profondeur 6) |
-| DC8 faisceau de 100 classes ≥ 95 % | **non soutenue** : 0,945 (0,80 à la profondeur 6) |
-| DC9 forme de l'arbre indifférente | **soutenue** : équilibré 1,00, chaîne 0,97 |
-| DC10 espace compact | **soutenue** : 71 000 classes et 0,11 s en moyenne à la profondeur 6 |
+| DC1 true class always built, fewer than 10⁶ pairs at d6 | **supported** for the construction (1.00); the bound holds on average (0.67 million) and in 77% of the depth-6 tasks, not at worst (2.0 million) |
+| DC2 composition over classes > existing pipeline | **supported**: +0.826 [+0.787, +0.862], and at each depth |
+| DC3 ranking | **supported**: rank 1 by errors in 96% of tasks; existing score −0.081 [−0.109, −0.055] |
+| DC4 intrinsic ambiguity small | **supported**: 0.2% of unobserved mass; agreement ≥ 0.99 in 100% of the cases where the class is the right one |
+| DC5 budget is not the problem | **supported**: difference exactly zero at 3 × and at 10 × |
+| DC6 fitting the composite is harmful | **supported**: C − A −0.038 [−0.042, −0.035]; D − A −0.012 [−0.014, −0.009] |
+| DC7 meet in the middle = exhaustive in ≥ 95% | **not supported**: 0.91 (0.63 at depth 6) |
+| DC8 beam of 100 classes ≥ 95% | **not supported**: 0.945 (0.80 at depth 6) |
+| DC9 shape of the tree indifferent | **supported**: balanced 1.00, chain 0.97 |
+| DC10 compact space | **supported**: 71,000 classes and 0.11 s on average at depth 6 |
 
-## 10. Réponses
+## 10. Answers
 
-**1. Pourquoi les vrais atomes ne suffisent-ils pas ?**
-Parce que le pipeline les modifie. Avec les vrais atomes, un candidat à 0,99 ou plus existe avant ajustement dans 99 %
-des tâches, et il est en tête du classement. L'ajustement initial le dégrade : c'est la cause de 134 pertes sur 149.
-Même un atome seul, donné avec ses vrais paramètres, n'est rendu correct que deux fois sur trois. Le reste vient du
-score, qui pénalise trop la taille. Ce n'est ni la composition ni l'espace de recherche.
+**1. Why are the true atoms not enough?**
+Because the pipeline modifies them. With the true atoms, a candidate at 0.99 or more exists before fitting in 99%
+of tasks, and it is at the top of the ranking. The initial fitting degrades it: this is the cause of 134 losses out of 149.
+Even a single atom, given with its true parameters, is returned correct only two times out of three. The rest comes from the
+score, which penalises size too much. It is neither the composition nor the search space.
 
-**2. À quelle profondeur la composition s'effondre-t-elle ?**
-Elle ne s'effondre pas quand rien n'est ajusté : 1,00 jusqu'à la profondeur 4, 0,97 à 5, 0,95 à 6. C'est le pipeline
-existant qui s'effondre, dès la profondeur 2 (0,23) et totalement à partir de 4 (0,00).
+**2. At what depth does composition collapse?**
+It does not collapse when nothing is fitted: 1.00 up to depth 4, 0.97 at 5, 0.95 at 6. It is the existing
+pipeline that collapses, from depth 2 (0.23) and totally from 4 onwards (0.00).
 
-**3. La vraie structure est-elle générée ?**
-Oui. La classe de la vraie structure est construite dans 100 % des tâches par la composition sur classes. Dans le
-pipeline existant, la vraie forme est dans le vivier dans 84 % des tâches (47 % à la profondeur 6).
+**3. Is the true structure generated?**
+Yes. The class of the true structure is built in 100% of tasks by composition over classes. In the
+existing pipeline, the true shape is in the pool in 84% of tasks (47% at depth 6).
 
-**4. Est-elle perdue au ranking ?**
-Pas avec un classement par erreurs : rang 1 dans 96 % des tâches, rang moyen 1,06. Oui, en partie, avec le score a
-posteriori existant : il perd 8 points de récupération, 18 à la profondeur 6, en préférant des structures trop petites.
+**4. Is it lost at ranking?**
+Not with a ranking by errors: rank 1 in 96% of tasks, mean rank 1.06. Yes, in part, with the existing posterior
+score: it loses 8 points of recovery, 18 at depth 6, by preferring structures that are too small.
 
-**5. L'équivalence fonctionnelle explique-t-elle une partie de l'échec ?**
-Elle explique les écarts de structure, pas des échecs. Dans 27 % des tâches l'arbre retenu diffère de la vérité tout
-en calculant la même fonction, et dans 3 % une fonction légèrement différente reste correcte. Compter « arbre exact »
-ferait croire à 31 % d'échecs là où il y en a 1,3 %. L'ambiguïté réellement intrinsèque (cellules jamais observées)
-pèse 0,2 % de la région.
+**5. Does functional equivalence explain part of the failure?**
+It explains the structural gaps, not failures. In 27% of tasks the retained tree differs from the truth while
+computing the same function, and in 3% a slightly different function remains correct. Counting "exact tree"
+would suggest 31% of failures where there are 1.3%. The truly intrinsic ambiguity (never-observed cells)
+weighs 0.2% of the region.
 
-**6. Le dynamic programming aide-t-il ?**
-Oui, c'est ce qui rend le problème petit. Construire chaque sous-structure une fois et ne garder qu'une structure par
-classe ramène la profondeur 6 à 71 000 classes et un dixième de seconde.
+**6. Does dynamic programming help?**
+Yes, it is what makes the problem small. Building each substructure once and keeping only one structure per
+class brings depth 6 down to 71,000 classes and a tenth of a second.
 
-**7. Le meet-in-the-middle aide-t-il ?**
-Non, pas ici. Il utilise 10 à 10 000 fois moins d'évaluations, mais il perd 7 à 8 points de récupération et n'égale
-l'exhaustif que dans 63 à 67 % des tâches à la profondeur 6. L'exhaustif coûtant déjà un dixième de seconde, il n'y a
-rien à gagner jusqu'à six atomes.
+**7. Does meet-in-the-middle help?**
+No, not here. It uses 10 to 10,000 times fewer evaluations, but it loses 7 to 8 points of recovery and equals
+the exhaustive only in 63 to 67% of tasks at depth 6. Since the exhaustive already costs a tenth of a second, there is
+nothing to gain up to six atoms.
 
-**8. Le problème est-il surtout budget ou stratégie ?**
-Ni l'un ni l'autre pour le pipeline existant : dix fois plus de budget donne exactement le même résultat, parce qu'il
-ne consomme pas son budget. Pour la composition sur classes, le budget compte à la profondeur 6 : 100 000
-compositions n'atteignent la vraie classe qu'une fois sur deux, il en faut 670 000 en moyenne. C'est un coût, pas un
+**8. Is the problem mainly budget or strategy?**
+Neither for the existing pipeline: ten times more budget gives exactly the same result, because it
+does not consume its budget. For composition over classes, budget matters at depth 6: 100,000
+compositions reach the true class only one time in two, 670,000 are needed on average. It is a cost, not an
 obstacle.
 
-**9. Le fit composite aide-t-il ou nuit-il ?**
-Il nuit, sans exception mesurée. Partant de la vraie structure et des vrais paramètres, il fait tomber la
-récupération de 1,00 à 0,17. Validé, il remonte à 0,77 mais reste sous l'absence d'ajustement (−0,012
-[−0,014 ; −0,009]) : les propositions qu'il accepte améliorent le critère observable et dégradent l'accord réel.
+**9. Does the composite fit help or harm?**
+It harms, with no measured exception. Starting from the true structure and the true parameters, it makes
+recovery fall from 1.00 to 0.17. Validated, it climbs back to 0.77 but stays below the absence of fitting (−0.012
+[−0.014, −0.009]): the proposals it accepts improve the observable criterion and degrade the real agreement.
 
-**10. Peut-on rendre la composition profonde viable sans brute force ?**
-Oui, à atomes donnés et jusqu'à six atomes. L'énumération porte sur les classes d'équivalence, pas sur les programmes,
-et reste exhaustive pour un coût négligeable. La limite est structurelle : le masque suppose au plus six atomes, et le
-nombre de classes est multiplié par un facteur croissant (18 du cinquième au sixième atome). Au-delà, il faudra un faisceau, qui perd déjà 20 % des
-vraies classes à la profondeur 6 avec 100 classes gardées.
+**10. Can deep composition be made viable without brute force?**
+Yes, with given atoms and up to six atoms. The enumeration bears on the equivalence classes, not on the programs,
+and remains exhaustive for a negligible cost. The limit is structural: the mask assumes at most six atoms, and the
+number of classes is multiplied by a growing factor (18 from the fifth to the sixth atom). Beyond that, a beam will be needed, which already loses 20% of the
+true classes at depth 6 with 100 classes kept.
 
-**Réponse à la question du sous-jalon.** La profondeur n'est difficile ni parce que l'espace explose, ni parce que
-des structures sont intrinsèquement équivalentes. Avec les vrais atomes, elle était difficile parce que l'ajustement
-détruisait les bonnes solutions et que le score préférait des structures trop petites.
+**Answer to the question of the sub-milestone.** Depth is difficult neither because the space explodes, nor because
+structures are intrinsically equivalent. With the true atoms, it was difficult because the fitting
+destroyed the good solutions and because the score preferred structures that are too small.
 
-### Ce que cela implique pour `flat_scene_k3` (non mesuré)
+### What this implies for `flat_scene_k3` (not measured)
 
-Rien de ce sous-jalon n'a été exécuté sur `flat_scene_k3`. Deux implications à vérifier, pas des résultats :
+Nothing in this sub-milestone was executed on `flat_scene_k3`. Two implications to verify, not results:
 
-- `flat_scene_k3` passe par le même ajustement et le même score que le pipeline existant. Si la dégradation mesurée
-  ici s'y retrouve, une partie de son écart aux vrais atomes viendrait de l'aval et non de ses primitives.
-- Le moteur sur classes ne lui est pas applicable tel quel : il fournit une vingtaine de littéraux, le masque en
-  accepte six. Et avec des littéraux imparfaits, « ne pas ajuster » n'est plus évidemment le bon choix.
+- `flat_scene_k3` goes through the same fitting and the same score as the existing pipeline. If the degradation measured
+  here is found there too, part of its gap to the true atoms would come from the downstream and not from its primitives.
+- The engine over classes is not applicable to it as is: it provides about twenty literals, the mask
+  accepts six. And with imperfect literals, "not fitting" is no longer obviously the right choice.
 
-## 11. Limites
+## 11. Limits
 
-- Atomes exacts : aucun paramètre n'est estimé. Le résultat ne dit pas ce que devient la composition sur classes avec
-  des atomes approximatifs, ni avec des atomes faux mêlés aux vrais.
-- Au plus six atomes, par construction du masque.
-- La récupération par erreurs suppose que tous les atomes fournis sont utiles ; avec des atomes superflus, minimiser
-  les erreurs sur-ajusterait. La pénalité légère par feuille fait aussi bien ici (0,984), mais n'a pas été mise à
-  l'épreuve d'atomes superflus.
-- Dev uniquement, une graine par tâche, pas de test confirmatoire.
-- Le pipeline existant n'a été comparé que dans sa stratégie factorisée, la seule qui accepte des atomes fournis.
-- La trace par étape porte sur 160 des 384 tâches (clés paires, profondeurs 2 à 6).
-- Rencontre au milieu et faisceau : mises en œuvre simples ; leur échec relatif vaut pour ces versions.
+- Exact atoms: no parameter is estimated. The result does not say what becomes of composition over classes with
+  approximate atoms, nor with false atoms mixed with the true ones.
+- At most six atoms, by construction of the mask.
+- Recovery by errors assumes that all the atoms provided are useful; with superfluous atoms, minimising
+  the errors would overfit. The light per-leaf penalty does as well here (0.984), but has not been put to
+  the test of superfluous atoms.
+- Dev only, one seed per task, no confirmatory test.
+- The existing pipeline was compared only in its factorised strategy, the only one that accepts provided atoms.
+- The per-step trace covers 160 of the 384 tasks (even keys, depths 2 to 6).
+- Meet in the middle and beam: simple implementations; their relative failure holds for these versions.
 
 ## 12. Verdict
 
-Règle pré-enregistrée : DC2 soutenue, et récupération de `dp_errors` de 1,00 ; 1,00 ; 1,00 ; 0,97 ; 0,95 aux profondeurs
-2 à 6, donc au-dessus de 0,80 partout.
+Preregistered rule: DC2 supported, and recovery of `dp_errors` of 1.00; 1.00; 1.00; 0.97; 0.95 at depths
+2 to 6, hence above 0.80 everywhere.
 
 `DEEP COMPOSITION READY FOR END-TO-END VALIDATION`
 
-Portée exacte de ce verdict : la composition, **à atomes exacts fournis**, n'est plus un verrou et peut entrer dans
-une validation de bout en bout. Il ne dit pas que la chaîne complète est prête : l'amont reste au niveau du sous-jalon
-précédent, et l'ajustement des paramètres, tel qu'il existe, détruit les solutions. Le pipeline gelé reste la référence
-officielle ; rien de ce sous-jalon n'y est branché.
+Exact scope of this verdict: composition, **with exact atoms provided**, is no longer a blocker and can enter
+an end-to-end validation. It does not say that the full chain is ready: the upstream remains at the level of the previous
+sub-milestone, and the parameter fitting, as it exists, destroys the solutions. The frozen pipeline remains the official
+reference; nothing from this sub-milestone is wired into it.
 
-Portée enregistrée de ce résultat : vrais atomes ; vrais paramètres ; jusqu'à 6 atomes ; aucun résultat confirmatoire
-global ; aucun lot scellé. La composition sur classes n'est pas le pipeline officiel.
+Recorded scope of this result: true atoms; true parameters; up to 6 atoms; no global confirmatory
+result; no sealed set. Composition over classes is not the official pipeline.

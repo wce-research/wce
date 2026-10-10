@@ -1,22 +1,22 @@
-# Pré-enregistrement — « Robust Structural Reconstruction & Measurement-Aware Inference » (figé AVANT les runs principaux)
+# Preregistration — "Robust Structural Reconstruction & Measurement-Aware Inference" (frozen BEFORE the main runs)
 
-Date de gel : 2026-10-03. AUCUNE modification après le benchmark scellé.
-Calcul : AWS SageMaker Processing (eu-north-1), identité WCE-Research-Runner, rôle d'exécution WCE-SageMaker-ExecutionRole.
-Graines : **16** (consigné avant run ; 32 seulement si le coût mesuré des 16 reste < 2 h d'instance ml.c5.4xlarge — décision consignée dans le manifeste).
-Budget de mesure par tâche : **16 unités de coût** (capteur standard = 1, précis = 3, bon marché = 0,3). Échantillon passif : 120 observations.
-Récupération fonctionnelle exacte = accord ≥ 0,97 avec la vraie fonction sur [−3,3]². Récupération de STRUCTURE = squelette canonique identique au vrai.
-Budget compact (H9) : ≤ 64 paramètres + ≤ 32 points bruts stockés par compétence.
-Référence « jalon précédent » (H7) : système complet ActiveStructuralDiscovery ré-exécuté sur le NOUVEAU banc (même graines).
+Freeze date: 2026-10-03. NO modification after the sealed benchmark.
+Compute: AWS SageMaker Processing (eu-north-1), identity WCE-Research-Runner, execution role WCE-SageMaker-ExecutionRole.
+Seeds: **16** (recorded before the run; 32 only if the measured cost of the 16 stays < 2 h of ml.c5.4xlarge instance — decision recorded in the manifest).
+Measurement budget per task: **16 cost units** (standard sensor = 1, precise = 3, cheap = 0.3). Passive sample: 120 observations.
+Exact functional recovery = agreement ≥ 0.97 with the true function on [−3,3]². STRUCTURE recovery = canonical skeleton identical to the true one.
+Compact budget (H9): ≤ 64 parameters + ≤ 32 raw points stored per skill.
+"Previous milestone" reference (H7): full ActiveStructuralDiscovery system re-run on the NEW bench (same seeds).
 
-| H | Métrique | Baseline | Succès | Échec |
+| H | Metric | Baseline | Success | Failure |
 |---|---|---|---|---|
-| H1 vraisemblance robuste | récupération fonctionnelle, bruit 8–15 % | fit naïf (même candidats, même requêtes = aucune) | +0,10 et IC95 > 0 | diff ≤ 0 |
-| H2 séparation structure / bruit | profondeur AST moyenne des structures retenues sur cibles de profondeur 1–2 bruitées ; part « trop profonde » | fit naïf + approfondissement par seuil | profondeur excédentaire réduite ≥ 30 % | non réduite |
-| H3 EFA | récupération fonctionnelle (et extrapolation) à budget égal | IG structurel (même inférence) | +0,05 et IC95 > 0 sur au moins une des deux métriques sans perte > 0,02 sur l'autre | ≤ IG structurel sur les deux |
-| H4 répétitions adaptatives | récupération à bruit 12–15 % | politique fixe (pas de répétition, même budget) | +0,05 et IC95 > 0 | ≤ 0 |
-| H5 calibration P(règle fausse) | ECE (TRAIN+VAL → test) | non calibré | ECE réduit ≥ 50 % | ECE non réduit |
-| H6 validation active des familles | précision de promotion (familles promues qui accélèrent / réussissent sur nouvelles instances) | promotion par regroupement (jalon précédent) | précision ≥ baseline + 0,2 | ≤ baseline |
-| H7 récupération sous 8–12 % | récupération fonctionnelle | ancien système sur le même banc | +0,10 et IC95 > 0 | ≤ 0 |
-| H8 extrapolation conservée | extrapolation hors région | ancien système | ≥ ancien − 0,02 | < ancien − 0,05 |
-| H9 budget compact | violations | — | 0 violation | ≥ 1 |
-| H10 gain prévu vs réel | corrélation de Spearman entre EFA prévue et gain fonctionnel réalisé | 0 | ρ ≥ 0,3 et IC95 > 0 | ρ ≤ 0 |
+| H1 robust likelihood | functional recovery, noise 8–15 % | naive fit (same candidates, same queries = none) | +0.10 and CI95 > 0 | diff ≤ 0 |
+| H2 structure / noise separation | mean AST depth of the retained structures on noisy targets of depth 1–2; "too deep" share | naive fit + deepening by threshold | excess depth reduced ≥ 30 % | not reduced |
+| H3 EFA | functional recovery (and extrapolation) at equal budget | structural IG (same inference) | +0.05 and CI95 > 0 on at least one of the two metrics without a loss > 0.02 on the other | ≤ structural IG on both |
+| H4 adaptive repetitions | recovery at noise 12–15 % | fixed policy (no repetition, same budget) | +0.05 and CI95 > 0 | ≤ 0 |
+| H5 calibration of P(rule wrong) | ECE (TRAIN+VAL → test) | uncalibrated | ECE reduced ≥ 50 % | ECE not reduced |
+| H6 active validation of families | promotion precision (promoted families that speed up / succeed on new instances) | promotion by clustering (previous milestone) | precision ≥ baseline + 0.2 | ≤ baseline |
+| H7 recovery under 8–12 % | functional recovery | old system on the same bench | +0.10 and CI95 > 0 | ≤ 0 |
+| H8 extrapolation preserved | out-of-region extrapolation | old system | ≥ old − 0.02 | < old − 0.05 |
+| H9 compact budget | violations | — | 0 violation | ≥ 1 |
+| H10 predicted vs actual gain | Spearman correlation between predicted EFA and realised functional gain | 0 | ρ ≥ 0.3 and CI95 > 0 | ρ ≤ 0 |

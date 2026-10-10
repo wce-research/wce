@@ -1,10 +1,10 @@
 # WCE — World Configuration Engine
 
-WCE est un paradigme expérimental alternatif : des primitives, transformations, invariants et compositions pour explorer la construction de structures et de comportements complexes. Ce document décrit les mécanismes scientifiques ; les implémentations du site et du futur hub ne font pas partie de cette publication.
+WCE is an alternative experimental paradigm: primitives, transformations, invariants and compositions to explore the construction of complex structures and behaviours. This document describes the scientific mechanisms; the implementations of the site and of the future hub are not part of this publication.
 
-## What exists now — le socle vérifiable
+## What exists now — the verifiable foundation
 
-Le moteur symbolique suit un parcours explicite :
+The symbolic engine follows an explicit path:
 
 ```text
 language/command.py → core/executor.py → core/world.py
@@ -12,32 +12,32 @@ language/command.py → core/executor.py → core/world.py
                                       → language/answer.py
 ```
 
-`app/session.py` assemble un monde réduit avec une balle et un support. `app/repl.py` permet de manipuler ce moteur. Les lois de gravité et de collision sont définies à l’avance : la démonstration ne les découvre pas.
+`app/session.py` assembles a reduced world with a ball and a support. `app/repl.py` lets one manipulate this engine. The laws of gravity and collision are defined in advance: the demonstration does not discover them.
 
-Le dépôt comprend également des prototypes scientifiques, des tests et des protocoles. Trois artefacts consultables décrivent la couverture prédictive, l’apprentissage continu et la découverte active. Ils incluent des limites, des hypothèses réfutées et des résultats non concluants. Ils ne constituent pas une comparaison générale avec les LLM ou les modèles du monde.
+The repository also includes scientific prototypes, tests and protocols. Three browsable artefacts describe predictive coverage, continual learning and active discovery. They include limits, refuted hypotheses and inconclusive results. They do not constitute a general comparison with LLMs or world models.
 
-## What is being explored — les mécanismes
+## What is being explored — the mechanisms
 
-- Composition : `core/transformations.py`, `core/invariants.py`, `core/transform_graph.py`.
-- État du monde : `core/world.py`, `core/model_state.py`.
-- Raisonnement et planification : `core/reasoning.py`, `core/planner.py`.
-- Langage ancré : `core/language_core.py`, `core/language_bridge.py`, `core/grounded.py`.
-- Mesure et observation : `core/measurement.py`, `core/source_reliability.py`.
-- Certificats et ancrage : `core/generative_certificate.py`, `core/truth_anchor.py`.
-- Plasticité et rétention : `core/plasticity.py`, `core/safe_plasticity.py`, `core/continuum.py`.
-- Découverte structurelle : `core/active_structure.py`, `core/active_world.py`.
-- Branches et instantanés : `core/branching.py`.
+- Composition: `core/transformations.py`, `core/invariants.py`, `core/transform_graph.py`.
+- World state: `core/world.py`, `core/model_state.py`.
+- Reasoning and planning: `core/reasoning.py`, `core/planner.py`.
+- Grounded language: `core/language_core.py`, `core/language_bridge.py`, `core/grounded.py`.
+- Measurement and observation: `core/measurement.py`, `core/source_reliability.py`.
+- Certificates and anchoring: `core/generative_certificate.py`, `core/truth_anchor.py`.
+- Plasticity and retention: `core/plasticity.py`, `core/safe_plasticity.py`, `core/continuum.py`.
+- Structural discovery: `core/active_structure.py`, `core/active_world.py`.
+- Branches and snapshots: `core/branching.py`.
 
-La présence de ces modules ne prouve ni leur intégration en un modèle unique ni la confirmation de leurs hypothèses. Chaque résultat doit être relié à son protocole et à son budget.
+The presence of these modules proves neither their integration into a single model nor the confirmation of their hypotheses. Each result must be tied to its protocol and its budget.
 
 ## Reproduction
 
-Le moteur symbolique se lance avec `python -m app.repl` et se vérifie avec `python -m unittest tests.test_wce`. Les expériences neuronales nécessitent PyTorch, leurs fixtures et leurs scripts propres. Une vérification du moteur ne reproduit pas ces expériences.
+The symbolic engine is launched with `python -m app.repl` and verified with `python -m unittest tests.test_wce`. The neural experiments require PyTorch, their fixtures and their own scripts. A verification of the engine does not reproduce these experiments.
 
-Consigner version du code, versions des dépendances, plateforme, précision numérique, graines, données, budget et empreintes des artefacts. Deux divergences numériques inter-plateformes restent connues dans la suite scientifique ; elles ne sont pas masquées par des changements de critères.
+Record code version, dependency versions, platform, numerical precision, seeds, data, budget and artefact fingerprints. Two cross-platform numerical divergences remain known in the scientific suite; they are not hidden by changes of criteria.
 
 ## What WCE aims to become
 
-Un hub ouvert pour de nouvelles architectures d’IA : code scientifique complet, protocoles inspectables, environnements reproductibles, contributions, forks et comparaisons expérimentales. Les interfaces d’entraînement communes, la licence et le processus public de contribution restent à formaliser. Aucune supériorité sur les architectures dominantes n’est démontrée ici.
+An open hub for new AI architectures: complete scientific code, inspectable protocols, reproducible environments, contributions, forks and experimental comparisons. The common training interfaces, the licence and the public contribution process remain to be formalised. No superiority over the dominant architectures is demonstrated here.
 
 **Open weights are not enough. Open the architecture.**

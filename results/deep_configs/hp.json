@@ -1,5 +1,5 @@
 {
- "note": "Sous-jalon High-Precision Primitive Estimation. Réglages fixés sur les clés de MISE AU POINT 1090-1095 uniquement, avant le lancement des runs AWS. Seuls band_factor et cos_normal ont été choisis sur une mesure (rappel des courbes vraies à 300 et 600 observations) ; les autres valeurs sont les valeurs par défaut, non balayées. La validation hors-échantillon exige un gain significatif (test apparié, z >= 1,64) : sans ce seuil, la procédure était acceptée sur des étiquettes aléatoires (test unitaire).",
+ "note": "Sub-milestone High-Precision Primitive Estimation. Settings fixed on the TUNING keys 1090-1095 only, before the launch of the AWS runs. Only band_factor and cos_normal were chosen on a measurement (recall of the true curves at 300 and 600 observations); the other values are the default values, not swept. The out-of-sample validation requires a significant gain (paired test, z >= 1.64): without this threshold, the procedure was accepted on random labels (unit test).",
  "tuning_keys": "1090-1095",
  "config": {
   "k": 5,

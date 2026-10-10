@@ -1,83 +1,83 @@
 # Validated Transformation Principle
 
-Statut : principe d'architecture **soutenu expérimentalement pour l'ajustement paramétrique uniquement**
-(exploratoire, partition dev). Il n'est pas appliqué automatiquement aux autres modules de WCE.
+Status: architecture principle **supported experimentally for parametric fitting only**
+(exploratory, dev partition). It is not applied automatically to the other WCE modules.
 
-## Énoncé
+## Statement
 
-Toute transformation interne susceptible de modifier un état suit la séquence :
+Every internal transformation that may modify a state follows the sequence:
 
 ```
 State → Transformation Proposal → Evaluation → Accept / Reject → Commit / Rollback
 ```
 
-Une transformation ne doit pas pouvoir détruire silencieusement un état déjà meilleur selon les critères disponibles.
+A transformation must not be able to silently destroy a state that is already better according to the available criteria.
 
-Trois obligations en découlent.
+Three obligations follow.
 
-1. **Conservation.** L'état initial reste disponible, intact, jusqu'à la décision. Le rollback rend cet état ; il ne le
-   reconstruit pas.
-2. **Évaluation observable.** L'acceptation repose sur un critère calculable au moment de la décision, sans vérité
-   cachée, avec une règle déterministe pour l'égalité, la tolérance numérique et les valeurs non finies.
-3. **Auditabilité.** Chaque décision laisse une trace : état initial, proposition, valeur du critère avant et après,
-   action, raison.
+1. **Conservation.** The initial state remains available, intact, until the decision. The rollback returns that state; it
+   does not rebuild it.
+2. **Observable evaluation.** Acceptance rests on a criterion computable at the time of the decision, without hidden
+   truth, with a deterministic rule for equality, numerical tolerance and non-finite values.
+3. **Auditability.** Every decision leaves a trace: initial state, proposal, value of the criterion before and after,
+   action, reason.
 
-## Ce qui est implémenté
+## What is implemented
 
-| Élément | Emplacement | Rôle |
+| Element | Location | Role |
 |---|---|---|
-| `validated_fit`, `FitTransaction`, `decide` | `core/deep_fit.py` | ajustement transactionnel : propose → évalue → commit / rollback |
-| `conditional_fit`, `OptimizationDecision`, `need_for_optimization` | `core/deep_optgate.py` | porte conditionnelle : faut-il seulement proposer une transformation ? |
-| `OptTrace` | `core/deep_optgate.py` | état initial, meilleur état rencontré, état final |
-| paramètre `validated` de `DeepSearch` | `core/deep_search.py` | active la politique à l'étape d'ajustement, et nulle part ailleurs |
+| `validated_fit`, `FitTransaction`, `decide` | `core/deep_fit.py` | transactional fitting: propose → evaluate → commit / rollback |
+| `conditional_fit`, `OptimizationDecision`, `need_for_optimization` | `core/deep_optgate.py` | conditional gate: should a transformation be proposed at all? |
+| `OptTrace` | `core/deep_optgate.py` | initial state, best state encountered, final state |
+| `validated` parameter of `DeepSearch` | `core/deep_search.py` | enables the policy at the fitting step, and nowhere else |
 
-Règle d'acceptation actuelle : la vraisemblance profilée des prédictions dures sur les observations doit augmenter de
-plus de la tolérance (1e-9 nat, ou le gain minimal de la porte). Égalité : rollback. Proposition non finie : rollback.
-État initial non fini et proposition finie : commit.
+Current acceptance rule: the profiled likelihood of the hard predictions on the observations must increase by
+more than the tolerance (1e-9 nat, or the minimal gain of the gate). Equality: rollback. Non-finite proposal: rollback.
+Non-finite initial state and finite proposal: commit.
 
-## Ce que les expériences soutiennent
+## What the experiments support
 
-Toutes en dev, vrais atomes fournis sauf mention ; détails dans `docs/rapport_validated_optimizer.md` et
+All in dev, true atoms provided unless stated otherwise; details in `docs/rapport_validated_optimizer.md` and
 `docs/rapport_objective_alignment.md`.
 
-- Sans validation, l'ajustement détruit près de neuf bonnes solutions sur dix.
-- Avec validation sur 128 tâches jamais vues : récupération au seuil 0,99 de 7 % à 54 % (+47 points, IC 95 %
-  [38 ; 56]), sans coût de calcul supplémentaire.
-- Le choix du critère est décisif : le même mécanisme, avec l'objectif que l'optimiseur maximise comme critère, accepte
-  95 % des propositions et ne restaure que 9 points.
-- Décider de ne pas transformer est une action à part entière : une porte qui préserve les candidats dont le résidu
-  ressemble à du bruit conserve 98 % des bonnes solutions, contre 71 % pour la validation seule.
+- Without validation, fitting destroys nearly nine good solutions out of ten.
+- With validation on 128 never-seen tasks: recovery at the 0.99 threshold from 7% to 54% (+47 points, 95% CI
+  [38, 56]), with no additional compute cost.
+- The choice of criterion is decisive: the same mechanism, with the objective that the optimiser maximises as criterion,
+  accepts 95% of the proposals and restores only 9 points.
+- Deciding not to transform is an action in its own right: a gate that preserves the candidates whose residual
+  looks like noise keeps 98% of the good solutions, against 71% for validation alone.
 
-## Ce que le principe ne garantit pas
+## What the principle does not guarantee
 
-- Il protège contre la dégradation **selon le critère choisi**. Si ce critère est mal aligné avec ce qui compte, une
-  dégradation réelle peut être acceptée (cas mesurés : un état mieux ajusté au bruit des observations, fonctionnellement
-  moins bon).
-- Il ne rend pas une transformation utile ; il empêche seulement qu'elle nuise sans être vue.
-- Il n'a été évalué ni en test confirmatoire, ni sur le lot scellé.
+- It protects against degradation **according to the chosen criterion**. If that criterion is poorly aligned with what
+  matters, a real degradation can be accepted (measured cases: a state better fitted to the noise of the observations,
+  functionally worse).
+- It does not make a transformation useful; it only prevents it from doing harm unseen.
+- It has been evaluated neither in a confirmatory test nor on the sealed set.
 
-## Extension possible (non réalisée)
+## Possible extension (not carried out)
 
-Par proximité avec ce qui est mesuré :
+By proximity to what is measured:
 
-1. la simplification de structure (elle retire un atome nécessaire dans environ 1,6 % des tâches) ;
-2. la réinjection des atomes polis dans la synthèse ;
-3. la promotion de fragments et de primitives dans les bibliothèques ;
-4. les mises à jour de croyance après une mesure active.
+1. structure simplification (it removes a necessary atom in about 1.6% of the tasks);
+2. reinjection of the polished atoms into the synthesis;
+3. promotion of fragments and primitives into the libraries;
+4. belief updates after an active measurement.
 
-Chaque extension exigerait son propre critère observable et sa propre expérience contrôlée à deux bras. Aucune n'est
-faite : appliquer le principe partout avant de l'avoir mesuré module par module reviendrait à supposer le résultat.
+Each extension would require its own observable criterion and its own controlled two-arm experiment. None has been
+done: applying the principle everywhere before having measured it module by module would amount to assuming the result.
 
-## Direction : WCE auto-évolutif
+## Direction: self-evolving WCE
 
-Implication architecturale, **pas capacité démontrée**. Une future modification par le système de ses propres
-paramètres, primitives, structures, poids, stratégies ou code devrait suivre :
+Architectural implication, **not a demonstrated capability**. A future modification by the system of its own
+parameters, primitives, structures, weights, strategies or code should follow:
 
 ```
 Proposal → Evaluation → Accept / Reject → Commit / Rollback
 ```
 
-La raison est la même que pour l'ajustement : un système qui se transforme a besoin de ne pas perdre un état meilleur.
-Deux leçons de ce jalon se transposeraient : conserver l'état avant de le transformer, et choisir un critère
-d'acceptation qui mesure réellement ce qu'on veut préserver. Plus la transformation est profonde (structure, code),
-plus le critère est difficile à définir ; c'est le problème ouvert, et rien ici ne le résout.
+The reason is the same as for fitting: a system that transforms itself needs not to lose a better state.
+Two lessons from this milestone would carry over: conserve the state before transforming it, and choose an acceptance
+criterion that actually measures what one wants to preserve. The deeper the transformation (structure, code),
+the harder the criterion is to define; that is the open problem, and nothing here solves it.

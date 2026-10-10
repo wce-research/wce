@@ -3,8 +3,8 @@
   "min_gain": 1.0,
   "incomplete": -1.0
  },
- "selected_on": "60 tâches de mise au point (clés 1090–1094)",
- "criterion": "accord final moyen de la chaîne C",
+ "selected_on": "60 tuning tasks (keys 1090–1094)",
+ "criterion": "mean final agreement of chain C",
  "grid": [
   {
    "min_gain": 1.0,
@@ -61,5 +61,5 @@
    "seconds": 3.0553
   }
  ],
- "note": "La colonne all_present de la grille a été retirée : elle était faussée par un défaut de mesure corrigé avant le run ; la sélection ne l'utilisait pas (critère : accord)."
+ "note": "The all_present column of the grid was removed: it was distorted by a measurement defect corrected before the run; the selection did not use it (criterion: agreement)."
 }

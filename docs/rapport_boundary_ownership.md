@@ -1,323 +1,323 @@
-# WCE Boundary Ownership & Fragment Attribution — rapport (dev, exploratoire)
+# WCE Boundary Ownership & Fragment Attribution — report (dev, exploratory)
 
-Statut : sous-jalon exploratoire, partition **dev** uniquement. Aucun test confirmatoire, aucune campagne 16 graines,
-lot scellé jamais touché. Le pipeline gelé reste la référence ; rien de ce sous-jalon n'y est branché par défaut.
+Status: exploratory sub-milestone, **dev** partition only. No confirmatory test, no 16-seed campaign,
+sealed set never touched. The frozen pipeline remains the reference; nothing from this sub-milestone is wired into it by default.
 
-## 0. Pré-enregistrement (écrit avant le lancement des runs AWS)
+## 0. Preregistration (written before launching the AWS runs)
 
-Mise au point faite uniquement sur 120 scènes de la sous-plage dev + 350 000 et sur la tâche de composition 799.
-Réglages figés avant le lancement (`results/deep_configs/ownership.json`) : coût par paramètre 10, terme « absent » à
-zéro, coût de hasard 3, température 16.
+Tuning done only on 120 scenes of the dev + 350,000 sub-range and on composition task 799.
+Settings frozen before launch (`results/deep_configs/ownership.json`): cost per parameter 10, "absent" term at
+zero, chance cost 3, temperature 16.
 
-Évaluation sur 1 920 scènes de masquage jamais vues (indices 200–231 de la sous-plage dev + 300 000) et sur **256
-tâches de composition jamais utilisées** (clés 700–731).
+Evaluation on 1,920 never-seen occlusion scenes (indices 200–231 of the dev + 300,000 sub-range) and on **256
+never-used composition tasks** (keys 700–731).
 
-### Confirmation de `flat_scene_k3` (comparaison principale, fixée ici)
+### Confirmation of `flat_scene_k3` (main comparison, fixed here)
 
-Au sous-jalon précédent, `flat_scene_k3` a battu le pipeline gelé, mais il avait été choisi parmi une douzaine de
-bras. La confirmation porte sur **trois bras seulement, désignés d'avance** : pipeline gelé, `flat_scene_k3`, et la
-méthode d'appartenance proposée `own_k3`. Jeu de tâches nouveau et indépendant, deux fois plus grand.
+In the previous sub-milestone, `flat_scene_k3` beat the frozen pipeline, but it had been chosen among a dozen
+arms. The confirmation covers **three arms only, designated in advance**: frozen pipeline, `flat_scene_k3`, and the
+proposed ownership method `own_k3`. New and independent task set, twice as large.
 
-Critère : `flat_scene_k3` − pipeline gelé, différence appariée par tâche, IC 95 % au-dessus de zéro **à la fois** sur
-la structure candidate et sur l'accord final. Si le critère est rempli, `flat_scene_k3` devient une **baseline
-candidate** ; sinon, il reste un résultat exploratoire non confirmé. Ce statut est indépendant du verdict du
-sous-jalon.
+Criterion: `flat_scene_k3` − frozen pipeline, paired difference per task, 95% CI above zero **both** on
+the candidate structure and on the final agreement. If the criterion is met, `flat_scene_k3` becomes a **candidate
+baseline**; otherwise, it remains an unconfirmed exploratory result. This status is independent of the verdict of the
+sub-milestone.
 
-### Hypothèses
+### Hypotheses
 
-| # | Hypothèse | Critère |
+| # | Hypothesis | Criterion |
 |---|---|---|
-| BO1 | l'attribution globale bat les micro-fragments locaux | F1 par paires, `solver` − `tangent`, IC 95 % > 0 |
-| BO2 | le recollement réduit le morcellement | morceaux par vraie frontière, `solver` − `tangent`, IC < 0 |
-| BO3 | l'association longue distance aide | F1, `solver` − `solver_local`, IC > 0 |
-| BO4 | le modèle d'occlusion aide | appartenance top-1 : `solver_absent` − `solver` > 0 et `solver_absent` − `solver_absent_naive` > 0 |
-| BO5 | le top-3 d'appartenance contient nettement plus souvent le bon propriétaire | top-3 − top-1 ≥ 0,10 |
-| BO6 | la composition aide à ré-attribuer | chaîne : F1 après composition − F1 du solveur, IC > 0 |
-| BO7 | le score d'appartenance est calibré | erreur de calibration ≤ 0,10 sur l'évaluation |
-| BO8 | la visibilité contrefactuelle bat le contraste | récupération top-1, masques inférés, IC > 0 |
-| BO9 | avec appartenance et type vrais, un secteur non masqué est retrouvé | récupération ≥ 0,5 ; sinon le paramétrage est intrinsèquement fragile |
-| BO10 | `flat_scene_k3` se confirme | critère ci-dessus |
-| BO11 | la méthode d'appartenance bat le pipeline gelé | `own_k3` − référence, structure candidate et accord final, IC > 0 |
-| BO12 | la méthode d'appartenance bat `flat_scene_k3` | `own_k3` − `flat_scene_k3`, accord final, IC > 0 |
+| BO1 | global attribution beats local micro-fragments | pairwise F1, `solver` − `tangent`, 95% CI > 0 |
+| BO2 | stitching reduces fragmentation | pieces per true boundary, `solver` − `tangent`, CI < 0 |
+| BO3 | long-range association helps | F1, `solver` − `solver_local`, CI > 0 |
+| BO4 | the occlusion model helps | top-1 ownership: `solver_absent` − `solver` > 0 and `solver_absent` − `solver_absent_naive` > 0 |
+| BO5 | the ownership top-3 contains the right owner markedly more often | top-3 − top-1 ≥ 0.10 |
+| BO6 | composition helps to re-attribute | chain: F1 after composition − F1 of the solver, CI > 0 |
+| BO7 | the ownership score is calibrated | calibration error ≤ 0.10 on the evaluation |
+| BO8 | counterfactual visibility beats contrast | top-1 recovery, inferred masks, CI > 0 |
+| BO9 | with true ownership and type, an unoccluded sector is recovered | recovery ≥ 0.5; otherwise the parameterisation is intrinsically fragile |
+| BO10 | `flat_scene_k3` is confirmed | criterion above |
+| BO11 | the ownership method beats the frozen pipeline | `own_k3` − reference, candidate structure and final agreement, CI > 0 |
+| BO12 | the ownership method beats `flat_scene_k3` | `own_k3` − `flat_scene_k3`, final agreement, CI > 0 |
 
-Attente déclarée d'après la mise au point : BO1, BO2, BO3 probables ; BO4 probablement fausse (le terme « absent »
-dégrade l'attribution en mise au point, avec ou sans masque explicite) ; BO7 incertaine ; BO10 probable ; BO11 et BO12
-peu probables.
+Expectation declared from the tuning: BO1, BO2, BO3 likely; BO4 probably false (the "absent" term
+degrades attribution in tuning, with or without an explicit mask); BO7 uncertain; BO10 likely; BO11 and BO12
+unlikely.
 
-Limite connue avant lancement : aucun coût de hasard testé ne ramène sous 10 % la part des milieux attribués sur des
-étiquettes aléatoires. Le plus fort (3) laisse 32 % ; sans ce coût, 96 %. Le bras sans coût de hasard
-(`solver_no_chance`, `own_nc_k3`) est rapporté à part, comme comparaison.
+Limit known before launch: no chance cost tested brings below 10% the share of midpoints attributed on
+random labels. The strongest (3) leaves 32%; without this cost, 96%. The arm without chance cost
+(`solver_no_chance`, `own_nc_k3`) is reported separately, as a comparison.
 
-Les bras de comparaison non désignés (`own_nc_k3`, `flat_owned_k3`, `flat_own_union_k3`, `po_owned_k3`) et la matrice
-oracle sont exploratoires et ne changent ni le verdict ni le statut de `flat_scene_k3`.
+The non-designated comparison arms (`own_nc_k3`, `flat_owned_k3`, `flat_own_union_k3`, `po_owned_k3`) and the oracle
+matrix are exploratory and change neither the verdict nor the status of `flat_scene_k3`.
 
-Règle de verdict fixée d'avance :
+Verdict rule fixed in advance:
 
-- `BOUNDARY OWNERSHIP READY FOR END-TO-END VALIDATION` : BO1, BO11 et BO12 soutenues.
-- `BOUNDARY OWNERSHIP IMPROVED BUT INSUFFICIENT` : BO1 soutenue, mais BO11 ou BO12 non soutenue.
-- `BOUNDARY OWNERSHIP STILL BLOCKING` : BO1 non soutenue.
+- `BOUNDARY OWNERSHIP READY FOR END-TO-END VALIDATION`: BO1, BO11 and BO12 supported.
+- `BOUNDARY OWNERSHIP IMPROVED BUT INSUFFICIENT`: BO1 supported, but BO11 or BO12 not supported.
+- `BOUNDARY OWNERSHIP STILL BLOCKING`: BO1 not supported.
 
-## 1. Protocole exécuté
+## 1. Protocol executed
 
-- Run AWS `wce-deepbo-20261005-211529` (EC2 + SSM, 2 × c6i.xlarge, 80 et 85 min, 3 296 sous-unités, 0 erreur,
-  26 176 lignes). Commandes : `make deep-run-bo`, `make deep-fetch`, `make deep-bo-aggregate`, `make deep-bo-report`.
-  Résumé : `results/deep_boundary_ownership_summary.json`.
-- Banc de masquage : 1 920 scènes jamais vues. Chaîne aval : 256 tâches de composition jamais utilisées.
-- Code : `core/deep_ownership.py` (système, sans vérité, sans modèle appris), `core/deep_ownership_exp.py`
-  (évaluation), `core/deep_bo_report.py`. Tests : 54 nouveaux (`make deep-bo-test`) ; suite complète 4 894 tests OK,
-  7 ignorés ; lot scellé intact.
-- Réglages figés avant le lancement ; aucun seuil réglé sur l'évaluation. Une seule graine par scène.
-- Écart au protocole : aucun.
+- AWS run `wce-deepbo-20261005-211529` (EC2 + SSM, 2 × c6i.xlarge, 80 and 85 min, 3,296 sub-units, 0 errors,
+  26,176 lines). Commands: `make deep-run-bo`, `make deep-fetch`, `make deep-bo-aggregate`, `make deep-bo-report`.
+  Summary: `results/deep_boundary_ownership_summary.json`.
+- Occlusion bench: 1,920 never-seen scenes. Downstream chain: 256 never-used composition tasks.
+- Code: `core/deep_ownership.py` (system, without truth, without learned model), `core/deep_ownership_exp.py`
+  (evaluation), `core/deep_bo_report.py`. Tests: 54 new (`make deep-bo-test`); full suite 4,894 tests OK,
+  7 skipped; sealed set intact.
+- Settings frozen before launch; no threshold tuned on the evaluation. A single seed per scene.
+- Deviation from the protocol: none.
 
-## 2. Confirmation de `flat_scene_k3` (256 tâches nouvelles, trois bras désignés)
+## 2. Confirmation of `flat_scene_k3` (256 new tasks, three designated arms)
 
-| Bras | Primitives retrouvées | Littéraux | Structure candidate | Final ≥ 0,95 | Accord final | Secondes |
+| Arm | Primitives recovered | Literals | Candidate structure | Final ≥ 0.95 | Final agreement | Seconds |
 |---|---|---|---|---|---|---|
-| pipeline gelé | 0,26 | 80,3 | 0,19 | 0,21 | 0,881 | 18,2 |
-| **`flat_scene_k3`** | 0,40 | 20,9 | **0,32** | **0,37** | **0,904** | 13,7 |
-| `own_k3` (méthode d'appartenance) | 0,04 | 2,1 | 0,13 | 0,16 | 0,620 | 4,4 |
+| frozen pipeline | 0.26 | 80.3 | 0.19 | 0.21 | 0.881 | 18.2 |
+| **`flat_scene_k3`** | 0.40 | 20.9 | **0.32** | **0.37** | **0.904** | 13.7 |
+| `own_k3` (ownership method) | 0.04 | 2.1 | 0.13 | 0.16 | 0.620 | 4.4 |
 
-`flat_scene_k3` − pipeline gelé, différences appariées, IC 95 % :
+`flat_scene_k3` − frozen pipeline, paired differences, 95% CI:
 
-- structure candidate : **+0,137 [+0,090 ; +0,184]** ;
-- accord final : **+0,023 [+0,015 ; +0,031]** ;
-- final ≥ 0,95 : +0,160 [+0,109 ; +0,215] ; primitives retrouvées : +0,148 [+0,106 ; +0,189].
+- candidate structure: **+0.137 [+0.090, +0.184]**;
+- final agreement: **+0.023 [+0.015, +0.031]**;
+- final ≥ 0.95: +0.160 [+0.109, +0.215]; primitives recovered: +0.148 [+0.106, +0.189].
 
-Le critère pré-enregistré est rempli sur ses deux volets. **`flat_scene_k3` devient une baseline candidate.** Il reste
-à type inconnu, sans oracle, avec quatre fois moins de littéraux et un quart de temps en moins. Le gain d'accord final
-est plus petit qu'au sous-jalon précédent (+0,023 contre +0,032), ce qui est attendu d'un bras sélectionné puis
-re-mesuré. La récupération à 0,99 reste à 6 %.
+The preregistered criterion is met on both of its parts. **`flat_scene_k3` becomes a candidate baseline.** It remains
+at unknown type, without oracle, with four times fewer literals and a quarter less time. The gain in final agreement
+is smaller than in the previous sub-milestone (+0.023 versus +0.032), which is expected of an arm selected and then
+re-measured. Recovery at 0.99 remains at 6%.
 
-Par profondeur, structure candidate (`flat_scene_k3` / pipeline gelé) : 0,70 / 0,48 à 2 ; 0,44 / 0,17 à 3 ;
-0,13 / 0,06 à 4 ; 0,03 / 0,03 à 5.
+By depth, candidate structure (`flat_scene_k3` / frozen pipeline): 0.70 / 0.48 at 2; 0.44 / 0.17 at 3;
+0.13 / 0.06 at 4; 0.03 / 0.03 at 5.
 
-## 3. Attribution (1 920 scènes)
+## 3. Attribution (1,920 scenes)
 
-| Méthode | Précision | Rappel | F1 | Pureté | Morceaux par vraie frontière | Longueur moyenne | Appartenance top-1 | top-3 |
+| Method | Precision | Recall | F1 | Purity | Pieces per true boundary | Mean length | Top-1 ownership | top-3 |
 |---|---|---|---|---|---|---|---|---|
-| micro-fragments (`tangent`) | 0,88 | 0,46 | 0,57 | 0,94 | 2,58 | 0,63 | — | — |
-| recollement local (`shared`) | 0,80 | 0,58 | 0,64 | 0,91 | 2,15 | 1,14 | — | — |
-| consensus | 0,65 | 0,83 | 0,71 | 0,81 | 1,50 | 2,09 | — | — |
-| **`solver`** (global, calibré par le hasard) | 0,72 | 0,78 | 0,73 | 0,80 | 1,13 | 2,69 | 0,39 | 0,41 |
-| `solver_no_chance` | 0,76 | 0,81 | **0,77** | 0,84 | 1,38 | 2,67 | **0,48** | 0,53 |
-| `solver_local` (sans longue distance) | 0,82 | 0,55 | 0,62 | 0,88 | 1,21 | 1,35 | 0,32 | 0,36 |
-| `solver_no_smooth` | 0,70 | 0,76 | 0,71 | 0,78 | 1,09 | 2,82 | 0,37 | 0,39 |
-| `solver_absent` (preuve négative, masques explicites) | 0,56 | 0,56 | 0,53 | 0,79 | 0,78 | 2,44 | 0,27 | 0,28 |
-| `solver_absent_naive` | 0,55 | 0,56 | 0,53 | 0,77 | 0,71 | 2,56 | 0,26 | 0,26 |
-| composition (ré-attribution par un petit composite) | 0,67 | 0,74 | 0,66 | 0,77 | 0,96 | 2,82 | — | — |
+| micro-fragments (`tangent`) | 0.88 | 0.46 | 0.57 | 0.94 | 2.58 | 0.63 | — | — |
+| local stitching (`shared`) | 0.80 | 0.58 | 0.64 | 0.91 | 2.15 | 1.14 | — | — |
+| consensus | 0.65 | 0.83 | 0.71 | 0.81 | 1.50 | 2.09 | — | — |
+| **`solver`** (global, calibrated by chance) | 0.72 | 0.78 | 0.73 | 0.80 | 1.13 | 2.69 | 0.39 | 0.41 |
+| `solver_no_chance` | 0.76 | 0.81 | **0.77** | 0.84 | 1.38 | 2.67 | **0.48** | 0.53 |
+| `solver_local` (without long range) | 0.82 | 0.55 | 0.62 | 0.88 | 1.21 | 1.35 | 0.32 | 0.36 |
+| `solver_no_smooth` | 0.70 | 0.76 | 0.71 | 0.78 | 1.09 | 2.82 | 0.37 | 0.39 |
+| `solver_absent` (negative evidence, explicit masks) | 0.56 | 0.56 | 0.53 | 0.79 | 0.78 | 2.44 | 0.27 | 0.28 |
+| `solver_absent_naive` | 0.55 | 0.56 | 0.53 | 0.77 | 0.71 | 2.56 | 0.26 | 0.26 |
+| composition (re-attribution by a small composite) | 0.67 | 0.74 | 0.66 | 0.77 | 0.96 | 2.82 | — | — |
 
-Différences appariées, IC 95 % :
+Paired differences, 95% CI:
 
-| Comparaison | F1 | Pureté | Morceaux par frontière | Appartenance top-1 |
+| Comparison | F1 | Purity | Pieces per boundary | Top-1 ownership |
 |---|---|---|---|---|
-| `solver` − `tangent` | +0,154 [+0,142 ; +0,165] | −0,138 [−0,145 ; −0,130] | −1,45 [−1,50 ; −1,39] | — |
-| `solver` − consensus | +0,021 [+0,012 ; +0,029] | −0,008 [−0,014 ; −0,001] | −0,37 [−0,40 ; −0,34] | — |
-| `solver` − `solver_local` | +0,113 [+0,102 ; +0,125] | −0,079 | −0,08 | +0,070 [+0,053 ; +0,088] |
-| `solver` − `solver_no_smooth` | +0,023 [+0,018 ; +0,027] | +0,022 | +0,04 | +0,020 [+0,013 ; +0,027] |
-| `solver` − `solver_no_chance` | −0,038 [−0,045 ; −0,030] | −0,031 | −0,25 | −0,085 [−0,098 ; −0,072] |
-| `solver_absent` − `solver` | −0,197 [−0,211 ; −0,183] | −0,022 | −0,35 | −0,127 [−0,142 ; −0,112] |
-| `solver_absent` − `solver_absent_naive` | +0,006 [+0,003 ; +0,009] | +0,014 | +0,06 | +0,006 [+0,002 ; +0,011] |
-| composition − `solver` | −0,064 [−0,071 ; −0,057] | −0,036 | −0,17 | — |
+| `solver` − `tangent` | +0.154 [+0.142, +0.165] | −0.138 [−0.145, −0.130] | −1.45 [−1.50, −1.39] | — |
+| `solver` − consensus | +0.021 [+0.012, +0.029] | −0.008 [−0.014, −0.001] | −0.37 [−0.40, −0.34] | — |
+| `solver` − `solver_local` | +0.113 [+0.102, +0.125] | −0.079 | −0.08 | +0.070 [+0.053, +0.088] |
+| `solver` − `solver_no_smooth` | +0.023 [+0.018, +0.027] | +0.022 | +0.04 | +0.020 [+0.013, +0.027] |
+| `solver` − `solver_no_chance` | −0.038 [−0.045, −0.030] | −0.031 | −0.25 | −0.085 [−0.098, −0.072] |
+| `solver_absent` − `solver` | −0.197 [−0.211, −0.183] | −0.022 | −0.35 | −0.127 [−0.142, −0.112] |
+| `solver_absent` − `solver_absent_naive` | +0.006 [+0.003, +0.009] | +0.014 | +0.06 | +0.006 [+0.002, +0.011] |
+| composition − `solver` | −0.064 [−0.071, −0.057] | −0.036 | −0.17 | — |
 
-Appartenance top-1 selon la part masquée : `solver` 0,69 ; 0,44 ; 0,30 ; 0,22 ; 0,31. `solver_no_chance` 0,81 ; 0,56 ;
-0,41 ; 0,29 ; 0,33. Par type (`solver_no_chance`) : anti-disque 0,61 ; disque 0,54 ; anneau 0,49 ; demi-plan 0,48 ;
-bande 0,46 ; secteur 0,29.
+Top-1 ownership by occluded share: `solver` 0.69; 0.44; 0.30; 0.22; 0.31. `solver_no_chance` 0.81; 0.56;
+0.41; 0.29; 0.33. By type (`solver_no_chance`): anti-disc 0.61; disc 0.54; ring 0.49; half-plane 0.48;
+band 0.46; sector 0.29.
 
-Énergie moyenne de la solution retenue, par terme : ajustement 25,8 ; milieux sans propriétaire 36,7 ; lissage 0,9 ;
-complexité 36,8 ; absence 0 (terme désactivé) ; hasard 80,0. Le coût de hasard est le terme dominant : il décide
-du nombre de courbes gardées (1,5 en moyenne, contre 2,0 sans lui). 27 attributions testées par scène, 0,21 s.
+Mean energy of the retained solution, by term: fit 25.8; midpoints without owner 36.7; smoothing 0.9;
+complexity 36.8; absence 0 (term disabled); chance 80.0. The chance cost is the dominant term: it decides
+the number of curves kept (1.5 on average, versus 2.0 without it). 27 attributions tested per scene, 0.21 s.
 
-Détection du masque : un masque est déclaré dans 11 à 24 % des scènes, et il n'est le bon que dans 2 à 5 %. Sans
-masque, il en est déclaré un à tort dans 11 % des scènes.
+Mask detection: a mask is declared in 11 to 24% of the scenes, and it is the right one in only 2 to 5%. Without
+a mask, one is wrongly declared in 11% of the scenes.
 
-Calibration du score d'appartenance : erreur de calibration 0,094, score de Brier 0,25. Mais la confiance est presque
-constante (0,29 à 0,54) pour une exactitude de 0,42 : le score est juste en moyenne et n'ordonne rien. Par niveau de
-masque, l'erreur va de 0,08 à 0,22. Conséquence de la température choisie, 95 % des fragments sont classés ambigus.
+Calibration of the ownership score: calibration error 0.094, Brier score 0.25. But the confidence is almost
+constant (0.29 to 0.54) for an accuracy of 0.42: the score is right on average and orders nothing. By occlusion
+level, the error goes from 0.08 to 0.22. As a consequence of the chosen temperature, 95% of the fragments are classified as ambiguous.
 
-## 4. Matrice oracle
+## 4. Oracle matrix
 
-Récupération exacte de la cible sur le banc de masquage. L'appartenance estimée sert de filtre : seules les hypothèses
-dont toutes les frontières sont des courbes possédées sont gardées.
+Exact recovery of the target on the occlusion bench. The estimated ownership serves as a filter: only the hypotheses
+all of whose boundaries are owned curves are kept.
 
-| Appartenance | Type vrai | Type inféré |
+| Ownership | True type | Inferred type |
 |---|---|---|
-| vraie | 0,67 | 0,44 |
-| aucune (scène entière) | 0,54 | 0,35 |
-| estimée, comme filtre | 0,26 | 0,22 |
-| estimée, primitives construites sur les courbes possédées | — | 0,25 |
+| true | 0.67 | 0.44 |
+| none (whole scene) | 0.54 | 0.35 |
+| estimated, as a filter | 0.26 | 0.22 |
+| estimated, primitives built on the owned curves | — | 0.25 |
 
-Différences appariées : appartenance vraie − aucune, +0,13 [+0,11 ; +0,15] à type vrai et +0,08 [+0,07 ; +0,10] à type
-inféré ; appartenance estimée − aucune, **−0,27 [−0,29 ; −0,25]** à type vrai et −0,13 [−0,16 ; −0,11] à type inféré.
-Le filtre ne garde que 14 % des hypothèses, et la cible n'a toutes ses frontières possédées que dans 34 % des scènes.
+Paired differences: true ownership − none, +0.13 [+0.11, +0.15] at true type and +0.08 [+0.07, +0.10] at
+inferred type; estimated ownership − none, **−0.27 [−0.29, −0.25]** at true type and −0.13 [−0.16, −0.11] at inferred type.
+The filter keeps only 14% of the hypotheses, and the target has all its boundaries owned in only 34% of the scenes.
 
-Dans la chaîne aval (256 tâches) :
+In the downstream chain (256 tasks):
 
-| Condition | Primitives retrouvées | Structure candidate | Accord final |
+| Condition | Primitives recovered | Candidate structure | Final agreement |
 |---|---|---|---|
-| vrais atomes | 1,00 | 0,65 | 0,959 |
-| appartenance vraie, type vrai | 0,74 | 0,52 | 0,938 |
-| appartenance vraie, type inféré | 0,65 | 0,40 | 0,919 |
-| aucune attribution, type vrai (`po_type_k3`) | 0,40 | 0,39 | 0,915 |
-| aucune attribution, type inféré (`flat_scene_k3`) | 0,40 | 0,32 | 0,904 |
-| appartenance estimée sans coût de hasard (`own_nc_k3`) | 0,25 | 0,29 | 0,893 |
-| appartenance estimée (`own_k3`) | 0,04 | 0,13 | 0,620 |
+| true atoms | 1.00 | 0.65 | 0.959 |
+| true ownership, true type | 0.74 | 0.52 | 0.938 |
+| true ownership, inferred type | 0.65 | 0.40 | 0.919 |
+| no attribution, true type (`po_type_k3`) | 0.40 | 0.39 | 0.915 |
+| no attribution, inferred type (`flat_scene_k3`) | 0.40 | 0.32 | 0.904 |
+| estimated ownership without chance cost (`own_nc_k3`) | 0.25 | 0.29 | 0.893 |
+| estimated ownership (`own_k3`) | 0.04 | 0.13 | 0.620 |
 
-De `flat_scene_k3` (0,32) aux vrais atomes (0,65), l'écart de 0,33 se répartit ainsi : +0,08 en donnant l'appartenance
-vraie, +0,12 en donnant ensuite le type, +0,13 en donnant enfin les paramètres.
+From `flat_scene_k3` (0.32) to the true atoms (0.65), the gap of 0.33 breaks down as follows: +0.08 by giving the true
+ownership, +0.12 by then giving the type, +0.13 by finally giving the parameters.
 
-## 5. Visibilité contrefactuelle contre contraste
+## 5. Counterfactual visibility versus contrast
 
-Même vivier de cinq hypothèses à type vrai, quatre classements (récupération en première position) :
+Same pool of five hypotheses at true type, four rankings (recovery in first position):
 
-| Classement | Toutes scènes | Masque 40 % | Masque 60 % |
+| Ranking | All scenes | Mask 40% | Mask 60% |
 |---|---|---|---|
-| contraste global | 0,55 | 0,59 | 0,30 |
-| visibilité, sans masque supposé | 0,51 | 0,54 | 0,23 |
-| visibilité, masques inférés | 0,52 | 0,55 | 0,23 |
-| visibilité, masque vrai | 0,58 | 0,64 | 0,34 |
+| global contrast | 0.55 | 0.59 | 0.30 |
+| visibility, no mask assumed | 0.51 | 0.54 | 0.23 |
+| visibility, inferred masks | 0.52 | 0.55 | 0.23 |
+| visibility, true mask | 0.58 | 0.64 | 0.34 |
 
-Contre le contraste : masques inférés −0,031 [−0,045 ; −0,017] ; masque vrai +0,032 [+0,018 ; +0,046]. Le principe
-fonctionne quand le masque est connu ; il est inutilisable tant que le masque n'est pas trouvé. Le vivier ne contient
-la vérité que dans 67 % des cas.
+Against contrast: inferred masks −0.031 [−0.045, −0.017]; true mask +0.032 [+0.018, +0.046]. The principle
+works when the mask is known; it is unusable as long as the mask is not found. The pool contains
+the truth in only 67% of the cases.
 
-## 6. Secteurs : attribution ou paramétrage ?
+## 6. Sectors: attribution or parameterisation?
 
-| Masque | Appartenance et type vrais | Aucune attribution, type vrai | Appartenance top-1 des demi-droites | Milieux sur la demi-droite la plus pauvre | Erreur de sommet (appartenance vraie) |
+| Mask | True ownership and type | No attribution, true type | Top-1 ownership of the half-lines | Midpoints on the poorest half-line | Apex error (true ownership) |
 |---|---|---|---|---|---|
-| 0 % | 0,70 | 0,72 | 0,45 | 13,0 | 0,37 |
-| 20 % | 0,55 | 0,25 | 0,31 | 8,5 | 0,73 |
-| 40 % | 0,27 | 0,17 | 0,28 | 4,2 | 0,80 |
-| 60 % | 0,02 | 0,09 | 0,32 | 1,1 | 1,54 |
-| 80 % | 0,00 | 0,03 | 0,05 | 0,3 | 1,83 |
+| 0% | 0.70 | 0.72 | 0.45 | 13.0 | 0.37 |
+| 20% | 0.55 | 0.25 | 0.31 | 8.5 | 0.73 |
+| 40% | 0.27 | 0.17 | 0.28 | 4.2 | 0.80 |
+| 60% | 0.02 | 0.09 | 0.32 | 1.1 | 1.54 |
+| 80% | 0.00 | 0.03 | 0.05 | 0.3 | 1.83 |
 
-Avec appartenance et type vrais, les échecs sont le sommet dans la grande majorité des cas (15 sur 19 sans masque,
-27 sur 47 à 40 %), puis l'absence d'hypothèse quand une demi-droite n'a plus de milieux.
+With true ownership and type, the failures are the apex in the great majority of cases (15 out of 19 without mask,
+27 out of 47 at 40%), then the absence of a hypothesis when a half-line has no midpoints left.
 
-## 7. Chaîne aval, bras exploratoires (256 tâches)
+## 7. Downstream chain, exploratory arms (256 tasks)
 
-| Bras | Statut | F1 d'attribution | Appartenance top-1 | Littéraux | Structure candidate | Accord final |
+| Arm | Status | Attribution F1 | Top-1 ownership | Literals | Candidate structure | Final agreement |
 |---|---|---|---|---|---|---|
-| pipeline gelé | désigné | — | — | 80,3 | 0,19 | 0,881 |
-| `flat_scene_k3` | désigné | — | — | 20,9 | 0,32 | 0,904 |
-| `own_k3` | désigné | 0,30 | 0,09 | 2,1 | 0,13 | 0,620 |
-| `own_nc_k3` | exploratoire | 0,57 | 0,38 | 7,0 | 0,29 | 0,893 |
-| `flat_owned_k3` (hypothèses filtrées par appartenance) | exploratoire | 0,30 | 0,09 | 12,6 | 0,22 | 0,886 |
-| `flat_own_union_k3` | exploratoire | 0,30 | 0,09 | 22,9 | 0,31 | 0,903 |
-| `po_owned_k3` (oracle de type, filtré) | exploratoire | 0,30 | 0,09 | 7,5 | 0,30 | 0,904 |
+| frozen pipeline | designated | — | — | 80.3 | 0.19 | 0.881 |
+| `flat_scene_k3` | designated | — | — | 20.9 | 0.32 | 0.904 |
+| `own_k3` | designated | 0.30 | 0.09 | 2.1 | 0.13 | 0.620 |
+| `own_nc_k3` | exploratory | 0.57 | 0.38 | 7.0 | 0.29 | 0.893 |
+| `flat_owned_k3` (hypotheses filtered by ownership) | exploratory | 0.30 | 0.09 | 12.6 | 0.22 | 0.886 |
+| `flat_own_union_k3` | exploratory | 0.30 | 0.09 | 22.9 | 0.31 | 0.903 |
+| `po_owned_k3` (type oracle, filtered) | exploratory | 0.30 | 0.09 | 7.5 | 0.30 | 0.904 |
 
-Contre le pipeline gelé : `own_k3` −0,261 [−0,307 ; −0,214] d'accord final ; `own_nc_k3` +0,012 [+0,004 ; +0,020] et
-+0,098 [+0,043 ; +0,152] de structure candidate. Contre `flat_scene_k3` : `own_k3` −0,284 [−0,331 ; −0,236] ;
-`own_nc_k3` −0,011 [−0,018 ; −0,004] ; filtrage par appartenance −0,018 [−0,024 ; −0,012] ; union 0,000.
+Against the frozen pipeline: `own_k3` −0.261 [−0.307, −0.214] of final agreement; `own_nc_k3` +0.012 [+0.004, +0.020] and
++0.098 [+0.043, +0.152] of candidate structure. Against `flat_scene_k3`: `own_k3` −0.284 [−0.331, −0.236];
+`own_nc_k3` −0.011 [−0.018, −0.004]; filtering by ownership −0.018 [−0.024, −0.012]; union 0.000.
 
-En composition, le solveur calibré par le hasard ne garde presque aucune courbe : 2,1 littéraux par tâche, 4 % de
-primitives retrouvées. Les frontières y sont courtes et nombreuses, et aucune ne dépasse nettement ce qu'une courbe
-capterait par hasard.
+In composition, the chance-calibrated solver keeps almost no curve: 2.1 literals per task, 4% of
+primitives recovered. The boundaries there are short and numerous, and none clearly exceeds what a curve
+would capture by chance.
 
-Ré-attribution par la composition (bras `own_k3`) : après composition, les milieux sont ré-attribués aux feuilles du
-meilleur composite là où elles sont visibles. F1 0,30 → 0,53, soit +0,11 [+0,08 ; +0,14] sur les tâches appariées ;
-appartenance top-1 0,09 → 0,32, soit +0,19 [+0,15 ; +0,23].
+Re-attribution by composition (arm `own_k3`): after composition, the midpoints are re-attributed to the leaves of the
+best composite where they are visible. F1 0.30 → 0.53, that is +0.11 [+0.08, +0.14] on the paired tasks;
+ownership top-1 0.09 → 0.32, that is +0.19 [+0.15, +0.23].
 
-## 8. Hypothèses pré-enregistrées
+## 8. Preregistered hypotheses
 
-| # | Résultat |
+| # | Result |
 |---|---|
-| BO1 attribution globale > micro-fragments | **soutenue** : F1 +0,154 [+0,142 ; +0,165] |
-| BO2 le recollement réduit le morcellement | **soutenue** : 2,58 → 1,13 morceaux, −1,45 [−1,50 ; −1,39] ; pureté 0,94 → 0,80 |
-| BO3 association longue distance | **soutenue** : F1 +0,113 [+0,102 ; +0,125] |
-| BO4 modèle d'occlusion | **non soutenue** : le terme d'absence dégrade l'appartenance (−0,127 [−0,142 ; −0,112]) ; masques explicites contre version naïve +0,006 |
-| BO5 top-3 − top-1 ≥ 0,10 | **non soutenue** : 0,41 − 0,39 = 0,02 (0,05 sans coût de hasard) |
-| BO6 la composition aide à ré-attribuer | **soutenue** dans la chaîne (+0,11 [+0,08 ; +0,14]), en partant d'une attribution faible ; l'inverse sur le banc de masquage (−0,064) |
-| BO7 calibration ≤ 0,10 | **soutenue sur le critère** (0,094), sans pouvoir de discrimination |
-| BO8 visibilité contrefactuelle > contraste | **non soutenue** : −0,031 [−0,045 ; −0,017] avec masques inférés |
-| BO9 secteur non masqué, appartenance et type vrais ≥ 0,5 | **soutenue** : 0,70 |
-| BO10 confirmation de `flat_scene_k3` | **soutenue** : +0,137 et +0,023, intervalles au-dessus de zéro |
-| BO11 `own_k3` > pipeline gelé | **non soutenue** : −0,261 d'accord final |
-| BO12 `own_k3` > `flat_scene_k3` | **non soutenue** : −0,284 |
+| BO1 global attribution > micro-fragments | **supported**: F1 +0.154 [+0.142, +0.165] |
+| BO2 stitching reduces fragmentation | **supported**: 2.58 → 1.13 pieces, −1.45 [−1.50, −1.39]; purity 0.94 → 0.80 |
+| BO3 long-range association | **supported**: F1 +0.113 [+0.102, +0.125] |
+| BO4 occlusion model | **not supported**: the absence term degrades ownership (−0.127 [−0.142, −0.112]); explicit masks versus naive version +0.006 |
+| BO5 top-3 − top-1 ≥ 0.10 | **not supported**: 0.41 − 0.39 = 0.02 (0.05 without chance cost) |
+| BO6 composition helps to re-attribute | **supported** in the chain (+0.11 [+0.08, +0.14]), starting from a weak attribution; the opposite on the occlusion bench (−0.064) |
+| BO7 calibration ≤ 0.10 | **supported on the criterion** (0.094), without discriminating power |
+| BO8 counterfactual visibility > contrast | **not supported**: −0.031 [−0.045, −0.017] with inferred masks |
+| BO9 unoccluded sector, true ownership and type ≥ 0.5 | **supported**: 0.70 |
+| BO10 confirmation of `flat_scene_k3` | **supported**: +0.137 and +0.023, intervals above zero |
+| BO11 `own_k3` > frozen pipeline | **not supported**: −0.261 of final agreement |
+| BO12 `own_k3` > `flat_scene_k3` | **not supported**: −0.284 |
 
-## 9. Réponses
+## 9. Answers
 
-**1. Quelle part de l'erreur vient réellement de l'ownership ?**
-Moins que je ne l'avais écrit au sous-jalon précédent. Sur le banc de masquage, donner l'appartenance vraie vaut +0,13
-[+0,11 ; +0,15] de récupération exacte. Dans la chaîne, sur l'écart de 0,33 de structure candidate entre
-`flat_scene_k3` et les vrais atomes, l'appartenance vraie rend 0,08, le type 0,12 et les paramètres 0,13 : environ un
-quart. Le précédent rapport lui attribuait 0,16 parce qu'il la mesurait à type vrai ; à type inféré, elle pèse moitié
-moins. L'appartenance est un verrou parmi trois de taille comparable, pas le verrou dominant.
+**1. What share of the error really comes from ownership?**
+Less than I had written in the previous sub-milestone. On the occlusion bench, giving the true ownership is worth +0.13
+[+0.11, +0.15] of exact recovery. In the chain, of the gap of 0.33 in candidate structure between
+`flat_scene_k3` and the true atoms, the true ownership gives back 0.08, the type 0.12 and the parameters 0.13: about a
+quarter. The previous report attributed 0.16 to it because it measured it at true type; at inferred type, it weighs half
+as much. Ownership is one lock among three of comparable size, not the dominant lock.
 
-**2. Top-k ownership aide-t-il ?**
-Non. Le bon propriétaire est dans les trois premiers à peine plus souvent qu'en premier (0,41 contre 0,39 ; 0,53
-contre 0,48 sans coût de hasard). Quand le solveur se trompe, la bonne courbe n'est généralement pas parmi celles
-qu'il a retenues : garder plusieurs propriétaires ne peut pas la faire revenir.
+**2. Does top-k ownership help?**
+No. The right owner is in the first three barely more often than in first place (0.41 versus 0.39; 0.53
+versus 0.48 without chance cost). When the solver is wrong, the right curve is generally not among those
+it has retained: keeping several owners cannot bring it back.
 
-**3. Le stitching réduit-il la fragmentation ?**
-Oui. Une vraie frontière passe de 2,6 morceaux à 1,1 et la longueur moyenne d'un groupe de 0,6 à 2,7. Le prix est la
-pureté, de 0,94 à 0,80. Le recollement local seul ne suffit pas (2,2 morceaux).
+**3. Does stitching reduce fragmentation?**
+Yes. A true boundary goes from 2.6 pieces to 1.1 and the mean length of a group from 0.6 to 2.7. The price is
+purity, from 0.94 to 0.80. Local stitching alone is not enough (2.2 pieces).
 
-**4. Les associations longue distance aident-elles ?**
-Oui : F1 +0,11 [+0,10 ; +0,12], appartenance top-1 +0,07 [+0,05 ; +0,09]. Sans elles, le rappel tombe de 0,78 à 0,55.
+**4. Do long-range associations help?**
+Yes: F1 +0.11 [+0.10, +0.12], top-1 ownership +0.07 [+0.05, +0.09]. Without them, recall falls from 0.78 to 0.55.
 
-**5. Le modèle d'occlusion aide-t-il ?**
-Non. Le masque n'est correctement identifié que dans 2 à 5 % des scènes. Pénaliser la frontière attendue et absente
-dégrade l'attribution, avec ou sans masques explicites. Le score de visibilité contrefactuelle perd contre le
-contraste avec les masques inférés (−0,031) et ne gagne qu'avec le masque vrai (+0,032). L'idée est juste, sa
-condition préalable — trouver le masque — n'est pas remplie.
+**5. Does the occlusion model help?**
+No. The mask is correctly identified in only 2 to 5% of the scenes. Penalising the expected and absent boundary
+degrades attribution, with or without explicit masks. The counterfactual visibility score loses against
+contrast with the inferred masks (−0.031) and wins only with the true mask (+0.032). The idea is right, its
+precondition — finding the mask — is not met.
 
-**6. La composition aide-t-elle à réattribuer ?**
-Dans la chaîne, oui, nettement : F1 d'attribution +0,11 et appartenance top-1 +0,19. Mais le point de départ est
-l'attribution très faible du solveur calibré (0,30), et le niveau atteint (0,53) reste sous celui du solveur sans
-coût de hasard (0,57). Sur le banc de masquage, où l'attribution de départ est meilleure, la composition la dégrade
-(−0,064). Elle répare une mauvaise attribution, elle n'améliore pas une attribution correcte.
+**6. Does composition help to re-attribute?**
+In the chain, yes, clearly: attribution F1 +0.11 and top-1 ownership +0.19. But the starting point is
+the very weak attribution of the calibrated solver (0.30), and the level reached (0.53) remains below that of the solver without
+chance cost (0.57). On the occlusion bench, where the starting attribution is better, composition degrades it
+(−0.064). It repairs a bad attribution, it does not improve a correct attribution.
 
-**7. Les secteurs restent-ils problématiques ?**
-Oui, et la cause est maintenant séparée. Sans masque, appartenance et type vrais donnent 0,70, autant que sans
-aucune attribution (0,72) : le paramétrage n'est pas intrinsèquement fragile et l'attribution n'est pas le problème.
-À 20 % de masque, l'appartenance vraie vaut beaucoup (0,55 contre 0,25) : là, c'est l'attribution. À partir de 40 %,
-même l'appartenance vraie échoue (0,27, puis 0,02) : la demi-droite la plus pauvre n'a plus que quatre milieux, puis
-un, et le sommet n'est plus déterminé. C'est un manque de données, pas un défaut de méthode.
+**7. Do sectors remain problematic?**
+Yes, and the cause is now separated. Without mask, true ownership and type give 0.70, as much as without
+any attribution (0.72): the parameterisation is not intrinsically fragile and attribution is not the problem.
+At 20% mask, the true ownership is worth a lot (0.55 versus 0.25): there, it is attribution. From 40% onwards,
+even the true ownership fails (0.27, then 0.02): the poorest half-line has only four midpoints left, then
+one, and the apex is no longer determined. It is a lack of data, not a defect of method.
 
-**8. flat_scene_k3 se confirme-t-il sur nouveau dev ?**
-Oui. Sur 256 tâches nouvelles, avec trois bras désignés d'avance : structure candidate +0,137 [+0,090 ; +0,184],
-accord final +0,023 [+0,015 ; +0,031]. Il devient une baseline candidate. Ce n'est pas une validation confirmatoire :
-dev uniquement, une graine.
+**8. Is flat_scene_k3 confirmed on new dev?**
+Yes. On 256 new tasks, with three arms designated in advance: candidate structure +0.137 [+0.090, +0.184],
+final agreement +0.023 [+0.015, +0.031]. It becomes a candidate baseline. This is not a confirmatory validation:
+dev only, one seed.
 
-**9. Le gain ownership traverse-t-il jusqu'à la structure finale ?**
-Non. L'attribution s'améliore (F1 0,57 → 0,73), mais la méthode d'appartenance désignée fait bien pire en aval que
-le pipeline gelé (accord 0,62 contre 0,88). Sa variante sans coût de hasard bat le pipeline gelé (+0,012) mais reste
-sous `flat_scene_k3` (−0,011). Utiliser l'appartenance estimée comme filtre fait perdre 0,27 de récupération sur le
-banc et 0,018 d'accord dans la chaîne. Aucun usage de l'appartenance estimée ne fait mieux que de ne rien attribuer.
+**9. Does the ownership gain carry through to the final structure?**
+No. Attribution improves (F1 0.57 → 0.73), but the designated ownership method does much worse downstream than
+the frozen pipeline (agreement 0.62 versus 0.88). Its variant without chance cost beats the frozen pipeline (+0.012) but remains
+below `flat_scene_k3` (−0.011). Using the estimated ownership as a filter loses 0.27 of recovery on the
+bench and 0.018 of agreement in the chain. No use of the estimated ownership does better than attributing nothing.
 
-**10. Quel est le nouveau goulot ?**
-Il n'y en a plus un seul en amont. Entre `flat_scene_k3` et les vrais atomes, appartenance, type et paramètres se
-partagent l'écart à parts voisines, et aucune des trois n'a cédé à une méthode géométrique explicite. Le plafond
-lui-même est bas : avec les vrais atomes, la structure candidate n'est atteinte que dans 65 % des tâches (38 % à la
-profondeur 5) et la récupération à 0,99 dans 10 %. Le prochain goulot à isoler est donc en aval de l'amont : la
-composition en profondeur et l'ajustement final, à atomes donnés.
+**10. What is the new bottleneck?**
+There is no longer a single one upstream. Between `flat_scene_k3` and the true atoms, ownership, type and parameters
+share the gap in similar parts, and none of the three has yielded to an explicit geometric method. The ceiling
+itself is low: with the true atoms, the candidate structure is reached in only 65% of the tasks (38% at
+depth 5) and recovery at 0.99 in 10%. The next bottleneck to isolate is therefore downstream of the upstream:
+deep composition and the final fit, with atoms given.
 
-## 10. Limites
+## 10. Limits
 
-- Dev uniquement, une graine par scène et par tâche. La confirmation de `flat_scene_k3` est une re-mesure sur données
-  nouvelles, pas un test confirmatoire.
-- La calibration par le hasard n'atteint pas sa cible : en mise au point, 32 % des milieux restent attribués sur des
-  étiquettes aléatoires (96 % sans le coût). Elle n'a pas été re-mesurée sur l'évaluation.
-- Le bras désigné `own_k3` porte ce coût de hasard, qui l'effondre en composition. Le bras sans ce coût est meilleur
-  en aval mais n'est pas calibré : ni l'un ni l'autre n'est satisfaisant.
-- Le score d'appartenance est calibré en moyenne par une température élevée qui l'aplatit ; il ne sépare pas les
-  attributions justes des fausses.
-- Le banc de masquage n'a qu'une forme de composition (`cible ∧ masque`).
-- Solveur glouton avec au plus trois reprises ; ni appariement optimal ni programmation en nombres entiers n'ont été
-  essayés. Le résultat négatif porte sur ce solveur et cette énergie.
-- Les rôles « limite du domaine » et « inconnu » des hypothèses d'appartenance sont construits et testés, pas
-  évalués quantitativement.
+- Dev only, one seed per scene and per task. The confirmation of `flat_scene_k3` is a re-measurement on new
+  data, not a confirmatory test.
+- The calibration by chance does not reach its target: in tuning, 32% of the midpoints remain attributed on
+  random labels (96% without the cost). It was not re-measured on the evaluation.
+- The designated arm `own_k3` carries this chance cost, which collapses it in composition. The arm without this cost is better
+  downstream but is not calibrated: neither one nor the other is satisfactory.
+- The ownership score is calibrated on average by a high temperature that flattens it; it does not separate the
+  right attributions from the wrong ones.
+- The occlusion bench has only one form of composition (`target ∧ mask`).
+- Greedy solver with at most three restarts; neither optimal matching nor integer programming were
+  tried. The negative result concerns this solver and this energy.
+- The "domain limit" and "unknown" roles of the ownership hypotheses are built and tested, not
+  evaluated quantitatively.
 
 ## 11. Verdict
 
-Règle pré-enregistrée : BO1 soutenue ; BO11 et BO12 non soutenues.
+Preregistered rule: BO1 supported; BO11 and BO12 not supported.
 
 `BOUNDARY OWNERSHIP IMPROVED BUT INSUFFICIENT`
 
-L'attribution mesurée progresse (recollement, longue distance), mais elle ne produit aucun gain aval et, utilisée
-comme filtre, elle nuit. Le modèle d'occlusion échoue faute de trouver le masque. Résultat séparé, acquis :
-`flat_scene_k3` est confirmé sur données nouvelles et devient une baseline candidate. Le pipeline gelé reste la
-référence officielle ; rien de ce sous-jalon n'y est branché.
+The measured attribution progresses (stitching, long range), but it produces no downstream gain and, used
+as a filter, it does harm. The occlusion model fails for lack of finding the mask. Separate result, established:
+`flat_scene_k3` is confirmed on new data and becomes a candidate baseline. The frozen pipeline remains the
+official reference; nothing from this sub-milestone is wired into it.
 
-Statut enregistré dans `results/deep_configs/baselines.json` : `flat_scene_k3` = `candidate baseline` (gain confirmé sur
-un nouveau jeu de dev ; ne remplace pas la baseline officielle confirmatoire). `own_k3` n'est pas branché.
+Status recorded in `results/deep_configs/baselines.json`: `flat_scene_k3` = `candidate baseline` (gain confirmed on
+a new dev set; does not replace the official confirmatory baseline). `own_k3` is not wired in.

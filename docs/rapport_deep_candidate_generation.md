@@ -1,280 +1,280 @@
-# Rapport diagnostique — WCE Deep Candidate Generation
+# Diagnostic report — WCE Deep Candidate Generation
 
-Sous-jalon EXPLORATOIRE du jalon « Deep Compositional Structure Discovery & Model-Class Boundary ».
-Données : partition **dev uniquement**. Ni la validation, ni le test confirmatoire, ni le lot scellé n'ont été touchés.
-Rien ici n'est confirmatoire : toutes les analyses sont `POST-HOC / EXPLORATORY` au sens du pré-enregistrement
-(`docs/hypotheses_deep_compositional_discovery.md`, gelé au tag `prereg-deep-compositional-discovery`).
+EXPLORATORY sub-milestone of the milestone "Deep Compositional Structure Discovery & Model-Class Boundary".
+Data: **dev partition only**. Neither the validation set, nor the confirmatory test, nor the sealed set has been touched.
+Nothing here is confirmatory: all analyses are `POST-HOC / EXPLORATORY` in the sense of the preregistration
+(`docs/hypotheses_deep_compositional_discovery.md`, frozen at tag `prereg-deep-compositional-discovery`).
 
-Sources : `results/deep_generation_summary.json` (run AWS `wce-deepgen-20261004-134629`, 1 056 sous-unités, 8 tâches par
-profondeur et par régime), `results/deep_cover_summary.json` (run `wce-deepcover-20261004-142805`, 6 tâches par
-cellule), `results/deep_reachability.json`, `results/deep_coverage.json`, `results/deep_fragments.json`.
-Cibles : `make deep-reachability`, `deep-coverage`, `deep-fragments`, `deep-run-gen`, `deep-run-cover`,
+Sources: `results/deep_generation_summary.json` (AWS run `wce-deepgen-20261004-134629`, 1,056 sub-units, 8 tasks per
+depth and per regime), `results/deep_cover_summary.json` (run `wce-deepcover-20261004-142805`, 6 tasks per
+cell), `results/deep_reachability.json`, `results/deep_coverage.json`, `results/deep_fragments.json`.
+Targets: `make deep-reachability`, `deep-coverage`, `deep-fragments`, `deep-run-gen`, `deep-run-cover`,
 `deep-gen-aggregate`, `deep-cover-aggregate`, `deep-gen-report`.
 
-Effectifs : 8 tâches par cellule (profondeur × régime) pour les rappels, 6 pour la couverture exhaustive. Les
-proportions ci-dessous ont donc une résolution de 1/8 ou 1/6 ; elles situent le problème, elles ne le chiffrent pas
-finement.
+Sample sizes: 8 tasks per cell (depth × regime) for the recalls, 6 for the exhaustive coverage. The
+proportions below therefore have a resolution of 1/8 or 1/6; they locate the problem, they do not quantify it
+finely.
 
-## Résumé
+## Summary
 
-La vraie structure n'entre pas dans les candidats au-delà de la profondeur 2. Le diagnostic sépare cinq étages :
+The true structure does not enter the candidates beyond depth 2. The diagnosis separates five stages:
 
-| Étage | Verdict | Mesure |
+| Stage | Verdict | Measure |
 |---|---|---|
-| Représentation | n'est pas le problème | 100 % des structures vraies représentables, intermédiaires tous valides |
-| Composition | résolue QUAND les atomes sont connus | avec les vrais atomes, la vraie forme est générée dans 100 % des cas jusqu'à la profondeur 3, 75 à 88 % aux profondeurs 4–5, 50 % à la profondeur 6 |
-| Identifiabilité | suffisante en régimes standard et riche | la vraie structure (vrais paramètres) bat ses variantes privées d'un atome dans 75 à 100 % des cas |
-| Classement | n'est pas le problème observé | aucune cause `RANKING_FAILURE` sur 640 runs de profondeur 3–6 |
-| Ajustement / découverte des atomes | **goulot** | rappel des vrais atomes 0,03 à 0,12 au-delà de la profondeur 1 ; même en ajustant TOUTES les formes, la vraie forme n'est jamais sélectionnée à la profondeur 3 |
+| Representation | is not the problem | 100% of true structures representable, intermediates all valid |
+| Composition | solved WHEN the atoms are known | with the true atoms, the true form is generated in 100% of cases up to depth 3, 75 to 88% at depths 4–5, 50% at depth 6 |
+| Identifiability | sufficient in the standard and rich regimes | the true structure (true parameters) beats its variants deprived of one atom in 75 to 100% of cases |
+| Ranking | is not the observed problem | no `RANKING_FAILURE` cause over 640 runs of depth 3–6 |
+| Fitting / discovery of the atoms | **bottleneck** | recall of the true atoms 0.03 to 0.12 beyond depth 1; even when fitting ALL the forms, the true form is never selected at depth 3 |
 
-Le problème n'est donc ni la grammaire, ni la logique de composition, ni le classement : c'est la localisation des
-paramètres des atomes sous composition. Le sous-jalon suivant est la découverte de primitives.
+The problem is therefore neither the grammar, nor the composition logic, nor the ranking: it is the localisation of the
+parameters of the atoms under composition. The next sub-milestone is primitive discovery.
 
-## 1. Pourquoi la vraie structure n'était-elle pas générée à profondeur 3–6 ?
+## 1. Why was the true structure not generated at depth 3–6?
 
-Trois causes mécaniques, mesurées séparément.
+Three mechanical causes, measured separately.
 
-**(a) Les opérateurs.** La baseline, la stratégie plate et la descendante n'ajoutent qu'un atome à la fois : elles ne
-construisent que des chaînes. Part des structures vraies atteignables par ces opérateurs (120 structures par
-profondeur, analyse sans ajustement) : 100 % jusqu'à la profondeur 3, 90 % à 4, 77 % à 5, 63 % à 6. L'opérateur
-manquant est la composition de deux sous-structures (`compose_pair`).
+**(a) The operators.** The baseline, the flat strategy and the top-down one add only one atom at a time: they
+build only chains. Share of true structures reachable by these operators (120 structures per
+depth, analysis without fitting): 100% up to depth 3, 90% at 4, 77% at 5, 63% at 6. The missing
+operator is the composition of two sub-structures (`compose_pair`).
 
-**(b) La taille de l'espace.** Nombre de formes distinctes : 8, 108, 2 088 (énumération exacte), puis ≈ 8,0·10⁴,
-2,8·10⁶, 1,0·10⁸ (borne). Les stratégies génèrent 110 à 220 candidats. Couverture exacte mesurée de l'espace à la
-profondeur 2 : 58 % (baseline, plate), 16 % (montante), 11 % (bidirectionnelle), 3 % (factorisée) ; à la profondeur 3 :
-1,7 à 2,9 % (baseline, plate), moins de 1 % pour les autres.
+**(b) The size of the space.** Number of distinct forms: 8, 108, 2,088 (exact enumeration), then ≈ 8.0·10⁴,
+2.8·10⁶, 1.0·10⁸ (bound). The strategies generate 110 to 220 candidates. Exact measured coverage of the space at
+depth 2: 58% (baseline, flat), 16% (bottom-up), 11% (bidirectional), 3% (factorised); at depth 3:
+1.7 to 2.9% (baseline, flat), less than 1% for the others.
 
-**(c) Les atomes.** Les stratégies guidées par le résidu ne cherchent pas au hasard : elles suivent les atomes qu'elles
-ont ajustés. Or ces atomes ne sont pas les vrais (section 3). Cause principale relevée sur les runs de profondeur 3–6
-(32 par méthode et par régime) :
+**(c) The atoms.** The residual-guided strategies do not search at random: they follow the atoms they
+have fitted. Yet these atoms are not the true ones (section 3). Main cause recorded on the runs of depth 3–6
+(32 per method and per regime):
 
-| Méthode (budget 150) | `TRUE_PARENT_NOT_GENERATED` | `PRUNED_TOO_EARLY` | `BUDGET_EXHAUSTED` | `OPERATORS_INSUFFICIENT` | `FIT_FAILURE` | Récupérée |
+| Method (budget 150) | `TRUE_PARENT_NOT_GENERATED` | `PRUNED_TOO_EARLY` | `BUDGET_EXHAUSTED` | `OPERATORS_INSUFFICIENT` | `FIT_FAILURE` | Recovered |
 |---|---|---|---|---|---|---|
 | Baseline, standard | 20 | 7 | 0 | 4 | 0 | 1 |
-| Baseline, riche | 24 | 3 | 0 | 4 | 0 | 1 |
-| Plate, standard | 20 | 2 | 5 | 4 | 1 | 0 |
-| Plate, riche | 24 | 0 | 2 | 4 | 0 | 2 |
-| Montante, standard | 29 | 1 | 1 | 0 | 1 | 0 |
-| Montante, riche | 31 | 0 | 1 | 0 | 0 | 0 |
-| Bidirectionnelle, standard | 30 | 2 | 0 | 0 | 0 | 0 |
-| Factorisée, standard | 32 | 0 | 0 | 0 | 0 | 0 |
-| Factorisée, riche | 30 | 1 | 0 | 0 | 1 | 0 |
+| Baseline, rich | 24 | 3 | 0 | 4 | 0 | 1 |
+| Flat, standard | 20 | 2 | 5 | 4 | 1 | 0 |
+| Flat, rich | 24 | 0 | 2 | 4 | 0 | 2 |
+| Bottom-up, standard | 29 | 1 | 1 | 0 | 1 | 0 |
+| Bottom-up, rich | 31 | 0 | 1 | 0 | 0 | 0 |
+| Bidirectional, standard | 30 | 2 | 0 | 0 | 0 | 0 |
+| Factorised, standard | 32 | 0 | 0 | 0 | 0 | 0 |
+| Factorised, rich | 30 | 1 | 0 | 0 | 1 | 0 |
 
-Aucune occurrence de `GRAMMAR_UNREPRESENTABLE`, `CANONICALIZATION_COLLAPSE`, `TYPE_MISMATCH`, `RANKING_FAILURE` ni
-`OBSERVATIONAL_NON_IDENTIFIABILITY` à ces profondeurs. `FRAGMENT_MISSING` ne peut pas apparaître : aucune stratégie
-n'utilisait de bibliothèque dans ce run.
+No occurrence of `GRAMMAR_UNREPRESENTABLE`, `CANONICALIZATION_COLLAPSE`, `TYPE_MISMATCH`, `RANKING_FAILURE` or
+`OBSERVATIONAL_NON_IDENTIFIABILITY` at these depths. `FRAGMENT_MISSING` cannot appear: no strategy
+used a library in this run.
 
-## 2. Était-elle théoriquement atteignable ?
+## 2. Was it theoretically reachable?
 
-Oui pour la représentation : 100 % des structures vraies sont exprimables, et tous leurs préfixes, suffixes, sous-arbres
-et compositions partielles sont des objets de recherche valides, sans collision de clé (clôture des parents : 100 %).
+Yes for the representation: 100% of true structures are expressible, and all their prefixes, suffixes, subtrees
+and partial compositions are valid search objects, without key collision (closure of the parents: 100%).
 
-Oui pour les opérateurs dès qu'on dispose de `compose_pair` ou de la synthèse sur signatures : 100 % à toutes les
-profondeurs. Non pour 10 à 37 % des structures de profondeur 4–6 avec les seuls opérateurs « un atome à la fois ».
+Yes for the operators as soon as `compose_pair` or the synthesis over signatures is available: 100% at all
+depths. No for 10 to 37% of the structures of depth 4–6 with the "one atom at a time" operators alone.
 
-Chemin oracle minimal : 2d − 1 opérations (1, 3, 5, 7, 9, 11). Largeur nécessaire (nombre de résultats partiels à
-détenir) : 2 jusqu'à la profondeur 3, jusqu'à 3 au-delà.
+Minimal oracle path: 2d − 1 operations (1, 3, 5, 7, 9, 11). Required width (number of partial results to
+hold): 2 up to depth 3, up to 3 beyond.
 
-Statut `Reachability` : `REPRESENTABLE_BUT_NOT_REACHED` pour la quasi-totalité des échecs ;
-`UNREACHABLE_WITH_CURRENT_OPERATORS` pour 4 cas sur 32 (baseline et plate) ; `NOT_REPRESENTABLE` jamais.
+`Reachability` status: `REPRESENTABLE_BUT_NOT_REACHED` for almost all the failures;
+`UNREACHABLE_WITH_CURRENT_OPERATORS` for 4 cases out of 32 (baseline and flat); `NOT_REPRESENTABLE` never.
 
-## 3. Quel opérateur ou parent manquait ?
+## 3. Which operator or parent was missing?
 
-L'opérateur `compose_pair` pour les arbres équilibrés (section 1a). Mais le parent manquant le plus fréquent est de
-taille 1 ou 2 : les ATOMES eux-mêmes. Rappel des vrais atomes (même type, accord ≥ 0,95 sur la région observée) parmi
-48 atomes ajustés par gradient sur la cible :
+The `compose_pair` operator for the balanced trees (section 1a). But the most frequent missing parent is of
+size 1 or 2: the ATOMS themselves. Recall of the true atoms (same type, agreement ≥ 0.95 on the observed region) among
+48 atoms fitted by gradient on the target:
 
-| Profondeur | 1 | 2 | 3 | 4 | 5 | 6 |
+| Depth | 1 | 2 | 3 | 4 | 5 | 6 |
 |---|---|---|---|---|---|---|
-| Standard | 0,88 | 0,06 | 0,12 | 0,03 | 0,05 | 0,06 |
-| Riche | 1,00 | 0,06 | 0,12 | 0,03 | 0,03 | 0,04 |
-| Standard, seuil 0,90 | 1,00 | 0,38 | 0,21 | 0,12 | 0,10 | 0,10 |
+| Standard | 0.88 | 0.06 | 0.12 | 0.03 | 0.05 | 0.06 |
+| Rich | 1.00 | 0.06 | 0.12 | 0.03 | 0.03 | 0.04 |
+| Standard, threshold 0.90 | 1.00 | 0.38 | 0.21 | 0.12 | 0.10 | 0.10 |
 
-L'objectif de séparation des paires de frontière essayé dans ce sous-jalon fait pire (0,00 à 0,08 au-delà de la
-profondeur 1) : résultat négatif.
+The boundary-pair separation objective tried in this sub-milestone does worse (0.00 to 0.08 beyond
+depth 1): negative result.
 
-## 4. Le pruning supprimait-il le bon chemin ?
+## 4. Did the pruning remove the right path?
 
-Marginalement. `PRUNED_TOO_EARLY` représente 0 à 7 cas sur 32 selon la méthode (surtout la baseline en régime
-standard). Dans la grande majorité des cas, le bon chemin n'est pas élagué : il n'est jamais ouvert.
+Marginally. `PRUNED_TOO_EARLY` accounts for 0 to 7 cases out of 32 depending on the method (mostly the baseline in the
+standard regime). In the great majority of cases, the right path is not pruned: it is never opened.
 
-## 5. Le budget était-il suffisant ?
+## 5. Was the budget sufficient?
 
-Pour une recherche non guidée, non, structurellement : 150 équivalents-ajustement contre 2 088 formes à la profondeur 3.
-Mais augmenter le budget n'aide pas les stratégies actuelles : à 450, la montante consomme en moyenne 125 (standard) à
-173 (riche) équivalents-ajustement et s'arrête sur sa règle d'absence de gain ; la factorisée consomme 129 à 136 quel que
-soit le plafond. Les rappels à 150 et à 450 sont identiques. La courbe récupération / budget est plate.
+For an unguided search, no, structurally: 150 fit-equivalents against 2,088 forms at depth 3.
+But increasing the budget does not help the current strategies: at 450, the bottom-up one consumes on average 125 (standard) to
+173 (rich) fit-equivalents and stops on its no-gain rule; the factorised one consumes 129 to 136 whatever
+the cap. The recalls at 150 and at 450 are identical. The recovery / budget curve is flat.
 
-L'énumération exhaustive montre que le budget n'est pas la vraie limite. En ajustant TOUTES les formes (4
-initialisations chacune) :
+The exhaustive enumeration shows that the budget is not the true limit. When fitting ALL the forms (4
+initialisations each):
 
-| | Formes ajustées | Équivalents-ajustement | CPU | Vraie forme sélectionnée | Rang médian de la vraie forme | Accord de la meilleure forme |
+| | Forms fitted | Fit-equivalents | CPU | True form selected | Median rank of the true form | Agreement of the best form |
 |---|---|---|---|---|---|---|
-| Profondeur 2, standard | 116 | 464 | 18 s | 17 % | 36 | 0,926 |
-| Profondeur 2, riche | 116 | 464 | 19 s | 33 % | 40 | 0,979 |
-| Profondeur 3, standard | 2 204 | 8 816 | 420 s | 0 % | 915 | 0,866 |
-| Profondeur 3, riche | 2 204 | 8 816 | 470 s | 0 % | 821 | 0,932 |
+| Depth 2, standard | 116 | 464 | 18 s | 17% | 36 | 0.926 |
+| Depth 2, rich | 116 | 464 | 19 s | 33% | 40 | 0.979 |
+| Depth 3, standard | 2,204 | 8,816 | 420 s | 0% | 915 | 0.866 |
+| Depth 3, rich | 2,204 | 8,816 | 470 s | 0% | 821 | 0.932 |
 
-Même avec 59 fois le budget de référence, la vraie forme de profondeur 3 n'est jamais sélectionnée : elle est générée
-mais mal ajustée (son rang médian est autour de 900 sur 2 204). L'ajustement des paramètres depuis des initialisations
-heuristiques échoue. C'est le même goulot que la section 3, vu de l'autre côté.
+Even with 59 times the reference budget, the true form of depth 3 is never selected: it is generated
+but badly fitted (its median rank is around 900 out of 2,204). The fitting of the parameters from heuristic
+initialisations fails. It is the same bottleneck as section 3, seen from the other side.
 
-## 6. Les fragments aident-ils ?
+## 6. Do the fragments help?
 
-Peu, et pas par construction. Borne haute (bibliothèque de 32 fragments construite sur les VRAIES structures de 120
-tâches de curriculum de profondeur 2–3) : 58 à 67 % des sous-structures vraies à 2 atomes sont dans la bibliothèque ; le
-chemin oracle ne raccourcit que de 8 à 12 % ; le gain de compression net est négatif (−166 bits sur 60 structures de
-profondeur 4, la bibliothèque coûtant plus qu'elle n'économise). Le monde d'évaluation tire ses compositions au hasard :
-il n'y a pas de régularité de composition à apprendre. Les fragments ne changent pas non plus la reachability une fois la
-synthèse sur signatures disponible, puisqu'elle énumère déjà toutes les paires.
+Little, and not by construction. Upper bound (library of 32 fragments built on the TRUE structures of 120
+curriculum tasks of depth 2–3): 58 to 67% of the true sub-structures with 2 atoms are in the library; the
+oracle path shortens only by 8 to 12%; the net compression gain is negative (−166 bits over 60 structures of
+depth 4, the library costing more than it saves). The evaluation world draws its compositions at random:
+there is no regularity of composition to learn. The fragments do not change the reachability either once the
+synthesis over signatures is available, since it already enumerates all the pairs.
 
-Non mesuré : l'effet des fragments sur les stratégies par résidu dans un run complet (les variantes « fragments exacts /
-anti-unifiés / transférés » n'ont pas été lancées, le diagnostic ayant montré que le goulot est en amont).
+Not measured: the effect of the fragments on the residual strategies in a complete run (the variants "exact fragments /
+anti-unified / transferred" were not launched, the diagnosis having shown that the bottleneck is upstream).
 
-## 7. L'anti-unification aide-t-elle ?
+## 7. Does anti-unification help?
 
-Comme compresseur de groupe, non : anti-unifier tous les fragments de même taille donne le schéma trivial (résultat
-négatif, corrigé en anti-unification par paires). Comme générateur, modestement : les schémas à une variable issus des
-paires de fragments proposent 30 schémas dont 16 absents de la bibliothèque, et la couverture des sous-structures vraies
-passe de 58–67 % à 68–79 %. Coût : ces schémas couvrent une large part des 108 formes à 2 atomes ; c'est un élargissement
-de la génération, pas une généralisation ciblée.
+As a group compressor, no: anti-unifying all the fragments of the same size gives the trivial schema (negative
+result, corrected into pairwise anti-unification). As a generator, modestly: the one-variable schemas derived from the
+pairs of fragments propose 30 schemas of which 16 are absent from the library, and the coverage of the true sub-structures
+goes from 58–67% to 68–79%. Cost: these schemas cover a large share of the 108 forms with 2 atoms; it is a widening
+of the generation, not a targeted generalisation.
 
-## 8. Le typage réduit-il réellement l'espace ?
+## 8. Does typing really reduce the space?
 
-Au niveau des atomes, oui : 30 nœuds unaires bien typés sur 45 bruts (un tiers écarté ; 70 % à la profondeur 3 si l'on
-composait des nœuds bruts). Au niveau logique, non : tout couple de régions est composable par and / or / xor, le typage
-n'écarte aucune composition. La réduction utile vient des signatures : sur un exemple de profondeur 3 avec 15 littéraux,
-28 % des 2 727 compositions tentées sont fusionnées (même signature) et 30 % écartées comme dégénérées (constantes, ou
-identiques à un enfant). Ce taux n'a pas été agrégé sur l'ensemble du run.
+At the level of the atoms, yes: 30 well-typed unary nodes out of 45 raw ones (one third discarded; 70% at depth 3 if one
+composed raw nodes). At the logical level, no: any pair of regions is composable by and / or / xor, typing
+discards no composition. The useful reduction comes from the signatures: on an example of depth 3 with 15 literals,
+28% of the 2,727 compositions attempted are merged (same signature) and 30% discarded as degenerate (constants, or
+identical to a child). This rate has not been aggregated over the whole run.
 
-## 9. La bidirectionnelle rencontre-t-elle enfin le bon sous-espace ?
+## 9. Does the bidirectional one finally meet the right subspace?
 
-La bidirectionnelle par ajustements, non : rappel à la génération 0,12 à la profondeur 2, 0 au-delà ; couverture
-quasi nulle à la profondeur 3. La rencontre sur signatures (tables montantes + trous typés descendants + produit
-bilinéaire), oui, À CONDITION d'avoir les atomes :
+The bidirectional one by fits, no: recall at generation 0.12 at depth 2, 0 beyond; coverage
+almost zero at depth 3. The meeting over signatures (bottom-up tables + top-down typed holes + bilinear
+product), yes, PROVIDED the atoms are available:
 
-| Profondeur | 1 | 2 | 3 | 4 | 5 | 6 |
+| Depth | 1 | 2 | 3 | 4 | 5 | 6 |
 |---|---|---|---|---|---|---|
-| Vraie forme générée, vrais atomes seuls (standard) | 1,00 | 1,00 | 1,00 | 0,75 | 0,88 | 0,50 |
-| Avec 12 atomes parasites (standard) | 1,00 | 1,00 | 1,00 | 0,75 | 0,62 | 0,12 |
-| … et classée première avant ajustement | 1,00 | 1,00 | 0,62 | 0,50 | 0,25 | 0,00 |
-| Temps de synthèse | 0,02 s | 0,03 s | 0,05 s | 0,06 s | 0,19 s | 2,4 s |
+| True form generated, true atoms alone (standard) | 1.00 | 1.00 | 1.00 | 0.75 | 0.88 | 0.50 |
+| With 12 parasite atoms (standard) | 1.00 | 1.00 | 1.00 | 0.75 | 0.62 | 0.12 |
+| … and ranked first before fitting | 1.00 | 1.00 | 0.62 | 0.50 | 0.25 | 0.00 |
+| Synthesis time | 0.02 s | 0.03 s | 0.05 s | 0.06 s | 0.19 s | 2.4 s |
 
-Les échecs aux profondeurs 4–6 avec les vrais atomes ne sont pas expliqués en détail (hypothèses : borne sur le nombre de
-littéraux, fusion par signature d'une forme équivalente, faisceau des trous). À la profondeur 6 avec parasites, la
-synthèse ne suffit pas.
+The failures at depths 4–6 with the true atoms are not explained in detail (hypotheses: bound on the number of
+literals, merging by signature of an equivalent form, beam of the holes). At depth 6 with parasites, the
+synthesis is not enough.
 
-## 10. Quel est le Recall@generated par profondeur ?
+## 10. What is the Recall@generated per depth?
 
-| Méthode (budget 150) | d1 | d2 | d3 | d4 | d5 | d6 |
+| Method (budget 150) | d1 | d2 | d3 | d4 | d5 | d6 |
 |---|---|---|---|---|---|---|
-| Baseline, standard | 1,00 | 0,88 | 0,12 | 0,00 | 0,00 | 0,00 |
-| Plate, standard | 1,00 | 0,75 | 0,12 | 0,00 | 0,00 | 0,00 |
-| Montante, standard | 1,00 | 0,25 | 0,12 | 0,00 | 0,00 | 0,00 |
-| Bidirectionnelle, standard | 1,00 | 0,12 | 0,00 | 0,00 | 0,00 | 0,00 |
-| Factorisée, standard | 1,00 | 0,00 | 0,00 | 0,00 | 0,00 | 0,00 |
-| Baseline, riche | 1,00 | 0,88 | 0,12 | 0,00 | 0,00 | 0,00 |
-| Plate, riche | 1,00 | 1,00 | 0,25 | 0,00 | 0,00 | 0,00 |
-| Montante, riche | 1,00 | 0,38 | 0,00 | 0,00 | 0,00 | 0,00 |
-| Factorisée, riche | 1,00 | 0,00 | 0,12 | 0,00 | 0,00 | 0,00 |
+| Baseline, standard | 1.00 | 0.88 | 0.12 | 0.00 | 0.00 | 0.00 |
+| Flat, standard | 1.00 | 0.75 | 0.12 | 0.00 | 0.00 | 0.00 |
+| Bottom-up, standard | 1.00 | 0.25 | 0.12 | 0.00 | 0.00 | 0.00 |
+| Bidirectional, standard | 1.00 | 0.12 | 0.00 | 0.00 | 0.00 | 0.00 |
+| Factorised, standard | 1.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 |
+| Baseline, rich | 1.00 | 0.88 | 0.12 | 0.00 | 0.00 | 0.00 |
+| Flat, rich | 1.00 | 1.00 | 0.25 | 0.00 | 0.00 | 0.00 |
+| Bottom-up, rich | 1.00 | 0.38 | 0.00 | 0.00 | 0.00 | 0.00 |
+| Factorised, rich | 1.00 | 0.00 | 0.12 | 0.00 | 0.00 | 0.00 |
 
-Aucune amélioration : les nouvelles stratégies génèrent MOINS souvent la vraie forme que la baseline à la profondeur 2.
-Les autres rappels (régime standard, baseline / plate / montante) : après élagage 0,50 / 0,62 / 0,25 à la profondeur 2 ;
-bien ajustée 0,25 / 0,12 / 0,12 ; dans les 5 premières 0,50 / 0,12 / 0,12 ; sélectionnée 0,25 / 0,12 / 0,12. À partir de la
-profondeur 4, tous les rappels sont nuls pour toutes les méthodes. Le rappel avant élagage n'est pas mesuré séparément :
-il est égal au rappel à la génération dans cette instrumentation.
+No improvement: the new strategies generate the true form LESS often than the baseline at depth 2.
+The other recalls (standard regime, baseline / flat / bottom-up): after pruning 0.50 / 0.62 / 0.25 at depth 2;
+well fitted 0.25 / 0.12 / 0.12; in the 5 best 0.50 / 0.12 / 0.12; selected 0.25 / 0.12 / 0.12. From
+depth 4 onwards, all the recalls are zero for all the methods. The recall before pruning is not measured separately:
+it is equal to the recall at generation in this instrumentation.
 
-L'objectif diagnostique exploratoire (« amélioration substantielle à la profondeur 3, fraction non triviale à la
-profondeur 4 ») n'est PAS atteint par la recherche complète. Il n'est atteint que par l'étage logique isolé (section 9).
+The exploratory diagnostic objective ("substantial improvement at depth 3, non-trivial fraction at
+depth 4") is NOT reached by the complete search. It is reached only by the isolated logical stage (section 9).
 
-## 11. Coût par vraie structure rendue atteignable
+## 11. Cost per true structure made reachable
 
-Par la recherche complète : non défini (aucune structure de profondeur ≥ 4 rendue atteignable). Par l'étage logique avec
-vrais atomes : 0,05 à 0,2 s de CPU et 10³ à 10⁶ paires évaluées par structure jusqu'à la profondeur 5, sans aucun
-ajustement par gradient.
+By the complete search: undefined (no structure of depth ≥ 4 made reachable). By the logical stage with
+true atoms: 0.05 to 0.2 s of CPU and 10³ to 10⁶ pairs evaluated per structure up to depth 5, without any
+gradient fitting.
 
-Coûts moyens séparés (régime standard, toutes profondeurs) :
+Separate mean costs (standard regime, all depths):
 
-| Méthode | Équivalents-ajustement | Candidats | Compositions tentées | CPU total | dont ajustement | dont synthèse |
+| Method | Fit-equivalents | Candidates | Compositions attempted | Total CPU | of which fitting | of which synthesis |
 |---|---|---|---|---|---|---|
-| Baseline | 132 | 109 | 0 | 40,0 s | 40,0 s | 0 |
-| Plate @150 | 127 | 119 | 0 | 17,0 s | 16,5 s | 0 |
-| Montante @150 | 116 | 173 | 0 | 12,4 s | 12,1 s | 0 |
-| Bidirectionnelle @150 | 89 | 141 | 0 | 8,1 s | 7,9 s | 0 |
-| Factorisée @150 | 129 | 217 | 3,5·10⁸ | 20,5 s | 7,2 s | 13,2 s |
+| Baseline | 132 | 109 | 0 | 40.0 s | 40.0 s | 0 |
+| Flat @150 | 127 | 119 | 0 | 17.0 s | 16.5 s | 0 |
+| Bottom-up @150 | 116 | 173 | 0 | 12.4 s | 12.1 s | 0 |
+| Bidirectional @150 | 89 | 141 | 0 | 8.1 s | 7.9 s | 0 |
+| Factorised @150 | 129 | 217 | 3.5·10⁸ | 20.5 s | 7.2 s | 13.2 s |
 
-Pour la factorisée, la synthèse (génération) est devenue le poste dominant, devant l'ajustement : le point chaud n'est
-plus `fit`. L'élagage, la canonicalisation, le regroupement d'équivalence et la recherche de fragments ne sont pas
-chronométrés séparément (limite de l'instrumentation).
+For the factorised one, the synthesis (generation) has become the dominant item, ahead of the fitting: the hot spot is no
+longer `fit`. Pruning, canonicalisation, equivalence grouping and fragment search are not
+timed separately (limit of the instrumentation).
 
-## 12. Le gain vient-il de meilleure composition ou de plus de calcul ?
+## 12. Does the gain come from better composition or from more computation?
 
-Il n'y a pas de gain de récupération à attribuer. Ce qui est établi : (i) plus de calcul n'aide pas (budget 450 = budget
-150 ; l'énumération exhaustive à 8 816 équivalents-ajustement ne sélectionne pas la vraie forme) ; (ii) la composition
-par signatures résout l'étage logique en une fraction de seconde quand les atomes sont justes. Le facteur limitant n'est
-ni la composition ni le calcul : ce sont les atomes.
+There is no recovery gain to attribute. What is established: (i) more computation does not help (budget 450 = budget
+150; the exhaustive enumeration at 8,816 fit-equivalents does not select the true form); (ii) the composition
+by signatures solves the logical stage in a fraction of a second when the atoms are right. The limiting factor is
+neither the composition nor the computation: it is the atoms.
 
-## Identifiabilité, distinguée de la génération
+## Identifiability, distinguished from generation
 
-Avec la vraie structure et ses vrais paramètres, sans recherche : part des tâches où elle bat toutes ses variantes privées
-d'un atome (facteur de Bayes > 3).
+With the true structure and its true parameters, without search: share of the tasks where it beats all its variants deprived
+of one atom (Bayes factor > 3).
 
-| Régime | d2 | d3 | d4 | d5 | d6 | Source |
+| Regime | d2 | d3 | d4 | d5 | d6 | Source |
 |---|---|---|---|---|---|---|
-| Difficile (160 points, bruit total 15 %) | 0,70 | 0,47 | 0,15 | 0,07 | 0,03 | 40 tâches, local |
-| Standard (300 points, 10 %) | 1,00 | 0,93 | 0,88 | 0,70 | 0,72 | 40 tâches, local |
-| Standard | 1,00 | 1,00 | 0,88 | 0,88 | 0,75 | 8 tâches, AWS |
-| Riche (600 points, 7 %) | 1,00 | 1,00 | 0,97 | 1,00 | 0,97 | 40 tâches, local |
-| Riche | 1,00 | 1,00 | 1,00 | 1,00 | 1,00 | 8 tâches, AWS |
+| Hard (160 points, total noise 15%) | 0.70 | 0.47 | 0.15 | 0.07 | 0.03 | 40 tasks, local |
+| Standard (300 points, 10%) | 1.00 | 0.93 | 0.88 | 0.70 | 0.72 | 40 tasks, local |
+| Standard | 1.00 | 1.00 | 0.88 | 0.88 | 0.75 | 8 tasks, AWS |
+| Rich (600 points, 7%) | 1.00 | 1.00 | 0.97 | 1.00 | 0.97 | 40 tasks, local |
+| Rich | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 8 tasks, AWS |
 
-En régime difficile, les profondeurs 4–6 ne sont pas identifiables quelle que soit la recherche : l'atome le plus faible
-modifie une douzaine de points pour 24 étiquettes retournées attendues. En régimes standard et riche, l'échec n'est pas
-un problème d'identifiabilité.
+In the hard regime, depths 4–6 are not identifiable whatever the search: the weakest atom
+modifies a dozen points for 24 expected flipped labels. In the standard and rich regimes, the failure is not
+an identifiability problem.
 
-## Qualité de la base
+## Quality of the basis
 
-La base est redondante : bande = deux demi-plans parallèles, anneau = disque ∧ anti-disque, secteur = deux demi-plans par
-l'apex. Une structure vraie compte en moyenne 1,5 fois plus d'atomes en base minimale {demi-plan, disque} (1,67 ; 3,07 ;
-4,52 ; 6,09 ; 7,58 ; 9,07 pour les profondeurs 1 à 6). Une structure peut donc être retrouvée fonctionnellement sous une
-autre forme, comptée comme un échec de rappel de forme. Aucune structure n'exige une primitive absente ; aucune n'est
-artificiellement longue par rapport à sa profondeur déclarée.
+The basis is redundant: band = two parallel half-planes, ring = disc ∧ anti-disc, sector = two half-planes through
+the apex. A true structure has on average 1.5 times more atoms in the minimal basis {half-plane, disc} (1.67; 3.07;
+4.52; 6.09; 7.58; 9.07 for depths 1 to 6). A structure can therefore be recovered functionally under
+another form, counted as a failure of form recall. No structure requires an absent primitive; none is
+artificially long relative to its declared depth.
 
 ## Canonicalisation
 
-Aucun cas de `CANONICALIZATION_COLLAPSE` mesuré. Deux précautions vérifiées par tests : la clé d'une sous-structure
-n'applique aucune réécriture dépendant des paramètres (sinon un `translate(0, 0)` ajusté changerait de clé) ; deux formes
-associativement équivalentes gardent des clés distinctes pendant la construction et ne sont réunies qu'à l'évaluation.
-Dans la synthèse, des formes de même signature sont fusionnées mais jusqu'à deux alternatives sont conservées.
+No case of `CANONICALIZATION_COLLAPSE` measured. Two precautions verified by tests: the key of a sub-structure
+applies no rewriting that depends on the parameters (otherwise a fitted `translate(0, 0)` would change key); two
+associatively equivalent forms keep distinct keys during construction and are merged only at evaluation.
+In the synthesis, forms with the same signature are merged but up to two alternatives are kept.
 
-## Bugs trouvés
+## Bugs found
 
-- Dans les lignes de l'exploration dev précédente, le booléen « vraie structure générée » était écrasé par le nombre de
-  candidats générés ; le champ `fate` restait correct. Corrigé pour ce sous-jalon (champs distincts).
-- La bibliothèque de fragments canonisait les programmes ajustés avec une réécriture dépendant des paramètres : un même
-  fragment recevait deux clés. Corrigé (`normalize`).
-- Premier essai du générateur factorisé sans borne sur le nombre de littéraux : tables de plusieurs millions de lignes,
-  plus de 10 minutes sans résultat. Corrigé par une sélection de diversité (14 littéraux au plus).
+- In the rows of the previous dev exploration, the boolean "true structure generated" was overwritten by the number of
+  candidates generated; the `fate` field remained correct. Fixed for this sub-milestone (distinct fields).
+- The fragment library canonicalised the fitted programs with a rewriting that depends on the parameters: one and the same
+  fragment received two keys. Fixed (`normalize`).
+- First attempt at the factorised generator without a bound on the number of literals: tables of several million rows,
+  more than 10 minutes without result. Fixed by a diversity selection (14 literals at most).
 
-## Limites
+## Limits
 
-- 8 tâches par cellule (6 pour la couverture) : faible résolution statistique.
-- Le rappel avant élagage n'est pas distinct du rappel à la génération ; les temps d'élagage, de canonicalisation et
-  d'équivalence ne sont pas séparés.
-- Les échecs de l'étage logique aux profondeurs 4–6 avec les vrais atomes ne sont pas expliqués en détail.
-- La détection géométrique directe (droites et cercles par consensus) et l'objectif de séparation ont échoué ; ils ne
-  sont décrits ici que comme résultats négatifs.
-- Les variantes « fragments » des stratégies par résidu et le curriculum de profondeur n'ont pas été exécutés en
-  conditions réelles.
+- 8 tasks per cell (6 for the coverage): low statistical resolution.
+- The recall before pruning is not distinct from the recall at generation; the times of pruning, canonicalisation and
+  equivalence are not separated.
+- The failures of the logical stage at depths 4–6 with the true atoms are not explained in detail.
+- The direct geometric detection (lines and circles by consensus) and the separation objective failed; they are
+  described here only as negative results.
+- The "fragments" variants of the residual strategies and the depth curriculum were not executed under
+  real conditions.
 
-## Réponse à la question de sortie
+## Answer to the exit question
 
-Pourquoi les vraies structures profondes n'étaient pas générées : parce que les paramètres des atomes ne sont pas
-trouvés sous composition (rappel atomique ≈ 0,05), ce qui laisse la recherche guidée sans prise et rend l'énumération
-exhaustive elle-même inopérante ; accessoirement parce que les opérateurs « un atome à la fois » excluent 10 à 37 % des
-arbres de profondeur 4–6.
+Why the true deep structures were not generated: because the parameters of the atoms are not
+found under composition (atomic recall ≈ 0.05), which leaves the guided search without purchase and makes the exhaustive
+enumeration itself ineffective; secondarily because the "one atom at a time" operators exclude 10 to 37% of the
+trees of depth 4–6.
 
-Quelles modifications minimales rendent la génération possible sans force brute : la synthèse sur signatures (tables
-montantes, trous typés, rencontre bilinéaire) suffit pour la composition jusqu'à la profondeur 5 — MAIS seulement une
-fois les atomes disponibles. Cette condition n'est pas remplie aujourd'hui. Le critère de sortie du sous-jalon n'est donc
-atteint qu'à moitié : la cause est établie expérimentalement, le remède complet ne l'est pas. Le goulot suivant est la
-découverte de primitives (`docs/rapport_primitive_discovery.md`).
+Which minimal modifications make generation possible without brute force: the synthesis over signatures (bottom-up
+tables, typed holes, bilinear meeting) is enough for the composition up to depth 5 — BUT only once
+the atoms are available. This condition is not met today. The exit criterion of the sub-milestone is therefore
+reached only by half: the cause is established experimentally, the complete remedy is not. The next bottleneck is
+primitive discovery (`docs/rapport_primitive_discovery.md`).

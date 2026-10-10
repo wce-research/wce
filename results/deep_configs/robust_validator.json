@@ -59,8 +59,8 @@
    "z_floor": 10.88
   }
  },
- "selected_on": "27 sc\u00e8nes de mise au point (indices 5000+)",
- "criterion": "moyenne harmonique \u00e9quivalence / pr\u00e9cision",
+ "selected_on": "27 tuning scenes (indices 5000+)",
+ "criterion": "harmonic mean equivalence / precision",
  "tuning": {
   "config": {
    "split": "none",

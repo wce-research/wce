@@ -1,313 +1,313 @@
-# Rapport — WCE Primitive Discovery
+# Report — WCE Primitive Discovery
 
-Sous-jalon EXPLORATOIRE du jalon « Deep Compositional Structure Discovery & Model-Class Boundary ».
-Données : partition **dev uniquement** (banc atomique et scènes d'entraînement sur des sous-plages dédiées de dev).
-Ni la validation, ni le test confirmatoire, ni le lot scellé n'ont été touchés. Rien ici n'est confirmatoire : tout est
-`POST-HOC / EXPLORATORY` au sens du pré-enregistrement.
+EXPLORATORY sub-milestone of the milestone "Deep Compositional Structure Discovery & Model-Class Boundary".
+Data: **dev only** partition (atomic benchmark and training scenes on dedicated sub-ranges of dev).
+Neither the validation, nor the confirmatory test, nor the sealed set has been touched. Nothing here is confirmatory: everything is
+`POST-HOC / EXPLORATORY` in the sense of the preregistration.
 
-Sources : `results/deep_primitive_summary.json` (run AWS `wce-deepprim-20261004-150003`, 1 536 sous-unités, aucune en
-erreur), `results/deep_neural_training.json` (run `wce-deepneural-20261004-145510`).
-Cibles : `make deep-train-proposer`, `deep-install-proposer`, `deep-run-prim`, `deep-prim-aggregate`,
+Sources: `results/deep_primitive_summary.json` (AWS run `wce-deepprim-20261004-150003`, 1,536 sub-units, none in
+error), `results/deep_neural_training.json` (run `wce-deepneural-20261004-145510`).
+Targets: `make deep-train-proposer`, `deep-install-proposer`, `deep-run-prim`, `deep-prim-aggregate`,
 `deep-prim-report`.
 
-Effectifs : 144 scènes atomiques par méthode (9 catégories × 16), soit 248 atomes vrais ; 8 scènes par décalage hors
-distribution ; 8 scènes par politique active ; 8 tâches par cellule (profondeur × régime) pour la chaîne aval.
+Sample sizes: 144 atomic scenes per method (9 categories × 16), i.e. 248 true atoms; 8 scenes per out-of-distribution
+shift; 8 scenes per active policy; 8 tasks per cell (depth × regime) for the downstream chain.
 
-## Résumé
+## Summary
 
-La question du sous-jalon était : peut-on découvrir assez bien les primitives pour rendre les structures profondes
-accessibles à la composition ? **Réponse mesurée : pas encore.**
+The question of the sub-milestone was: can the primitives be discovered well enough to make deep structures
+accessible to composition? **Measured answer: not yet.**
 
-- Aucun des nouveaux proposeurs ne dépasse l'ajustement par gradient direct, qui reste la meilleure méthode du banc
-  atomique (équivalence 0,56 contre 0,46 à 0,49 pour les méthodes géométrique et hybrides).
-- Le proposeur neuronal compact n'apporte aucun gain de rappel : seul, il est le plus faible (0,22) ; en hybride, il
-  égale l'hybride sans réseau (0,49). Il est en revanche le plus précis (0,54) et le plus rapide.
-- La chaîne causale est vérifiée : quand toutes les primitives sont retrouvées, une structure candidate fonctionnelle
-  apparaît dans 56 à 100 % des cas, contre 8 à 23 % sinon. Le manque d'atomes explique bien l'échec de génération.
-- Un second goulot apparaît en aval : même avec les VRAIS atomes, la récupération finale au seuil 0,99 n'est atteinte
-  que dans 0 à 25 % des cas, alors que l'accord moyen est de 0,85 à 0,98.
+- None of the new proposers exceeds direct gradient fitting, which remains the best method of the atomic
+  benchmark (equivalence 0.56 versus 0.46 to 0.49 for the geometric and hybrid methods).
+- The compact neural proposer brings no recall gain: alone, it is the weakest (0.22); as a hybrid, it
+  equals the hybrid without a network (0.49). It is, on the other hand, the most precise (0.54) and the fastest.
+- The causal chain is verified: when all the primitives are recovered, a functional candidate structure
+  appears in 56 to 100% of cases, versus 8 to 23% otherwise. The lack of atoms does explain the generation failure.
+- A second bottleneck appears downstream: even with the TRUE atoms, final recovery at the 0.99 threshold is reached
+  in only 0 to 25% of cases, whereas the mean agreement is 0.85 to 0.98.
 
 ## 1. Architecture
 
-`core/deep_primitives.py` — distinctions maintenues dans le code : `Primitive` (élément de base) ≠ `Fragment`
-(composition réutilisable) ≠ `CompositeStructure` (assemblage).
+`core/deep_primitives.py` — distinctions maintained in the code: `Primitive` (basic element) ≠ `Fragment`
+(reusable composition) ≠ `CompositeStructure` (assembly).
 
-- `PrimitiveCandidate` : objet explicite — type, paramètres, domaine, support observationnel, incertitude, résidu
-  expliqué, coût descriptif, invariants, parenté. Jamais un vecteur latent.
-- `PrimitiveProposal` (interface) : `GradientProposer` (référence), `GeometricProposer` (droites et cercles par
-  consensus, aucun ajustement), `ContrastProposer` (gradient sur un objectif de contraste), `RefiningProposer`
-  (hybride : les propositions des autres servent d'initialisation), `NeuralProposer` (réseau compact).
-- `PrimitiveValidation` : le validateur WCE. Signal explicite, indépendant de la polarité : parmi les paires de points
-  voisins que la frontière du candidat sépare, la part de paires d'étiquettes opposées doit dépasser le taux de base
-  (écart z). Seuil corrigé des comparaisons multiples (√(2·ln N) + 1). Critères : support, contraste, stabilité au
-  rééchantillonnage, équivalence avec une primitive retenue.
-- `CompatiblePrimitives` : hypothèses multiples pondérées, regroupées par classes d'équivalence (accord ou complément
-  ≥ 0,97 sur la région observée) ; le type d'une primitive peut rester ouvert.
-- `discover` : boucle guidée par le résidu (proposer → valider → retenir → retirer les paires expliquées → reproposer),
-  arrêt quand plus aucun candidat ne passe la validation. Le résidu est un ensemble de paires inexpliquées, pas une
-  mémoire de points.
-- `PrimitiveFamily`, `PrimitiveLibrary`, `BirthProposal`, `merge_redundant` : familles paramétriques, bibliothèque,
-  naissance, fusion, retrait.
-- `core/deep_primitive_eval.py` (évaluation) : métriques et classes d'identifiabilité. `core/deep_primitive_world.py`
-  (évaluation) : banc atomique.
+- `PrimitiveCandidate`: explicit object — type, parameters, domain, observational support, uncertainty, explained
+  residual, descriptive cost, invariants, lineage. Never a latent vector.
+- `PrimitiveProposal` (interface): `GradientProposer` (reference), `GeometricProposer` (lines and circles by
+  consensus, no fitting), `ContrastProposer` (gradient on a contrast objective), `RefiningProposer`
+  (hybrid: the proposals of the others serve as initialisation), `NeuralProposer` (compact network).
+- `PrimitiveValidation`: the WCE validator. Explicit signal, independent of polarity: among the pairs of neighbouring
+  points that the candidate's boundary separates, the share of pairs with opposite labels must exceed the base rate
+  (z gap). Threshold corrected for multiple comparisons (√(2·ln N) + 1). Criteria: support, contrast, stability under
+  resampling, equivalence with a retained primitive.
+- `CompatiblePrimitives`: weighted multiple hypotheses, grouped by equivalence classes (agreement or complement
+  ≥ 0.97 on the observed region); the type of a primitive may remain open.
+- `discover`: residual-guided loop (propose → validate → retain → remove the explained pairs → propose again),
+  stopping when no candidate passes validation any more. The residual is a set of unexplained pairs, not a
+  memory of points.
+- `PrimitiveFamily`, `PrimitiveLibrary`, `BirthProposal`, `merge_redundant`: parametric families, library,
+  birth, merging, retirement.
+- `core/deep_primitive_eval.py` (evaluation): metrics and identifiability classes. `core/deep_primitive_world.py`
+  (evaluation): atomic benchmark.
 
-## 2. Résultats du banc atomique
+## 2. Results of the atomic benchmark
 
-| Méthode | Exact | Fonctionnel | Équivalence | Composantes | Précision | Erreur de paramètres | Classes retenues | Propositions | Équiv.-ajustement | Temps |
+| Method | Exact | Functional | Equivalence | Components | Precision | Parameter error | Retained classes | Proposals | Equiv.-fitting | Time |
 |---|---|---|---|---|---|---|---|---|---|---|
-| Gradient direct (référence) | 0,34 | 0,47 | **0,56** | 0,60 | 0,37 | 0,24 | 2,1 | 76 | 38 | 1,0 s |
-| Géométrique analytique | 0,29 | 0,38 | 0,46 | 0,53 | 0,25 | 0,20 | 4,3 | 159 | 0 | 0,15 s |
-| Contraste | 0,05 | 0,23 | 0,34 | 0,39 | 0,12 | 0,42 | 4,4 | 105 | 63 | 2,3 s |
-| Hybride | 0,27 | 0,38 | 0,49 | 0,56 | 0,19 | 0,28 | 4,6 | 301 | 67 | 3,4 s |
-| Hybride, base minimale | 0,28 | 0,41 | 0,47 | 0,56 | 0,27 | 0,07 | 4,6 | 245 | 50 | 1,4 s |
-| Neuronal compact | 0,12 | 0,17 | 0,22 | 0,26 | **0,54** | 0,12 | 0,8 | 36 | 0 | 0,03 s |
-| Neuronal + hybride | 0,28 | 0,38 | 0,49 | 0,56 | 0,20 | 0,29 | 4,5 | 368 | 65 | 3,4 s |
+| Direct gradient (reference) | 0.34 | 0.47 | **0.56** | 0.60 | 0.37 | 0.24 | 2.1 | 76 | 38 | 1.0 s |
+| Analytic geometric | 0.29 | 0.38 | 0.46 | 0.53 | 0.25 | 0.20 | 4.3 | 159 | 0 | 0.15 s |
+| Contrast | 0.05 | 0.23 | 0.34 | 0.39 | 0.12 | 0.42 | 4.4 | 105 | 63 | 2.3 s |
+| Hybrid | 0.27 | 0.38 | 0.49 | 0.56 | 0.19 | 0.28 | 4.6 | 301 | 67 | 3.4 s |
+| Hybrid, minimal basis | 0.28 | 0.41 | 0.47 | 0.56 | 0.27 | 0.07 | 4.6 | 245 | 50 | 1.4 s |
+| Compact neural | 0.12 | 0.17 | 0.22 | 0.26 | **0.54** | 0.12 | 0.8 | 36 | 0 | 0.03 s |
+| Neural + hybrid | 0.28 | 0.38 | 0.49 | 0.56 | 0.20 | 0.29 | 4.5 | 368 | 65 | 3.4 s |
 
-Définitions : *exact* = même type et accord ≥ 0,95 ; *fonctionnel* = accord ≥ 0,95 ou complément, tout type ;
-*équivalence* = toutes les composantes de frontière de l'atome (droites, cercles, demi-droites) retrouvées ;
-*précision* = part des classes retenues dont toutes les composantes correspondent à une frontière vraie.
+Definitions: *exact* = same type and agreement ≥ 0.95; *functional* = agreement ≥ 0.95 or complement, any type;
+*equivalence* = all the boundary components of the atom (lines, circles, half-lines) recovered;
+*precision* = share of the retained classes all of whose components correspond to a true boundary.
 
-Lecture : moins de six atomes sur dix sont retrouvés même par la meilleure méthode, et entre la moitié et près de neuf
-dixièmes des primitives retenues sont fausses. Compacité : les méthodes hybrides retiennent 3 classes par atome vrai
-(1,4 pour le gradient, 0,5 pour le réseau).
+Reading: fewer than six atoms out of ten are recovered even by the best method, and between half and nearly nine
+tenths of the retained primitives are false. Compactness: the hybrid methods retain 3 classes per true atom
+(1.4 for the gradient, 0.5 for the network).
 
-### Par type d'atome (hybride)
+### By atom type (hybrid)
 
-| Atome | n | Exact | Équivalence | Composantes |
+| Atom | n | Exact | Equivalence | Components |
 |---|---|---|---|---|
-| Demi-plan | 43 | 0,28 | 0,93 | 0,93 |
-| Bande | 25 | 0,32 | 0,64 | 0,80 |
-| Disque | 103 | 0,42 | 0,53 | 0,53 |
-| Anti-disque | 25 | 0,04 | 0,32 | 0,32 |
-| Anneau | 31 | 0,03 | 0,03 | 0,26 |
-| Secteur | 21 | 0,05 | 0,05 | 0,29 |
+| Half-plane | 43 | 0.28 | 0.93 | 0.93 |
+| Band | 25 | 0.32 | 0.64 | 0.80 |
+| Disc | 103 | 0.42 | 0.53 | 0.53 |
+| Anti-disc | 25 | 0.04 | 0.32 | 0.32 |
+| Ring | 31 | 0.03 | 0.03 | 0.26 |
+| Sector | 21 | 0.05 | 0.05 | 0.29 |
 
-Les droites sont bien retrouvées ; les cercles à moitié ; les anneaux et les secteurs presque jamais. La reconnaissance
-des macros (deux cercles concentriques → anneau, deux demi-droites → secteur) ne fonctionne pas.
+Lines are recovered well; circles half of the time; rings and sectors almost never. The recognition
+of macros (two concentric circles → ring, two half-lines → sector) does not work.
 
-### Par catégorie (équivalence)
+### By category (equivalence)
 
-| Catégorie | Gradient | Géométrique | Hybride | Neuronal | Neuronal + hybride |
+| Category | Gradient | Geometric | Hybrid | Neural | Neural + hybrid |
 |---|---|---|---|---|---|
-| Un atome | 0,63 | 0,44 | 0,50 | 0,25 | 0,44 |
-| Deux atomes | 0,28 | 0,44 | 0,38 | 0,16 | 0,38 |
-| Plusieurs atomes | 0,17 | 0,36 | 0,34 | 0,08 | 0,44 |
-| Atomes proches | 0,25 | 0,56 | 0,56 | 0,25 | 0,53 |
-| Atomes imbriqués | 0,72 | 0,56 | 0,59 | 0,25 | 0,66 |
-| Atomes redondants | 0,97 | 0,75 | 0,81 | 0,38 | 0,81 |
-| Bruit élevé | 0,63 | 0,38 | 0,50 | 0,13 | 0,38 |
-| Outliers groupés | 0,88 | 0,56 | 0,63 | 0,31 | 0,69 |
-| Frontière partielle | 0,50 | 0,06 | 0,06 | 0,19 | 0,06 |
+| One atom | 0.63 | 0.44 | 0.50 | 0.25 | 0.44 |
+| Two atoms | 0.28 | 0.44 | 0.38 | 0.16 | 0.38 |
+| Several atoms | 0.17 | 0.36 | 0.34 | 0.08 | 0.44 |
+| Close atoms | 0.25 | 0.56 | 0.56 | 0.25 | 0.53 |
+| Nested atoms | 0.72 | 0.56 | 0.59 | 0.25 | 0.66 |
+| Redundant atoms | 0.97 | 0.75 | 0.81 | 0.38 | 0.81 |
+| High noise | 0.63 | 0.38 | 0.50 | 0.13 | 0.38 |
+| Clustered outliers | 0.88 | 0.56 | 0.63 | 0.31 | 0.69 |
+| Partial boundary | 0.50 | 0.06 | 0.06 | 0.19 | 0.06 |
 
-Le gradient direct domine sur les scènes simples (un atome, redondants, bruit, outliers, frontière partielle) ; les
-méthodes géométriques et hybrides font mieux dès qu'il y a plusieurs atomes (deux, plusieurs, proches). Aucune méthode
-n'est bonne partout. Les frontières partiellement observées mettent les méthodes géométriques en échec (0,06).
+The direct gradient dominates on the simple scenes (one atom, redundant, noise, outliers, partial boundary); the
+geometric and hybrid methods do better as soon as there are several atoms (two, several, close). No method
+is good everywhere. Partially observed boundaries defeat the geometric methods (0.06).
 
-## 3. Identifiabilité
+## 3. Identifiability
 
-Classement des atomes vrais AVANT de juger (contraste du vrai atome sur les observations) : 244 identifiables, 4
-partiels, 0 non identifiable. Le banc atomique ne contient donc presque que des atomes identifiables : les rappels
-ci-dessus ne sont pas pénalisés par des atomes impossibles à voir. Équivalence sur les seuls identifiables : 0,56
-(gradient), 0,49 (hybride), 0,50 (neuronal + hybride), 0,22 (neuronal). Sur les 4 partiels : 0 à 0,25.
+Classification of the true atoms BEFORE judging (contrast of the true atom on the observations): 244 identifiable, 4
+partial, 0 non-identifiable. The atomic benchmark therefore contains almost only identifiable atoms: the recalls
+above are not penalised by atoms that are impossible to see. Equivalence on the identifiable ones only: 0.56
+(gradient), 0.49 (hybrid), 0.50 (neural + hybrid), 0.22 (neural). On the 4 partial ones: 0 to 0.25.
 
-Conséquence : l'échec de découverte n'est pas un problème d'identifiabilité des atomes. Le signal existe (les vrais
-atomes ont un contraste élevé), mais ni les proposeurs ne le trouvent de façon fiable, ni le validateur ne l'isole des
-fausses primitives.
+Consequence: the discovery failure is not a problem of identifiability of the atoms. The signal exists (the true
+atoms have a high contrast), but neither do the proposers find it reliably, nor does the validator isolate it from the
+false primitives.
 
-## 4. Proposeur neuronal compact
+## 4. Compact neural proposer
 
 | | |
 |---|---|
-| Rôle | propose des cercles (centre, rayon) et des droites (ancre, direction) ; ne prédit ni structure ni étiquettes |
-| Paramètres | 23 881 |
-| Mémoire | 95,5 Ko |
-| Coût d'un passage | 13,7 millions de multiplications-additions |
-| Entraînement | 4 000 scènes de dev, 30 époques, 158 s sur `c6i.xlarge` |
-| Perte | 3,28 → 1,54 (curriculum complet) ; 3,04 → 0,99 (atomes seuls) |
-| Gain réel sur le rappel des primitives | **aucun** : 0,22 seul ; 0,49 en hybride, comme l'hybride sans réseau |
+| Role | proposes circles (centre, radius) and lines (anchor, direction); predicts neither structure nor labels |
+| Parameters | 23,881 |
+| Memory | 95.5 kB |
+| Cost of one pass | 13.7 million multiply-adds |
+| Training | 4,000 dev scenes, 30 epochs, 158 s on `c6i.xlarge` |
+| Loss | 3.28 → 1.54 (full curriculum); 3.04 → 0.99 (atoms only) |
+| Real gain on primitive recall | **none**: 0.22 alone; 0.49 as a hybrid, like the hybrid without a network |
 
-Le réseau est précis mais muet : il propose peu (36 candidats), 0,8 classe retenue par scène. Sa validation finale reste
-côté WCE.
+The network is precise but mute: it proposes little (36 candidates), 0.8 retained class per scene. Its final validation remains
+on the WCE side.
 
-### Généralisation hors distribution (scènes à deux atomes, équivalence)
+### Out-of-distribution generalisation (two-atom scenes, equivalence)
 
-| Décalage | Hybride (sans apprentissage) | Neuronal, curriculum complet | Neuronal, atomes seuls | Neuronal + hybride |
+| Shift | Hybrid (no learning) | Neural, full curriculum | Neural, atoms only | Neural + hybrid |
 |---|---|---|---|---|
-| Référence nominale | 0,38 | 0,16 | non mesuré | 0,38 |
-| Positions nouvelles | 0,25 | 0,00 | 0,06 | 0,25 |
-| Tailles nouvelles | 0,50 | 0,06 | 0,06 | 0,50 |
-| Orientations nouvelles | 0,69 | 0,19 | 0,31 | 0,63 |
-| Densités différentes | 0,56 | 0,06 | 0,19 | 0,56 |
-| Bruit différent | 0,19 | 0,06 | 0,13 | 0,19 |
+| Nominal reference | 0.38 | 0.16 | not measured | 0.38 |
+| New positions | 0.25 | 0.00 | 0.06 | 0.25 |
+| New sizes | 0.50 | 0.06 | 0.06 | 0.50 |
+| New orientations | 0.69 | 0.19 | 0.31 | 0.63 |
+| Different densities | 0.56 | 0.06 | 0.19 | 0.56 |
+| Different noise | 0.19 | 0.06 | 0.13 | 0.19 |
 
-Le réseau ne généralise pas : son rappel tombe à 0,00–0,06 sur des positions, tailles, densités ou bruits nouveaux.
+The network does not generalise: its recall falls to 0.00–0.06 on new positions, sizes, densities or noises.
 
 ### Curriculum
 
-Le réseau entraîné sur le curriculum complet (atomes → deux atomes → scènes multiples → compositions profondes) ne fait
-pas mieux, hors distribution, que celui entraîné sur des atomes seuls (0,00–0,19 contre 0,06–0,31). La comparaison en
-distribution nominale n'a pas été lancée. L'effet du curriculum sur les structures profondes n'est donc pas établi, et
-le peu qui est mesuré ne le soutient pas.
+The network trained on the full curriculum (atoms → two atoms → multiple scenes → deep compositions) does
+no better, out of distribution, than the one trained on atoms only (0.00–0.19 versus 0.06–0.31). The comparison in
+nominal distribution was not run. The effect of the curriculum on deep structures is therefore not established, and
+the little that is measured does not support it.
 
-## 5. Base riche, minimale, apprise
+## 5. Rich, minimal, learned basis
 
-| | Base riche (8 atomes) | Base minimale (demi-plan, disque, anti-disque) |
+| | Rich basis (8 atoms) | Minimal basis (half-plane, disc, anti-disc) |
 |---|---|---|
-| Équivalence | 0,49 | 0,47 |
-| Précision | 0,19 | 0,27 |
-| Erreur de paramètres | 0,28 | 0,07 |
-| Temps | 3,4 s | 1,4 s |
-| Accord final en aval, riche d2 / d3 | 0,978 / 0,930 | 0,969 / 0,925 |
-| Accord final en aval, standard d2 / d3 | 0,929 / 0,868 | 0,949 / 0,921 |
+| Equivalence | 0.49 | 0.47 |
+| Precision | 0.19 | 0.27 |
+| Parameter error | 0.28 | 0.07 |
+| Time | 3.4 s | 1.4 s |
+| Final downstream agreement, rich d2 / d3 | 0.978 / 0.930 | 0.969 / 0.925 |
+| Final downstream agreement, standard d2 / d3 | 0.929 / 0.868 | 0.949 / 0.921 |
 
-La base minimale fait jeu égal en rappel, mieux en précision et en erreur de paramètres, pour 2,4 fois moins de temps.
-Rien n'indique que les atomes redondants (bande, anneau, secteur) aident la découverte. Longueur des structures : en
-base minimale une structure vraie compte 1,5 fois plus d'atomes (mesuré au sous-jalon précédent). La base « apprise »
-n'a pas été évaluée comme base de travail : seules des propositions de naissance ont été produites (section 8).
+The minimal basis is on a par in recall, better in precision and in parameter error, for 2.4 times less time.
+Nothing indicates that the redundant atoms (band, ring, sector) help discovery. Length of the structures: in
+the minimal basis a true structure has 1.5 times more atoms (measured in the previous sub-milestone). The "learned" basis
+was not evaluated as a working basis: only birth proposals were produced (section 8).
 
-## 6. Mesures actives dirigées vers les primitives
+## 6. Active measurements directed towards the primitives
 
-16 mesures supplémentaires, puis redécouverte (hybride).
+16 additional measurements, then rediscovery (hybrid).
 
-| Scènes | Sans mesure | 16 mesures aléatoires | 16 mesures dirigées |
+| Scenes | No measurement | 16 random measurements | 16 directed measurements |
 |---|---|---|---|
-| Deux atomes — équivalence | 0,31 | 0,56 | 0,56 |
-| Deux atomes — précision | 0,12 | 0,27 | 0,27 |
-| Plusieurs atomes — équivalence | 0,28 | 0,47 | 0,47 |
-| Plusieurs atomes — précision | 0,31 | 0,39 | 0,44 |
+| Two atoms — equivalence | 0.31 | 0.56 | 0.56 |
+| Two atoms — precision | 0.12 | 0.27 | 0.27 |
+| Several atoms — equivalence | 0.28 | 0.47 | 0.47 |
+| Several atoms — precision | 0.31 | 0.39 | 0.44 |
 
-Des mesures supplémentaires aident. La politique dirigée (désaccord interne aux classes de primitives) ne fait pas mieux
-que l'aléatoire en rappel ; le gain de précision sur les scènes multiples (0,44 contre 0,39) repose sur 8 scènes.
-Résultat négatif pour la politique active.
+Additional measurements help. The directed policy (disagreement internal to the primitive classes) does no better
+than random in recall; the precision gain on the multiple scenes (0.44 versus 0.39) rests on 8 scenes.
+Negative result for the active policy.
 
-## 7. Chaîne causale : primitives → candidats → récupération
+## 7. Causal chain: primitives → candidates → recovery
 
-### Matrice de décomposition oracle
+### Oracle decomposition matrix
 
-| | Vraie composition | Composition WCE |
+| | True composition | WCE composition |
 |---|---|---|
-| **Vrais atomes** | identifiable dans 75 à 100 % des cas (borne) | candidat de la bonne forme : 0,75 à 1,00 ; candidat fonctionnel (≥ 0,97) : 0,00 à 1,00 ; récupération finale (≥ 0,99) : 0,00 à 0,25 |
-| **Atomes découverts** (hybride) | accord 0,56 à 0,72 | candidat fonctionnel : 0,00 à 0,88 ; récupération finale : 0,00 à 0,13 |
+| **True atoms** | identifiable in 75 to 100% of cases (bound) | candidate of the right form: 0.75 to 1.00; functional candidate (≥ 0.97): 0.00 to 1.00; final recovery (≥ 0.99): 0.00 to 0.25 |
+| **Discovered atoms** (hybrid) | agreement 0.56 to 0.72 | functional candidate: 0.00 to 0.88; final recovery: 0.00 to 0.13 |
 
-Détail par profondeur, vrais atomes + composition WCE :
-
-| | d2 | d3 | d4 | d5 |
-|---|---|---|---|---|
-| Standard — candidat de la bonne forme | 1,00 | 0,88 | 0,88 | 0,75 |
-| Standard — candidat fonctionnel | 0,88 | 0,50 | 0,38 | 0,00 |
-| Standard — récupération finale | 0,13 | 0,00 | 0,00 | 0,00 |
-| Standard — accord final moyen | 0,977 | 0,968 | 0,923 | 0,850 |
-| Riche — candidat de la bonne forme | 1,00 | 0,88 | 1,00 | 0,88 |
-| Riche — candidat fonctionnel | 0,88 | 1,00 | 0,75 | 0,75 |
-| Riche — récupération finale | 0,25 | 0,13 | 0,00 | 0,00 |
-| Riche — accord final moyen | 0,977 | 0,984 | 0,972 | 0,968 |
-
-Atomes découverts + composition WCE (candidat fonctionnel) :
+Detail by depth, true atoms + WCE composition:
 
 | | d2 | d3 | d4 | d5 |
 |---|---|---|---|---|
-| Gradient, standard / riche | 0,25 / 0,50 | 0,25 / 0,38 | 0,00 / 0,25 | 0,00 / 0,00 |
-| Hybride, standard / riche | 0,63 / 0,88 | 0,13 / 0,50 | 0,00 / 0,25 | 0,00 / 0,00 |
-| Hybride minimal, standard / riche | 0,50 / 0,75 | 0,13 / 0,38 | 0,00 / 0,25 | 0,00 / 0,00 |
-| Neuronal + hybride, standard / riche | 0,63 / 0,88 | 0,13 / 0,63 | 0,00 / 0,25 | 0,00 / 0,00 |
+| Standard — candidate of the right form | 1.00 | 0.88 | 0.88 | 0.75 |
+| Standard — functional candidate | 0.88 | 0.50 | 0.38 | 0.00 |
+| Standard — final recovery | 0.13 | 0.00 | 0.00 | 0.00 |
+| Standard — mean final agreement | 0.977 | 0.968 | 0.923 | 0.850 |
+| Rich — candidate of the right form | 1.00 | 0.88 | 1.00 | 0.88 |
+| Rich — functional candidate | 0.88 | 1.00 | 0.75 | 0.75 |
+| Rich — final recovery | 0.25 | 0.13 | 0.00 | 0.00 |
+| Rich — mean final agreement | 0.977 | 0.984 | 0.972 | 0.968 |
 
-Rappel des primitives sur ces mêmes tâches (équivalence), standard d2 → d5 : gradient 0,81 → 0,25 ; hybride 0,56 → 0,15.
-Riche : gradient 0,88 → 0,48 ; hybride 0,75 → 0,50.
+Discovered atoms + WCE composition (functional candidate):
 
-### Transitions et corrélations (64 tâches par méthode)
+| | d2 | d3 | d4 | d5 |
+|---|---|---|---|---|
+| Gradient, standard / rich | 0.25 / 0.50 | 0.25 / 0.38 | 0.00 / 0.25 | 0.00 / 0.00 |
+| Hybrid, standard / rich | 0.63 / 0.88 | 0.13 / 0.50 | 0.00 / 0.25 | 0.00 / 0.00 |
+| Minimal hybrid, standard / rich | 0.50 / 0.75 | 0.13 / 0.38 | 0.00 / 0.25 | 0.00 / 0.00 |
+| Neural + hybrid, standard / rich | 0.63 / 0.88 | 0.13 / 0.63 | 0.00 / 0.25 | 0.00 / 0.00 |
 
-| Méthode | Tâches où toutes les primitives sont retrouvées | Candidat fonctionnel si toutes retrouvées | … sinon | Récupération finale si candidat | … sinon | Corrélation rappel ↔ candidat | Corrélation rappel ↔ accord final |
+Primitive recall on these same tasks (equivalence), standard d2 → d5: gradient 0.81 → 0.25; hybrid 0.56 → 0.15.
+Rich: gradient 0.88 → 0.48; hybrid 0.75 → 0.50.
+
+### Transitions and correlations (64 tasks per method)
+
+| Method | Tasks where all the primitives are recovered | Functional candidate if all recovered | … otherwise | Final recovery if candidate | … otherwise | Correlation recall ↔ candidate | Correlation recall ↔ final agreement |
 |---|---|---|---|---|---|---|---|
-| Gradient | 16 | 0,56 | 0,08 | 0,15 | 0,00 | 0,57 | 0,47 |
-| Hybride | 7 | 0,86 | 0,23 | 0,05 | 0,00 | 0,57 | 0,50 |
-| Hybride minimal | 7 | 0,86 | 0,18 | 0,25 | 0,00 | 0,54 | 0,39 |
-| Neuronal + hybride | 8 | 1,00 | 0,21 | 0,05 | 0,00 | 0,64 | 0,51 |
+| Gradient | 16 | 0.56 | 0.08 | 0.15 | 0.00 | 0.57 | 0.47 |
+| Hybrid | 7 | 0.86 | 0.23 | 0.05 | 0.00 | 0.57 | 0.50 |
+| Minimal hybrid | 7 | 0.86 | 0.18 | 0.25 | 0.00 | 0.54 | 0.39 |
+| Neural + hybrid | 8 | 1.00 | 0.21 | 0.05 | 0.00 | 0.64 | 0.51 |
 
-Le manque d'atomes explique bien l'échec de génération : retrouver toutes les primitives multiplie par 4 à 7 la
-probabilité d'avoir un candidat fonctionnel. Mais la transition suivante est mauvaise : avoir un candidat fonctionnel ne
-donne la récupération finale que dans 5 à 25 % des cas. Sans candidat, jamais.
+The lack of atoms does explain the generation failure: recovering all the primitives multiplies by 4 to 7 the
+probability of having a functional candidate. But the next transition is poor: having a functional candidate
+yields final recovery in only 5 to 25% of cases. Without a candidate, never.
 
-À la profondeur 2, les proposeurs hybrides donnent plus souvent un candidat fonctionnel que le gradient (0,63–0,88 contre
-0,25–0,50) alors que leur rappel de primitives est plus bas : la composition tolère des primitives approximatives. C'est
-le seul point où les nouveaux proposeurs font mieux en aval, et il ne se traduit pas en récupération finale.
+At depth 2, the hybrid proposers give a functional candidate more often than the gradient (0.63–0.88 versus
+0.25–0.50) whereas their primitive recall is lower: composition tolerates approximate primitives. This is
+the only point where the new proposers do better downstream, and it does not translate into final recovery.
 
-## 8. Familles, bibliothèque, naissance, fusion, retrait
+## 8. Families, library, birth, merging, retirement
 
-À partir des primitives validées du banc atomique (hybride, contraste ≥ 5) :
+From the validated primitives of the atomic benchmark (hybrid, contrast ≥ 5):
 
-- **Familles paramétriques** : 8 familles (une par type), par exemple `norm.le(θ0∈[−4,07 ; 2,39], θ1∈[−3,05 ; 3,09],
-  θ2∈[0,07 ; 3,52]) ×127`. Les plages couvrent presque tout le domaine : ces familles n'apportent aucune information
-  au-delà du type. Le passage instances → famille → paramétrisation compacte est mécaniquement réalisé, pas utile.
-- **Naissances proposées** : 5 relations récurrentes détectées, 2 acceptées — deux disques concentriques (3 tâches,
-  2 paramètres économisés) et deux demi-plans parallèles (5 tâches, 1 paramètre). Ce sont l'anneau et la bande : le
-  mécanisme retrouve des atomes que la grammaire possède déjà. Trois propositions vues sur une seule tâche sont
-  refusées (pas de naissance opportuniste). Aucune naissance n'a été validée par un gain de prédiction ou de
-  compression mesuré en aval.
-- **Retrait** : aucun type candidat au retrait (tous sont validés au moins deux fois).
-- **Fusion** : réalisée à la découverte par les classes d'équivalence.
-- **Bibliothèque persistante** : fréquences d'usage des types (disque 39 %, demi-plan 16 %, secteur 13 %…). Son effet sur
-  le temps de découverte, le rappel ou le transfert vers de nouveaux mondes n'a **pas été mesuré** : aucune seconde
-  passe utilisant la bibliothèque n'a été lancée.
+- **Parametric families**: 8 families (one per type), for example `norm.le(θ0∈[−4,07 ; 2,39], θ1∈[−3,05 ; 3,09],
+  θ2∈[0,07 ; 3,52]) ×127`. The ranges cover almost the whole domain: these families bring no information
+  beyond the type. The passage instances → family → compact parametrisation is mechanically carried out, not useful.
+- **Proposed births**: 5 recurrent relations detected, 2 accepted — two concentric discs (3 tasks,
+  2 parameters saved) and two parallel half-planes (5 tasks, 1 parameter). These are the ring and the band: the
+  mechanism recovers atoms that the grammar already possesses. Three proposals seen on a single task are
+  refused (no opportunistic birth). No birth was validated by a prediction or
+  compression gain measured downstream.
+- **Retirement**: no type is a candidate for retirement (all are validated at least twice).
+- **Merging**: carried out at discovery by the equivalence classes.
+- **Persistent library**: usage frequencies of the types (disc 39%, half-plane 16%, sector 13%…). Its effect on
+  discovery time, recall or transfer to new worlds was **not measured**: no second
+  pass using the library was run.
 
-## 9. Erreurs et résultats négatifs
+## 9. Errors and negative results
 
-- Les nouveaux proposeurs ne battent pas le gradient direct sur le banc atomique.
-- Le proposeur neuronal n'apporte aucun rappel et ne généralise pas hors distribution.
-- L'objectif de contraste seul est la plus mauvaise méthode (équivalence 0,34, précision 0,12).
-- Le validateur laisse passer beaucoup de fausses primitives (précision 0,12 à 0,37 hors réseau). Mécanismes
-  identifiés : une frontière tangente ou parallèle à une vraie frontière sépare de vraies paires opposées ; des atomes
-  à deux frontières (bandes, anneaux) balaient plusieurs frontières à la fois.
-- Premier validateur sans correction de comparaisons multiples : trois primitives retenues sur des étiquettes
-  aléatoires. Corrigé (seuil √(2·ln N) + 1) avant le run.
-- Reconnaissance des macros (anneau, secteur) : quasi nulle.
-- Politique active dirigée : pas mieux que l'aléatoire.
-- Curriculum : pas d'effet positif mesuré.
+- The new proposers do not beat the direct gradient on the atomic benchmark.
+- The neural proposer brings no recall and does not generalise out of distribution.
+- The contrast objective alone is the worst method (equivalence 0.34, precision 0.12).
+- The validator lets many false primitives through (precision 0.12 to 0.37 excluding the network). Mechanisms
+  identified: a boundary tangent or parallel to a true boundary separates true opposite pairs; atoms
+  with two boundaries (bands, rings) sweep several boundaries at once.
+- First validator without multiple-comparison correction: three primitives retained on random
+  labels. Corrected (threshold √(2·ln N) + 1) before the run.
+- Recognition of macros (ring, sector): almost nil.
+- Directed active policy: no better than random.
+- Curriculum: no positive effect measured.
 
-## 10. Limites
+## 10. Limits
 
-- 8 tâches par cellule pour la chaîne aval et les décalages : résolution de 1/8.
-- Le seuil de récupération finale (accord ≥ 0,99 sur [−3, 3]², zone d'extrapolation comprise) est sévère ; l'accord
-  moyen est rapporté à côté.
-- La perte entre « candidat fonctionnel » et « récupération finale » n'a pas été décomposée (polissage des paramètres,
-  simplification, classement). Le pré-enregistrement interdisait de modifier ces étages pendant ce sous-jalon.
-- Un seul réseau, une seule architecture, un seul budget d'entraînement.
-- La base apprise, l'effet de la bibliothèque et la naissance validée en aval ne sont pas mesurés.
-- Un seul monde synthétique en deux dimensions.
+- 8 tasks per cell for the downstream chain and the shifts: resolution of 1/8.
+- The final recovery threshold (agreement ≥ 0.99 on [−3, 3]², extrapolation zone included) is severe; the mean
+  agreement is reported alongside.
+- The loss between "functional candidate" and "final recovery" was not decomposed (parameter polishing,
+  simplification, ranking). The preregistration forbade modifying these stages during this sub-milestone.
+- A single network, a single architecture, a single training budget.
+- The learned basis, the effect of the library and birth validated downstream are not measured.
+- A single synthetic world in two dimensions.
 
-## 11. Prochaines étapes
+## 11. Next steps
 
-1. Décomposer la perte aval avec les vrais atomes : candidat de la bonne forme dans 75 à 100 % des cas, récupération
-   finale 0 à 25 %. C'est mesurable sans toucher au lot scellé et c'est maintenant le goulot le mieux isolé.
-2. Découverte : combiner le gradient direct (meilleur sur les scènes simples) et le géométrique (meilleur sur les scènes
-   à plusieurs atomes), et durcir le validateur contre les frontières tangentes.
-3. Travailler en base minimale : même rappel, meilleure précision, 2,4 fois moins de temps.
-4. Proposeur neuronal : le garder comme filtre de haute précision, ou l'abandonner ; rien ne justifie de l'agrandir.
+1. Decompose the downstream loss with the true atoms: candidate of the right form in 75 to 100% of cases, final
+   recovery 0 to 25%. This is measurable without touching the sealed set and it is now the best-isolated bottleneck.
+2. Discovery: combine the direct gradient (best on the simple scenes) and the geometric (best on the scenes
+   with several atoms), and harden the validator against tangent boundaries.
+3. Work in the minimal basis: same recall, better precision, 2.4 times less time.
+4. Neural proposer: keep it as a high-precision filter, or abandon it; nothing justifies enlarging it.
 
 ## Readiness for WCE.01
 
-Évaluation objective, composant par composant.
+Objective assessment, component by component.
 
-| Composant | État | Preuve |
+| Component | State | Evidence |
 |---|---|---|
-| Primitive discovery | **manque — bloquant** | meilleure équivalence 0,56 ; précision 0,12 à 0,37 hors réseau ; anneaux et secteurs non retrouvés ; rappel 0,15 à 0,25 dans des compositions de profondeur 5 en régime standard |
-| Compositional reconstruction | **partiel — bloquant** | avec les vrais atomes, la bonne forme est candidate dans 75 à 100 % des cas, mais la récupération finale ne dépasse pas 25 % |
-| Fragment learning | **existe, non utile** | la bibliothèque couvre 58 à 67 % des sous-structures mais le gain de compression net est négatif ; le monde n'a pas de régularité de composition |
-| Uncertainty | **partiel** | classes d'équivalence, hypothèses multiples de primitives et de structures, quatre niveaux d'incertitude implémentés ; aucun n'est calibré ni évalué en confirmatoire |
-| Model-class boundary | **implémenté, non évalué** | onze signaux hors classe et décision à trois issues existent ; la frontière n'a été ni calibrée sur validation ni testée |
-| Compact neural proposal | **existe, sans gain** | 23 881 paramètres, précision 0,54, rappel 0,22, pas de généralisation hors distribution |
-| Lifelong library growth | **manque** | familles et naissances proposées ; aucun effet mesuré sur une seconde passe, aucune croissance validée |
+| Primitive discovery | **missing — blocking** | best equivalence 0.56; precision 0.12 to 0.37 excluding the network; rings and sectors not recovered; recall 0.15 to 0.25 in compositions of depth 5 in the standard regime |
+| Compositional reconstruction | **partial — blocking** | with the true atoms, the right form is a candidate in 75 to 100% of cases, but final recovery does not exceed 25% |
+| Fragment learning | **exists, not useful** | the library covers 58 to 67% of the sub-structures but the net compression gain is negative; the world has no compositional regularity |
+| Uncertainty | **partial** | equivalence classes, multiple hypotheses of primitives and of structures, four levels of uncertainty implemented; none is calibrated or evaluated in confirmatory mode |
+| Model-class boundary | **implemented, not evaluated** | eleven out-of-class signals and a three-outcome decision exist; the boundary has been neither calibrated on validation nor tested |
+| Compact neural proposal | **exists, no gain** | 23,881 parameters, precision 0.54, recall 0.22, no out-of-distribution generalisation |
+| Lifelong library growth | **missing** | families and births proposed; no effect measured on a second pass, no growth validated |
 
-**Prêt** : la représentation hiérarchique, la synthèse de composition sur signatures, le moteur d'ajustement par lots,
-l'instrumentation de reachability, l'infrastructure AWS (checkpoints, reprise, progression), la discipline de
-pré-enregistrement et de lot scellé.
+**Ready**: the hierarchical representation, composition synthesis on signatures, the batch fitting engine,
+the reachability instrumentation, the AWS infrastructure (checkpoints, resumption, progress), the discipline of
+preregistration and of the sealed set.
 
-**Manque** : une découverte de primitives fiable ; un validateur précis ; la reconnaissance des atomes à deux
-frontières ; une récupération finale fidèle une fois les atomes connus ; l'évaluation de la frontière de classe ; une
-bibliothèque dont la croissance améliore quelque chose.
+**Missing**: a reliable primitive discovery; a precise validator; the recognition of atoms with two
+boundaries; a faithful final recovery once the atoms are known; the evaluation of the class boundary; a
+library whose growth improves something.
 
-**Bloquant** : (1) la découverte de primitives ; (2) la perte entre candidat correct et récupération finale. Tant que
-ces deux points ne sont pas résolus, la thèse « primitives + transformations + composition + invariants → structure
-complexe » n'est démontrée que pour l'étage de composition isolé, avec des atomes fournis.
+**Blocking**: (1) primitive discovery; (2) the loss between correct candidate and final recovery. As long as
+these two points are not resolved, the thesis "primitives + transformations + composition + invariants → complex
+structure" is demonstrated only for the isolated composition stage, with supplied atoms.
 
-**Verdict : WCE.01 n'est pas prêt.** Le lot scellé reste intact et la campagne confirmatoire 16 graines n'a pas été
-lancée ; les lancer dans cet état reviendrait à consommer le lot scellé pour confirmer un échec déjà mesuré en dev.
+**Verdict: WCE.01 is not ready.** The sealed set remains intact and the 16-seed confirmatory campaign has not been
+run; running them in this state would amount to consuming the sealed set to confirm a failure already measured in dev.

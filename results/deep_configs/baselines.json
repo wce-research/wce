@@ -1,16 +1,16 @@
 {
  "official_baseline": {
-  "name": "pipeline gelé",
+  "name": "frozen pipeline",
   "status": "official",
-  "note": "référence confirmatoire ; DeepSearch(\"factorized\", validated=None), littéraux par gradient"
+  "note": "confirmatory reference; DeepSearch(\"factorized\", validated=None), literals by gradient"
  },
  "candidate_baseline": {
   "name": "flat_scene_k3",
   "status": "confirmed dev baseline candidate",
   "definition": "core.deep_fragments.flat_types(observe(X, y), k=3) → literals → DeepSearch(\"factorized\", fact_literals=…, fact_residual=False, validated=None)",
   "evidence": {
-   "first_seen": "wce-deepft-20261005-110621 (128 tâches dev, sélectionné parmi une douzaine de bras)",
-   "confirmed_on": "wce-deepbo-20261005-211529 (256 tâches dev nouvelles, trois bras désignés d'avance)",
+   "first_seen": "wce-deepft-20261005-110621 (128 dev tasks, selected among a dozen arms)",
+   "confirmed_on": "wce-deepbo-20261005-211529 (256 new dev tasks, three arms designated in advance)",
    "candidate_structure_diff": [
     0.137,
     [
@@ -44,28 +44,28 @@
     ]
    }
   },
-  "limits": "dev uniquement, une graine ; trois jeux dev indépendants ; pas une baseline confirmatoire officielle avant campagne multi-graines ; non branché par défaut"
+  "limits": "dev only, one seed; three independent dev sets; not an official confirmatory baseline before a multi-seed campaign; not wired in by default"
  },
  "not_integrated": [
-  "composition sur classes (core.deep_compose)",
+  "composition over classes (core.deep_compose)",
   "own_k3",
   "own_nc_k3"
  ],
  "class_composition_scope": {
   "verdict": "DEEP COMPOSITION READY FOR END-TO-END VALIDATION",
   "scope": [
-   "vrais atomes",
-   "vrais paramètres",
-   "jusqu'à 6 atomes",
-   "aucun résultat confirmatoire global",
-   "aucun lot scellé"
+   "true atoms",
+   "true parameters",
+   "up to 6 atoms",
+   "no global confirmatory result",
+   "no sealed set"
   ],
   "run": "wce-deepdc-20261009-212700",
-  "status": "non branché ; pas le pipeline officiel"
+  "status": "not wired in; not the official pipeline"
  },
  "end_to_end_scope": {
   "verdict": "END-TO-END STILL BLOCKING",
   "run": "wce-deepee-20261009-224553",
-  "note": "la chaîne flat_scene_k3 + composition sur classes + finalisation validée ne bat ni le pipeline gelé ni flat_scene_k3 + aval actuel ; non branchée"
+  "note": "the chain flat_scene_k3 + composition over classes + validated finalisation beats neither the frozen pipeline nor flat_scene_k3 + current downstream; not wired in"
  }
 }

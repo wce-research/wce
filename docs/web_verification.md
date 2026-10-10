@@ -1,149 +1,149 @@
-# Vérification de la refonte WCE — 3 octobre 2026
+# Verification of the WCE redesign — 3 October 2026
 
-## Exécution
+## Execution
 
-Stack construite et exécutée uniquement sur le Dell `<LOCAL_HOST>`, dans `~/workspace/wce`. Service unique `wce-web-1`, sain après build et après `docker compose down` puis `docker compose up -d --wait`.
+Stack built and run only on the Dell `dell-host`, in `~/workspace/wce`. Single service `wce-web-1`, healthy after the build and after `docker compose down` followed by `docker compose up -d --wait`.
 
-Port inchangé : `127.0.0.1:3018 → web:8000`, allocation existante `wce/web`. Résolution DNS du service `web` vérifiée dans le réseau Compose. Les outils et la police source de génération des logos sont exclus de l'image ; seuls les exports et la galerie sont livrés.
+Port unchanged: `127.0.0.1:3018 → web:8000`, existing allocation `wce/web`. DNS resolution of the `web` service verified inside the Compose network. The tools and the source font used to generate the logos are excluded from the image; only the exports and the gallery are shipped.
 
-## Contrôles effectués
+## Checks performed
 
-- 161 tests ciblés `tests.test_web tests.test_wce` : **OK sur le Dell**.
-- Dix pages rendues dans Chromium aux largeurs 1440, 768 et 390 px : **30 rendus sans débordement horizontal**.
-- Navigation mobile, fermeture avec Échap et filtres de recherche : **OK**.
-- Laboratoire → API → moteur : soulever la balle, lire la hauteur dans la même session, refuser une durée excessive : **OK**.
-- Dix-sept liens/ressources internes, incluant le ZIP et les favicons : **HTTP 200**.
-- Aucun échec JavaScript observé.
-- 225 fichiers du kit d'identité validés : dimensions PNG/SVG, limites de poids GitHub/LinkedIn, cinq ICO multi-résolution ; archive complète créée.
-- Footer commun : GitHub, X, LinkedIn et Instagram présents sur les neuf pages du site. URL officielles absentes des `.env*` audités, donc entrées « À venir » ; configuration par `WCE_*_URL` dans `.env`.
+- 161 targeted tests `tests.test_web tests.test_wce`: **OK on the Dell**.
+- Ten pages rendered in Chromium at widths 1440, 768 and 390 px: **30 renders without horizontal overflow**.
+- Mobile navigation, closing with Escape and research filters: **OK**.
+- Lab → API → engine: lift the ball, read the height in the same session, refuse an excessive duration: **OK**.
+- Seventeen internal links/resources, including the ZIP and the favicons: **HTTP 200**.
+- No JavaScript failure observed.
+- 225 files of the identity kit validated: PNG/SVG dimensions, GitHub/LinkedIn size limits, five multi-resolution ICO files; complete archive created.
+- Shared footer: GitHub, X, LinkedIn and Instagram present on the nine pages of the site. Official URLs absent from the audited `.env*` files, hence "Coming soon" entries; configuration through `WCE_*_URL` in `.env`.
 
-Le contrôle navigateur du site réel a utilisé des requêtes HTTP relayées par une commande SSH existante vers `127.0.0.1:3018` sur le Dell. Le serveur SSH interdit le forwarding TCP ; sa configuration n'a pas été changée. Aucun nouveau port ni stack Docker n'a été lancé sur le GEEKOM.
+The browser check of the real site used HTTP requests relayed by an existing SSH command to `127.0.0.1:3018` on the Dell. The SSH server forbids TCP forwarding; its configuration was not changed. No new port or Docker stack was started on the GEEKOM.
 
-## Limites conservées
+## Limits retained
 
-La suite scientifique complète n'a pas été relancée pour cette refonte visuelle. Les deux différences scientifiques entre CPU Dell et GEEKOM documentées dans le README restent ouvertes. Les tests ciblés verts ne signifient donc pas que toute la suite scientifique est verte sur le Dell.
+The full scientific suite was not rerun for this visual redesign. The two scientific differences between the Dell CPU and the GEEKOM documented in the README remain open. The green targeted tests therefore do not mean that the whole scientific suite is green on the Dell.
 
-Les comptes utilisateurs et le catalogue collaboratif ne sont pas implémentés. La structure partagée du frontend, sa frontière API et la trajectoire d'intégration sont documentées dans `hub_evolution.md`.
+User accounts and the collaborative catalogue are not implemented. The shared structure of the frontend, its API boundary and the integration path are documented in `hub_evolution.md`.
 
-L'identité C2 est une direction de travail argumentée. La distinctivité et la mémorisation sont évaluées qualitativement ; elles n'ont pas fait l'objet d'un test de reconnaissance auprès d'utilisateurs ni d'une validation exhaustive des marques voisines.
+The C2 identity is a reasoned working direction. Distinctiveness and memorability are assessed qualitatively; they have not been subjected to a recognition test with users or to an exhaustive validation against neighbouring brands.
 
-## Mise à jour — 4 octobre 2026
+## Update — 4 October 2026
 
-Image reconstruite et conteneur sain sur le Dell, y compris après `docker compose down` puis `docker compose up -d --wait` ; `/healthz` répond `ok`. 163 tests ciblés HTTP/moteur passent. Le navigateur a contrôlé les 48 URL bilingues et 12 rendus représentatifs sur ordinateur/mobile : aucun débordement ni erreur JavaScript. Les 96 rendus locaux préalables couvrent également toutes les pages et les deux largeurs.
+Image rebuilt and container healthy on the Dell, including after `docker compose down` followed by `docker compose up -d --wait`; `/healthz` answers `ok`. 163 targeted HTTP/engine tests pass. The browser checked the 48 bilingual URLs and 12 representative renders on desktop/mobile: no overflow and no JavaScript error. The 96 earlier local renders also cover all pages and both widths.
 
-Vérifiés sur la stack réelle : survol des sous-menus, accordéons mobiles et Échap, thème nuit conservé après rechargement, changement de langue conservant la page, cookie de préférence et redirection de l’accueil, symbole WCE dans le footer et quatre marques sociales de 28 px. Le laboratoire anglais conserve la hauteur entre commandes et refuse une durée excessive.
+Verified on the real stack: hover on the submenus, mobile accordions and Escape, night theme kept after reload, language switch keeping the page, preference cookie and redirection of the home page, WCE symbol in the footer and four social marks of 28 px. The English lab keeps the height between commands and refuses an excessive duration.
 
-Logs inspectés sans erreur applicative ; port limité à `127.0.0.1:3018` ; nom DNS `web` résolu dans Compose. Les URL officielles des comptes sociaux restent à renseigner. Les deux écarts scientifiques antérieurs restent ouverts.
+Logs inspected without application error; port restricted to `127.0.0.1:3018`; DNS name `web` resolved in Compose. The official URLs of the social accounts remain to be filled in. The two earlier scientific discrepancies remain open.
 
-Captures du site Docker : [navigation jour](web-nav-day.png), [page nuit](web-night.png), [navigation mobile](web-nav-mobile.png), [footer mobile](web-footer-mobile.png).
+Screenshots of the Docker site: [day navigation](web-nav-day.png), [night page](web-night.png), [mobile navigation](web-nav-mobile.png), [mobile footer](web-footer-mobile.png).
 
-## Présentations et fidélité au backend — 4 octobre 2026
+## Presentations and fidelity to the backend — 4 October 2026
 
-### Modifications livrées
+### Changes delivered
 
-- Cartes de mécanismes : forme arrondie, statut visible, description, chaîne conceptuelle et fichier source. Dix familles constituent l’atlas d’architecture ; six sont présentées sur l’accueil.
-- Présentations des cinq rubriques et cartes vers leurs sous-pages ; cartes de poursuite dans les dossiers.
-- Six nouvelles sous-pages : langage hybride, algèbre de mesure, preuves et sources, certificats génératifs, découverte active et branches. Total : 30 pages, chacune en français et anglais.
-- Textes revus après lecture des interfaces et mécanismes : TransformationSpec, ModelState, TransformationPlanner, StructuralVerifier, MeasurementOperator, certificats, consolidation et continuum. Les fonctions web, les prototypes de recherche et le hub envisagé sont distingués.
-- Inventaire repliable de 121 modules moteur/recherche présents sur le Dell, avec symboles supplémentaires dépliables. Il est généré par analyse statique, sans importer les modules scientifiques. `make docker-up`, `docker-build` et `docker-dev` le régénèrent avant construction.
+- Mechanism cards: rounded shape, visible status, description, conceptual chain and source file. Ten families make up the architecture atlas; six are presented on the home page.
+- Presentations of the five sections and cards to their subpages; continuation cards in the dossiers.
+- Six new subpages: hybrid language, measurement algebra, evidence and sources, generative certificates, active discovery and branches. Total: 30 pages, each in French and English.
+- Texts revised after reading the interfaces and mechanisms: TransformationSpec, ModelState, TransformationPlanner, StructuralVerifier, MeasurementOperator, certificates, consolidation and continuum. The web functions, the research prototypes and the envisaged hub are distinguished.
+- Collapsible inventory of 121 engine/research modules present on the Dell, with expandable additional symbols. It is generated by static analysis, without importing the scientific modules. `make docker-up`, `docker-build` and `docker-dev` regenerate it before the build.
 
-### Vérifications
+### Verifications
 
-165 tests ciblés `tests.test_web tests.test_wce` passent sur le Dell : routes bilingues, liens localisés, API/session/validation, références source et actualité de l’inventaire. Les contrôles navigateur locaux couvrent 120 rendus (60 URL × ordinateur/mobile). Sur la stack réelle du Dell : 60 URL répondent, 12 rendus représentatifs sont contrôlés, les cartes ouvrent leurs dossiers, les symboles d’inventaire se déploient, et aucun débordement horizontal ni erreur JavaScript n’est observé. Les thèmes, la langue, les sous-menus, le footer et le laboratoire anglais sont également vérifiés.
+165 targeted tests `tests.test_web tests.test_wce` pass on the Dell: bilingual routes, localised links, API/session/validation, source references and freshness of the inventory. The local browser checks cover 120 renders (60 URLs × desktop/mobile). On the real Dell stack: 60 URLs respond, 12 representative renders are checked, the cards open their dossiers, the inventory symbols expand, and no horizontal overflow or JavaScript error is observed. The themes, the language, the submenus, the footer and the English lab are also verified.
 
-Image reconstruite, conteneur sain, `/healthz` répond `ok`, logs inspectés. Le port réservé reste `127.0.0.1:3018`. Aucune stack n’a été lancée sur le GEEKOM.
+Image rebuilt, container healthy, `/healthz` answers `ok`, logs inspected. The reserved port remains `127.0.0.1:3018`. No stack was started on the GEEKOM.
 
-### Différences entre dépôts
+### Differences between repositories
 
-L’inventaire local audité sur le GEEKOM comporte 123 modules, contre 121 sur le Dell : `core/deep_structure.py` et `core/deep_world.py` sont présents uniquement sur le GEEKOM ; les symboles de `core/robust_experiments.py` diffèrent aussi. Les sources scientifiques du Dell n’ont pas été remplacées pendant ce chantier éditorial. Le site décrit son inventaire réel, généré depuis ce dépôt cible.
+The local inventory audited on the GEEKOM contains 123 modules, against 121 on the Dell: `core/deep_structure.py` and `core/deep_world.py` are present only on the GEEKOM; the symbols of `core/robust_experiments.py` also differ. The scientific sources of the Dell were not replaced during this editorial work. The site describes its real inventory, generated from this target repository.
 
-La suite scientifique complète n’a pas été relancée. Les deux écarts antérieurs documentés restent ouverts ; les 165 tests ciblés ne constituent pas un verdict sur l’ensemble des expériences.
+The full scientific suite was not rerun. The two earlier documented discrepancies remain open; the 165 targeted tests do not constitute a verdict on the whole set of experiments.
 
-### Captures du site réel
+### Screenshots of the real site
 
-- [Architecture, vue jour](web-architecture-atlas.png)
-- [Les dix cartes](web-architecture-cards.png)
-- [Carte mobile en mode nuit](web-card-mobile-night.png)
-- [Dossier de mécanisme sur mobile](web-mechanism-mobile.png)
-- [Inventaire et symboles dépliés](web-source-map.png)
+- [Architecture, day view](web-architecture-atlas.png)
+- [The ten cards](web-architecture-cards.png)
+- [Mobile card in night mode](web-card-mobile-night.png)
+- [Mechanism dossier on mobile](web-mechanism-mobile.png)
+- [Inventory and expanded symbols](web-source-map.png)
 
-## Études interactives et vues scientifiques — 4 octobre 2026
+## Interactive studies and scientific views — 4 October 2026
 
-### Livré sur le Dell
+### Delivered on the Dell
 
-- Étude de configuration sur l’accueil : primitives, rotation et composition, repère fixe et nombre de primitives constant. Le caractère illustratif est explicite ; aucun moteur d’inférence n’est exécuté par cette interaction.
-- Dix schémas de mécanismes propres aux cartes et à leurs dossiers, distincts de traces d’exécution ou de preuves expérimentales.
-- Couverture prédictive/crédible par source, sur l’échelle 0–1, avec les cinq groupes de l’artefact.
-- Sélecteur de neuf métriques continuum pour les neuf méthodes, moyennes, intervalles à 95 % et tableaux d’effectifs. L’ordre suit le fichier ; les coûts ne sont pas masqués par un classement général.
-- Dix hypothèses de découverte active, avec quatre verdicts soutenus, trois réfutés et trois non concluants ; les champs bruts de chaque hypothèse sont dépliables.
-- Provenance des vues : lien vers le JSON source, préfixe SHA-256 affiché et empreinte complète au survol. Les valeurs sont lues depuis les artefacts existants et non recopiées manuellement dans les templates.
+- Configuration study on the home page: primitives, rotation and composition, fixed frame and constant number of primitives. Its illustrative nature is explicit; no inference engine is run by this interaction.
+- Ten mechanism diagrams specific to the cards and their dossiers, distinct from execution traces or experimental evidence.
+- Predictive/credible coverage per source, on the 0–1 scale, with the five groups of the artefact.
+- Selector of nine continuum metrics for the nine methods, means, 95% intervals and tables of counts. The order follows the file; the costs are not hidden by an overall ranking.
+- Ten active discovery hypotheses, with four supported verdicts, three refuted and three inconclusive; the raw fields of each hypothesis are expandable.
+- Provenance of the views: link to the source JSON, SHA-256 prefix displayed and full fingerprint on hover. The values are read from the existing artefacts and not copied by hand into the templates.
 
-### Vérification
+### Verification
 
-168 tests HTTP/moteur passent sur le Dell. Ils comparent notamment les couvertures, moyennes, intervalles, effectifs et verdicts affichés aux JSON servis, et vérifient que le rendu suit une modification des valeurs d’un artefact.
+168 HTTP/engine tests pass on the Dell. In particular they compare the displayed coverages, means, intervals, counts and verdicts with the served JSON files, and verify that the render follows a change in the values of an artefact.
 
-Le script conservé dans `tests/browser/frontier.cjs` passe sur les pages réellement servies par Docker : 36 rendus français/anglais aux largeurs 1440, 768 et 390 px ; sélection des trois configurations et conservation du repère ; neuf métriques × neuf méthodes, tableaux dépliables ; champs des hypothèses ; deux thèmes et dix schémas. Aucun débordement horizontal ni erreur JavaScript observé. Le même script a également passé les contrôles sur les exports locaux avant déploiement.
+The script kept in `tests/browser/frontier.cjs` passes on the pages actually served by Docker: 36 French/English renders at widths 1440, 768 and 390 px; selection of the three configurations and preservation of the frame; nine metrics × nine methods, expandable tables; fields of the hypotheses; two themes and ten diagrams. No horizontal overflow or JavaScript error observed. The same script also passed the checks on the local exports before deployment.
 
-Image construite uniquement sur le Dell ; conteneur `wce-web-1` sain, port inchangé `127.0.0.1:3018`. Clé SSH existante réutilisée et déjà chargée dans l’agent ; aucune modification de clé ou de configuration SSH. L’inventaire du Dell reste généré depuis ses propres modules. Les protections Docker et HTTP restent appliquées.
+Image built only on the Dell; container `wce-web-1` healthy, port unchanged `127.0.0.1:3018`. Existing SSH key reused and already loaded in the agent; no change of key or SSH configuration. The Dell inventory remains generated from its own modules. The Docker and HTTP protections remain applied.
 
-La suite scientifique complète n’a pas été relancée : les deux écarts antérieurs restent ouverts. Les graphiques présentent les artefacts de leurs protocoles ; ils ne démontrent pas une supériorité générale sur les LLM ou world models.
+The full scientific suite was not rerun: the two earlier discrepancies remain open. The charts present the artefacts of their protocols; they do not demonstrate a general superiority over LLMs or world models.
 
-### Captures du site réel
+### Screenshots of the real site
 
-- [Accueil jour](web-frontier-home-day.png)
-- [Accueil nuit](web-frontier-home-night.png)
-- [Schémas des mécanismes](web-frontier-mechanisms.png)
-- [Vue continuum et intervalles](web-frontier-continuum.png)
-- [Couverture par source](web-frontier-coverage.png)
-- [Verdicts sur mobile](web-frontier-verdicts-mobile.png)
+- [Home page, day](web-frontier-home-day.png)
+- [Home page, night](web-frontier-home-night.png)
+- [Mechanism diagrams](web-frontier-mechanisms.png)
+- [Continuum view and intervals](web-frontier-continuum.png)
+- [Coverage per source](web-frontier-coverage.png)
+- [Verdicts on mobile](web-frontier-verdicts-mobile.png)
 
-[Commandes de vérification navigateur](browser_checks.md).
+[Browser verification commands](browser_checks.md).
 
-## Révision éditoriale et frontière de publication — 4 octobre 2026
+## Editorial revision and publication boundary — 4 October 2026
 
-- Cartes asymétriques, atlas à grille variable, index de recherche en cartes, boutons de 44–48 px et panneaux de vision recomposés ; variantes jour/nuit et mobile conservées.
-- Reproduction publique recentrée sur le moteur et les protocoles. Retrait du serveur HTTP de l’inventaire public et des références au déploiement privé dans les pages et le document scientifique.
-- Dell : 171 tests ciblés verts, image reconstruite, service healthy, écoute exclusive 127.0.0.1:3018. Document privé du hub : HTTP 404.
-- Navigateur : 36 rendus FR/EN desktop/tablette/mobile, schémas, données, thèmes, absence de débordement et d’erreur JavaScript.
-- Export scientifique : sélection explicite sans site/hub/cloud/historique ; manifeste SHA-256 et archive déterministe. Les 155 tests du moteur passent depuis l’archive extraite séparément.
-- Deux divergences scientifiques numériques préexistantes restent ouvertes ; la suite scientifique complète n’est pas déclarée verte. Licence et dépôt public officiel restent à définir. Aucun déploiement Internet ni publication GitHub effectué.
+- Asymmetric cards, variable-grid atlas, research index as cards, buttons of 44–48 px and recomposed vision panels; day/night and mobile variants kept.
+- Public reproduction refocused on the engine and the protocols. Removal of the HTTP server from the public inventory and of the references to the private deployment in the pages and the scientific document.
+- Dell: 171 targeted tests green, image rebuilt, service healthy, listening exclusively on 127.0.0.1:3018. Private hub document: HTTP 404.
+- Browser: 36 FR/EN desktop/tablet/mobile renders, diagrams, data, themes, absence of overflow and of JavaScript error.
+- Scientific export: explicit selection without site/hub/cloud/history; SHA-256 manifest and deterministic archive. The 155 engine tests pass from the separately extracted archive.
+- Two pre-existing numerical scientific divergences remain open; the full scientific suite is not declared green. Licence and official public repository remain to be defined. No Internet deployment or GitHub publication carried out.
 
-## Clarté UX et sémantique — 4 octobre 2026
+## UX clarity and semantics — 4 October 2026
 
-172 tests ciblés verts localement et sur le Dell. Conteneur reconstruit et healthy. 54 rendus bilingues desktop/tablette/mobile validés, lexique dépliable au clavier et trois parcours de lecture vérifiés. Le débordement du fil d’Ariane mobile détecté pendant le contrôle a été corrigé ; aucun débordement ni erreur JavaScript au dernier passage. Les limites scientifiques précédemment documentées restent inchangées.
+172 targeted tests green locally and on the Dell. Container rebuilt and healthy. 54 bilingual desktop/tablet/mobile renders validated, keyboard-expandable glossary and three reading paths verified. The overflow of the mobile breadcrumb detected during the check was fixed; no overflow and no JavaScript error on the last pass. The previously documented scientific limits remain unchanged.
 
-## Portée des preuves et lecture des dossiers
+## Scope of the evidence and reading of the dossiers
 
-173 tests ciblés verts sur les deux machines ; build Docker réalisé uniquement sur le Dell, conteneur healthy. 94 rendus navigateur validés : parcours existants et dix dossiers d’architecture en FR/EN sur desktop/mobile ; trois repères de preuve par dossier, lexique au clavier, absence de débordement et d’erreur JavaScript. Aucun résultat scientifique ni seuil expérimental modifié.
+173 targeted tests green on both machines; Docker build performed only on the Dell, container healthy. 94 browser renders validated: existing paths and ten architecture dossiers in FR/EN on desktop/mobile; three evidence markers per dossier, keyboard glossary, absence of overflow and of JavaScript error. No scientific result or experimental threshold modified.
 
-## Recherche de mécanismes et liens entre dossiers
+## Mechanism search and links between dossiers
 
-175 tests ciblés verts localement et sur le Dell. Docker reconstruit sur le Dell uniquement ; conteneur healthy, port local réservé inchangé. 94 rendus navigateur validés ; recherche par chemin de module, absence de résultat et remise à zéro contrôlées dans les deux langues. Dix dossiers, lexique au clavier, tableaux, thèmes et absence de débordement ou d’erreur JavaScript vérifiés. Aucun moteur scientifique ni résultat modifié.
+175 targeted tests green locally and on the Dell. Docker rebuilt on the Dell only; container healthy, reserved local port unchanged. 94 browser renders validated; search by module path, no-result state and reset checked in both languages. Ten dossiers, keyboard glossary, tables, themes and absence of overflow or JavaScript error verified. No scientific engine or result modified.
 
-## Explication des résultats et empreintes accessibles
+## Explanation of the results and accessible fingerprints
 
-176 tests ciblés verts localement et sur le Dell ; conteneur reconstruit et healthy. 94 rendus navigateur validés, neuf guides de métriques contrôlés à chaque sélection, empreinte complète dépliée au clavier et vérifiée sur desktop/mobile. Aucun débordement ni erreur JavaScript. Les résultats JSON n’ont pas été modifiés ; les limites numériques scientifiques préexistantes restent ouvertes.
+176 targeted tests green locally and on the Dell; container rebuilt and healthy. 94 browser renders validated, nine metric guides checked at each selection, full fingerprint expanded with the keyboard and verified on desktop/mobile. No overflow and no JavaScript error. The JSON results were not modified; the pre-existing numerical scientific limits remain open.
 
-## Découverte guidée
+## Guided discovery
 
-177 tests ciblés verts sur les deux machines. Protocole préenregistré accessible (HTTP 200), conteneur healthy sur le Dell. 94 rendus navigateur validés : titres des dix questions, filtres soutenu/réfuté/non concluant/tous avec effectifs 4/3/3/10, champs bruts conservés, contrôles au clavier, absence de débordement ou d’erreur JavaScript. Les critères et verdicts scientifiques restent inchangés.
+177 targeted tests green on both machines. Preregistered protocol accessible (HTTP 200), container healthy on the Dell. 94 browser renders validated: titles of the ten questions, supported/refuted/inconclusive/all filters with counts 4/3/3/10, raw fields kept, keyboard controls, absence of overflow or JavaScript error. The scientific criteria and verdicts remain unchanged.
 
-## Inventaire recherchable et préparation des contributions
+## Searchable inventory and preparation of contributions
 
-178 tests ciblés verts localement et sur le Dell ; image reconstruite, conteneur healthy sur le port local réservé. 106 rendus navigateur validés, incluant sources et contribution dans les deux langues et trois tailles d’écran. Recherche par chemin et symbole, état sans résultat, restauration des groupes à l’effacement et absence de débordement vérifiés. Aucun fichier du dépôt n’est chargé par le filtre et aucun canal de contribution opérationnel n’est annoncé.
+178 targeted tests green locally and on the Dell; image rebuilt, container healthy on the reserved local port. 106 browser renders validated, including sources and contribution in both languages and three screen sizes. Search by path and symbol, no-result state, restoration of the groups on clearing and absence of overflow verified. No file of the repository is loaded by the filter and no operational contribution channel is announced.
 
-## Laboratoire : retours d’exécution et reprise
+## Lab: execution feedback and retry
 
-179 tests ciblés verts sur les deux machines ; conteneur reconstruit et healthy sur le Dell. 112 rendus FR/EN desktop/tablette/mobile validés. Commandes réelles du navigateur vers le moteur : soulever à 2 m puis observer ; refus de la durée 61 s ; erreur réseau simulée, saisie conservée et reprise possible. Aucun débordement ni erreur JavaScript. Le moteur scientifique et ses protections n’ont pas été modifiés.
+179 targeted tests green on both machines; container rebuilt and healthy on the Dell. 112 FR/EN desktop/tablet/mobile renders validated. Real commands from the browser to the engine: lift to 2 m then observe; refusal of the 61 s duration; simulated network error, input kept and retry possible. No overflow and no JavaScript error. The scientific engine and its protections were not modified.
 
-## Correction du contraste après inspection visuelle
+## Contrast fix after visual inspection
 
-Le contraste des libellés et réponses dans la console fixe sombre était incorrect en mode nuit, malgré les tests fonctionnels. Correction déployée sur le Dell après interruption du premier rebuild. Contrôle ciblé navigateur FR/EN : libellés dans les deux thèmes, couleur des réponses du moteur, commandes réelles, validation serveur, reprise après erreur réseau ; aucun débordement ni erreur JavaScript. Capture revue : docs/web-lab-mobile-verified.png. Commande de contrôle ciblé : WCE_BROWSER_SCOPE=lab avec tests/browser/frontier.cjs et les variables de connexion habituelles.
+The contrast of the labels and answers in the dark fixed console was incorrect in night mode, despite the functional tests. Fix deployed on the Dell after interruption of the first rebuild. Targeted FR/EN browser check: labels in both themes, colour of the engine answers, real commands, server validation, retry after network error; no overflow and no JavaScript error. Screenshot reviewed: docs/web-lab-mobile-verified.png. Targeted check command: WCE_BROWSER_SCOPE=lab with tests/browser/frontier.cjs and the usual connection variables.
 
-## Passe cohérente accueil / navigation / accessibilité
+## Consistent pass over home page / navigation / accessibility
 
-181 tests ciblés verts localement et sur le Dell. Contrôle des liens internes et ancres, unicité des identifiants et titre principal sur les 60 pages FR/EN. 112 rendus navigateur de régression validés : schémas, données et filtres, inventaire, guides, laboratoire réel, absence de débordement et d’erreur JavaScript. Sous-menu au clavier et au survol, fermeture Échap, menu mobile et footer à cinq rubriques contrôlés. L’accueil a également passé huit rendus dédiés FR/EN desktop/mobile jour/nuit.
+181 targeted tests green locally and on the Dell. Check of the internal links and anchors, uniqueness of the identifiers and main title on the 60 FR/EN pages. 112 regression browser renders validated: diagrams, data and filters, inventory, guides, real lab, absence of overflow and of JavaScript error. Submenu with keyboard and hover, closing with Escape, mobile menu and five-section footer checked. The home page also passed eight dedicated FR/EN desktop/mobile day/night renders.
 
-Captures de revue : docs/web-home-studies-desktop.png, docs/web-footer-reviewed-mobile.png, docs/web-lab-mobile-verified.png. Conteneur healthy sur le Dell, port réservé 127.0.0.1:3018 inchangé. Aucun déploiement Internet ou dépôt GitHub public créé. Deux divergences scientifiques numériques préexistantes et la définition de la licence restent ouvertes.
+Review screenshots: docs/web-home-studies-desktop.png, docs/web-footer-reviewed-mobile.png, docs/web-lab-mobile-verified.png. Container healthy on the Dell, reserved port 127.0.0.1:3018 unchanged. No Internet deployment or public GitHub repository created. Two pre-existing numerical scientific divergences and the definition of the licence remain open.
 
-La dernière capture du footer montre l’ensemble du bloc, logo et réseaux compris. Après revue, le titre français « Recherche ouverte » a été harmonisé et le lien redondant du laboratoire remplacé par ses limites. Les 13 tests de contenu passent après ces précisions ; quatre rendus ciblés FR/EN desktop/mobile du footer passent également. Image finale healthy sur le Dell.
+The last screenshot of the footer shows the whole block, including logo and social networks. After review, the French title "Recherche ouverte" was harmonised and the redundant link to the lab replaced by its limits. The 13 content tests pass after these clarifications; four targeted FR/EN desktop/mobile renders of the footer also pass. Final image healthy on the Dell.

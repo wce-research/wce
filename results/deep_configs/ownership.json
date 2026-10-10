@@ -5,8 +5,8 @@
   "chance": 3.0,
   "temperature": 16.0
  },
- "selected_on": "120 scènes de mise au point",
- "criterion": "coût de hasard par calibration nulle, puis F1 d'attribution + appartenance top-1, puis ECE",
+ "selected_on": "120 tuning scenes",
+ "criterion": "chance cost by null calibration, then attribution F1 + top-1 membership, then ECE",
  "null_calibration": [
   {
    "chance": 0.0,
@@ -129,5 +129,5 @@
  ],
  "null_target": 0.1,
  "null_target_met": false,
- "note": "Aucun coût de hasard testé ne ramène l'attribution sur étiquettes aléatoires sous 10 % ; le plus fort (3.0) est retenu, il laisse 32 %."
+ "note": "No tested chance cost brings the attribution on random labels below 10%; the strongest (3.0) is retained, it leaves 32%."
 }

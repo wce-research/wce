@@ -1,187 +1,187 @@
-# WCE Robust Structural Reconstruction & Measurement-Aware Inference — rapport final (jalon gelé)
+# WCE Robust Structural Reconstruction & Measurement-Aware Inference — final report (frozen milestone)
 
-Campagnes exécutées sur AWS les 2026-10-03 et 2026-10-04, 16 graines, lot scellé évalué une seule fois.
-Hypothèses pré-enregistrées avant tout run : `docs/hypotheses_robust_reconstruction.md`.
-Synthèse chiffrée : `results/robust_summary.json`. Artefacts bruts : `results/aws/`. Temps : `results/aws_timing.json`.
+Campaigns run on AWS on 2026-10-03 and 2026-10-04, 16 seeds, sealed set evaluated only once.
+Hypotheses preregistered before any run: `docs/hypotheses_robust_reconstruction.md`.
+Numerical summary: `results/robust_summary.json`. Raw artefacts: `results/aws/`. Timings: `results/aws_timing.json`.
 
-Bilan : 5 hypothèses soutenues, 3 réfutées, 2 non concluantes.
+Outcome: 5 hypotheses supported, 3 refuted, 2 inconclusive.
 
 ## 1. Architecture
-- Modèle de mesure : chaque observation porte son capteur, son taux de retournement, sa résolution, son poids temporel et sa source.
-- Inférence : vraisemblances naïve, à retournement, à contamination et à marge douce ; évidence APPROCHÉE et longueur de description (MDL) ; ensemble de structures compatibles avec réponse « UNKNOWN » possible.
-- Mesure active : planificateur séparé de la recherche, six critères (EFA, IG structurel, IG fonctionnel, désaccord, incertitude, aléatoire), choix du capteur, option de répétition.
-- Décisions : approfondissement par facteur de Bayes, attribution des écarts en cinq classes, contrôle prédictif a posteriori, calibration de P(règle fausse).
-- Monde d'évaluation séparé du code d'inférence, qui ne l'importe jamais.
-- Les analogies physiques (Fourier, Boltzmann, Heisenberg, etc.) sont des inspirations de conception, rien de plus.
+- Measurement model: each observation carries its sensor, its flip rate, its resolution, its temporal weight and its source.
+- Inference: naive, flip, contamination and soft-margin likelihoods; APPROXIMATE evidence and description length (MDL); set of compatible structures with a possible "UNKNOWN" answer.
+- Active measurement: planner separated from the search, six criteria (EFA, structural IG, functional IG, disagreement, uncertainty, random), choice of sensor, repetition option.
+- Decisions: deepening by Bayes factor, attribution of discrepancies into five classes, posterior predictive check, calibration of P(rule wrong).
+- Evaluation world separated from the inference code, which never imports it.
+- The physical analogies (Fourier, Boltzmann, Heisenberg, etc.) are design inspirations, nothing more.
 
-## 2. Fichiers
+## 2. Files
 - `core/robust_world.py`, `core/robust_reconstruction.py`, `core/robust_experiments.py`, `core/robust_aggregate.py`
 - `wce_aws/orchestrate.py`, `wce_aws/sm_entry.py`, `wce_aws/bench.py`
-- `tests/test_robust.py`, `docs/hypotheses_robust_reconstruction.md`, cinq scripts de démo dans `scripts/`
+- `tests/test_robust.py`, `docs/hypotheses_robust_reconstruction.md`, five demo scripts in `scripts/`
 
-## 3. Tests ajoutés
-266 tests (objectif : au moins 200) : vraisemblances, postérieure, MDL, gains attendus, planificateur, calibration, fuites, orchestration AWS sans appel réseau, checkpoints et reprise, cache.
+## 3. Tests added
+266 tests (target: at least 200): likelihoods, posterior, MDL, expected gains, planner, calibration, leaks, AWS orchestration without network calls, checkpoints and resume, cache.
 
 ## 4. `make check`
-Syntaxe OK.
+Syntax OK.
 
 ## 5. `make test`
-3 828 tests, 7 ignorés, aucune régression.
+3,828 tests, 7 skipped, no regression.
 
-## 6. Workflow AWS
-- Backend EC2 + SSM, toujours explicite (`WCE_BACKEND=ec2`). SageMaker inutilisable (quotas à 0), jamais testé en exécution réelle.
-- Pas de SSH ni de clé, instances taguées `Project=WCE`, terminaison automatique, garde-fou d'extinction.
-- Unités découpées en sous-unités déterministes ; un checkpoint par sous-unité, publié vers S3 toutes les 45 s.
-- Cibles : `aws-login`, `aws-whoami`, `aws-check-guardrails`, `aws-ec2-diagnose`, `aws-progress`, `aws-resume`, `aws-stop`, `aws-inspect`, `aws-timing`, `aws-profile`, `aws-bench`, `aws-fetch-results`, `aws-multiseed`, `aws-run-rest`, `aws-sealed-eval`, `robust-aggregate`.
-- Reprise validée de bout en bout (interruption brutale, 55 checkpoints repris, 45 recalculés).
-- Écart à la règle Makefile : un seul appel `aws s3 ls` direct, en lecture seule.
+## 6. AWS workflow
+- EC2 + SSM backend, always explicit (`WCE_BACKEND=ec2`). SageMaker unusable (quotas at 0), never tested in real execution.
+- No SSH and no key, instances tagged `Project=WCE`, automatic termination, shutdown safeguard.
+- Units split into deterministic sub-units; one checkpoint per sub-unit, published to S3 every 45 s.
+- Targets: `aws-login`, `aws-whoami`, `aws-check-guardrails`, `aws-ec2-diagnose`, `aws-progress`, `aws-resume`, `aws-stop`, `aws-inspect`, `aws-timing`, `aws-profile`, `aws-bench`, `aws-fetch-results`, `aws-multiseed`, `aws-run-rest`, `aws-sealed-eval`, `robust-aggregate`.
+- Resume validated end to end (abrupt interruption, 55 checkpoints reused, 45 recomputed).
+- Deviation from the Makefile rule: a single direct `aws s3 ls` call, read-only.
 
-## 7. Identité
-`WCE-Research-Runner` (profil `wce-runner`, `eu-north-1`). Lectures IAM refusées comme attendu. Aucune permission modifiée par le runner.
+## 7. Identity
+`WCE-Research-Runner` (profile `wce-runner`, `eu-north-1`). IAM reads denied as expected. No permission modified by the runner.
 
 ## 8. Instances
-- Référence scientifique : `c6i.xlarge` (4 vCPU), 2 instances en parallèle (quota de 8 vCPU).
-- `t3.large` : test et débogage seulement (1,7 fois plus lent, 1,5 fois plus cher par charge).
-- Un processus par vCPU, un thread Torch. Les threads Torch ralentissent (×0,77 à ×0,92) ; les vCPU sont des hyperthreads (59 à 61 % de la vitesse d'un processus seul).
+- Scientific reference: `c6i.xlarge` (4 vCPU), 2 instances in parallel (quota of 8 vCPU).
+- `t3.large`: testing and debugging only (1.7 times slower, 1.5 times more expensive per workload).
+- One process per vCPU, one Torch thread. Torch threads slow things down (×0.77 to ×0.92); the vCPUs are hyperthreads (59 to 61 % of the speed of a single process).
 
-## 9. Temps d'exécution
+## 9. Run times
 
-| Campagne | Sous-unités | Durée par instance |
+| Campaign | Sub-units | Duration per instance |
 |---|---|---|
-| Banc principal | 1 600 | 1 h 48 et 2 h 12 |
-| Bruit, calibration, auxiliaires | 1 676 | 1 h 29 et 1 h 27 |
-| Lot scellé | 120 | 7 et 8 min |
+| Main bench | 1,600 | 1 h 48 and 2 h 12 |
+| Noise, calibration, auxiliaries | 1,676 | 1 h 29 and 1 h 27 |
+| Sealed set | 120 | 7 and 8 min |
 
-CPU moyen 97 à 100 %, mémoire pic 351 Mo par processus. Point chaud : ajustement par gradient (`fit_robust`, 78 % du temps).
+Mean CPU 97 to 100 %, peak memory 351 MB per process. Hot spot: gradient fitting (`fit_robust`, 78 % of the time).
 
-## 10. Coût
-Environ 1,50 $ pour 8,3 heures-instance sur 17 jobs, essais d'infrastructure compris. Estimation à partir de tarifs à la demande cités de mémoire, à vérifier sur la facture.
+## 10. Cost
+About $1.50 for 8.3 instance-hours over 17 jobs, infrastructure trials included. Estimate based on on-demand prices quoted from memory, to be checked against the invoice.
 
-## 11. Multi-graines (banc principal, bruit 8 et 12 %, IC 95 %)
+## 11. Multi-seed (main bench, noise 8 and 12 %, 95 % CI)
 
-| Méthode | Récupération | Structure exacte | Extrapolation | Requêtes |
+| Method | Recovery | Exact structure | Extrapolation | Queries |
 |---|---|---|---|---|
-| Ancien système | 0,117 [0,079 ; 0,155] | 0,141 | 0,778 | 15,6 |
-| Passif | 0,047 [0,006 ; 0,088] | 0,055 | 0,619 | 0 |
-| Ajustement robuste seul | 0,219 [0,152 ; 0,285] | 0,242 | 0,806 | 0 |
-| Postérieure robuste | 0,211 [0,143 ; 0,279] | 0,242 | 0,797 | 0 |
-| Actif, IG structurel | 0,328 [0,260 ; 0,396] | 0,250 | 0,847 | 16,0 |
-| Actif, EFA | 0,266 [0,207 ; 0,325] | 0,266 | 0,863 | 11,4 |
-| Système complet | 0,234 [0,175 ; 0,293] | 0,273 | 0,834 | 10,7 |
-| Requêtes aléatoires | 0,266 [0,202 ; 0,329] | 0,242 | 0,838 | 16,0 |
-| Requêtes par désaccord | 0,328 [0,260 ; 0,396] | 0,250 | 0,845 | 16,0 |
-| Oracle (borne haute) | 0,352 [0,291 ; 0,412] | 0,266 | 0,873 | 16,0 |
+| Old system | 0.117 [0.079, 0.155] | 0.141 | 0.778 | 15.6 |
+| Passive | 0.047 [0.006, 0.088] | 0.055 | 0.619 | 0 |
+| Robust fit alone | 0.219 [0.152, 0.285] | 0.242 | 0.806 | 0 |
+| Robust posterior | 0.211 [0.143, 0.279] | 0.242 | 0.797 | 0 |
+| Active, structural IG | 0.328 [0.260, 0.396] | 0.250 | 0.847 | 16.0 |
+| Active, EFA | 0.266 [0.207, 0.325] | 0.266 | 0.863 | 11.4 |
+| Full system | 0.234 [0.175, 0.293] | 0.273 | 0.834 | 10.7 |
+| Random queries | 0.266 [0.202, 0.329] | 0.242 | 0.838 | 16.0 |
+| Disagreement queries | 0.328 [0.260, 0.396] | 0.250 | 0.845 | 16.0 |
+| Oracle (upper bound) | 0.352 [0.291, 0.412] | 0.266 | 0.873 | 16.0 |
 
-Récupération selon la profondeur du monde :
+Recovery by world depth:
 
-| Méthode | Prof. 1 | Prof. 2 | Prof. 3 | Prof. 4 |
+| Method | Depth 1 | Depth 2 | Depth 3 | Depth 4 |
 |---|---|---|---|---|
-| Ancien système | 0,41 | 0,00 | 0,00 | 0,06 |
-| Postérieure robuste | 0,56 | 0,13 | 0,03 | 0,13 |
-| Actif, IG structurel | 0,91 | 0,13 | 0,09 | 0,19 |
-| Actif, EFA | 0,72 | 0,13 | 0,06 | 0,16 |
-| Système complet | 0,66 | 0,13 | 0,06 | 0,09 |
-| Oracle | 0,91 | 0,19 | 0,09 | 0,22 |
+| Old system | 0.41 | 0.00 | 0.00 | 0.06 |
+| Robust posterior | 0.56 | 0.13 | 0.03 | 0.13 |
+| Active, structural IG | 0.91 | 0.13 | 0.09 | 0.19 |
+| Active, EFA | 0.72 | 0.13 | 0.06 | 0.16 |
+| Full system | 0.66 | 0.13 | 0.06 | 0.09 |
+| Oracle | 0.91 | 0.19 | 0.09 | 0.22 |
 
-Reproductibilité : graines 0 et 9 rejouées dans un run séparé, résultats identiques (hors champs de durée).
+Reproducibility: seeds 0 and 9 replayed in a separate run, identical results (apart from duration fields).
 
-## 12. Balayage de bruit (récupération)
+## 12. Noise sweep (recovery)
 
-| Bruit | Système complet | Postérieure robuste | Ancien système | Passif |
+| Noise | Full system | Robust posterior | Old system | Passive |
 |---|---|---|---|---|
-| 0 % | 0,479 | 0,333 | 0,292 | 0,188 |
-| 2 % | 0,438 | 0,333 | 0,229 | 0,062 |
-| 5 % | 0,312 | 0,292 | 0,188 | 0,104 |
-| 8 % | 0,250 | 0,208 | 0,208 | 0,104 |
-| 12 % | 0,271 | 0,208 | 0,062 | 0,042 |
-| 15 % | 0,312 | 0,167 | 0,125 | 0,062 |
+| 0 % | 0.479 | 0.333 | 0.292 | 0.188 |
+| 2 % | 0.438 | 0.333 | 0.229 | 0.062 |
+| 5 % | 0.312 | 0.292 | 0.188 | 0.104 |
+| 8 % | 0.250 | 0.208 | 0.208 | 0.104 |
+| 12 % | 0.271 | 0.208 | 0.062 | 0.042 |
+| 15 % | 0.312 | 0.167 | 0.125 | 0.062 |
 
-Par type de bruit, système complet : 0,385 (frontière), 0,354 (i.i.d.), 0,292 (outliers groupés) ; ancien système : 0,281, 0,135, 0,135.
+By noise type, full system: 0.385 (boundary), 0.354 (i.i.d.), 0.292 (clustered outliers); old system: 0.281, 0.135, 0.135.
 
-## 13. Lot scellé (une seule évaluation, 24 tâches dont 20 représentables)
+## 13. Sealed set (a single evaluation, 24 tasks of which 20 representable)
 
-| Méthode | Récupération | Extrapolation |
+| Method | Recovery | Extrapolation |
 |---|---|---|
-| Système complet | 0,20 [0,01 ; 0,39] | 0,819 |
-| Postérieure robuste | 0,15 [−0,02 ; 0,32] | 0,743 |
-| Requêtes aléatoires | 0,15 [−0,02 ; 0,32] | 0,792 |
-| Ancien système | 0,10 [−0,04 ; 0,24] | 0,687 |
-| Passif | 0,00 | 0,713 |
+| Full system | 0.20 [0.01, 0.39] | 0.819 |
+| Robust posterior | 0.15 [−0.02, 0.32] | 0.743 |
+| Random queries | 0.15 [−0.02, 0.32] | 0.792 |
+| Old system | 0.10 [−0.04, 0.24] | 0.687 |
+| Passive | 0.00 | 0.713 |
 
-Classement cohérent avec les 16 graines, mais intervalles qui se chevauchent : le lot scellé ne permet pas de conclure seul.
+Ranking consistent with the 16 seeds, but overlapping intervals: the sealed set does not allow a conclusion on its own.
 
-## 14. Calibration de P(règle fausse)
-215 cas d'apprentissage (graines 700000+), 348 cas de test ; calibrateurs ajustés sur l'apprentissage seulement.
+## 14. Calibration of P(rule wrong)
+215 training cases (seeds 700000+), 348 test cases; calibrators fitted on the training set only.
 
-| Calibrateur | ECE | Brier |
+| Calibrator | ECE | Brier |
 |---|---|---|
-| Brut | 0,181 | 0,148 |
-| Isotonique | 0,071 | 0,080 |
-| Bêta | 0,075 | 0,077 |
-| Platt | 0,108 | 0,081 |
+| Raw | 0.181 | 0.148 |
+| Isotonic | 0.071 | 0.080 |
+| Beta | 0.075 | 0.077 |
+| Platt | 0.108 | 0.081 |
 
-## 15. Rappel
-- Promotion de familles : rappel 0,688 par validation active, 0,438 par regroupement.
-- Récupération sur nouvelle instance : 0,208 avec l'a priori de famille contre 0,313 par recherche complète.
+## 15. Recall
+- Family promotion: recall 0.688 by active validation, 0.438 by clustering.
+- Recovery on a new instance: 0.208 with the family prior versus 0.313 by full search.
 
 ## 16. Extrapolation
-Système complet 0,834 contre 0,778 pour l'ancien système (+0,056 [0,013 ; 0,099]). EFA seule : 0,863, meilleure méthode non oracle.
+Full system 0.834 versus 0.778 for the old system (+0.056 [0.013, 0.099]). EFA alone: 0.863, best non-oracle method.
 
-## 17. Fausse promotion et faux rejet
-- Familles : 39 promues par validation active, précision 0,846 (6 fausses) ; 23 par regroupement, précision 0,913 (2 fausses).
-- Mondes non représentables : le système complet déclare « identifié » dans 28 cas sur 32 ; le test d'identifiabilité classe 13 mondes non représentables sur 16 comme identifiables.
-- Réponse « UNKNOWN » : 1,9 % (système complet), 16 % (postérieure robuste), 21 % (oracle).
+## 17. False promotion and false rejection
+- Families: 39 promoted by active validation, precision 0.846 (6 false); 23 by clustering, precision 0.913 (2 false).
+- Non-representable worlds: the full system declares "identified" in 28 cases out of 32; the identifiability test classifies 13 non-representable worlds out of 16 as identifiable.
+- "UNKNOWN" answer: 1.9 % (full system), 16 % (robust posterior), 21 % (oracle).
 
-## 18. Efficacité des requêtes
-- EFA : 11,4 requêtes en moyenne ; système complet : 10,7 ; autres politiques actives : 16.
-- EFA contre aléatoire : récupération 0,000 [−0,054 ; 0,054], extrapolation +0,025 [0,003 ; 0,047].
-- IG structurel et désaccord : meilleures politiques non oracle (0,328).
-- Oracle contre système complet : +0,117 [0,072 ; 0,163].
+## 18. Query efficiency
+- EFA: 11.4 queries on average; full system: 10.7; other active policies: 16.
+- EFA versus random: recovery 0.000 [−0.054, 0.054], extrapolation +0.025 [0.003, 0.047].
+- Structural IG and disagreement: best non-oracle policies (0.328).
+- Oracle versus full system: +0.117 [0.072, 0.163].
 
-## 19. Complexité
-- Taille moyenne des programmes retenus : 1,6 à 2,2 (méthodes robustes), 5,15 (ancien système), 4,82 (passif).
-- « Simple + 8 % de bruit » : excès de taille 0,94 (seuil naïf) contre 0,00 (règle bayésienne robuste).
-- « Complexe + 0 % de bruit » : excès 0,63 contre 0,00, récupération 0,125 dans les deux cas.
+## 19. Complexity
+- Mean size of the retained programs: 1.6 to 2.2 (robust methods), 5.15 (old system), 4.82 (passive).
+- "Simple + 8 % noise": size excess 0.94 (naive threshold) versus 0.00 (robust Bayesian rule).
+- "Complex + 0 % noise": excess 0.63 versus 0.00, recovery 0.125 in both cases.
 
-## 20. Capacité
-- Aucune violation du budget compact (3,6 paramètres et 17,5 points d'erreur en moyenne).
-- Compression du résidu sans apport : 0,911 sans résidu, 0,909 avec résidu brut à porte, 0,831 avec prototypes.
+## 20. Capacity
+- No violation of the compact budget (3.6 parameters and 17.5 error points on average).
+- Residual compression brings no gain: 0.911 without residual, 0.909 with gated raw residual, 0.831 with prototypes.
 
-## 21. Hypothèses soutenues
-- H2 : excès de profondeur ramené de 0,94 à 0,00.
-- H5 : ECE réduit de 0,181 à 0,071.
-- H7 : récupération +0,117 [0,055 ; 0,179] par rapport à l'ancien système.
-- H8 : extrapolation conservée, +0,056.
-- H9 : 0 violation du budget compact.
+## 21. Supported hypotheses
+- H2: depth excess brought down from 0.94 to 0.00.
+- H5: ECE reduced from 0.181 to 0.071.
+- H7: recovery +0.117 [0.055, 0.179] relative to the old system.
+- H8: extrapolation preserved, +0.056.
+- H9: 0 violation of the compact budget.
 
-## 22. Hypothèses réfutées
-- H4 : les répétitions adaptatives ne sont jamais choisies (0 sur 64 runs) ; écart nul.
-- H6 : validation active moins précise que le regroupement (0,846 contre 0,913).
-- H10 : gain prévu par l'EFA sans corrélation avec le gain réalisé (ρ = −0,008 [−0,093 ; 0,078]).
+## 22. Refuted hypotheses
+- H4: adaptive repetitions are never chosen (0 out of 64 runs); zero difference.
+- H6: active validation less precise than clustering (0.846 versus 0.913).
+- H10: gain predicted by the EFA uncorrelated with the realised gain (ρ = −0.008 [−0.093, 0.078]).
 
-## 23. Hypothèses non concluantes
-- H1 : vraisemblance robuste contre naïve, +0,125 [−0,205 ; 0,455].
-- H3 : non concluante au sens pré-enregistré, mais défavorable : EFA significativement moins bonne que l'IG structurel en récupération (−0,063 [−0,105 ; −0,020]).
+## 23. Inconclusive hypotheses
+- H1: robust versus naive likelihood, +0.125 [−0.205, 0.455].
+- H3: inconclusive in the preregistered sense, but unfavourable: EFA significantly worse than structural IG in recovery (−0.063 [−0.105, −0.020]).
 
-## 24. Bugs corrigés
-- Graine du balayage de bruit dépendante de `hash()` d'une chaîne (non reproductible) : corrigée avant tout run.
-- Contrôle prédictif des familles : points et étiquettes tirés séparément : corrigé avant tout run.
-- Profondeur du monde écrasée par la taille du programme dans les lignes du banc principal : rétablie à l'agrégation, sans recalcul.
-- Script EC2 : échec d'installation rapporté « Completed » : corrigé, les échecs remontent.
-- Premier pilote sans checkpoint ni progression, arrêté après 52 minutes sans résultat récupérable.
-- Non résolu : empreinte de code différente entre la campagne et le run de reproductibilité, cause non identifiée ; résultats identiques.
+## 24. Bugs fixed
+- Noise-sweep seed dependent on `hash()` of a string (not reproducible): fixed before any run.
+- Predictive check of the families: points and labels drawn separately: fixed before any run.
+- World depth overwritten by the program size in the rows of the main bench: restored at aggregation, without recomputation.
+- EC2 script: installation failure reported as "Completed": fixed, failures are now propagated.
+- First pilot without checkpoint or progress, stopped after 52 minutes with no recoverable result.
+- Unresolved: code fingerprint differs between the campaign and the reproducibility run, cause not identified; identical results.
 
-## 25. Limites
-- Récupération faible en absolu : 0,35 pour l'oracle, presque rien au-delà de la profondeur 1.
-- Le système ne reconnaît pas qu'un monde est hors de sa classe d'hypothèses.
-- Répétitions et choix multi-capteurs sans apport dans ce monde ; le système complet fait moins bien que l'IG structurel seul.
-- Évidence approchée, pas évidence bayésienne exacte.
-- Monde synthétique en deux dimensions.
-- Lot scellé trop petit pour conclure seul.
-- SageMaker jamais testé en exécution réelle.
+## 25. Limits
+- Recovery low in absolute terms: 0.35 for the oracle, almost nothing beyond depth 1.
+- The system does not recognise that a world is outside its hypothesis class.
+- Repetitions and multi-sensor choice bring no gain in this world; the full system does worse than structural IG alone.
+- Approximate evidence, not exact Bayesian evidence.
+- Synthetic world in two dimensions.
+- Sealed set too small to conclude on its own.
+- SageMaker never tested in real execution.
 
-## 26. Prochain goulot
-La recherche de structure au-delà de la profondeur 1 : même avec une politique de mesure oracle, la bonne structure n'est presque jamais retrouvée. La politique de mesure n'est pas le facteur limitant ; c'est la génération et l'ajustement des candidats profonds, qui est aussi le point chaud en temps de calcul.
+## 26. Next bottleneck
+Structure search beyond depth 1: even with an oracle measurement policy, the right structure is almost never found. The measurement policy is not the limiting factor; it is the generation and fitting of deep candidates, which is also the hot spot in compute time.
 
-## Gel du jalon
-Les résultats de ce jalon ne sont plus modifiés après le commit de gel. Le lot scellé (`SEALED_SHA256` dans `core/robust_world.py`) a été consommé et ne doit plus servir à aucun réglage.
+## Milestone freeze
+The results of this milestone are no longer modified after the freeze commit. The sealed set (`SEALED_SHA256` in `core/robust_world.py`) has been consumed and must no longer be used for any tuning.

@@ -1,39 +1,39 @@
-# WCE Labs — identité publique et exploitation
+# WCE Labs — public identity and operations
 
-Mise à jour du 10 octobre 2026. La direction artistique et le symbole C2 existants sont conservés.
+Update of 10 October 2026. The existing art direction and C2 symbol are kept.
 
-## Audit et périmètre
+## Audit and scope
 
-Le frontend est rendu côté serveur Python (app/site.py, templates et CSS/JS), avec le laboratoire Session et l’API dans le même service web. Aucun serveur frontend supplémentaire, base de données ou worker n’est nécessaire pour cette mise à jour. Les comptes du futur hub restent une ambition et leur architecture privée n’est pas publiée.
+The frontend is rendered server-side in Python (app/site.py, templates and CSS/JS), with the Session lab and the API in the same web service. No additional frontend server, database or worker is needed for this update. The accounts of the future hub remain an ambition and their private architecture is not published.
 
-Les mentions du projet WCE et les documents scientifiques restent WCE / World Configuration Engine. L’identité du laboratoire dans le header, footer, titres, métadonnées et nouveaux exports devient WCE Labs. Les planches historiques de recherche de logo sont conservées comme archives, pas utilisées comme identité principale.
+The mentions of the WCE project and the scientific documents remain WCE / World Configuration Engine. The identity of the laboratory in the header, footer, titles, metadata and new exports becomes WCE Labs. The historical logo research boards are kept as archives, not used as the main identity.
 
-Audit : shell partagé, routes FR/EN, liens sociaux et configuration .env.example, exports/favicon, manifeste, métadonnées et ressources de recherche. Il n’existait pas de canonical/OG/JSON-LD centralisé ; app/public_identity.py les fournit désormais. Aucun email personnel ajouté. Aucun ancien domaine introduit dans les nouveaux exports.
+Audit: shared shell, FR/EN routes, social links and .env.example configuration, exports/favicon, manifest, metadata and research resources. There was no centralised canonical/OG/JSON-LD; app/public_identity.py now provides them. No personal email added. No old domain introduced in the new exports.
 
 ## Configuration
 
-- Domaine et organisation centralisés dans app/public_identity.py : https://wcelabs.com et https://github.com/wce-research.
-- PUBLIC_CONTACT_EMAIL : vide par défaut ; seule une adresse sous wcelabs.com valide est affichée. Fournir une vraie boîte avant activation.
-- PUBLIC_WCE_REPO_ENABLED=false : le lien https://github.com/wce-research/wce reste masqué par défaut. Le dépôt est désormais public avec une licence Apache-2.0, selon l’état communiqué par le propriétaire ; le code scientifique local n’a pas encore été poussé. Son existence ne vaut pas publication du code. Toute publication scientifique nécessite un audit préalable.
-- WCE_GITHUB_URL est conservé pour compatibilité Compose ; le frontend utilise l’organisation officielle centralisée. X, LinkedIn et Instagram gardent leur configuration existante.
+- Domain and organisation centralised in app/public_identity.py: https://wcelabs.com and https://github.com/wce-research.
+- PUBLIC_CONTACT_EMAIL: empty by default; only a valid address under wcelabs.com is displayed. Provide a real mailbox before activation.
+- PUBLIC_WCE_REPO_ENABLED=false: the link https://github.com/wce-research/wce remains hidden by default. The repository is now public with an Apache-2.0 licence, according to the state communicated by the owner; the local scientific code has not yet been pushed. Its existence does not amount to publication of the code. Any scientific publication requires a prior audit.
+- WCE_GITHUB_URL is kept for Compose compatibility; the frontend uses the centralised official organisation. X, LinkedIn and Instagram keep their existing configuration.
 
-## Assets et SEO
+## Assets and SEO
 
-La langue canonique future du dépôt scientifique public est l’anglais : code, commentaires et docstrings, README, documentation technique, rapports, hypothèses, artefacts et métadonnées publiques. Le site reste multilingue et pourra traduire cette source canonique. Cette règle ne signifie pas que les documents locaux existants ont déjà été traduits ou publiés.
+The future canonical language of the public scientific repository is English: code, comments and docstrings, README, technical documentation, reports, hypotheses, artefacts and public metadata. The site remains multilingual and will be able to translate this canonical source. This rule does not mean that the existing local documents have already been translated or published.
 
-Sources : tools/build_labs_brand.py, SVG dans app/static/brand. Exports : avatars carrés PNG/SVG clair et sombre, SVG monochrome, logos horizontaux WCE Labs clair/sombre/monochrome, image sociale 1200 × 630. Favicon adaptatif SVG, ICO 16/32/48 et apple-touch-icon 180. La géométrie originale est inchangée. Régénération : python3 tools/build_labs_brand.py (Pillow et police système DejaVu Sans requis ; aucun outil ajouté à l’image de production).
+Sources: tools/build_labs_brand.py, SVG files in app/static/brand. Exports: square PNG/SVG avatars light and dark, monochrome SVG, horizontal WCE Labs logos light/dark/monochrome, social image 1200 × 630. Adaptive SVG favicon, ICO 16/32/48 and apple-touch-icon 180. The original geometry is unchanged. Regeneration: python3 tools/build_labs_brand.py (Pillow and the DejaVu Sans system font required; no tool added to the production image).
 
-Chaque page FR/EN reçoit titre WCE Labs, description prudente, canonical localisé, hreflang, OpenGraph, Twitter summary_large_image et Organization JSON-LD. Les images utilisent le domaine officiel. Le manifeste reste display=browser : aucune capacité PWA promise.
+Each FR/EN page receives a WCE Labs title, a cautious description, a localised canonical, hreflang, OpenGraph, Twitter summary_large_image and Organization JSON-LD. The images use the official domain. The manifest remains display=browser: no PWA capability promised.
 
-## Machines et ports
+## Machines and ports
 
-Développement : GEEKOM A6. Exécution : Dell <LOCAL_HOST>, ~/workspace/wce. SSH existant <user>@<dell-host> avec geekom_to_dell_ed25519 ; aucun changement de clé/configuration.
+Development: GEEKOM A6. Execution: Dell dell-host, ~/workspace/wce. Existing SSH <user>@<dell-host> with <ssh-key>; no change of key/configuration.
 
-L’autorité sur le GEEKOM est ~/workspace/_machine_registry (équivalent effectif du dossier demandé). ports.json projects.wce et la table README réservent déjà web : 3018, binding 127.0.0.1. ./ports check valide le registre. Aucune nouvelle réservation nécessaire. La copie Dell ~/workspace/portfolio-port-governance est historique : ne pas remplacer l’autorité récente par cette copie.
+The authority on the GEEKOM is ~/workspace/_machine_registry (effective equivalent of the requested folder). ports.json projects.wce and the README table already reserve web: 3018, binding 127.0.0.1. ./ports check validates the registry. No new reservation needed. The Dell copy ~/workspace/portfolio-port-governance is historical: do not replace the recent authority with this copy.
 
-Compose publie uniquement 127.0.0.1:3018 → web:8000 pour navigateur et API locale. Le Dell fonctionne sous Linux ; pas de couche Windows/WSL active à supposer. ss et docker compose ps ont confirmé que ce port appartient déjà à WCE, sans collision.
+Compose publishes only 127.0.0.1:3018 → web:8000 for the browser and the local API. The Dell runs Linux; no active Windows/WSL layer to be assumed. ss and docker compose ps confirmed that this port already belongs to WCE, without collision.
 
-## Commandes sur le Dell
+## Commands on the Dell
 
 ```bash
 cd ~/workspace/wce
@@ -45,30 +45,30 @@ docker compose down
 docker compose up -d --wait
 ```
 
-URL locale : http://localhost:3018/fr/ ou http://localhost:3018/en/.
-Contrôle : curl -fsS http://127.0.0.1:3018/healthz.
-Pas d’exposition LAN ou Internet ajoutée. Les sessions du laboratoire sont temporaires ; aucun stockage persistant de comptes n’est annoncé.
+Local URL: http://localhost:3018/fr/ or http://localhost:3018/en/.
+Check: curl -fsS http://127.0.0.1:3018/healthz.
+No LAN or Internet exposure added. The lab sessions are temporary; no persistent storage of accounts is announced.
 
-## Connexion future de wcelabs.com — validation requise
+## Future connection of wcelabs.com — validation required
 
-Le DNS Cloudflare n’est pas modifié. Une entrée DNS ne rend pas le port privé 127.0.0.1:3018 accessible depuis Internet. Documentation : https://developers.cloudflare.com/dns/proxy-status/ et https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/.
+The Cloudflare DNS is not modified. A DNS entry does not make the private port 127.0.0.1:3018 reachable from the Internet. Documentation: https://developers.cloudflare.com/dns/proxy-status/ and https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/.
 
-Après autorisation explicite :
+After explicit authorisation:
 
-1. Auditer l’ingress actuel du Dell (reverse proxy, connecteurs existants, TLS, règles Cloudflare), choisir sa réutilisation avant toute création.
-2. Valider une route HTTPS pour wcelabs.com vers WCE. Si un connecteur local existant est retenu, origine http://127.0.0.1:3018 ; si connecteur Docker, origine http://web:8000 sur un réseau partagé explicitement contrôlé. Aucun nouveau port arbitraire.
-3. Contrôler Host/Origin, TLS public, politique cookies et protection de l’API interactive derrière l’ingress ; conserver les protections actuelles.
-4. Valider ensemble la modification DNS/route puis l’exécuter. Ne pas créer de tunnel, redirection de box ou secret tant que cette étape n’est pas autorisée.
-5. Vérifier HTTPS, FR/EN, canonical, assets OG, API et logs depuis un accès externe. Ne déclarer le domaine opérationnel qu’après ces contrôles.
+1. Audit the current ingress of the Dell (reverse proxy, existing connectors, TLS, Cloudflare rules), choose to reuse it before any creation.
+2. Validate an HTTPS route for wcelabs.com to WCE. If an existing local connector is retained, origin http://127.0.0.1:3018; if a Docker connector, origin http://web:8000 on an explicitly controlled shared network. No new arbitrary port.
+3. Check Host/Origin, public TLS, cookie policy and protection of the interactive API behind the ingress; keep the current protections.
+4. Validate the DNS/route change together then execute it. Do not create a tunnel, router redirection or secret as long as this step is not authorised.
+5. Verify HTTPS, FR/EN, canonical, OG assets, API and logs from an external access. Declare the domain operational only after these checks.
 
-Restent à fournir : adresse officielle de contact, publication du dépôt scientifique et choix/validation de l’ingress. Aucun partenariat ni crédit cloud affiché. Le frontend et l’architecture du hub ne doivent pas être inclus dans la publication du dépôt scientifique.
+Still to be provided: official contact address, publication of the scientific repository and choice/validation of the ingress. No partnership or cloud credit displayed. The frontend and the architecture of the hub must not be included in the publication of the scientific repository.
 
-## Vérification de cette livraison
+## Verification of this delivery
 
-- Authentification GitHub SSH : compte CSAEAI ; connexion Dell confirmée. Aucun push effectué et droits d’administration de l’organisation wce-research non présumés.
-- 184 tests concernés passent sur le frontend actuel (web, moteur, frontière de publication, identité). Ce contrôle n’est pas une certification de toute la recherche scientifique.
-- 166 tests passent sur une copie isolée de l’arbre préparé pour le commit identité (sans les anciennes modifications non committées).
-- Dell : 158 tests identité/moteur, build Docker, healthcheck, pages FR/EN, Open Research, manifeste, favicon et images HTTP 200. Arrêt/redémarrage Compose validé ; utilisateur wce ; port 3018 limité à 127.0.0.1.
-- Navigateur connecté au Dell : footer FR/EN sur desktop/mobile, cinq sections, titres localisés ; aucune erreur JavaScript ni débordement. Captures de contrôle temporaires dans /tmp/wce-labs-browser sur le GEEKOM.
-- Revue du diff dédié et contrôle des motifs de secrets réalisés. Aucun .env, clé privée, credential ou fichier scientifique dans le commit.
-- Compose a signalé l’absence de buildx pour Bake ; le build a néanmoins réussi avec le driver Docker existant. Aucune installation système nécessaire à cette livraison.
+- GitHub SSH authentication: existing project account; Dell connection confirmed. No push performed and administration rights on the wce-research organisation not presumed.
+- 184 relevant tests pass on the current frontend (web, engine, publication boundary, identity). This check is not a certification of all the scientific research.
+- 166 tests pass on an isolated copy of the tree prepared for the identity commit (without the old uncommitted modifications).
+- Dell: 158 identity/engine tests, Docker build, healthcheck, FR/EN pages, Open Research, manifest, favicon and images HTTP 200. Compose stop/restart validated; user wce; port 3018 restricted to 127.0.0.1.
+- Browser connected to the Dell: FR/EN footer on desktop/mobile, five sections, localised titles; no JavaScript error or overflow. Temporary check screenshots in /tmp/wce-labs-browser on the GEEKOM.
+- Review of the dedicated diff and check of secret patterns carried out. No .env, private key, credential or scientific file in the commit.
+- Compose reported the absence of buildx for Bake; the build nevertheless succeeded with the existing Docker driver. No system installation needed for this delivery.

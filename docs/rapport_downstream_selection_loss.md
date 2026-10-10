@@ -1,270 +1,270 @@
-# Rapport diagnostique — WCE Downstream Selection Loss
+# Diagnostic report — WCE Downstream Selection Loss
 
-Sous-jalon EXPLORATOIRE du jalon « Deep Compositional Structure Discovery & Model-Class Boundary ».
-Données : partition **dev uniquement**, 128 tâches (profondeurs 2 à 5 × régimes standard et riche × 16 tâches), **vrais
-atomes fournis** comme littéraux : la découverte de primitives est entièrement neutralisée. Ni la validation, ni le
-test confirmatoire, ni le lot scellé n'ont été touchés. Tout est `POST-HOC / EXPLORATORY`.
+EXPLORATORY sub-milestone of the milestone "Deep Compositional Structure Discovery & Model-Class Boundary".
+Data: **dev partition only**, 128 tasks (depths 2 to 5 × standard and rich regimes × 16 tasks), **true
+atoms supplied** as literals: primitive discovery is entirely neutralised. Neither the validation set, nor the
+confirmatory test, nor the sealed set was touched. Everything is `POST-HOC / EXPLORATORY`.
 
-Source : `results/deep_downstream_summary.json` (run AWS `wce-deepdown-20261004-153523`, aucune unité en erreur).
-Cibles : `make deep-run-down`, `make deep-down-aggregate`, `make deep-down-report`.
+Source: `results/deep_downstream_summary.json` (AWS run `wce-deepdown-20261004-153523`, no unit in error).
+Targets: `make deep-run-down`, `make deep-down-aggregate`, `make deep-down-report`.
 
-Méthode : le pipeline n'a PAS été modifié. Une sous-classe d'instrumentation (`TracedSearch`) enregistre chaque
-ajustement (programme avant, programme après) et la simplification en appelant le code existant ; des tests vérifient
-qu'elle produit exactement la même sélection, les mêmes scores et le même coût. Tout ce qui utilise la vérité est
-calculé après coup.
+Method: the pipeline was NOT modified. An instrumentation subclass (`TracedSearch`) records each
+fit (program before, program after) and the simplification by calling the existing code; tests verify
+that it produces exactly the same selection, the same scores and the same cost. Everything that uses the truth is
+computed after the fact.
 
-## Résumé
+## Summary
 
-Une solution presque parfaite est trouvée dans 99 % des tâches, puis **détruite par le premier ajustement par gradient**.
+A nearly perfect solution is found in 99 % of the tasks, then **destroyed by the first gradient fit**.
 
-| | Part des tâches avec un candidat d'accord ≥ 0,99 |
+| | Share of tasks with a candidate of agreement ≥ 0.99 |
 |---|---|
-| Après la génération (avant tout ajustement) | 99 % |
-| Après l'ajustement initial | 13 % |
-| À la sélection finale | 9 % |
+| After generation (before any fit) | 99 % |
+| After the initial fit | 13 % |
+| At final selection | 9 % |
 
-Cause principale des 116 échecs : `INITIAL_FIT_BAD` dans 102 cas (88 %). La simplification, le classement, le score et
-la canonicalisation sont des causes marginales (5 cas à eux tous). Le problème est d'**optimisation**, pas de sélection
-ni de métrique.
+Main cause of the 116 failures: `INITIAL_FIT_BAD` in 102 cases (88 %). Simplification, ranking, score and
+canonicalisation are marginal causes (5 cases between them). The problem is one of **optimisation**, not of selection
+nor of metric.
 
-## 1. Une bonne solution est-elle trouvée avant la fin ?
+## 1. Is a good solution found before the end?
 
-Oui, presque toujours. La synthèse sur signatures, avec les vrais atomes, produit un candidat d'accord ≥ 0,99 dans
-127 tâches sur 128 (99,2 %). Dans 90 % de ces cas, ce candidat est aussi le premier au score avant ajustement. Le
-candidat classé premier avant ajustement a un accord moyen de 0,9956 et atteint 0,99 dans 89 % des tâches.
+Yes, almost always. Synthesis on signatures, with the true atoms, produces a candidate of agreement ≥ 0.99 in
+127 tasks out of 128 (99.2 %). In 90 % of these cases, this candidate is also the first by score before fitting. The
+candidate ranked first before fitting has a mean agreement of 0.9956 and reaches 0.99 in 89 % of the tasks.
 
-Le système a donc déjà en main la bonne solution, avec les bons paramètres, avant de commencer à ajuster.
+The system therefore already has the right solution in hand, with the right parameters, before it starts fitting.
 
-## 2. À quelle étape est-elle perdue ?
+## 2. At which stage is it lost?
 
-À l'ajustement initial. Part des tâches où un candidat d'accord ≥ 0,99 existe, étape par étape :
+At the initial fit. Share of tasks where a candidate of agreement ≥ 0.99 exists, stage by stage:
 
-| Cellule | Vrais atomes | Génération | Ajustement initial | Réajustement | Simplification | Canonicalisation / dédoublonnage | Score | Classement | Sélection finale |
+| Cell | True atoms | Generation | Initial fit | Refit | Simplification | Canonicalisation / deduplication | Score | Ranking | Final selection |
 |---|---|---|---|---|---|---|---|---|---|
-| Standard d2 | 1,00 | 1,00 | 0,12 | 0,12 | 0,06 | 0,06 | 0,06 | 0,06 | 0,06 |
-| Standard d3 | 1,00 | 1,00 | 0,00 | 0,00 | 0,00 | 0,00 | 0,00 | 0,00 | 0,00 |
-| Standard d4 | 1,00 | 0,94 | 0,00 | 0,00 | 0,00 | 0,00 | 0,00 | 0,00 | 0,00 |
-| Standard d5 | 1,00 | 1,00 | 0,00 | 0,00 | 0,00 | 0,00 | 0,00 | 0,00 | 0,00 |
-| Riche d2 | 1,00 | 1,00 | 0,50 | 0,50 | 0,50 | 0,50 | 0,50 | 0,50 | 0,50 |
-| Riche d3 | 1,00 | 1,00 | 0,38 | 0,38 | 0,19 | 0,31 | 0,19 | 0,19 | 0,19 |
-| Riche d4 | 1,00 | 1,00 | 0,06 | 0,06 | 0,00 | 0,06 | 0,00 | 0,00 | 0,00 |
-| Riche d5 | 1,00 | 1,00 | 0,00 | 0,00 | 0,00 | 0,00 | 0,00 | 0,00 | 0,00 |
+| Standard d2 | 1.00 | 1.00 | 0.12 | 0.12 | 0.06 | 0.06 | 0.06 | 0.06 | 0.06 |
+| Standard d3 | 1.00 | 1.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 |
+| Standard d4 | 1.00 | 0.94 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 |
+| Standard d5 | 1.00 | 1.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 |
+| Rich d2 | 1.00 | 1.00 | 0.50 | 0.50 | 0.50 | 0.50 | 0.50 | 0.50 | 0.50 |
+| Rich d3 | 1.00 | 1.00 | 0.38 | 0.38 | 0.19 | 0.31 | 0.19 | 0.19 | 0.19 |
+| Rich d4 | 1.00 | 1.00 | 0.06 | 0.06 | 0.00 | 0.06 | 0.00 | 0.00 | 0.00 |
+| Rich d5 | 1.00 | 1.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 |
 
-Étape où la bonne solution est perdue (`BestCandidateTrajectory`), sur les 128 tâches : ajustement initial 110,
-simplification 5, génération 1, jamais perdue 12. Les colonnes « réajustement », « canonicalisation » mesurent le
-meilleur candidat encore disponible ; les colonnes « simplification », « score », « classement » et « sélection finale »
-mesurent le candidat retenu à cette étape.
+Stage at which the good solution is lost (`BestCandidateTrajectory`), over the 128 tasks: initial fit 110,
+simplification 5, generation 1, never lost 12. The columns "refit", "canonicalisation" measure the
+best candidate still available; the columns "simplification", "score", "ranking" and "final selection"
+measure the candidate retained at that stage.
 
-Meilleur accord moyen par étape : 1,000 à la génération ; 0,933 à 0,986 après l'ajustement initial ; 0,898 à 0,982 à la
-sélection finale.
+Best mean agreement per stage: 1.000 at generation; 0.933 to 0.986 after the initial fit; 0.898 to 0.982 at
+final selection.
 
-## 3. Quelle étape contribue le plus à la dégradation ?
+## 3. Which stage contributes most to the degradation?
 
-L'ajustement par gradient (polissage) des candidats.
+The gradient fit (polishing) of the candidates.
 
-| Cause principale | Standard | Riche | Total |
+| Main cause | Standard | Rich | Total |
 |---|---|---|---|
 | `INITIAL_FIT_BAD` | 55 | 47 | 102 |
-| Récupérée (accord final ≥ 0,99) | 1 | 11 | 12 |
+| Recovered (final agreement ≥ 0.99) | 1 | 11 | 12 |
 | `THRESHOLD_TOO_STRICT` | 6 | 2 | 8 |
 | `SCORING_MISALIGNED` | 0 | 2 | 2 |
-| `CANONICALIZATION_CHANGED_BEHAVIOR` (dédoublonnage) | 1 | 1 | 2 |
+| `CANONICALIZATION_CHANGED_BEHAVIOR` (deduplication) | 1 | 1 | 2 |
 | `RANKING_FAILURE` | 0 | 1 | 1 |
-| `OTHER` (aucun candidat ≥ 0,99 généré) | 1 | 0 | 1 |
+| `OTHER` (no candidate ≥ 0.99 generated) | 1 | 0 | 1 |
 | `POLISH_DEGRADED`, `SIMPLIFICATION_DEGRADED`, `FINAL_SELECTION_FAILURE`, `NUMERICAL_INSTABILITY`, `FUNCTIONAL_EQUIVALENCE_MISCOUNTED` | 0 | 0 | 0 |
 
-Par profondeur, `INITIAL_FIT_BAD` : standard 12, 12, 15, 16 sur 16 (d2 à d5) ; riche 7, 9, 15, 16 sur 16.
+By depth, `INITIAL_FIT_BAD`: standard 12, 12, 15, 16 out of 16 (d2 to d5); rich 7, 9, 15, 16 out of 16.
 
-Définitions utilisées : `INITIAL_FIT_BAD` = un candidat ≥ 0,99 a été soumis à l'ajustement et plus aucun candidat ≥ 0,99
-n'existe après ; `THRESHOLD_TOO_STRICT` = même situation, mais l'ajustement a amélioré la vraisemblance sur les données
-et l'accord final reste ≥ 0,97 (la perte est statistique, pas un défaut d'optimisation). `SIMPLIFICATION_DEGRADED`
-n'apparaît jamais comme cause principale parce que, lorsque la simplification dégrade, le candidat avait déjà été abîmé
-en amont.
+Definitions used: `INITIAL_FIT_BAD` = a candidate ≥ 0.99 was submitted to the fit and no candidate ≥ 0.99
+exists any longer afterwards; `THRESHOLD_TOO_STRICT` = same situation, but the fit improved the likelihood on the data
+and the final agreement stays ≥ 0.97 (the loss is statistical, not an optimisation defect). `SIMPLIFICATION_DEGRADED`
+never appears as a main cause because, when the simplification degrades, the candidate had already been damaged
+upstream.
 
-## 4. Le score interne est-il mal aligné avec la qualité fonctionnelle ?
+## 4. Is the internal score misaligned with functional quality?
 
-Modérément, et ce n'est pas la cause dominante. Classement oracle (par accord fonctionnel réel) contre scores internes,
-sur toutes les structures ajustées de chaque tâche :
+Moderately, and it is not the dominant cause. Oracle ranking (by real functional agreement) against internal scores,
+over all the fitted structures of each task:
 
-| Score | Corrélation de rang | Accord du premier (top-1) | Meilleur dans les 3 premiers | … dans les 5 premiers | Accord du candidat classé premier |
+| Score | Rank correlation | Agreement of the first (top-1) | Best within the first 3 | … within the first 5 | Agreement of the candidate ranked first |
 |---|---|---|---|---|---|
-| Score a posteriori (actuel) | 0,78 | 0,64 | 0,79 | 0,85 | 0,953 |
-| Vraisemblance profilée | 0,86 | 0,51 | 0,85 | 0,95 | 0,956 |
-| Vraisemblance robuste adoucie | 0,85 | 0,36 | 0,78 | 0,90 | 0,955 |
-| MDL | 0,77 | 0,64 | 0,79 | 0,84 | 0,953 |
-| Pénalité de paramètres seule | −0,78 | 0,01 | 0,01 | 0,02 | 0,717 |
-| Pénalité de structure seule | −0,74 | 0,01 | 0,01 | 0,02 | 0,717 |
+| Posterior score (current) | 0.78 | 0.64 | 0.79 | 0.85 | 0.953 |
+| Profile likelihood | 0.86 | 0.51 | 0.85 | 0.95 | 0.956 |
+| Softened robust likelihood | 0.85 | 0.36 | 0.78 | 0.90 | 0.955 |
+| MDL | 0.77 | 0.64 | 0.79 | 0.84 | 0.953 |
+| Parameter penalty alone | −0.78 | 0.01 | 0.01 | 0.02 | 0.717 |
+| Structure penalty alone | −0.74 | 0.01 | 0.01 | 0.02 | 0.717 |
 
-Lecture : la vraisemblance est la composante la mieux corrélée à la qualité réelle ; les pénalités de complexité vont à
-l'encontre de la qualité (les bonnes structures sont les plus grosses). Le score composite choisit le meilleur candidat
-disponible dans 64 % des tâches. En moyenne sur les 128 tâches (écart nul quand il le choisit), le meilleur disponible a une vraisemblance plus
-élevée de 1,7 nat mais paie 7,7 nats de pénalité de paramètres et 3,3 de pénalité de structure de plus : c'est la
-pénalité de complexité qui fait perdre les bonnes structures, pas la vraisemblance.
+Reading: the likelihood is the component best correlated with real quality; the complexity penalties go
+against quality (the good structures are the largest ones). The composite score chooses the best available
+candidate in 64 % of the tasks. On average over the 128 tasks (zero gap when it chooses it), the best available one has a likelihood
+higher by 1.7 nat but pays 7.7 nats more of parameter penalty and 3.3 more of structure penalty: it is the
+complexity penalty that loses the good structures, not the likelihood.
 
-Mais l'enjeu est faible ici : choisir systématiquement le meilleur candidat disponible après ajustement ne donnerait que
-13 % de récupération (contre 9 %), parce que les bons candidats ont déjà été abîmés.
+But the stakes are low here: systematically choosing the best available candidate after fitting would give only
+13 % recovery (against 9 %), because the good candidates have already been damaged.
 
-### Calibration du score final
+### Calibration of the final score
 
-La confiance interne (masse de la structure retenue) est très mal calibrée : confiance moyenne 0,905 pour un taux de
-récupération réel de 0,094.
+The internal confidence (mass of the retained structure) is very poorly calibrated: mean confidence 0.905 for a real
+recovery rate of 0.094.
 
-| Tranche de confiance | Tâches | Confiance moyenne | Récupération ≥ 0,99 | Récupération ≥ 0,97 |
+| Confidence bin | Tasks | Mean confidence | Recovery ≥ 0.99 | Recovery ≥ 0.97 |
 |---|---|---|---|---|
-| 0,2 – 0,4 | 1 | 0,26 | 0,00 | 0,00 |
-| 0,4 – 0,6 | 12 | 0,49 | 0,00 | 0,25 |
-| 0,6 – 0,8 | 8 | 0,68 | 0,13 | 0,13 |
-| 0,8 – 1,0 | 107 | 0,98 | 0,10 | 0,56 |
+| 0.2 – 0.4 | 1 | 0.26 | 0.00 | 0.00 |
+| 0.4 – 0.6 | 12 | 0.49 | 0.00 | 0.25 |
+| 0.6 – 0.8 | 8 | 0.68 | 0.13 | 0.13 |
+| 0.8 – 1.0 | 107 | 0.98 | 0.10 | 0.56 |
 
-ECE 0,81 et Brier 0,76 au seuil 0,99 ; ECE 0,41 et Brier 0,39 au seuil 0,97.
+ECE 0.81 and Brier 0.76 at threshold 0.99; ECE 0.41 and Brier 0.39 at threshold 0.97.
 
-## 5. Le seuil 0,99 explique-t-il une part importante du problème ?
+## 5. Does the 0.99 threshold explain a large share of the problem?
 
-Une part, pas l'essentiel. Part des tâches dont l'accord final atteint chaque seuil :
+A share, not the bulk of it. Share of tasks whose final agreement reaches each threshold:
 
-| Cellule | ≥ 0,90 | ≥ 0,95 | ≥ 0,97 | ≥ 0,99 | Structure exacte | Structure équivalente | Accord final moyen |
+| Cell | ≥ 0.90 | ≥ 0.95 | ≥ 0.97 | ≥ 0.99 | Exact structure | Equivalent structure | Mean final agreement |
 |---|---|---|---|---|---|---|---|
-| Standard d2 | 1,00 | 0,81 | 0,63 | 0,06 | 0,81 | 0,81 | 0,966 |
-| Standard d3 | 0,88 | 0,81 | 0,50 | 0,00 | 0,25 | 0,56 | 0,960 |
-| Standard d4 | 0,75 | 0,44 | 0,13 | 0,00 | 0,31 | 0,38 | 0,923 |
-| Standard d5 | 0,56 | 0,00 | 0,00 | 0,00 | 0,06 | 0,13 | 0,898 |
-| Riche d2 | 1,00 | 0,94 | 0,88 | 0,50 | 0,63 | 0,63 | 0,982 |
-| Riche d3 | 1,00 | 1,00 | 0,81 | 0,19 | 0,56 | 0,88 | 0,982 |
-| Riche d4 | 1,00 | 0,81 | 0,75 | 0,00 | 0,50 | 0,50 | 0,968 |
-| Riche d5 | 0,81 | 0,69 | 0,31 | 0,00 | 0,06 | 0,19 | 0,945 |
-| **Toutes** | 0,88 | 0,69 | 0,50 | 0,09 | | | |
+| Standard d2 | 1.00 | 0.81 | 0.63 | 0.06 | 0.81 | 0.81 | 0.966 |
+| Standard d3 | 0.88 | 0.81 | 0.50 | 0.00 | 0.25 | 0.56 | 0.960 |
+| Standard d4 | 0.75 | 0.44 | 0.13 | 0.00 | 0.31 | 0.38 | 0.923 |
+| Standard d5 | 0.56 | 0.00 | 0.00 | 0.00 | 0.06 | 0.13 | 0.898 |
+| Rich d2 | 1.00 | 0.94 | 0.88 | 0.50 | 0.63 | 0.63 | 0.982 |
+| Rich d3 | 1.00 | 1.00 | 0.81 | 0.19 | 0.56 | 0.88 | 0.982 |
+| Rich d4 | 1.00 | 0.81 | 0.75 | 0.00 | 0.50 | 0.50 | 0.968 |
+| Rich d5 | 0.81 | 0.69 | 0.31 | 0.00 | 0.06 | 0.19 | 0.945 |
+| **All** | 0.88 | 0.69 | 0.50 | 0.09 | | | |
 
-41 % des tâches se situent entre 0,97 et 0,99 : l'échec au seuil 0,99 est en partie un effet de seuil. Mais la moitié
-des tâches reste sous 0,97, et à la profondeur 5 en régime standard aucune n'atteint 0,95. L'échec est réel.
+41 % of the tasks lie between 0.97 and 0.99: the failure at the 0.99 threshold is partly a threshold effect. But half
+of the tasks remain below 0.97, and at depth 5 in the standard regime none reaches 0.95. The failure is real.
 
-Le seuil n'est pas non plus inatteignable : le candidat disponible AVANT ajustement atteint 0,99 dans 89 % des tâches.
-Seules 8 tâches sur 128 relèvent de `THRESHOLD_TOO_STRICT`.
+Nor is the threshold unreachable: the candidate available BEFORE fitting reaches 0.99 in 89 % of the tasks.
+Only 8 tasks out of 128 fall under `THRESHOLD_TOO_STRICT`.
 
-Représentations équivalentes : une structure retenue fonctionnellement correcte (≥ 0,99) mais de forme non équivalente à
-la vraie apparaît dans 2,3 % des tâches ; elle est comptée comme un succès fonctionnel, pas comme un échec. À l'inverse,
-la structure exacte est souvent retenue avec des paramètres abîmés (81 % de structures exactes en standard d2 pour 6 % de
-récupération à 0,99).
+Equivalent representations: a retained structure that is functionally correct (≥ 0.99) but of a form not equivalent to
+the true one appears in 2.3 % of the tasks; it is counted as a functional success, not as a failure. Conversely,
+the exact structure is often retained with damaged parameters (81 % exact structures in standard d2 for 6 %
+recovery at 0.99).
 
-## 6. La simplification est-elle sûre ?
+## 6. Is the simplification safe?
 
-Presque, et elle agit rarement. Elle modifie la structure retenue dans 3 tâches sur 128 (2,3 %). Dans 2 de ces 3 cas
-elle retire un atome nécessaire (accord −0,050 et −0,007) ; dans le troisième elle améliore légèrement l'accord
-(+0,005). Elle ne fusionne jamais deux structures : elle remplace une structure par l'un de ses enfants, réajusté
-(60 pas), donc elle modifie les paramètres quand elle agit. La règle (facteur de Bayes < 3) est donc trop permissive
-dans environ 1,6 % des tâches. Elle n'est la cause principale d'aucun échec.
+Almost, and it rarely acts. It modifies the retained structure in 3 tasks out of 128 (2.3 %). In 2 of these 3 cases
+it removes a necessary atom (agreement −0.050 and −0.007); in the third it slightly improves the agreement
+(+0.005). It never merges two structures: it replaces a structure by one of its children, refitted
+(60 steps), so it modifies the parameters when it acts. The rule (Bayes factor < 3) is therefore too permissive
+in about 1.6 % of the tasks. It is the main cause of no failure.
 
-## 7. Le polissage est-il sûr ?
+## 7. Is the polishing safe?
 
-**Non.** Sur les 713 ajustements de candidats dont l'accord avant ajustement était ≥ 0,97 :
-
-| | |
-|---|---|
-| Accord moyen avant → après | 0,994 → 0,956 |
-| Candidats dégradés (accord −0,002 ou plus) | 95 % |
-| Candidats parfaits (accord ≥ 0,999) tombant sous 0,99 | 93 % (379 sur 408) |
-| Chute moyenne d'accord | 0,038 |
-| Déplacement moyen du paramètre le plus modifié | 0,67 |
-| Ajustements qui font BAISSER la vraisemblance sur les données | 55 % |
-| Variation moyenne du nombre d'erreurs sur les données | +1,35 |
-
-Le polissage dégrade donc silencieusement, et dans plus de la moitié des cas le résultat est objectivement moins bon sur
-les données disponibles que le point de départ — sans que rien ne s'y oppose, puisque la version initiale n'est jamais
-enregistrée.
-
-Par cellule, part des candidats ≥ 0,97 rendus moins vraisemblables : standard 49 %, 28 %, 36 %, 42 % (d2 à d5) ; riche
-74 %, 48 %, 72 %, 85 %. Chute moyenne d'accord : 0,031, 0,028, 0,064, 0,066 (standard) ; 0,018, 0,015, 0,039, 0,038
-(riche).
-
-Borne d'estimation : la VRAIE structure, ajustée depuis ses VRAIS paramètres, finit avec un accord moyen de 0,774 et
-passe de 39 à 118 erreurs sur les données en moyenne ; elle n'améliore sa vraisemblance que dans 16 % des tâches. Ce
-n'est pas un problème de données insuffisantes : l'optimiseur quitte un optimum pour un point nettement moins bon.
-Explication la plus probable, non testée isolément : l'ajustement démarre avec une frontière très adoucie (raideur 4)
-et un pas de 0,05, ce qui éloigne des paramètres déjà justes avant que la raideur ne remonte.
-
-## 8. Le nouveau fitter change-t-il le ranking ?
-
-Parfois, et l'équivalence numérique annoncée ne tient pas en général. Ancien ajusteur (`fit_robust`) contre nouvel
-ajusteur par lots, mêmes candidats, même initialisation, 100 pas :
+**No.** Over the 713 fits of candidates whose agreement before fitting was ≥ 0.97:
 
 | | |
 |---|---|
-| Tâches où l'écart de paramètres dépasse 1e-3 | 28 % |
-| Écart maximal de paramètres | 1,01 |
-| Écart maximal de score | 24,5 nats |
-| Écart maximal d'accord fonctionnel | 0,035 |
-| Même candidat classé premier | 98,4 % |
-| Même ordre complet | 86,7 % |
-| Corrélation de rang moyenne | 0,985 |
+| Mean agreement before → after | 0.994 → 0.956 |
+| Degraded candidates (agreement −0.002 or more) | 95 % |
+| Perfect candidates (agreement ≥ 0.999) falling below 0.99 | 93 % (379 out of 408) |
+| Mean drop in agreement | 0.038 |
+| Mean displacement of the most modified parameter | 0.67 |
+| Fits that LOWER the likelihood on the data | 55 % |
+| Mean change in the number of errors on the data | +1.35 |
 
-L'écart de 1e-7 mesuré au début du jalon venait de cas courts et bien conditionnés. Sur des trajectoires de 100 pas
-partant de candidats composites, une différence d'arrondi de l'initialisation (l'ancien ajusteur passe par des flottants
-simple précision) s'amplifie : l'optimisation est numériquement sensible. Conséquence pour le pré-enregistrement :
-l'hypothèse H10(b) (écart ≤ 1e-6) ne tient pas telle qu'elle est formulée sur ces tâches. Ce n'est pas la cause de la
-perte aval — l'ancien ajusteur dégrade autant — mais c'est un symptôme du même défaut : l'ajustement est instable.
+The polishing therefore degrades silently, and in more than half of the cases the result is objectively worse on
+the available data than the starting point — with nothing opposing it, since the initial version is never
+recorded.
 
-## 9. Le problème est-il principalement optimisation, sélection ou métrique ?
+By cell, share of candidates ≥ 0.97 made less likely: standard 49 %, 28 %, 36 %, 42 % (d2 to d5); rich
+74 %, 48 %, 72 %, 85 %. Mean drop in agreement: 0.031, 0.028, 0.064, 0.066 (standard); 0.018, 0.015, 0.039, 0.038
+(rich).
+
+Estimation bound: the TRUE structure, fitted from its TRUE parameters, ends with a mean agreement of 0.774 and
+goes from 39 to 118 errors on the data on average; it improves its likelihood in only 16 % of the tasks. This
+is not a problem of insufficient data: the optimiser leaves an optimum for a markedly worse point.
+Most probable explanation, not tested in isolation: the fit starts with a very softened boundary (stiffness 4)
+and a step size of 0.05, which moves already correct parameters away before the stiffness rises again.
+
+## 8. Does the new fitter change the ranking?
+
+Sometimes, and the announced numerical equivalence does not hold in general. Old fitter (`fit_robust`) against new
+batched fitter, same candidates, same initialisation, 100 steps:
+
+| | |
+|---|---|
+| Tasks where the parameter gap exceeds 1e-3 | 28 % |
+| Maximum parameter gap | 1.01 |
+| Maximum score gap | 24.5 nats |
+| Maximum functional agreement gap | 0.035 |
+| Same candidate ranked first | 98.4 % |
+| Same complete order | 86.7 % |
+| Mean rank correlation | 0.985 |
+
+The gap of 1e-7 measured at the start of the milestone came from short, well-conditioned cases. On trajectories of 100 steps
+starting from composite candidates, a rounding difference in the initialisation (the old fitter goes through
+single-precision floats) is amplified: the optimisation is numerically sensitive. Consequence for the preregistration:
+hypothesis H10(b) (gap ≤ 1e-6) does not hold as it is formulated on these tasks. This is not the cause of the
+downstream loss — the old fitter degrades just as much — but it is a symptom of the same defect: the fit is unstable.
+
+## 9. Is the problem mainly optimisation, selection or metric?
 
 **Optimisation.**
 
-| Famille | Tâches | Part des 116 échecs |
+| Family | Tasks | Share of the 116 failures |
 |---|---|---|
 | Optimisation (`INITIAL_FIT_BAD`) | 102 | 88 % |
-| Métrique (`THRESHOLD_TOO_STRICT`) | 8 | 7 % |
-| Sélection (score, classement, dédoublonnage) | 5 | 4 % |
-| Génération (`OTHER`) | 1 | 1 % |
+| Metric (`THRESHOLD_TOO_STRICT`) | 8 | 7 % |
+| Selection (score, ranking, deduplication) | 5 | 4 % |
+| Generation (`OTHER`) | 1 | 1 % |
 
-Contrefactuels calculés sur les états enregistrés, sans modifier le pipeline :
+Counterfactuals computed on the recorded states, without modifying the pipeline:
 
-| Scénario | ≥ 0,99 | ≥ 0,97 | Accord moyen |
+| Scenario | ≥ 0.99 | ≥ 0.97 | Mean agreement |
 |---|---|---|---|
-| Pipeline actuel | 9 % | 50 % | — |
-| Sans simplification | 9 % | 50 % | 0,953 |
-| Sans dédoublonnage | 9 % | 50 % | 0,953 |
-| Meilleur candidat disponible après ajustement (sélection oracle) | 13 % | 60 % | 0,968 |
-| Garde-fou « hold-best » (voir section 10) | 57 % | 72 % | 0,975 |
-| Candidat classé premier AVANT ajustement, sans ajuster | 89 % | 96 % | 0,996 |
+| Current pipeline | 9 % | 50 % | — |
+| Without simplification | 9 % | 50 % | 0.953 |
+| Without deduplication | 9 % | 50 % | 0.953 |
+| Best candidate available after fitting (oracle selection) | 13 % | 60 % | 0.968 |
+| "hold-best" safeguard (see section 10) | 57 % | 72 % | 0.975 |
+| Candidate ranked first BEFORE fitting, without fitting | 89 % | 96 % | 0.996 |
 
-Améliorer la sélection ne peut pas rapporter plus de 4 points ; ne pas dégrader à l'ajustement en rapporte 48 à 80.
+Improving the selection cannot gain more than 4 points; not degrading at the fit gains 48 to 80.
 
-## 10. Quelle correction minimale est justifiée par les données ?
+## 10. Which minimal correction is justified by the data?
 
-**Un garde-fou à l'étape d'ajustement, et rien d'autre** : ne jamais remplacer un candidat par sa version ajustée si
-celle-ci est moins vraisemblable sur les données disponibles.
+**A safeguard at the fitting stage, and nothing else**: never replace a candidate by its fitted version if
+the latter is less likely on the available data.
 
-- Il ne touche qu'un étage (l'enregistrement du résultat d'un ajustement). Score, classement, simplification,
-  canonicalisation et critères d'acceptation restent inchangés.
-- Il n'utilise aucune vérité : la comparaison se fait sur la vraisemblance profilée des données observées.
-- Estimation contrefactuelle (exploratoire, calculée sur les états enregistrés) : récupération à 0,99 de 9 % → 57 % ;
-  à 0,97 de 50 % → 72 %. Par cellule : standard 56 %, 44 %, 31 %, 13 % (d2 à d5) ; riche 81 %, 69 %, 88 %, 75 %.
-- Il n'est PAS intégré au pipeline : seul le contrefactuel a été calculé.
+- It touches only one stage (the recording of the result of a fit). Score, ranking, simplification,
+  canonicalisation and acceptance criteria remain unchanged.
+- It uses no truth: the comparison is made on the profile likelihood of the observed data.
+- Counterfactual estimate (exploratory, computed on the recorded states): recovery at 0.99 from 9 % → 57 %;
+  at 0.97 from 50 % → 72 %. By cell: standard 56 %, 44 %, 31 %, 13 % (d2 to d5); rich 81 %, 69 %, 88 %, 75 %.
+- It is NOT integrated into the pipeline: only the counterfactual was computed.
 
-Ce garde-fou ne récupère pas tout (57 % contre 89 % sans ajustement) : quand la version ajustée est légèrement plus
-vraisemblable mais fonctionnellement moins bonne, il la garde. Ce résidu relève du surajustement au bruit, pas de
-l'optimiseur.
+This safeguard does not recover everything (57 % against 89 % without fitting): when the fitted version is slightly more
+likely but functionally worse, it keeps it. This residue comes from overfitting to the noise, not from
+the optimiser.
 
-### Expérience contrôlée proposée
+### Proposed controlled experiment
 
-1. Un seul changement : enregistrer la version initiale de chaque candidat et ne la remplacer que si l'ajustement
-   augmente la vraisemblance profilée. Aucun autre étage modifié.
-2. Deux bras, mêmes tâches, mêmes graines : pipeline actuel contre pipeline + garde-fou.
-3. Tâches : les 128 de ce diagnostic (pour vérifier que le contrefactuel se réalise) et 128 nouvelles tâches de dev
-   jamais vues (pour ne pas juger sur les tâches qui ont motivé la correction).
-4. Mesures : récupération à 0,90 / 0,95 / 0,97 / 0,99, accord moyen, part des ajustements acceptés, coût.
-5. Critère annoncé d'avance : le garde-fou est retenu si la récupération à 0,99 sur les nouvelles tâches dépasse celle du
-   pipeline actuel d'au moins 20 points, sans baisse d'accord moyen.
+1. A single change: record the initial version of each candidate and replace it only if the fit
+   increases the profile likelihood. No other stage modified.
+2. Two arms, same tasks, same seeds: current pipeline against pipeline + safeguard.
+3. Tasks: the 128 of this diagnostic (to verify that the counterfactual materialises) and 128 new dev tasks
+   never seen (so as not to judge on the tasks that motivated the correction).
+4. Measures: recovery at 0.90 / 0.95 / 0.97 / 0.99, mean agreement, share of fits accepted, cost.
+5. Criterion announced in advance: the safeguard is retained if the recovery at 0.99 on the new tasks exceeds that of the
+   current pipeline by at least 20 points, without a drop in mean agreement.
 
-Une seconde correction possible — changer le schéma de l'optimiseur (raideur initiale, pas) pour qu'il ne quitte plus un
-bon point — touche un autre mécanisme. Elle ne doit être testée qu'après, et séparément, pour ne pas confondre les deux
-effets.
+A second possible correction — changing the optimiser schedule (initial stiffness, step size) so that it no longer leaves a
+good point — touches another mechanism. It must be tested only afterwards, and separately, so as not to confound the two
+effects.
 
-## Limites
+## Limits
 
-- 16 tâches par cellule : les proportions par cellule ont une résolution de 1/16.
-- La cause « raideur initiale trop faible » du polissage est une explication plausible, pas un résultat : elle n'a pas
-  été isolée expérimentalement.
-- Le contrefactuel « hold-best » est calculé a posteriori ; son effet réel dans la boucle (les tours de réajustement
-  réinjectent les atomes polis) peut différer.
-- La colonne « canonicalisation » mêle la normalisation des clés (qui ne change jamais le comportement : 0 cas) et le
-  dédoublonnage fonctionnel (qui écarte en moyenne 3,4 structures par tâche et coûte le bon candidat dans 2 tâches).
-- Diagnostic conduit avec les vrais atomes : il ne dit rien de la chaîne complète avec des atomes découverts.
-- Rien ici n'est confirmatoire.
+- 16 tasks per cell: the per-cell proportions have a resolution of 1/16.
+- The cause "initial stiffness too low" of the polishing is a plausible explanation, not a result: it has not
+  been isolated experimentally.
+- The "hold-best" counterfactual is computed a posteriori; its real effect in the loop (the refit rounds
+  reinject the polished atoms) may differ.
+- The "canonicalisation" column mixes key normalisation (which never changes the behaviour: 0 cases) and
+  functional deduplication (which discards on average 3.4 structures per task and costs the good candidate in 2 tasks).
+- Diagnostic conducted with the true atoms: it says nothing about the complete chain with discovered atoms.
+- Nothing here is confirmatory.

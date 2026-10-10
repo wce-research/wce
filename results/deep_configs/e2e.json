@@ -4,8 +4,8 @@
   "fit": "validated",
   "selector": "bic"
  },
- "selected_on": "60 tâches de mise au point (clés 990–994)",
- "criterion": "accord final moyen",
+ "selected_on": "60 tuning tasks (keys 990–994)",
+ "criterion": "mean final agreement",
  "grid": [
   {
    "min_gain": 1.0,

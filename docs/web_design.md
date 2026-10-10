@@ -1,105 +1,105 @@
-# WCE — direction du site de recherche
+# WCE — direction of the research site
 
-## Références consultées
+## References consulted
 
-- https://www.anthropic.com/research : organisation éditoriale de la recherche.
-- https://openai.com/research/ : hiérarchie claire et navigation entre dossiers.
-- https://amilabs.xyz/ : site AMI Labs, associé à Yann LeCun ; sobriété de la présentation scientifique.
+- https://www.anthropic.com/research: editorial organisation of the research.
+- https://openai.com/research/: clear hierarchy and navigation between dossiers.
+- https://amilabs.xyz/: AMI Labs site, associated with Yann LeCun; sobriety of the scientific presentation.
 
-L'identité WCE utilise un fond ivoire, du graphite et un accent cobalt. Les titres éditoriaux, règles fines, annotations monospace et diagrammes de trajectoires composent une identité dédiée au projet. Le schéma de l'accueil est une illustration conceptuelle, pas une visualisation de résultats.
+The WCE identity uses an ivory background, graphite and a cobalt accent. The editorial titles, thin rules, monospace annotations and trajectory diagrams compose an identity dedicated to the project. The diagram on the home page is a conceptual illustration, not a visualisation of results.
 
 ## Navigation
 
-- `/` : introduction courte et accès aux dossiers.
-- `/research` : index avec filtres par domaine.
-- `/research/measurement`, `/research/continual`, `/research/discovery` : dossiers et liens aux artefacts.
-- `/architecture` : parcours opérationnel et modules exploratoires.
-- `/vision` : les trois niveaux de maturité demandés.
-- `/open` : disponibilité actuelle et étapes vers le hub ouvert.
-- `/lab` : interface isolée du moteur symbolique.
+- `/`: short introduction and access to the dossiers.
+- `/research`: index with filters by domain.
+- `/research/measurement`, `/research/continual`, `/research/discovery`: dossiers and links to the artefacts.
+- `/architecture`: operational path and exploratory modules.
+- `/vision`: the three requested maturity levels.
+- `/open`: current availability and steps towards the open hub.
+- `/lab`: isolated interface of the symbolic engine.
 
-Le serveur ne sert que les routes et assets explicitement autorisés. Aucun CDN, police distante ou nouveau service n'est nécessaire. Le menu mobile fonctionne au clavier et se ferme avec Échap. Les filtres exposent leur état via `aria-pressed`, le laboratoire utilise une zone de résultats annoncée aux technologies d'assistance.
+The server serves only the explicitly authorised routes and assets. No CDN, remote font or new service is needed. The mobile menu works with the keyboard and closes with Escape. The filters expose their state through `aria-pressed`, the lab uses a results area announced to assistive technologies.
 
-Le port hôte reste `127.0.0.1:3018`, réservé pour `wce/web` dans les registres existants. La refonte n'introduit aucun port supplémentaire.
+The host port remains `127.0.0.1:3018`, reserved for `wce/web` in the existing registries. The redesign introduces no additional port.
 
-## Extension bilingue et thèmes — 4 octobre 2026
+## Bilingual extension and themes — 4 October 2026
 
-24 pages éditoriales sont accessibles sous `/fr` et `/en`. Les dossiers approfondis sont structurés dans `app/content.py` ; le catalogue `app/copy.en.json` traduit les pages historiques. Le sélecteur préserve le dossier courant. Les sources scientifiques restent inchangées.
+24 editorial pages are accessible under `/fr` and `/en`. The in-depth dossiers are structured in `app/content.py`; the catalogue `app/copy.en.json` translates the historical pages. The selector preserves the current dossier. The scientific sources remain unchanged.
 
-Les tokens CSS définissent les palettes jour et nuit. `theme.js` applique le choix avant le rendu ; le système fournit la valeur initiale, puis le choix explicite persiste. Les sous-menus couvrent cinq rubriques, avec survol, clavier, Échap et accordéons mobiles.
+The CSS tokens define the day and night palettes. `theme.js` applies the choice before rendering; the system provides the initial value, then the explicit choice persists. The submenus cover five sections, with hover, keyboard, Escape and mobile accordions.
 
-Le symbole du footer mesure 44 px sur ordinateur ; les marques GitHub, X, LinkedIn et Instagram mesurent 28 px. Les SVG sont locaux et leurs sources/licences sont documentées dans `app/static/social/`.
+The footer symbol measures 44 px on desktop; the GitHub, X, LinkedIn and Instagram marks measure 28 px. The SVG files are local and their sources/licences are documented in `app/static/social/`.
 
-## Refonte des présentations et de la carte du backend
+## Redesign of the presentations and of the backend map
 
-L’accueil présente la thèse des petites primitives et six mécanismes de recherche. L’architecture expose le parcours web puis dix cartes : composition, monde, planification, langage hybride, mesure, preuves, certificats, adaptation, découverte et branches. Des cartes dédiées rendent les sous-pages accessibles depuis chacune des cinq rubriques.
+The home page presents the thesis of small primitives and six research mechanisms. The architecture exposes the web path then ten cards: composition, world, planning, hybrid language, measurement, evidence, certificates, adaptation, discovery and branches. Dedicated cards make the subpages accessible from each of the five sections.
 
-Les cartes ont une forme arrondie sobre, une hiérarchie constante (statut, mécanisme, description, chaîne conceptuelle, source), un état de focus visible et un survol discret désactivé en cas de préférence pour les mouvements réduits. Les palettes existantes ivoire/graphite/cobalt sont conservées. Les compositions géométriques sont décoratives et masquées aux lecteurs d’écran.
+The cards have a sober rounded shape, a constant hierarchy (status, mechanism, description, conceptual chain, source), a visible focus state and a discreet hover disabled when reduced motion is preferred. The existing ivory/graphite/cobalt palettes are kept. The geometric compositions are decorative and hidden from screen readers.
 
-Trente pages sont disponibles en français et anglais. Le catalogue bilingue décrit les interfaces réellement lues dans le code, avec limites et distinctions de protocole. Le planificateur et le noyau hybride de langage sont explicitement décrits comme prototypes de recherche ; le simulateur web conserve son périmètre.
+Thirty pages are available in French and English. The bilingual catalogue describes the interfaces actually read in the code, with limits and protocol distinctions. The planner and the hybrid language kernel are explicitly described as research prototypes; the web simulator keeps its scope.
 
-L’inventaire repliable de `/open/source` est généré à partir des fichiers présents sur la machine du dépôt. Il inclut les noms publics de classes et fonctions, sans importer les modules ni publier les environnements, identités cloud ou fichiers de résultats bruts non sélectionnés. Les symboles supplémentaires se déploient dans chaque entrée.
+The collapsible inventory of `/open/source` is generated from the files present on the machine of the repository. It includes the public names of classes and functions, without importing the modules or publishing the environments, cloud identities or unselected raw result files. The additional symbols expand in each entry.
 
-## Études de configuration et registres de résultats
+## Configuration studies and result registers
 
-L’illustration de l’accueil devient une étude manipulable : trois primitives, trois configurations, un repère constant et un opérateur explicite. Elle expose visuellement la thèse de composition tout en signalant son caractère purement illustratif. Aucun appel au moteur ou au réseau n’est nécessaire pour ces opérations.
+The illustration on the home page becomes a manipulable study: three primitives, three configurations, a constant frame and an explicit operator. It visually exposes the composition thesis while signalling its purely illustrative nature. No call to the engine or to the network is needed for these operations.
 
-Les cartes utilisent désormais dix schémas spécifiques : composition, état/action, recherche vers un objectif, vérification du langage, mesure, pondération des preuves, sondes de certificats, consolidation/retour arrière, boucle d’exploration et branches. Les dossiers distinguent ces schémas conceptuels des traces d’exécution et des résultats mesurés.
+The cards now use ten specific diagrams: composition, state/action, search towards a goal, language verification, measurement, weighting of evidence, certificate probes, consolidation/rollback, exploration loop and branches. The dossiers distinguish these conceptual diagrams from execution traces and measured results.
 
-Les vues de résultats sont calculées au rendu depuis les JSON existants. La couverture est affichée par source ; les méthodes continuum se comparent sur neuf métriques, avec intervalles et tableaux ; les dix verdicts de découverte sont tous présents et dépliables. L’ordre suit les artefacts, sans classement général. Les couleurs cobalte/graphite identifient les séries, et les verdicts réfutés utilisent un accent rouge discret. Les vues sont adaptées aux deux thèmes et aux petits écrans.
+The result views are computed at render time from the existing JSON files. The coverage is displayed per source; the continuum methods are compared on nine metrics, with intervals and tables; the ten discovery verdicts are all present and expandable. The order follows the artefacts, without an overall ranking. The cobalt/graphite colours identify the series, and the refuted verdicts use a discreet red accent. The views are adapted to both themes and to small screens.
 
-## Parcours de compréhension — 4 octobre 2026
+## Comprehension path — 4 October 2026
 
-L’accueil commence par une définition de WCE et un parcours question / preuve / ambition. Les cartes présentent des questions compréhensibles avant de renvoyer vers les mécanismes et leurs sources. Le manifeste explique ce que représentent les poids et pourquoi l’architecture compte.
+The home page starts with a definition of WCE and a question / evidence / ambition path. The cards present understandable questions before pointing to the mechanisms and their sources. The manifesto explains what the weights represent and why the architecture matters.
 
-Chaque dossier de résultats explicite sa question, son périmètre et ce que l’expérience ne démontre pas. L’architecture propose six définitions dépliables, utilisables au clavier. Les sous-pages disposent d’un fil d’Ariane et la vision emploie des intitulés français dans la version française.
+Each results dossier makes explicit its question, its scope and what the experiment does not demonstrate. The architecture offers six expandable definitions, usable with the keyboard. The subpages have a breadcrumb and the vision uses French headings in the French version.
 
-Ces composants sont rendus côté serveur, sans dépendance de recherche supplémentaire ni service du hub exposé. Les variantes anglaises sont écrites explicitement ; aucun résultat scientifique n’est traduit ou recalculé.
+These components are rendered server-side, without an additional search dependency or an exposed hub service. The English variants are written explicitly; no scientific result is translated or recomputed.
 
-## Dossiers : mécanismes et portée de la preuve
+## Dossiers: mechanisms and scope of the evidence
 
-Les dix dossiers d’architecture affichent trois repères : code identifié, vérification ciblée et intégration actuelle. Les cinq familles reliées aux trois artefacts publics proposent des liens vers les expériences associées, avec une mention explicite de leur portée. Les autres signalent l’absence de dossier de résultats dédié ici : aucun badge ne prétend que la seule présence de tests valide une capacité générale.
+The ten architecture dossiers display three markers: identified code, targeted verification and current integration. The five families linked to the three public artefacts offer links to the associated experiments, with an explicit mention of their scope. The others signal the absence of a dedicated results dossier here: no badge claims that the mere presence of tests validates a general capability.
 
-Le sommaire reçoit des cibles tactiles de 44 px et une disposition compacte sur mobile. Les exemples du laboratoire expliquent le parcours soulever / observer / avancer, en français et en anglais, sans annoncer une conversation libre. Les tests de l’interface web ne figurent plus parmi les sources scientifiques du dossier d’état du monde.
+The table of contents receives touch targets of 44 px and a compact layout on mobile. The lab examples explain the lift / observe / move forward path, in French and in English, without announcing a free conversation. The tests of the web interface no longer appear among the scientific sources of the world-state dossier.
 
-## Orientation dans l’atlas
+## Orientation in the atlas
 
-Recherche locale des dix mécanismes par mots et chemin de module, indépendante de l’API et du moteur scientifique. La normalisation ignore casse et accents ; plusieurs mots sont combinés. Un compteur accessible et un message sans résultat accompagnent le champ. Sans JavaScript, toutes les cartes restent lisibles et aucun contrôle inactif n’apparaît.
+Local search of the ten mechanisms by words and module path, independent of the API and of the scientific engine. The normalisation ignores case and accents; several words are combined. An accessible counter and a no-result message accompany the field. Without JavaScript, all the cards remain readable and no inactive control appears.
 
-Les liens entre dossiers sont des relations de lecture éditoriales, explicitement distinctes d’une intégration des composants. Les parcours relient transformations, monde, planification, branches, mesure, sources, certificats, apprentissage et découverte, avec accès aux expériences associées.
+The links between dossiers are editorial reading relations, explicitly distinct from an integration of the components. The paths connect transformations, world, planning, branches, measurement, sources, certificates, learning and discovery, with access to the associated experiments.
 
-## Lecture des métriques et provenance
+## Reading the metrics and provenance
 
-Neuf indicateurs de l’apprentissage continu disposent d’explications bilingues fondées sur `checkpoint_metrics` et les compteurs de mémoire du backend. La rétention et l’exactitude moyenne sont explicitement identifiées comme deux noms du même calcul dans ce protocole. L’oubli, le transfert arrière, l’ECE et les coûts ne sont pas confondus avec une mesure générale d’intelligence.
+Nine continual learning indicators have bilingual explanations based on `checkpoint_metrics` and the memory counters of the backend. Retention and mean accuracy are explicitly identified as two names of the same computation in this protocol. Forgetting, backward transfer, ECE and the costs are not confused with a general measure of intelligence.
 
-La couverture prédictive et la couverture crédible sont expliquées à partir du calcul d’intervalles dans `core/source_calibration.py`. Le nombre 96 est présenté comme des cas agrégés du résumé, sans l’assimiler au nombre d’exemples d’entraînement. Les types de sources ont des libellés FR/EN accessibles.
+The predictive coverage and the credible coverage are explained from the interval computation in `core/source_calibration.py`. The number 96 is presented as aggregated cases of the summary, without equating it with the number of training examples. The source types have accessible FR/EN labels.
 
-L’empreinte SHA-256 complète de chaque artefact est dépliable au clavier et sur écran tactile ; aucune information n’est disponible uniquement au survol. Les fichiers bruts et les valeurs scientifiques restent inchangés.
+The full SHA-256 fingerprint of each artefact is expandable with the keyboard and on a touch screen; no information is available only on hover. The raw files and the scientific values remain unchanged.
 
-## Découverte : questions et verdicts
+## Discovery: questions and verdicts
 
-Les dix identifiants H1–H10 reçoivent des titres et questions FR/EN établis à partir du protocole préenregistré et de `core/active_benchmark.py`. Les questions exposent la comparaison étudiée ; elles ne présentent pas une hypothèse comme une capacité acquise. Pour H10, la comparaison porte sur le système complet face aux experts seuls, sans attribuer causalement le résultat à la composition seule.
+The ten identifiers H1–H10 receive FR/EN titles and questions established from the preregistered protocol and from `core/active_benchmark.py`. The questions expose the comparison studied; they do not present a hypothesis as an acquired capability. For H10, the comparison concerns the complete system against the experts alone, without causally attributing the result to composition alone.
 
-Les verdicts restent lus dans `active_summary.json`, sans recalcul ni modification des seuils. Les champs exacts restent disponibles dans les panneaux. Des filtres affichent les quatre hypothèses soutenues, trois réfutées ou trois non concluantes ; le total général reste visible. Sans JavaScript, les dix hypothèses restent accessibles. Le protocole original est publié via une route de fichier explicitement autorisée, sans explorer les documents privés.
+The verdicts remain read from `active_summary.json`, without recomputation or modification of the thresholds. The exact fields remain available in the panels. Filters display the four supported hypotheses, three refuted or three inconclusive; the overall total remains visible. Without JavaScript, the ten hypotheses remain accessible. The original protocol is published through an explicitly authorised file route, without exploring the private documents.
 
-## Sources et contribution : accessibilité et statut public
+## Sources and contribution: accessibility and public status
 
-L’inventaire statique se recherche par chemin de module ou symbole, avec compteur et état sans résultat. Les groupes et symboles correspondants sont ouverts pendant la recherche ; les états d’ouverture précédents sont restaurés lorsqu’elle est effacée. Le filtre ne charge aucun fichier du dépôt ni service distant. Sans JavaScript, les groupes natifs restent utilisables.
+The static inventory is searched by module path or symbol, with a counter and a no-result state. The matching groups and symbols are opened during the search; the previous open states are restored when it is cleared. The filter loads no file of the repository and no remote service. Without JavaScript, the native groups remain usable.
 
-La rubrique recherche ouverte distingue ressources consultables, publication du code à finaliser et ambition de collaboration. Une préparation d’export ne signifie pas qu’un dépôt public ou une licence sont disponibles. Le canevas scientifique de contribution expose question, mécanisme, contexte, baseline, budget, critères, reproduction, artefacts et limites ; aucun formulaire d’envoi ni canal communautaire opérationnel n’est inventé. Les détails privés du site et du hub restent exclus.
+The open research section distinguishes consultable resources, publication of the code still to be finalised and collaboration ambition. Preparing an export does not mean that a public repository or a licence is available. The scientific contribution template exposes question, mechanism, context, baseline, budget, criteria, reproduction, artefacts and limits; no submission form or operational community channel is invented. The private details of the site and of the hub remain excluded.
 
-## Laboratoire : exécution, erreurs et portée
+## Lab: execution, errors and scope
 
-Commande explicitement nommée, compteur de caractères et statut accessible. Les exemples et la saisie sont bloqués pendant l’exécution pour éviter les doubles envois ; la saisie reste disponible après un échec. Les erreurs réseau et réponses illisibles ont des messages FR/EN compréhensibles. Le délai client de 15 secondes arrête l’attente, sans prétendre annuler une action déjà exécutée : le visiteur est invité à vérifier l’état avant de renvoyer une action.
+Explicitly named command, character counter and accessible status. The examples and the input are blocked during execution to avoid double submissions; the input remains available after a failure. Network errors and unreadable responses have understandable FR/EN messages. The client timeout of 15 seconds stops the wait, without claiming to cancel an action already executed: the visitor is invited to check the state before sending an action again.
 
-Le journal conserve au plus vingt réponses dans l’affichage, les plus récentes en premier ; cela ne réinitialise pas le monde. Toutes les réponses sont insérées comme texte. Aucune API nouvelle, aucune donnée scientifique simulée et aucune extension des capacités linguistiques ne sont introduites. Le moteur, ses validations et les limites de simulation restent inchangés.
+The log keeps at most twenty answers in the display, the most recent first; this does not reset the world. All the answers are inserted as text. No new API, no simulated scientific data and no extension of the linguistic capabilities are introduced. The engine, its validations and the simulation limits remain unchanged.
 
-## Accueil : privilégier les dossiers de preuve
+## Home page: favouring the evidence dossiers
 
-Le teaser de six mécanismes est remplacé par trois cartes éditoriales : observation, apprentissage et découverte. Les effectifs sont lus dans les artefacts JSON, sans nombres décoratifs : cas agrégés, méthodes comparées, hypothèses soutenues/réfutées/non concluantes. Les cartes conduisent vers les protocoles et résultats ; elles n’annoncent pas un niveau d’intelligence. L’atlas des dix mécanismes conserve sa page dédiée avec un accès explicite depuis l’accueil, ce qui réduit la répétition et la longueur du parcours initial.
+The teaser of six mechanisms is replaced by three editorial cards: observation, learning and discovery. The counts are read from the JSON artefacts, without decorative numbers: aggregated cases, methods compared, supported/refuted/inconclusive hypotheses. The cards lead to the protocols and results; they do not announce a level of intelligence. The atlas of the ten mechanisms keeps its dedicated page with an explicit access from the home page, which reduces the repetition and the length of the initial path.
 
-## Revue cohérente : orientation et accessibilité
+## Consistent review: orientation and accessibility
 
-Footer organisé en cinq rubriques et chemins courts vers preuves, mécanismes, état actuel, reproduction et laboratoire. Les cibles des thèmes et langues sont agrandies sur mobile. La navigation distingue la rubrique active de la page courante ; une rubrique parente n’est plus annoncée comme la page courante d’un sous-dossier. Les liens de cartes de recherche occupent leur largeur sur mobile.
+Footer organised in five sections and short paths to evidence, mechanisms, current state, reproduction and lab. The targets of the themes and languages are enlarged on mobile. The navigation distinguishes the active section from the current page; a parent section is no longer announced as the current page of a sub-dossier. The links of the research cards occupy their width on mobile.
 
-Contrôle systématique des trente pages dans les deux langues : liens internes, ancres, unicité des identifiants et titre principal. La revue des textes des templates ne trouve pas de texte français sans traduction anglaise dans les pages servies. Les changements du site restent séparés des sources scientifiques et de l’architecture privée du hub.
+Systematic check of the thirty pages in both languages: internal links, anchors, uniqueness of the identifiers and main title. The review of the template texts finds no French text without an English translation in the served pages. The changes to the site remain separate from the scientific sources and from the private architecture of the hub.

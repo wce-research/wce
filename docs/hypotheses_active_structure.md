@@ -1,20 +1,20 @@
-# Pré-enregistrement — jalon « Active Structural Discovery » (figé AVANT tout multi-graines / scellé)
+# Preregistration — milestone "Active Structural Discovery" (frozen BEFORE any multi-seed / sealed run)
 
-Date de gel : 2026-10-03. Critères NON modifiables après observation. Unité : graine (16). IC95 t sur graines.
-Récupération fonctionnelle = accord ≥ 0,97 avec la vraie frontière sur la région complète [−3,3]².
-Budget de requêtes commun à toutes les méthodes actives : 16. Budget de capacité (H10) : 400 flottants, choisi avant run.
-Seuil de fausse réjection visé (H4) : ≤ 0,10 (justification : 5 % est irréaliste avec 8–12 % de bruit et ≤ 16 ancres ;
-on accepte 1 bonne règle sur 10 rejetée à tort, contre 0,51 au jalon précédent).
+Freeze date: 2026-10-03. Criteria NOT modifiable after observation. Unit: seed (16). 95% CI by t over seeds.
+Functional recovery = agreement ≥ 0.97 with the true boundary over the full region [−3,3]².
+Query budget common to all active methods: 16. Capacity budget (H10): 400 floats, chosen before the run.
+Targeted false-rejection threshold (H4): ≤ 0.10 (justification: 5% is unrealistic with 8–12% noise and ≤ 16 anchors;
+we accept 1 good rule out of 10 wrongly rejected, against 0.51 at the previous milestone).
 
-| H | Métrique | Baseline | Effet min. | Succès | Échec |
+| H | Metric | Baseline | Min. effect | Success | Failure |
 |---|---|---|---|---|---|
-| H1 entrelacement | récup. fonctionnelle (familles held-out + profondeur 3/4) | actif-après-recherche, même budget de requêtes | +0,10 | diff ≥ +0,10 et IC95 > 0 | diff ≤ 0 |
-| H2 IG structurel | entropie de l'espace des versions après 8 requêtes | requêtes aléatoires | −20 % | réduction ≥ 20 % de plus que l'aléatoire, ≥ 12/16 graines | ≤ aléatoire |
-| H3 clustering fonctionnel | rappel de découverte de familles (held-out) ; fausses promotions | anti-unification AST | +0,2 rappel | rappel ≥ AST + 0,2 ET fausses promotions ≤ AST + 0,5 / graine | rappel ≤ AST |
-| H4 ancres sensibles au bruit | fausse réjection (règles correctes) ; détection des fausses règles | ancres binomiales du jalon précédent | — | fausse réjection ≤ 0,10 ET détection ≥ 0,6 (bruit 8 %) | fausse réjection > 0,25 ou détection < 0,4 |
-| H5 stabilité sous bruit | taux d'acceptation des programmes fonctionnellement corrects à 8 % et 12 % ; acceptation des non représentables | test de stabilité du jalon précédent | — | acceptation correcte ≥ 0,7 aux deux niveaux ET acceptation non-repr. ≤ 0,35 | acceptation correcte < 0,4 |
-| H6 profondeur guidée | évaluations de candidats pour résoudre les familles profondeur 3/4 ; taux résolu | recherche non guidée profondeur 3/4 | −30 % coût | coût ≤ 0,7 × non guidé ET taux résolu ≥ non guidé − 0,05 | coût ≥ non guidé |
-| H7 classes canoniques | réutilisation de famille sur instances transformées (rotation, translation, échelle, réflexion) : récupération | familles non canonisées | +0,1 | diff ≥ +0,1 | diff ≤ 0 |
-| H8 OOD via expériences structurelles | extrapolation hors région | même système, requêtes aléatoires | +0,03 | diff ≥ +0,03 et IC95 > 0 | diff ≤ 0 |
-| H9 résidu à porte | dégradation OOD du résidu vs programme seul ; exactitude en région | résidu global (jalon précédent) | — | dégradation OOD(porte) ≤ 0,5 × dégradation OOD(global) ET région ≥ global − 0,01 | dégradation(porte) ≥ dégradation(global) |
-| H10 budget strict | compétences retenues (exactitude ≥ 0,85) sous budget 400 | croissance par experts seuls, même budget | +30 % | retenues ≥ 1,3 × experts-seuls ET 0 dépassement | retenues ≤ experts-seuls |
+| H1 interleaving | functional recov. (held-out families + depth 3/4) | active-after-search, same query budget | +0.10 | diff ≥ +0.10 and 95% CI > 0 | diff ≤ 0 |
+| H2 structural IG | entropy of the version space after 8 queries | random queries | −20% | reduction ≥ 20% more than random, ≥ 12/16 seeds | ≤ random |
+| H3 functional clustering | family discovery recall (held-out); false promotions | AST anti-unification | +0.2 recall | recall ≥ AST + 0.2 AND false promotions ≤ AST + 0.5 / seed | recall ≤ AST |
+| H4 noise-aware anchors | false rejection (correct rules); detection of false rules | binomial anchors of the previous milestone | — | false rejection ≤ 0.10 AND detection ≥ 0.6 (noise 8%) | false rejection > 0.25 or detection < 0.4 |
+| H5 stability under noise | acceptance rate of functionally correct programs at 8% and 12%; acceptance of non-representable ones | stability test of the previous milestone | — | correct acceptance ≥ 0.7 at both levels AND non-repr. acceptance ≤ 0.35 | correct acceptance < 0.4 |
+| H6 guided depth | candidate evaluations to solve the depth 3/4 families; solved rate | unguided depth 3/4 search | −30% cost | cost ≤ 0.7 × unguided AND solved rate ≥ unguided − 0.05 | cost ≥ unguided |
+| H7 canonical classes | family reuse on transformed instances (rotation, translation, scale, reflection): recovery | non-canonicalised families | +0.1 | diff ≥ +0.1 | diff ≤ 0 |
+| H8 OOD via structural experiments | extrapolation outside the region | same system, random queries | +0.03 | diff ≥ +0.03 and 95% CI > 0 | diff ≤ 0 |
+| H9 gated residual | OOD degradation of the residual vs program alone; in-region accuracy | global residual (previous milestone) | — | OOD degradation(gate) ≤ 0.5 × OOD degradation(global) AND region ≥ global − 0.01 | degradation(gate) ≥ degradation(global) |
+| H10 strict budget | retained skills (accuracy ≥ 0.85) under budget 400 | growth by experts alone, same budget | +30% | retained ≥ 1.3 × experts-alone AND 0 overrun | retained ≤ experts-alone |

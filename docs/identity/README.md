@@ -1,81 +1,81 @@
-# WCE — identité visuelle / étude 01
+# WCE — visual identity / study 01
 
-Ouvrir `index.html` pour examiner les 12 concepts et les 5 finalistes. Les planches sont également disponibles en SVG et PNG sous `boards/`.
+Open `index.html` to examine the 12 concepts and the 5 finalists. The boards are also available as SVG and PNG under `boards/`.
 
-## Intention
+## Intent
 
-Condenser **complexity from composition**. La forme doit porter l'identité sans slogan, sans couleur obligatoire et sans pictogramme conventionnel d'IA.
+Condense **complexity from composition**. The shape must carry the identity without a slogan, without a mandatory colour and without a conventional AI pictogram.
 
-Les concepts sont dessinés en SVG à partir de primitives et d'opérateurs géométriques. Aucun cerveau, robot, puce, constellation, hexagone, étoile AI, éclair ou symbole infini n'est utilisé. Le wordmark WCE est dessiné en tracés vectoriels dédiés ; il ne sert pas de symbole.
+The concepts are drawn in SVG from geometric primitives and operators. No brain, robot, chip, constellation, hexagon, AI star, lightning bolt or infinity symbol is used. The WCE wordmark is drawn as dedicated vector paths; it does not serve as a symbol.
 
-## Sélection
+## Selection
 
-| Famille | Explorations | Décision |
+| Family | Explorations | Decision |
 |---|---|---|
-| A — transformation | A1 Accrétion ; A2 Pli générateur | A1 écarté : graphique de croissance. A2 conservé : parcours et replis. |
-| B — configurations | B1 Plans compatibles ; B2 Chambre variable | B1 écarté : duplication de calques. B2 conservé : frontière fixe/variable. |
-| C — invariant | C1 Noyau stable ; C2 Invariant décalé | C1 écarté : autofocus/scanner. C2 conservé : invariant, décalage et rotation. |
-| D — composition | D1 Cellules liées ; D2 Joint ouvert | D1 écarté : escalier/pavage. D2 conservé : modules et joints ouverts. |
-| E — monde/état | E1 Monde discontinu ; E2 Repère mobile | Écartés : chargement/viseur et outils CAD. Ces idées restent utilisables dans les diagrammes. |
-| F — frontière | F1 Front ouvert ; F2 Incision | F1 écarté : lettre F ou sortie. F2 conservé : découpe structurante et silhouette compacte. |
+| A — transformation | A1 Accretion; A2 Generating fold | A1 discarded: growth chart. A2 kept: path and folds. |
+| B — configurations | B1 Compatible planes; B2 Variable chamber | B1 discarded: duplication of layers. B2 kept: fixed/variable boundary. |
+| C — invariant | C1 Stable core; C2 Shifted invariant | C1 discarded: autofocus/scanner. C2 kept: invariant, shift and rotation. |
+| D — composition | D1 Linked cells; D2 Open joint | D1 discarded: staircase/tiling. D2 kept: modules and open joints. |
+| E — world/state | E1 Discontinuous world; E2 Moving frame | Discarded: loading/viewfinder and CAD tools. These ideas remain usable in the diagrams. |
+| F — boundary | F1 Open front; F2 Incision | F1 discarded: letter F or exit. F2 kept: structuring cut and compact silhouette. |
 
-Chaque concept possède dans la page et `concepts.json` : nom, symbole, principe, pertinence WCE, risque de confusion et comportement prévu en favicon/GitHub/Docker/documentation/site. Les risques sont des appréciations visuelles ; aucune disponibilité exclusive de marque n'est affirmée.
+Each concept has in the page and `concepts.json`: name, symbol, principle, WCE relevance, risk of confusion and intended behaviour as favicon/GitHub/Docker/documentation/site. The risks are visual assessments; no exclusive trademark availability is asserted.
 
-## Les cinq finalistes
+## The five finalists
 
-- **A2 — Pli générateur** : met la transformation au premier plan. Deux parcours issus d'une bande composent une configuration asymétrique. Force : logique évolutive. Faiblesse : risque de monogramme ou circuit angulaire.
-- **B2 — Chambre variable** : une limite fixe, une limite courbe et une primitive centrale. Force : famille distincte, bonne lisibilité. Faiblesse : peut se lire comme un opérateur ou une lettre D.
-- **C2 — Invariant décalé** : deux angles identiques à orientations opposées et une barre centrale stable. Force : lien direct avec invariants et transformations ; trois primitives seulement. Faiblesse : rapprochement possible avec crochets de code.
-- **D2 — Joint ouvert** : deux angles et une traverse assemblés sans fermer tous les joints. Force : composition extensible et silhouette compacte. Faiblesse : plus dense, connotation industrielle possible.
-- **F2 — Incision** : le vide découpe un bloc en deux éléments compatibles. Force : masse et contreforme mémorisables, lisibilité robuste. Faiblesse : lien à l'invariant moins direct et ton plus institutionnel.
+- **A2 — Generating fold**: puts transformation in the foreground. Two paths issued from a band compose an asymmetric configuration. Strength: evolutive logic. Weakness: risk of monogram or angular circuit.
+- **B2 — Variable chamber**: a fixed limit, a curved limit and a central primitive. Strength: distinct family, good legibility. Weakness: can be read as an operator or a letter D.
+- **C2 — Shifted invariant**: two identical angles with opposite orientations and a stable central bar. Strength: direct link with invariants and transformations; three primitives only. Weakness: possible association with code brackets.
+- **D2 — Open joint**: two angles and a crossbar assembled without closing all the joints. Strength: extensible composition and compact silhouette. Weakness: denser, possible industrial connotation.
+- **F2 — Incision**: the void cuts a block into two compatible elements. Strength: memorable mass and counterform, robust legibility. Weakness: less direct link to the invariant and more institutional tone.
 
-## Évaluation qualitative
+## Qualitative evaluation
 
-Ces appréciations servent à choisir une direction à développer ; elles ne sont pas des mesures expérimentales de mémorisation ni une garantie de reconnaissance dans dix ans. Pas de classement chiffré.
+These assessments serve to choose a direction to develop; they are not experimental measurements of memorability nor a guarantee of recognition in ten years. No numerical ranking.
 
-| Critère | A2 | B2 | C2 | D2 | F2 |
+| Criterion | A2 | B2 | C2 | D2 | F2 |
 |---|---|---|---|---|---|
-| Distinctivité | Forte | Bonne | Bonne | Bonne | Forte |
-| Simplicité | Bonne | Forte | Forte | Bonne | Forte |
-| Mémorisation potentielle | Bonne | Bonne | Forte | Forte | Forte |
-| Cohérence avec la thèse WCE | Forte | Forte | Forte | Forte | Bonne |
-| Transformation / composition | Forte | Bonne | Forte | Forte | Forte |
-| Potentiel frontier research | Fort | Bon | Fort | Bon | Fort |
-| Intemporalité | Bonne | Forte | Forte | Forte | Forte |
-| Petite taille | Bonne | Forte | Forte | Forte | Forte |
-| Open source / GitHub | Fort | Fort | Fort | Fort | Fort |
-| Futur hub | Bon | Bon | Fort | Fort | Fort |
+| Distinctiveness | Strong | Good | Good | Good | Strong |
+| Simplicity | Good | Strong | Strong | Good | Strong |
+| Potential memorability | Good | Good | Strong | Strong | Strong |
+| Consistency with the WCE thesis | Strong | Strong | Strong | Strong | Good |
+| Transformation / composition | Strong | Good | Strong | Strong | Strong |
+| Frontier research potential | Strong | Good | Strong | Good | Strong |
+| Timelessness | Good | Strong | Strong | Strong | Strong |
+| Small size | Good | Strong | Strong | Strong | Strong |
+| Open source / GitHub | Strong | Strong | Strong | Strong | Strong |
+| Future hub | Good | Good | Strong | Strong | Strong |
 
-**Recommandation : C2**, pour sa logique architecturale autant que sa forme. **Challenger : F2**, plus puissant comme silhouette de plateforme. La reconnaissance réelle doit encore être confrontée à des lecteurs et aux marques voisines.
+**Recommendation: C2**, for its architectural logic as much as its shape. **Challenger: F2**, more powerful as a platform silhouette. Real recognition still has to be confronted with readers and with neighbouring brands.
 
-## Livrables par finaliste
+## Deliverables per finalist
 
-Dans `finalists/a2`, `b2`, `c2`, `d2` et `f2` :
+In `finalists/a2`, `b2`, `c2`, `d2` and `f2`:
 
-| Fichier / famille | Usage |
+| File / family | Use |
 |---|---|
-| `symbol-black`, `symbol-white` | Symbole seul, transparent, SVG et PNG |
-| `logo-horizontal`, `logo-horizontal-white` | Symbole + wordmark WCE, SVG et PNG |
-| `logo-stacked` | Relation verticale, SVG et PNG |
-| `logo-full-name` | WCE + World Configuration Engine, tracés vectoriels |
-| `favicon.svg`, `favicon.ico` | Navigateur ; ICO contenant 16, 32 et 48 px |
-| `favicon-16/32/48/180/192/512.png` | Tailles exactes ; 180 px adapté à apple-touch-icon |
-| `avatar-1024`, `avatar-dark-1024`, `x-avatar-400` | Avatars carrés, symbole centré compatible recadrage circulaire |
-| `x-header-1500x500` | Bannière X |
-| `linkedin-profile-1584x396` | Couverture de profil LinkedIn |
-| `linkedin-page-1512x256` | Couverture de Page LinkedIn selon la documentation consultée |
-| `github-preview-1280x640` | Aperçu social de dépôt GitHub |
-| `instagram-square-1080` | Publication carrée |
-| `instagram-portrait-1080x1350` | Publication portrait 4:5 |
-| `instagram-story-1080x1920` | Composition verticale 9:16, éléments importants éloignés des extrémités |
+| `symbol-black`, `symbol-white` | Symbol alone, transparent, SVG and PNG |
+| `logo-horizontal`, `logo-horizontal-white` | Symbol + WCE wordmark, SVG and PNG |
+| `logo-stacked` | Vertical relation, SVG and PNG |
+| `logo-full-name` | WCE + World Configuration Engine, vector paths |
+| `favicon.svg`, `favicon.ico` | Browser; ICO containing 16, 32 and 48 px |
+| `favicon-16/32/48/180/192/512.png` | Exact sizes; 180 px suited to apple-touch-icon |
+| `avatar-1024`, `avatar-dark-1024`, `x-avatar-400` | Square avatars, centred symbol compatible with circular cropping |
+| `x-header-1500x500` | X banner |
+| `linkedin-profile-1584x396` | LinkedIn profile cover |
+| `linkedin-page-1512x256` | LinkedIn Page cover according to the documentation consulted |
+| `github-preview-1280x640` | GitHub repository social preview |
+| `instagram-square-1080` | Square post |
+| `instagram-portrait-1080x1350` | Portrait post 4:5 |
+| `instagram-story-1080x1920` | Vertical composition 9:16, important elements kept away from the ends |
 
-Les bannières ménagent l'angle inférieur gauche et placent l'identité au centre/droite. Un aperçu de recadrage reste nécessaire dans le compte réel, car les plateformes varient selon l'écran. Instagram ne propose pas de bannière de profil : les formats livrés sont avatar, publications et story.
+The banners spare the lower left corner and place the identity at the centre/right. A cropping preview remains necessary in the real account, because the platforms vary with the screen. Instagram does not offer a profile banner: the formats delivered are avatar, posts and story.
 
-## Palette secondaire
+## Secondary palette
 
-Après validation de la forme monochrome : graphite `#161616`, ivoire `#F4F2EC`, cobalt `#343CF2`. La couleur est un accent du système éditorial, pas une condition d'identification du symbole. Pas de gradient. Les kits initiaux restent volontairement monochromes.
+After validation of the monochrome shape: graphite `#161616`, ivory `#F4F2EC`, cobalt `#343CF2`. Colour is an accent of the editorial system, not a condition for identifying the symbol. No gradient. The initial kits remain deliberately monochrome.
 
-## Construction / reproductibilité
+## Construction / reproducibility
 
 ```bash
 python3 -m pip install -r docs/identity/requirements.txt
@@ -85,17 +85,17 @@ NODE_PATH=/chemin/node_modules WCE_CHROMIUM=/chemin/chromium node docs/identity/
 python3 docs/identity/package.py
 ```
 
-`assets/DejaVuSans.ttf` est utilisé pour les petits labels de nom complet, convertis en tracés. La licence est conservée dans `assets/typeface-license.txt`. Le wordmark WCE et les symboles sont dessinés indépendamment de cette police. Aucun fichier de police, outil de génération ni donnée privée n'est nécessaire pour afficher les logos exportés.
+`assets/DejaVuSans.ttf` is used for the small full-name labels, converted to paths. The licence is kept in `assets/typeface-license.txt`. The WCE wordmark and the symbols are drawn independently of this font. No font file, generation tool or private data is needed to display the exported logos.
 
-## Références vérifiées le 3 octobre 2026
+## References verified on 3 October 2026
 
-- [X — dimensions de profil et header](https://help.x.com/en/managing-your-account/how-to-customize-your-profile) : avatar 400 × 400 ; header 1500 × 500.
-- [LinkedIn — couverture de profil](https://www.linkedin.com/help/linkedin/answer/a568217/?lang=en-US) : 1584 × 396.
-- [LinkedIn — images des Pages](https://www.linkedin.com/help/linkedin/answer/a563309/image-specifications-for-your-linkedin-pages-and-career-pages) : la page ouverte indique 1512 × 256, malgré des extraits de recherche plus anciens indiquant d'autres tailles.
-- [GitHub — aperçu social](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/customizing-your-repositorys-social-media-preview) : 1280 × 640 pour le meilleur affichage ; moins de 1 Mo.
-- Les aides Instagram/Meta demandées n'ont pas été lisibles (limitation d'accès). Les exports Instagram sont des compositions usuelles aux ratios 1:1, 4:5 et 9:16, pas une certification des contraintes du compte.
-- Références visuelles examinées : [OpenAI](https://openai.com/brand/), [Hugging Face](https://huggingface.co/brand), [Anthropic](https://www.anthropic.com/research), [AMI Labs](https://amilabs.xyz/). Les symboles de ces marques ne sont pas réutilisés.
+- [X — profile and header dimensions](https://help.x.com/en/managing-your-account/how-to-customize-your-profile): avatar 400 × 400; header 1500 × 500.
+- [LinkedIn — profile cover](https://www.linkedin.com/help/linkedin/answer/a568217/?lang=en-US): 1584 × 396.
+- [LinkedIn — Page images](https://www.linkedin.com/help/linkedin/answer/a563309/image-specifications-for-your-linkedin-pages-and-career-pages): the opened page indicates 1512 × 256, despite older search snippets indicating other sizes.
+- [GitHub — social preview](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/customizing-your-repositorys-social-media-preview): 1280 × 640 for the best display; less than 1 MB.
+- The requested Instagram/Meta help pages could not be read (access limitation). The Instagram exports are usual compositions at the 1:1, 4:5 and 9:16 ratios, not a certification of the account constraints.
+- Visual references examined: [OpenAI](https://openai.com/brand/), [Hugging Face](https://huggingface.co/brand), [Anthropic](https://www.anthropic.com/research), [AMI Labs](https://amilabs.xyz/). The symbols of these brands are not reused.
 
-## Intégration au site
+## Site integration
 
-C2 est l’identité de travail utilisée pour le symbole du header et les favicons. Le site sert `/favicon.svg` (adaptation automatique clair/sombre), `/favicon.ico`, `/apple-touch-icon.png` et `/wce-logo.svg`. L’étude conserve les cinq finalistes pour poursuivre la décision ; aucun compte social n’a été modifié ou publié.
+C2 is the working identity used for the header symbol and the favicons. The site serves `/favicon.svg` (automatic light/dark adaptation), `/favicon.ico`, `/apple-touch-icon.png` and `/wce-logo.svg`. The study keeps the five finalists to continue the decision; no social account was modified or published.
