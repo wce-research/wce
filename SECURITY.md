@@ -2,14 +2,14 @@
 
 ## Reporting a vulnerability
 
-Please report security issues privately, through GitHub private vulnerability reporting on this repository
-(**Security → Report a vulnerability**). Do not open a public issue for a vulnerability or for anything that
-exposes credentials.
+No dedicated private security channel is operational yet. Until one is listed here:
 
-A dedicated security e-mail address will be listed here once it is confirmed operational.
+- do **not** publish the details of a vulnerability, a credential or anything that would compromise a sealed
+  evaluation set in a public issue;
+- open a minimal public issue on this repository asking for a private channel, without technical details. A
+  maintainer will reply with a way to send the report privately.
 
-Include what you found, how to reproduce it, and the affected commit. We will acknowledge the report and keep you
-informed of the fix.
+This section will be replaced by a confirmed private contact as soon as one is operational.
 
 ## Scope
 
