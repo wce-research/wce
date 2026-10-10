@@ -1,0 +1,65 @@
+{
+ "config": {
+  "min_gain": 1.0,
+  "incomplete": -1.0
+ },
+ "selected_on": "60 tâches de mise au point (clés 1090–1094)",
+ "criterion": "accord final moyen de la chaîne C",
+ "grid": [
+  {
+   "min_gain": 1.0,
+   "incomplete": 0.1,
+   "accord": 0.9006,
+   "functional_097": 0.2667,
+   "accord_d4_6": 0.8617,
+   "iterations": 1.2333,
+   "seconds": 1.5505
+  },
+  {
+   "min_gain": 1.0,
+   "incomplete": 0.0,
+   "accord": 0.9018,
+   "functional_097": 0.3,
+   "accord_d4_6": 0.8589,
+   "iterations": 2.0667,
+   "seconds": 2.1933
+  },
+  {
+   "min_gain": 1.0,
+   "incomplete": -1.0,
+   "accord": 0.9023,
+   "functional_097": 0.3,
+   "accord_d4_6": 0.8594,
+   "iterations": 2.4,
+   "seconds": 2.5754
+  },
+  {
+   "min_gain": 2.0,
+   "incomplete": 0.1,
+   "accord": 0.8989,
+   "functional_097": 0.25,
+   "accord_d4_6": 0.8589,
+   "iterations": 1.2333,
+   "seconds": 1.2605
+  },
+  {
+   "min_gain": 2.0,
+   "incomplete": 0.0,
+   "accord": 0.8992,
+   "functional_097": 0.2667,
+   "accord_d4_6": 0.8572,
+   "iterations": 2.1167,
+   "seconds": 2.2068
+  },
+  {
+   "min_gain": 2.0,
+   "incomplete": -1.0,
+   "accord": 0.8996,
+   "functional_097": 0.2667,
+   "accord_d4_6": 0.8578,
+   "iterations": 2.4667,
+   "seconds": 3.0553
+  }
+ ],
+ "note": "La colonne all_present de la grille a été retirée : elle était faussée par un défaut de mesure corrigé avant le run ; la sélection ne l'utilisait pas (critère : accord)."
+}

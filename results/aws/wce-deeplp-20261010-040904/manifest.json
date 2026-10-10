@@ -1,0 +1,205 @@
+{
+ "run_id": "wce-deeplp-20261010-040904",
+ "git_commit": "a05b15c0623b334cf39fa30b0bee12bae78da664",
+ "code_hash": "f67511747b816563",
+ "config_hash": "cc0509762d9b",
+ "timestamp": "20261010-040904",
+ "region": "eu-north-1",
+ "identity": "AWSReservedSSO_WCE-Research-Runner_251aca5f63af0b9d",
+ "instance_type": "c6i.xlarge",
+ "image": "763104351884.dkr.ecr.eu-north-1.amazonaws.com/pytorch-training:2.5.1-cpu-py311-ubuntu22.04-sagemaker",
+ "backend": "ec2",
+ "kind": "deeplp",
+ "keys": [
+  "1000",
+  "1001",
+  "1002",
+  "1003",
+  "1004",
+  "1005",
+  "1006",
+  "1007",
+  "1008",
+  "1009",
+  "1010",
+  "1011",
+  "1012",
+  "1013",
+  "1014",
+  "1015",
+  "1016",
+  "1017",
+  "1018",
+  "1019",
+  "1020",
+  "1021",
+  "1022",
+  "1023",
+  "1024",
+  "1025",
+  "1026",
+  "1027",
+  "1028",
+  "1029",
+  "1030",
+  "1031"
+ ],
+ "jobs": [
+  {
+   "name": "wce-deeplp-20261010-040904-s0",
+   "units": 16,
+   "unit_list": [
+    {
+     "kind": "deeplp",
+     "key": "1000"
+    },
+    {
+     "kind": "deeplp",
+     "key": "1002"
+    },
+    {
+     "kind": "deeplp",
+     "key": "1004"
+    },
+    {
+     "kind": "deeplp",
+     "key": "1006"
+    },
+    {
+     "kind": "deeplp",
+     "key": "1008"
+    },
+    {
+     "kind": "deeplp",
+     "key": "1010"
+    },
+    {
+     "kind": "deeplp",
+     "key": "1012"
+    },
+    {
+     "kind": "deeplp",
+     "key": "1014"
+    },
+    {
+     "kind": "deeplp",
+     "key": "1016"
+    },
+    {
+     "kind": "deeplp",
+     "key": "1018"
+    },
+    {
+     "kind": "deeplp",
+     "key": "1020"
+    },
+    {
+     "kind": "deeplp",
+     "key": "1022"
+    },
+    {
+     "kind": "deeplp",
+     "key": "1024"
+    },
+    {
+     "kind": "deeplp",
+     "key": "1026"
+    },
+    {
+     "kind": "deeplp",
+     "key": "1028"
+    },
+    {
+     "kind": "deeplp",
+     "key": "1030"
+    }
+   ],
+   "output": "s3://wce-research/robust/runs/wce-deeplp-20261010-040904/wce-deeplp-20261010-040904-s0/",
+   "instance_id": "i-06df9362f452ed397",
+   "command_id": "6aa149cc-2736-4647-8760-b0fce3823ea8",
+   "instance_state": "gone",
+   "status": "Completed",
+   "failure": "",
+   "runtime_s": 6595.0
+  },
+  {
+   "name": "wce-deeplp-20261010-040904-s1",
+   "units": 16,
+   "unit_list": [
+    {
+     "kind": "deeplp",
+     "key": "1001"
+    },
+    {
+     "kind": "deeplp",
+     "key": "1003"
+    },
+    {
+     "kind": "deeplp",
+     "key": "1005"
+    },
+    {
+     "kind": "deeplp",
+     "key": "1007"
+    },
+    {
+     "kind": "deeplp",
+     "key": "1009"
+    },
+    {
+     "kind": "deeplp",
+     "key": "1011"
+    },
+    {
+     "kind": "deeplp",
+     "key": "1013"
+    },
+    {
+     "kind": "deeplp",
+     "key": "1015"
+    },
+    {
+     "kind": "deeplp",
+     "key": "1017"
+    },
+    {
+     "kind": "deeplp",
+     "key": "1019"
+    },
+    {
+     "kind": "deeplp",
+     "key": "1021"
+    },
+    {
+     "kind": "deeplp",
+     "key": "1023"
+    },
+    {
+     "kind": "deeplp",
+     "key": "1025"
+    },
+    {
+     "kind": "deeplp",
+     "key": "1027"
+    },
+    {
+     "kind": "deeplp",
+     "key": "1029"
+    },
+    {
+     "kind": "deeplp",
+     "key": "1031"
+    }
+   ],
+   "output": "s3://wce-research/robust/runs/wce-deeplp-20261010-040904/wce-deeplp-20261010-040904-s1/",
+   "instance_id": "i-0b6b97cbd5a1fa155",
+   "command_id": "73076ab7-2b21-47bf-a092-6149ca7b20a5",
+   "instance_state": "gone",
+   "status": "Completed",
+   "failure": "",
+   "runtime_s": 4585.0
+  }
+ ],
+ "status": "Completed",
+ "max_runtime": 21600
+}

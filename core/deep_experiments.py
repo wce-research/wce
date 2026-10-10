@@ -550,7 +550,15 @@ def ee_subunits(key):
     return subunits(key)
 
 
-SUBUNITS = {"deepee": ee_subunits, "deepdc": dc_subunits, "deepbo": bo_subunits, "deepft": ft_subunits, "deeppo": po_subunits, "deeprp": rp_subunits, "deepobj": obj_subunits, "deepe2e": e2e_subunits, "deepresid": resid_subunits, "deepvo": vo_subunits, "deepopt": opt_subunits, "deepdown": down_subunits, "deepprofile": profile_subunits, "deepdev": dev_subunits, "deepgen": gen_subunits, "deepcover": cover_subunits, "deepprim": prim_subunits, "deepneural": neural_subunits}
+# ================================================================ sous-jalon Latent Primitive Recovery (dev)
+
+def lp_subunits(key):
+    """Clés 1000–1031 : trois sources de primitives dans le même aval fort, sensibilité, faux positifs, complétude."""
+    from core.deep_lpr_exp import subunits
+    return subunits(key)
+
+
+SUBUNITS = {"deeplp": lp_subunits, "deepee": ee_subunits, "deepdc": dc_subunits, "deepbo": bo_subunits, "deepft": ft_subunits, "deeppo": po_subunits, "deeprp": rp_subunits, "deepobj": obj_subunits, "deepe2e": e2e_subunits, "deepresid": resid_subunits, "deepvo": vo_subunits, "deepopt": opt_subunits, "deepdown": down_subunits, "deepprofile": profile_subunits, "deepdev": dev_subunits, "deepgen": gen_subunits, "deepcover": cover_subunits, "deepprim": prim_subunits, "deepneural": neural_subunits}
 
 
 def subunit_ids(kind, key): return [sid for sid, _ in SUBUNITS[kind](key)]

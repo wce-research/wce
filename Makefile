@@ -815,6 +815,24 @@ deep-ee-aggregate:
 deep-ee-report:
 	$(PYTHON) -m core.deep_ee_report report
 
+# sous-jalon Latent Primitive Recovery (dev uniquement ; aucun oracle dans les chaînes principales)
+DEEP_LP_KEYS ?= 1000-1031
+.PHONY: deep-lp-test deep-lp-tune deep-run-lp deep-lp-aggregate deep-lp-report
+deep-lp-test:
+	$(PYTHON) -m unittest tests.test_deep_lpr
+
+deep-lp-tune:
+	$(PYTHON) -m core.deep_lp_report tune
+
+deep-run-lp:
+	$(DEEP_BACKEND) $(AWSPY) submit --kind deeplp --keys $(DEEP_LP_KEYS) --shards $(DEEP_SHARDS) --instance $(DEEP_INSTANCE) --max-runtime 21600
+
+deep-lp-aggregate:
+	$(PYTHON) -m core.deep_lp_report aggregate
+
+deep-lp-report:
+	$(PYTHON) -m core.deep_lp_report report
+
 deep-progress:
 	$(AWSPY) progress $(if $(RUN),--run $(RUN),)
 
