@@ -1,5 +1,5 @@
-"""Agrège les artefacts AWS (results/aws/*/artifacts) → results/robust_summary.json + verdicts H1–H10 pré-enregistrés.
-Analyse locale légère uniquement (aucun calcul expérimental)."""
+"""Aggregates the AWS artifacts (results/aws/*/artifacts) → results/robust_summary.json + preregistered H1–H10 verdicts.
+Lightweight local analysis only (no experimental computation)."""
 import glob
 import json
 import math
@@ -19,7 +19,7 @@ def load(root=None):
         for f in glob.glob(os.path.join(os.path.dirname(mp), "artifacts", "**", "*.json"), recursive=True):
             if os.path.basename(f).startswith("_"): continue
             r = json.load(open(f))
-            if r.get("status") == "ok" and int(r["key"]) in CAMPAIGN_KEYS.get(r["kind"], ()): by[r["kind"]][str(r["key"])] = r   # clés pré-enregistrées seulement (les runs de test d'infrastructure sont ignorés)
+            if r.get("status") == "ok" and int(r["key"]) in CAMPAIGN_KEYS.get(r["kind"], ()): by[r["kind"]][str(r["key"])] = r   # preregistered keys only (the infrastructure test runs are ignored)
     return by, runs
 
 
@@ -54,8 +54,8 @@ def _per_seed(rows_by_seed, pred, key):
 def aggregate(by, runs):
     S = {"runs": [{k: m.get(k) for k in ("run_id", "backend", "instance_type", "status", "code_hash", "config_hash", "identity", "region", "kind")} | {"runtime_s": [j.get("runtime_s") for j in m["jobs"]]} for m in runs]}
     main = {s: r["result"] for s, r in by.get("main", {}).items()}; H = {}
-    # Dans les lignes du banc principal, le champ "depth" est la TAILLE DU PROGRAMME RETENU (il écrase la profondeur du
-    # monde à la construction de la ligne). La profondeur du monde est rétablie depuis l'ordre fixe des sous-unités.
+    # In the rows of the main benchmark, the "depth" field is the SIZE OF THE RETAINED PROGRAM (it overwrites the depth of the
+    # world when the row is built). The depth of the world is restored from the fixed order of the sub-units.
     from core.robust_experiments import MAIN_SPECS, METHODS
     for rows in main.values():
         if len(rows) == len(MAIN_SPECS) * len(METHODS):
@@ -70,7 +70,7 @@ def aggregate(by, runs):
             xa, xb = _per_seed(main, lambda r: r["method"] == a and pred(r), k), _per_seed(main, lambda r: r["method"] == b and pred(r), k)
             return ci([x - y for x, y in zip(xa, xb) if x is not None and y is not None])
         d1 = diff("robust_posterior", "robust_fit_only", "recovery"); S["diff_robust_vs_naive_passive"] = d1
-        # H1 : vraisemblance robuste vs fit naïf (job hard + main) — voir aussi 'hard'
+        # H1: robust likelihood vs naive fit (hard + main job) — see also 'hard'
         d3r, d3e = diff("robust_active_efa", "robust_active_structural_ig", "recovery"), diff("robust_active_efa", "robust_active_structural_ig", "extrapolation")
         H["H3"] = {"recovery": d3r, "extrapolation": d3e, "verdict": "SOUTENUE" if ((d3r["mean"] >= 0.05 and d3r["ci95"][0] > 0 and d3e["mean"] > -0.02) or (d3e["mean"] >= 0.05 and d3e["ci95"][0] > 0 and d3r["mean"] > -0.02)) else "RÉFUTÉE" if d3r["mean"] <= 0 and d3e["mean"] <= 0 else "NON CONCLUANTE"}
         d7 = diff("full", "old_system", "recovery"); H["H7"] = {"value": d7, "verdict": "SOUTENUE" if d7["mean"] >= 0.10 and d7["ci95"][0] > 0 else "RÉFUTÉE" if d7["mean"] <= 0 else "NON CONCLUANTE"}
@@ -107,7 +107,7 @@ def aggregate(by, runs):
     cal = []
     if train and by.get("calibration"):
         from core.robust_experiments import fit_calibrators
-        cal = [fit_calibrators(train, x["result"]) for x in by["calibration"].values() if x["result"]]   # calibrateurs ajustés sur train, évalués par graine de test
+        cal = [fit_calibrators(train, x["result"]) for x in by["calibration"].values() if x["result"]]   # calibrators fitted on train, evaluated per test seed
     if cal:
         S["calibration"] = {k: {"ece": ci([c[k]["ece"] for c in cal if "ece" in c.get(k, {})]), "brier": ci([c[k]["brier"] for c in cal if "brier" in c.get(k, {})])} for k in ("raw", "isotonic", "platt", "beta")}
         S["calibration"]["n_train"] = cal[0]["n_train"]; S["calibration"]["n_test_total"] = sum(c["n_test"] for c in cal)

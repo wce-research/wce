@@ -1,4 +1,4 @@
-"""Expériences contrôlées de l'algèbre de mesure : Fourier, référentiels, macro/micro-états, compromis de capteur."""
+"""Controlled experiments of the measurement algebra: Fourier, reference frames, macro/micro-states, sensor trade-off."""
 from __future__ import annotations
 
 import math
@@ -13,7 +13,7 @@ from core.measurement import (
     distance, information_gain, new_graph,
 )
 
-# ================================================================ Fourier : changement de base utile
+# ================================================================ Fourier: useful change of basis
 
 CANDIDATE_FREQS = (3, 5, 8, 11, 14, 19, 23, 29)
 
@@ -29,7 +29,7 @@ def make_signal(rng, n=128, noise=0.6):
 
 
 def raw_reasoning(x):
-    """Raisonnement dans la base TEMPORELLE : fréquence estimée par passages à zéro (une seule fréquence)."""
+    """Reasoning in the TIME basis: frequency estimated by zero crossings (a single frequency)."""
     zc = int(((x[:-1] * x[1:]) < 0).sum())
     f = zc / 2.0
     best = min(CANDIDATE_FREQS, key=lambda c: abs(c - f))
@@ -37,7 +37,7 @@ def raw_reasoning(x):
 
 
 def spectral_reasoning(x, bt: BasisTransform, k_noise=4.0):
-    """Raisonnement dans la base FRÉQUENTIELLE : pics du spectre au-dessus du bruit (seuil robuste par médiane)."""
+    """Reasoning in the FREQUENCY basis: peaks of the spectrum above the noise (robust threshold by median)."""
     X = bt.forward(x); mag = X.abs()[: len(x) // 2]
     thr = k_noise * float(mag.median())
     present = {f for f in CANDIDATE_FREQS if float(mag[f]) > thr}
@@ -64,7 +64,7 @@ def fourier_experiment(n_trials=200, seed=0, noise=0.6):
     return out
 
 
-# ================================================================ référentiels : transformer, invariants, comparaisons invalides
+# ================================================================ reference frames: transform, invariants, invalid comparisons
 
 def frame_experiment(n_trials=200, seed=0):
     rng = random.Random(seed)
@@ -76,19 +76,19 @@ def frame_experiment(n_trials=200, seed=0):
         Q = P + torch.tensor([rng.uniform(-1.5, 1.5), rng.uniform(-1.5, 1.5)], dtype=torch.float64)
         truth_close = float(torch.linalg.norm(P - Q)) < 1.0
         pa = frames["A"].from_world(FramedValue(P, "world")); qb = frames["B"].from_world(FramedValue(Q, "world"))
-        # système conscient des référentiels : transforme avant de comparer
+        # frame-aware system: transforms before comparing
         d_aware = distance(change_frame(pa, frames, "world"), change_frame(qb, frames, "world"))
         c["aware_correct"] += (d_aware < 1.0) == truth_close
-        # système naïf : compare des coordonnées brutes de référentiels différents
+        # naive system: compares raw coordinates of different reference frames
         d_naive = float(torch.linalg.norm(torch.as_tensor(pa.value) - torch.as_tensor(qb.value)))
         c["naive_correct"] += (d_naive < 1.0) == truth_close
         try: distance(pa, qb)
         except FrameError: c["invalid_detected"] += 1
-        # invariant : distance entre deux objets vue par UN même observateur = distance dans le monde
+        # invariant: distance between two objects seen by ONE same observer = distance in the world
         qa = frames["A"].from_world(FramedValue(Q, "world"))
         c["distance_invariant"] += abs(distance(pa, qa) - float(torch.linalg.norm(P - Q))) < 1e-9
         c["coordinates_change"] += float(torch.linalg.norm(torch.as_tensor(pa.value) - P)) > 1e-6
-        # orientation : un angle relatif entre deux directions est invariant, une direction absolue ne l'est pas
+        # orientation: a relative angle between two directions is invariant, an absolute direction is not
         u, v = torch.tensor([1.0, 0.0], dtype=torch.float64), torch.tensor([0.0, 1.0], dtype=torch.float64)
         ua = frames["A"].from_world(FramedValue(u, "world", "vector")).value; va = frames["A"].from_world(FramedValue(v, "world", "vector")).value
         ang = lambda a, b: math.atan2(float(a[0] * b[1] - a[1] * b[0]), float(a @ b))
@@ -96,7 +96,7 @@ def frame_experiment(n_trials=200, seed=0):
     return {k: round(v / n_trials, 3) for k, v in c.items()}
 
 
-# ================================================================ macro / micro-états
+# ================================================================ macro / micro-states
 
 def macrostate_set(n_particles=4, n_cells=6, graph=None):
     dom = {(f"p{i}", "cell"): list(range(n_cells)) for i in range(n_particles)}
@@ -108,8 +108,8 @@ def macro_left_count(states, n_cells=6):
 
 
 def macrostate_experiment(n_trials=40, seed=0, policies=("random", "fixed", "max_ig"), n_particles=4, n_cells=6):
-    """Macro-observation (combien de particules à gauche) -> ambiguïté conservée ; sondes de cellule (occupée ?)
-    choisies par politique ; mesure : sondes nécessaires pour isoler le micro-état, corrélation IG prédit / réalisé."""
+    """Macro-observation (how many particles on the left) -> ambiguity preserved; cell probes (occupied?)
+    chosen by policy; measure: probes needed to isolate the micro-state, predicted / realised IG correlation."""
     rng = random.Random(seed)
     base = macrostate_set(n_particles, n_cells)
     mult = base.multiplicity(lambda s: macro_left_count(s, n_cells))
@@ -129,7 +129,7 @@ def macrostate_experiment(n_trials=40, seed=0, policies=("random", "fixed", "max
                 ops = [MeasurementOperator(Observable("cell", f"p{i}", "cell", tuple(range(n_cells))),
                                            MeasurementContext(sensor=f"probe{i}", noise=NoiseModel("confusion", 1.0), cost=0.0))
                        for i in range(n_particles)]
-                # sonde « la particule i est-elle à gauche ? » (mesure grossière) ou cellule exacte (fine)
+                # probe "is particle i on the left?" (coarse measurement) or exact cell (fine)
                 choice = planner.choose(S, ops, None) if policy != "fixed" else planner.choose(S, ops[n % n_particles:] + ops[:n % n_particles], None)
                 if choice is None: break
                 h0 = S.entropy()
@@ -150,7 +150,7 @@ def macrostate_experiment(n_trials=40, seed=0, policies=("random", "fixed", "max
     return out
 
 
-# ================================================================ compromis de capteur
+# ================================================================ sensor trade-off
 
 def tradeoff_experiment(n_trials=500, seed=0):
     rng = random.Random(seed); sensor = MeasurementTradeoff(0.1, 0.1)

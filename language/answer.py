@@ -14,7 +14,7 @@ def answer_query(world, query: Query) -> str:
 
     if query.entity not in world.entities:
         raise AnswerError(
-            f"Entité inconnue : {query.entity!r}"
+            f"Unknown entity: {query.entity!r}"
         )
 
     entity = world.entities[query.entity]
@@ -22,7 +22,7 @@ def answer_query(world, query: Query) -> str:
     if query.kind == "height":
         if "y" not in entity.properties:
             raise AnswerError(
-                f"Aucune hauteur connue pour {query.entity!r}"
+                f"No known height for {query.entity!r}"
             )
 
         y = entity.properties["y"]
@@ -35,7 +35,7 @@ def answer_query(world, query: Query) -> str:
     if query.kind == "x_position":
         if "x" not in entity.properties:
             raise AnswerError(
-                f"Aucune position horizontale connue pour {query.entity!r}"
+                f"No known horizontal position for {query.entity!r}"
             )
 
         x = entity.properties["x"]
@@ -48,7 +48,7 @@ def answer_query(world, query: Query) -> str:
     if query.kind == "vx":
         if "vx" not in entity.properties:
             raise AnswerError(
-                f"Aucune vitesse horizontale connue pour {query.entity!r}"
+                f"No known horizontal velocity for {query.entity!r}"
             )
 
         vx = entity.properties["vx"]
@@ -61,7 +61,7 @@ def answer_query(world, query: Query) -> str:
     if query.kind == "vy":
         if "vy" not in entity.properties:
             raise AnswerError(
-                f"Aucune vitesse verticale connue pour {query.entity!r}"
+                f"No known vertical velocity for {query.entity!r}"
             )
 
         vy = entity.properties["vy"]
@@ -77,7 +77,7 @@ def answer_query(world, query: Query) -> str:
 
         if vx is None and vy is None:
             raise AnswerError(
-                f"Aucune vitesse connue pour {query.entity!r}"
+                f"No known velocity for {query.entity!r}"
             )
 
         parts = []
@@ -95,7 +95,7 @@ def answer_query(world, query: Query) -> str:
             )
 
         raise AnswerError(
-            f"Vitesse inconnue pour {query.entity!r}"
+            f"Unknown velocity for {query.entity!r}"
         )
 
     if query.kind == "position":
@@ -104,10 +104,10 @@ def answer_query(world, query: Query) -> str:
 
         if x is None and y is None:
             raise AnswerError(
-                f"Aucune position connue pour {query.entity!r}"
+                f"No known position for {query.entity!r}"
             )
 
-        # Vérifier le support d'abord
+        # Check the support first
         support = find_relation_object(
             world,
             subject=query.entity,
@@ -115,7 +115,7 @@ def answer_query(world, query: Query) -> str:
         )
 
         if support is not None:
-            # Sur un support, y est probablement 0 ou connu
+            # On a support, y is probably 0 or known
             if x is not None and x != 0:
                 return (
                     f"{capitalize(query.entity)} "
@@ -126,7 +126,7 @@ def answer_query(world, query: Query) -> str:
                 f"est sur {support}."
             )
 
-        # Construire la réponse avec x et y
+        # Build the answer with x and y
         parts = []
 
         if x is not None:
@@ -142,7 +142,7 @@ def answer_query(world, query: Query) -> str:
             )
 
         raise AnswerError(
-            f"Position inconnue pour {query.entity!r}"
+            f"Unknown position for {query.entity!r}"
         )
 
     if query.kind == "location":
@@ -168,11 +168,11 @@ def answer_query(world, query: Query) -> str:
             )
 
         raise AnswerError(
-            f"Position inconnue pour {query.entity!r}"
+            f"Unknown position for {query.entity!r}"
         )
 
     raise AnswerError(
-        f"Type de question inconnu : {query.kind!r}"
+        f"Unknown question type: {query.kind!r}"
     )
 
 

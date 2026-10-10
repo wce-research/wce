@@ -1,11 +1,11 @@
-"""Rapports du sous-jalon Deep Candidate Generation (dev uniquement).
+"""Reports of the Deep Candidate Generation sub-milestone (dev only).
 
-  reachability : analyse MÉCANIQUE (aucun ajustement) des vraies structures de dev par profondeur
-  coverage     : couverture exacte de l'espace des formes à petite profondeur (énumération exhaustive)
-  aggregate    : agrège les runs AWS `deepgen` → results/deep_generation_summary.json
-  report       : imprime les tableaux du rapport
+  reachability : MECHANICAL analysis (no fitting) of the true dev structures by depth
+  coverage     : exact coverage of the space of forms at small depth (exhaustive enumeration)
+  aggregate    : aggregates the AWS `deepgen` runs → results/deep_generation_summary.json
+  report       : prints the tables of the report
 
-Module d'évaluation : il lit la vérité des tâches de DEV. Il ne touche jamais au lot scellé.
+Evaluation module: it reads the truth of the DEV tasks. It never touches the sealed set.
 """
 from __future__ import annotations
 
@@ -31,14 +31,14 @@ def reachability(n=120):
                    "parent_closure": sum(R.parent_closure(t)["closed"] for t in ts) / n, "atoms_minimal_basis": sum(b["atoms_in_minimal_basis"] for b in bq) / n, "redundant_atoms": sum(b["redundant_atoms"] for b in bq) / n,
                    "params": sum(b["params"] for b in bq) / n, "reachable": {m: sum(R.operator_reachable(t, ops)[0] for t in ts) / n for m, ops in R.OPERATORS.items()}}
     json.dump(rows, open(os.path.join(OUT, "deep_reachability.json"), "w"), indent=1)
-    print("prof | représentable | formes T(d) | chemin oracle | largeur moy/max | clôture | atomes en base minimale | atteignable : chaîne (baseline, flat, top_down) / bottom_up / factorized")
+    print("depth | representable | forms T(d) | oracle path | width mean/max | closure | atoms in minimal basis | reachable: chain (baseline, flat, top_down) / bottom_up / factorized")
     for d, r in rows.items():
         print(d, r["representable"], f"{r['space_forms']:.3g}", r["oracle_length"], f"{r['width_mean']:.2f}/{r['width_max']}", r["parent_closure"], f"{r['atoms_minimal_basis']:.2f}", f"{r['reachable']['baseline']:.2f} / {r['reachable']['bottom_up']:.2f} / {r['reachable']['factorized']:.2f}")
     return rows
 
 
 def enumerate_forms(depth, atom_list=None):
-    """Toutes les formes algébriques distinctes à `depth` atomes (énumération exhaustive ; faisable jusqu'à 3)."""
+    """All the distinct algebraic forms at `depth` atoms (exhaustive enumeration; feasible up to 3)."""
     from core.boundary_program import BNode, atoms
     from core.deep_structure import COMBINATORS, algebraic_form
     A = atom_list or atoms(); level = {1: {algebraic_form(a): a for a in A}}
@@ -54,7 +54,7 @@ def enumerate_forms(depth, atom_list=None):
 
 
 def coverage():
-    """Couverture exacte : taille de l'espace énuméré (profondeur ≤ 3) et effet du typage sur les nœuds bruts."""
+    """Exact coverage: size of the enumerated space (depth ≤ 3) and effect of typing on the raw nodes."""
     from core.boundary_program import BNode, atoms
     from core.deep_generation import well_typed
     from core.deep_reachability import space_size
@@ -68,11 +68,11 @@ def coverage():
 
 
 def fragments(n_curr=60, n_eval=60):
-    """Bibliothèque de fragments comme aide à la reachability — BORNE HAUTE : la bibliothèque est construite à partir
-    des VRAIES structures de tâches de curriculum (profondeurs 2–3, graines de dev disjointes), comme si les
-    profondeurs précédentes avaient été parfaitement résolues. Mesure, sur d'autres tâches de dev (profondeurs 3–6) :
-    part des sous-structures vraies à 2 atomes présentes (fragments exacts), couvertes par un schéma anti-unifié, faux
-    schémas proposés, et raccourcissement du chemin oracle."""
+    """Fragment library as an aid to reachability — UPPER BOUND: the library is built from the
+    TRUE structures of curriculum tasks (depths 2–3, disjoint dev seeds), as if the
+    previous depths had been solved perfectly. Measures, on other dev tasks (depths 3–6):
+    share of the true 2-atom substructures present (exact fragments), covered by an anti-unified schema, false
+    schemas proposed, and shortening of the oracle path."""
     import core.deep_world as W
     from core.boundary_program import atoms
     from core.deep_structure import FragmentLibrary, n_atoms, skel_key, subtrees
@@ -93,8 +93,8 @@ def fragments(n_curr=60, n_eval=60):
 
 
 def cover_aggregate():
-    """Couverture exhaustive (profondeurs 2 et 3) : toutes les formes ajustées. La vraie structure est-elle
-    sélectionnée quand la génération est COMPLÈTE ? Et quelle part de l'espace chaque stratégie génère-t-elle ?"""
+    """Exhaustive coverage (depths 2 and 3): all the forms fitted. Is the true structure
+    selected when generation is COMPLETE? And what share of the space does each strategy generate?"""
     by = defaultdict(lambda: {"forms": [], "strategies": {}, "fe": 0.0, "sec": 0.0})
     for f in glob.glob(os.path.join(OUT, "aws", "wce-deepcover-*", "artifacts", "*", "deepcover_*.json")):
         r = json.load(open(f))
@@ -153,23 +153,23 @@ def aggregate():
                 if not x: continue
                 k = f"{reg}/d{d}/{name}"; S["by"][k] = {"n": len(x), **{rc: _mean(r.get(rc) for r in x) for rc in RECALLS}, "functional": _mean(r["functional"] for r in x), "equivalent": _mean(r["equivalent"] for r in x), "full": _mean(r["full"] for r in x)}
                 S["taxonomy"][k] = dict(Counter(r.get("cause") for r in x)); S["costs"][k] = {c: _mean(r.get(c) for r in x) for c in ("fit_equivalents", "n_candidates", "n_fitted", "n_structures", "compositions", "seconds", "fit_seconds", "synthesis_seconds")}
-    json.dump(S, open(os.path.join(OUT, "deep_generation_summary.json"), "w"), indent=1); print("lignes", len(rows), "unités en erreur", bad); return S
+    json.dump(S, open(os.path.join(OUT, "deep_generation_summary.json"), "w"), indent=1); print("rows", len(rows), "units in error", bad); return S
 
 
 def report():
     S = json.load(open(os.path.join(OUT, "deep_generation_summary.json"))); names = sorted({k.split("/")[2] for k in S["by"]})
     for reg in ("standard", "rich"):
         for metric in ("recall_generated", "recall_fitted", "recall_post_pruning", "recall_top_k", "recall_selected", "functional"):
-            print(f"\n{reg} — {metric}"); print("méthode@budget".ljust(22) + " ".join(f"d{d}".rjust(6) for d in range(1, 7)))
+            print(f"\n{reg} — {metric}"); print("method@budget".ljust(22) + " ".join(f"d{d}".rjust(6) for d in range(1, 7)))
             for n in names: print(n.ljust(22) + " ".join((f"{S['by'][f'{reg}/d{d}/{n}'][metric]:.2f}" if f"{reg}/d{d}/{n}" in S["by"] and S["by"][f"{reg}/d{d}/{n}"][metric] is not None else "—").rjust(6) for d in range(1, 7)))
-        print(f"\n{reg} — mécanique"); keys = ("identifiable_bound", "weakest_atom_effect_points", "expected_flips", "atom_recall_global", "atom_recall_global_090", "atom_recall_separation", "atom_recall_separation_090", "logic_true_atoms", "logic_with_distractors", "logic_with_distractors_rank0", "logic_seconds", "reachable_chain")
+        print(f"\n{reg} — mechanics"); keys = ("identifiable_bound", "weakest_atom_effect_points", "expected_flips", "atom_recall_global", "atom_recall_global_090", "atom_recall_separation", "atom_recall_separation_090", "logic_true_atoms", "logic_with_distractors", "logic_with_distractors_rank0", "logic_seconds", "reachable_chain")
         for k in keys: print(k.ljust(30) + " ".join((f"{S['mechanics'][f'{reg}/d{d}'][k]:.2f}" if f"{reg}/d{d}" in S["mechanics"] and S["mechanics"][f"{reg}/d{d}"][k] is not None else "—").rjust(7) for d in range(1, 7)))
-        print(f"\n{reg} — cause principale (profondeurs 3–6 cumulées)")
+        print(f"\n{reg} — main cause (depths 3–6 cumulated)")
         for n in names:
             c = Counter()
             for d in range(3, 7): c.update(S["taxonomy"].get(f"{reg}/d{d}/{n}", {}))
             print(n.ljust(22), dict(c))
-        print(f"\n{reg} — coûts moyens (toutes profondeurs)")
+        print(f"\n{reg} — mean costs (all depths)")
         for n in names:
             x = [S["costs"][k] for k in S["costs"] if k.startswith(reg + "/") and k.endswith("/" + n)]
             print(n.ljust(22), {c: _mean(v[c] for v in x) for c in ("fit_equivalents", "n_candidates", "compositions", "seconds", "fit_seconds", "synthesis_seconds")})

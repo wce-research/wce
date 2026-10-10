@@ -1,4 +1,4 @@
-"""Recherche bornée de compositions de TransformationSpec orientée par Goal."""
+"""Bounded search over compositions of TransformationSpec, directed by a Goal."""
 from __future__ import annotations
 
 import copy
@@ -279,7 +279,7 @@ class TransformationPlanner:
                             metrics.explored_nodes, metrics=metrics)
 
     def promote_to_macro(self, result, name):
-        if not result.success or not result.transformations: raise ValueError("un plan réussi non vide est requis")
+        if not result.success or not result.transformations: raise ValueError("a successful non-empty plan is required")
         domain = result.transformations[0].domain
         return MacroTransformation(name=name, steps=tuple(result.transformations), domain=domain,
                                    description="stratégie promue depuis un plan")
@@ -299,7 +299,7 @@ class TransformationPlanner:
 
 
 def algebra_candidate_generator(state, goal):
-    """Génère les opérations primitives suggérées par les constantes de l'AST."""
+    """Generates the primitive operations suggested by the constants of the AST."""
     from core.algebra import (Add, AddBothSides, DivideBothSides, Multiply, MultiplyBothSides,
                               Number, Simplify, SubtractBothSides)
     expression = state.expression

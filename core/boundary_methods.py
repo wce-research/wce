@@ -1,8 +1,8 @@
-"""Méthodes comparées et évaluation d'une tâche de frontière.
+"""Compared methods and evaluation of a boundary task.
 
-1 memorization (1-NN)  2 kNN (k=7)  3 petit MLP (capacité comparable)  4 oracle « famille connue » (squelette vrai
-fourni : BORNE HAUTE, n'est pas une méthode d'induction)  5 recherche de primitives SANS anti-unification
-6 induction complète (macros de familles induites d'abord)  7 induction + expériences actives  8 programme + résidu.
+1 memorization (1-NN)  2 kNN (k=7)  3 small MLP (comparable capacity)  4 "known family" oracle (true skeleton
+provided: UPPER BOUND, is not an induction method)  5 primitive search WITHOUT anti-unification
+6 full induction (induced family macros first)  7 induction + active experiments  8 program + residual.
 """
 from __future__ import annotations
 
@@ -38,7 +38,7 @@ def mlp_params(p): return sum(v.numel() for v in p.values())
 
 
 def train_residual(prog, X, y, h=3, steps=500, seed=0, scale=4.0):
-    """Résidu neuronal : logit = scale·(2·programme − 1) + r(x) ; seul r est entraîné (programme figé)."""
+    """Neural residual: logit = scale·(2·program − 1) + r(x); only r is trained (program frozen)."""
     g = torch.Generator().manual_seed(seed); base = (2 * predict(prog, X).float() - 1) * scale
     p = {"w1": torch.randn(h, 2, generator=g) * 0.7, "b1": torch.zeros(h), "w2": torch.randn(1, h, generator=g) * 0.1, "b2": torch.zeros(1)}
     q = {k: v.clone().requires_grad_(True) for k, v in p.items()}; opt = torch.optim.Adam(q.values(), lr=0.03)
@@ -56,14 +56,14 @@ def split(X, y, frac=0.75):
     n = int(frac * len(X)); return X[:n], y[:n], X[n:], y[n:]
 
 
-STABILITY_MIN = 0.86        # 5e centile de la stabilité sur familles d'ENTRAÎNEMENT + VALIDATION (results/boundary_stability_calibration.json)
+STABILITY_MIN = 0.86        # 5th percentile of the stability on TRAINING + VALIDATION families (results/boundary_stability_calibration.json)
 VAL_MIN = 0.90
 
 
 def stable_search(X, y, macros=None, seed=0, **kw):
-    """Recherche sur l'ensemble, plus test de STABILITÉ : deux recherches sur des moitiés disjointes doivent
-    produire des programmes fonctionnellement d'accord sur la région observée (≥ 0,9) ; sinon « aucun programme
-    adéquat » (pas de structure stable expliquant les données)."""
+    """Search on the whole set, plus a STABILITY test: two searches on disjoint halves must
+    produce programs that functionally agree on the observed region (≥ 0.9); otherwise "no adequate
+    program" (no stable structure explaining the data)."""
     Xt, yt, Xv, yv = split(X, y); s = BoundaryProgramSearch(macros=macros, seed=seed, **kw).run(Xt, yt, Xv, yv)
     n = len(X) // 2
     a = BoundaryProgramSearch(macros=macros, seed=seed + 1, **kw).run(*split(X[:n], y[:n]))
@@ -77,9 +77,9 @@ def stable_search(X, y, macros=None, seed=0, **kw):
 
 
 def active_refine(search, inst, X, y, g, budget=12, policy="ig", noise=0.03, refit_every=4):
-    """Expériences actives sur la postérieure des programmes : point de gain d'information max (ou désaccord
-    max, ou aléatoire) dans la région COMPLÈTE ; étiquette observée (bruitée) ; tous les `refit_every`, les
-    squelettes candidats sont réajustés sur données + requêtes. Renvoie (programme MAP, postérieure, nb requêtes)."""
+    """Active experiments on the posterior over programs: point of max information gain (or max
+    disagreement, or random) in the FULL region; observed label (noisy); every `refit_every`, the
+    candidate skeletons are refitted on data + queries. Returns (MAP program, posterior, number of queries)."""
     cands = [c[0] for c in search.candidates][:8]; Xa, ya = X.clone(), y.clone()
     post = ProgramPosterior(cands); post.update(Xa, ya); pool = full_region(600, g); n = 0
     for q in range(budget):
@@ -97,7 +97,7 @@ def active_refine(search, inst, X, y, g, budget=12, policy="ig", noise=0.03, ref
 
 
 def run_shared(inst, X, y, g, macros=None, active_budget=12, search_kw=None):
-    """Une seule recherche par variante (sans / avec macros) partagée par les méthodes d'induction."""
+    """A single search per variant (without / with macros) shared by the induction methods."""
     kw = dict(search_kw or {}); out = {}
     t0 = time.time(); s0 = stable_search(X, y, None, **kw); t_no = time.time() - t0
     t0 = time.time(); s1 = stable_search(X, y, macros, **kw) if macros else s0; t_full = (time.time() - t0) if macros else t_no
@@ -108,7 +108,7 @@ def run_shared(inst, X, y, g, macros=None, active_budget=12, search_kw=None):
 
 
 def run_method(method, inst, X, y, g, macros=None, active_budget=12, query_noise=0.03, search_kw=None, shared=None):
-    """Renvoie un dict : prédicteur, programme éventuel, paramètres, coûts, adéquation."""
+    """Returns a dict: predictor, program if any, parameters, costs, adequacy."""
     t0 = time.time(); out = {"program": None, "adequate": True, "evaluations": 0, "queries": 0}
     if method == "memorization": out.update(pred=lambda Q: knn_predict(X, y, Q, 1), params=X.numel() + y.numel())
     elif method == "knn": out.update(pred=lambda Q: knn_predict(X, y, Q, 7), params=X.numel() + y.numel())

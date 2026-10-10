@@ -44,10 +44,10 @@ class GravityForce(ForceProvider):
 
 class SupportForce(ForceProvider):
     """
-    Modèle 2D :
-    un support statique équilibre exactement
-    le poids vertical de l'objet supporté.
-    Pas de frottement horizontal dans cette version.
+    2D model:
+    a static support exactly balances
+    the vertical weight of the supported object.
+    No horizontal friction in this version.
     """
 
     def __init__(self, g: float = -9.81):
@@ -86,9 +86,9 @@ class SupportForce(ForceProvider):
 
 class ConstantForce(ForceProvider):
     """
-    Force générique utile pour les expériences
-    et les futurs moteurs de poussée, traction, etc.
-    Supporte maintenant les composantes x et y.
+    Generic force useful for experiments
+    and for future push, pull, etc. engines.
+    Now supports the x and y components.
     """
 
     def __init__(
@@ -164,7 +164,7 @@ def get_mass(entity) -> float:
 
     if mass <= 0:
         raise ValueError(
-            f"Masse invalide pour {entity.name!r}: {mass}"
+            f"Invalid mass for {entity.name!r}: {mass}"
         )
 
     return mass
@@ -190,9 +190,9 @@ def net_force(
     entity_name: str,
 ) -> tuple[float, float]:
     """
-    Retourne la force nette (fx, fy) sur une entité.
-    Pour la rétrocompatibilité avec le code existant qui attend
-    un scalaire, voir net_force_y().
+    Returns the net force (fx, fy) on an entity.
+    For backward compatibility with existing code that expects
+    a scalar, see net_force_y().
     """
     forces = collect_forces(world, providers)
     fx = sum(
@@ -214,8 +214,8 @@ def net_force_y(
     entity_name: str,
 ) -> float:
     """
-    Retourne la composante verticale de la force nette.
-    Maintien la rétrocompatibilité avec l'ancienne interface.
+    Returns the vertical component of the net force.
+    Maintains backward compatibility with the old interface.
     """
     _, fy = net_force(world, providers, entity_name)
     return fy

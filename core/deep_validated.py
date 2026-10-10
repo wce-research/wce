@@ -1,12 +1,12 @@
-"""Sous-jalon Validated Optimizer — module d'ÉVALUATION, dev uniquement, vrais atomes fournis.
+"""Validated Optimizer sub-milestone — EVALUATION module, dev only, true atoms provided.
 
-1. Expérience contrôlée à deux bras : pipeline gelé (A) contre pipeline + garde-fou d'ajustement seul (B, critère
-   pré-défini : vraisemblance profilée). Un bras C exploratoire utilise le critère de substitution de l'optimiseur.
-2. Diagnostic de l'OPTIMISEUR lui-même (non modifié) : trajectoires, désaccord entre objectif continu et accord discret,
-   expérience aux vrais paramètres, baseline sans optimisation, arrêt précoce, meilleur état rencontré, descente
-   monotone, sensibilité numérique, comparaison systématique des deux ajusteurs.
+1. Controlled two-arm experiment: frozen pipeline (A) against pipeline + fit-only guardrail (B, predefined
+   criterion: profiled likelihood). An exploratory arm C uses the optimizer's surrogate criterion.
+2. Diagnosis of the OPTIMIZER itself (unmodified): trajectories, disagreement between continuous objective and discrete agreement,
+   experiment at the true parameters, baseline without optimization, early stopping, best state encountered, monotone
+   descent, numerical sensitivity, systematic comparison of the two fitters.
 
-La vérité n'est utilisée que pour MESURER (accord fonctionnel) ; aucune décision du système n'en dépend.
+The truth is used only to MEASURE (functional agreement); no decision of the system depends on it.
 """
 from __future__ import annotations
 
@@ -22,7 +22,7 @@ from core.deep_generation import generate_candidates
 from core.deep_search import DeepSearch
 from core.deep_structure import algebraic_form, n_atoms, normalize, skel_key, structurally_equivalent
 
-ARMS = {"A": None, "B": "profiled", "C": "surrogate"}            # A : pipeline gelé ; B : garde-fou pré-défini ; C : exploratoire
+ARMS = {"A": None, "B": "profiled", "C": "surrogate"}            # A: frozen pipeline; B: predefined guardrail; C: exploratory
 THRESHOLDS = (0.90, 0.95, 0.97, 0.99)
 
 
@@ -33,7 +33,7 @@ def _eval(task):
 
 
 def arm_run(task, arm: str, seed=0) -> dict:
-    """Un bras de l'expérience contrôlée : même pipeline, mêmes littéraux (vrais atomes), seul `validated` change."""
+    """One arm of the controlled experiment: same pipeline, same literals (true atoms), only `validated` changes."""
     from core.deep_reachability import leaves
     t0 = time.time(); tr = task.world.truth; tl = leaves(tr); data = FitData.build(task.X, task.y, 0.10); A, AI = _eval(task)
     out = DeepSearch("factorized", budget=150.0, seed=seed, max_depth=min(6, n_atoms(tr) + 1), fact_literals=tl, fact_residual=False, validated=ARMS[arm]).run(data); best = out.best().program; a = A(best)
@@ -43,7 +43,7 @@ def arm_run(task, arm: str, seed=0) -> dict:
             "rollbacks": out.stats["rollbacks"], "fit_equivalents": out.stats["fit_equivalents"], "seconds": round(time.time() - t0, 2)}
 
 
-# ================================================================ diagnostic de l'optimiseur (inchangé : on l'observe)
+# ================================================================ optimizer diagnosis (unchanged: we observe it)
 
 def _objective(fn, th, X, y, f, w, gamma, k):
     p = fn(th, X, lambda z: torch.sigmoid(k * z)).clamp(1e-6, 1 - 1e-6); p1 = (1 - gamma) * (f + (1 - 2 * f) * p) + gamma * 0.5
@@ -51,9 +51,9 @@ def _objective(fn, th, X, y, f, w, gamma, k):
 
 
 def optimize_traced(skel: BNode, data: FitData, init, steps=100, lr=0.05, k_start=4.0, k_end=24.0, gamma=0.02, every=5, accord=None, monotone=False, dtype=DT):
-    """Reproduit l'optimiseur de `fit_batch` (Adam, raideur k = k_start + (k_end − k_start)·t/steps) en ENREGISTRANT la
-    trajectoire. Avec les valeurs par défaut, la trajectoire est celle de `fit_batch` (testé).
-    `monotone=True` : variante de mesure où un pas n'est gardé que s'il améliore l'objectif À RAIDEUR FIXE k_end."""
+    """Reproduces the optimizer of `fit_batch` (Adam, stiffness k = k_start + (k_end − k_start)·t/steps) while RECORDING the
+    trajectory. With the default values, the trajectory is that of `fit_batch` (tested).
+    `monotone=True`: measurement variant where a step is kept only if it improves the objective AT FIXED STIFFNESS k_end."""
     th = torch.as_tensor(init, dtype=dtype).reshape(1, -1).clone().requires_grad_(True); th0 = th.detach().clone().to(DT); fn = compile_skeleton(skel); X = data.X[None].to(dtype); y, f, w = data.y.to(dtype), data.flip.to(dtype), data.weight.to(dtype)
     opt = torch.optim.Adam([th], lr=lr); traj = []; best = {"profiled": (-math.inf, None, 0), "surrogate": (-math.inf, None, 0)}
     def snap(t, k, loss, gnorm):
@@ -87,8 +87,8 @@ def _spearman(a, b):
 
 
 def local_geometry(skel: BNode, data: FitData, theta, gamma=0.02):
-    """Géométrie locale de l'objectif continu AU POINT DE DÉPART : gradient (le point est-il stationnaire ?), hessienne
-    (conditionnement, directions non identifiables, courbure négative), couplage entre atomes, saturation."""
+    """Local geometry of the continuous objective AT THE STARTING POINT: gradient (is the point stationary?), Hessian
+    (conditioning, non-identifiable directions, negative curvature), coupling between atoms, saturation."""
     fn = compile_skeleton(skel); X = data.X[None]; out = {}; th0 = torch.as_tensor(theta, dtype=DT).reshape(-1)
     for k in (4.0, 24.0):
         f = lambda v: _objective(fn, v.reshape(1, -1), X, data.y, data.flip, data.weight, gamma, k); v = th0.clone().requires_grad_(True); g = torch.autograd.grad(f(v), v)[0]
@@ -103,7 +103,7 @@ def local_geometry(skel: BNode, data: FitData, theta, gamma=0.02):
 
 
 def _walk_leaves(skel: BNode):
-    """Atomes (sous-arbres non composites) dans l'ordre du vecteur de paramètres."""
+    """Atoms (non-composite subtrees) in the order of the parameter vector."""
     if skel.kind in ("and", "or", "xor"): return [l for c in skel.children for l in _walk_leaves(c)]
     return [_Whole(skel)]
 
@@ -118,8 +118,8 @@ CONFIGS = {"default": {}, "k_start_12": {"k_start": 12.0}, "k_const_24": {"k_sta
 
 
 def optimizer_diagnosis(task, seed=0) -> dict:
-    """Diagnostic de l'optimiseur sur deux points de départ quasi parfaits : la VRAIE structure aux VRAIS paramètres,
-    et le candidat classé premier avant ajustement. L'optimiseur n'est pas modifié ; les variantes sont des MESURES."""
+    """Diagnosis of the optimizer on two near-perfect starting points: the TRUE structure at the TRUE parameters,
+    and the candidate ranked first before fitting. The optimizer is not modified; the variants are MEASUREMENTS."""
     from core.deep_reachability import leaves
     from core.robust_reconstruction import SENSOR_MODELS, Observations, fit_robust
     tr = normalize(task.world.truth); tl = leaves(tr); data = FitData.build(task.X, task.y, 0.10); A, _ = _eval(task); rows = {}
@@ -138,11 +138,11 @@ def optimizer_diagnosis(task, seed=0) -> dict:
                 c["trajectory"] = traj; acc = [t["accord"] for t in traj]; c["corr_surrogate_accord"] = _spearman([t["surrogate_loglik"] for t in traj], acc); c["corr_loss_accord"] = _spearman([-t["loss"] for t in traj], acc)
                 c["corr_profiled_accord"] = _spearman([t["profiled_loglik"] for t in traj], acc); c["first_drop_step"] = next((t["step"] for t in traj if t["accord"] < noop["accord"] - 0.002), None)
                 c["first_drop_below_099_step"] = next((t["step"] for t in traj if t["accord"] < 0.99), None) if noop["accord"] >= 0.99 else None
-                # arrêt précoce sur données accessibles : s'arrêter au premier contrôle où la vraisemblance profilée passe sous sa valeur initiale
+                # early stopping on accessible data: stop at the first check where the profiled likelihood falls below its initial value
                 stop = next((i for i, t in enumerate(traj) if t["profiled_loglik"] < noop["profiled"] - 1e-9), None); c["early_stop"] = {"step": traj[stop - 1]["step"] if stop else traj[-1]["step"], "accord": traj[stop - 1]["accord"] if stop else traj[-1]["accord"], "stopped": stop is not None} if stop != 0 else {"step": 0, "accord": noop["accord"], "stopped": True}
                 same, _ = fit_batch(sk, data, th0.reshape(1, -1), steps=100); c["matches_fit_batch"] = float((same[0] - th).abs().max())
             r["configs"][cname] = c
-        # ancien ajusteur contre ajusteur par lots, même point de départ
+        # old fitter against batch fitter, same starting point
         obs = Observations.build(task.X, task.y, SENSOR_MODELS["standard"], 0.05); t0 = time.time(); po, _ = fit_robust(sk, obs, steps=100, n_init=0, init=init); to = time.time() - t0; t0 = time.time(); tn, _ = fit_batch(sk, data, th0.reshape(1, -1), steps=100); tb = time.time() - t0
         tho = torch.tensor(po.param_vector(), dtype=DT); r["fitters"] = {"old": meas(tho), "new": meas(tn[0]), "param_diff": float((tho - tn[0]).abs().max()), "seconds_old": round(to, 4), "seconds_new": round(tb, 4),
                                                                       "init_rounding": float((torch.tensor(init, dtype=torch.float32).double() - th0).abs().max())}

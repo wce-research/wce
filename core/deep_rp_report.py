@@ -1,8 +1,8 @@
-"""Rapports du sous-jalon Robust Primitive Discovery (dev uniquement ; jamais le lot scellé).
+"""Reports of the Robust Primitive Discovery sub-milestone (dev only; never the sealed set).
 
-  smoke     : démonstration locale courte sur des scènes de MISE AU POINT (indices 5000+, jamais évaluées)
-  aggregate : agrège les runs AWS `deeprp` → results/deep_robust_primitive_summary.json
-  report    : imprime les tableaux
+  smoke     : short local demonstration on TUNING scenes (indices 5000+, never evaluated)
+  aggregate : aggregates the AWS `deeprp` runs → results/deep_robust_primitive_summary.json
+  report    : prints the tables
 """
 from __future__ import annotations
 
@@ -23,7 +23,7 @@ def _mean(xs):
 
 
 def paired_ci(a, b, n_boot=4000, seed=0):
-    """Différence moyenne appariée b − a et IC bootstrap à 95 % (rééchantillonnage des unités appariées)."""
+    """Mean paired difference b − a and 95% bootstrap CI (resampling of the paired units)."""
     d = [float(y) - float(x) for x, y in zip(a, b) if x is not None and y is not None]
     if len(d) < 3: return None
     rng = random.Random(seed); n = len(d); bs = sorted(sum(d[rng.randrange(n)] for _ in range(n)) / n for _ in range(n_boot))
@@ -45,7 +45,7 @@ ATOMIC_KEYS = ("exact", "functional", "equivalence", "component_recall", "precis
 def summarize(rows, bad=0):
     from core.deep_robust_prim import AUDIT_CLASSES, BEST, REFERENCE
     S = {"n_rows": len(rows), "units_in_error": bad}
-    # ---- banc atomique
+    # ---- atomic bench
     at = [r for r in rows if r["experiment"] == "atomic" and not r.get("unavailable")]; methods = sorted({r["method"] for r in at}); S["atomic"] = {}; S["atomic_by_category"] = {}; S["by_type"] = {}; S["paired_vs_reference"] = {}
     by = {m: {r["scene"]: r for r in at if r["method"] == m} for m in methods}
     for m in methods:
@@ -66,12 +66,12 @@ def summarize(rows, bad=0):
         fp = [r for r in au if r["method"] == m and r["kind"] == "false_positive"]; ns = len({r["scene"] for r in au if r["method"] == m})
         S["audit_false_positives"][m] = {"per_scene": round(len(fp) / max(1, ns), 3), "near_true_share": _mean(r["near_true"] for r in fp), "by_type": dict(Counter(r["type"] for r in fp))}
         S["audit_reject_reasons"][m] = dict(Counter(r["reason"] for r in comp if r["class"] == "rejected"))
-    # ---- validateur
+    # ---- validator
     va = [r for r in rows if r["experiment"] == "validator"]; S["validator"] = {}
     for v in sorted({r["validator"] for r in va}):
         x = [r for r in va if r["validator"] == v]; ta, fa, tr, fr = (sum(r[k] for r in x) for k in ("TA", "FA", "TR", "FR"))
         S["validator"][v] = {"TA": ta, "FA": fa, "TR": tr, "FR": fr, "true_accept_rate": round(ta / max(1, ta + fr), 4), "false_accept_rate": round(fa / max(1, fa + tr), 4), "accept_precision": round(ta / max(1, ta + fa), 4), "seconds": _mean(r["seconds"] for r in x)}
-    # ---- diversité
+    # ---- diversity
     dv = [r for r in rows if r["experiment"] == "diversity"]; names = sorted({r["proposer"] for r in dv}); hits = {p: {(r["scene"], i) for r in dv if r["proposer"] == p for i in r["hits"]} for p in names}
     total = sum(r["n_true"] for r in dv if r["proposer"] == names[0]) if names else 0; allh = set().union(*hits.values()) if hits else set(); S["diversity"] = {"n_true_components": total, "union_recall": round(len(allh) / max(1, total), 4), "proposers": {}, "jaccard": {}}
     for p in names:
@@ -80,9 +80,9 @@ def summarize(rows, bad=0):
                                           "seconds": _mean(r["seconds"] for r in x)}
         for q in names:
             if p < q: S["diversity"]["jaccard"][f"{p}~{q}"] = round(len(hits[p] & hits[q]) / max(1, len(hits[p] | hits[q])), 3)
-    # ---- mesures actives
+    # ---- active measurements
     ac = [r for r in rows if r["experiment"] == "active"]; S["active"] = {m: {"n": sum(r["method"] == m for r in ac), **{k: _mean(r[k] for r in ac if r["method"] == m) for k in ("equivalence", "component_recall", "precision", "exact")}} for m in sorted({r["method"] for r in ac})}
-    # ---- chaîne aval
+    # ---- downstream chain
     ch = [r for r in rows if r["experiment"] == "chain"]; S["chain"] = {}; S["chain_by_depth"] = {}; S["chain_paired"] = {}; C = ("primitive_equivalence", "primitive_exact", "component_recall", "primitive_precision", "n_literals", "candidate_functional", "candidate_best", "final_functional", "final_095", "final_full", "atoms", "fit_equivalents", "seconds")
     arms = sorted({(r["source"], r["policy"]) for r in ch}); cb = {a: {r["task_id"]: r for r in ch if (r["source"], r["policy"]) == a} for a in arms}
     for s, p in arms:
@@ -95,42 +95,42 @@ def summarize(rows, bad=0):
 
 
 def aggregate():
-    rows, bad = load_rows(); S = summarize(rows, bad); json.dump(S, open(SUMMARY, "w"), indent=1); print("lignes", len(rows), "unités en erreur", bad); return S
+    rows, bad = load_rows(); S = summarize(rows, bad); json.dump(S, open(SUMMARY, "w"), indent=1); print("rows", len(rows), "units in error", bad); return S
 
 
 def _fmt(v): return "—" if v is None else f"{v:.2f}" if isinstance(v, float) else str(v)
 
 
 def show(S):
-    print("\nBANC ATOMIQUE"); K = ("n", "exact", "equivalence", "component_recall", "precision", "false_positives", "retained", "joint", "compactness", "proposals", "fit_equivalents", "seconds")
-    print("bras".ljust(20) + " ".join(k[:10].rjust(11) for k in K))
+    print("\nATOMIC BENCH"); K = ("n", "exact", "equivalence", "component_recall", "precision", "false_positives", "retained", "joint", "compactness", "proposals", "fit_equivalents", "seconds")
+    print("arm".ljust(20) + " ".join(k[:10].rjust(11) for k in K))
     for m, v in S["atomic"].items(): print(m.ljust(20) + " ".join(_fmt(v[k]).rjust(11) for k in K))
-    print("\ndifférences appariées contre la référence (gradient direct), IC 95 %")
+    print("\npaired differences against the reference (direct gradient), 95% CI")
     for m, v in S["paired_vs_reference"].items(): print(m.ljust(20), {k: (x["diff"], x["ci95"]) if x else None for k, x in v.items() if k in ("equivalence", "precision", "false_positives")})
-    print("\npar type d'atome (exact / équivalence / composantes)")
+    print("\nby atom type (exact / equivalence / components)")
     for m, v in S["by_type"].items():
         if m in ("gradient", "union_rv", "union_joint", "union_old"): print(m.ljust(14), {t: (x["n"], x["exact"], x["equivalence"], x["component_recall"]) for t, x in v.items()})
-    print("\npar catégorie (équivalence / précision)")
+    print("\nby category (equivalence / precision)")
     for k, v in S["atomic_by_category"].items():
         if k.split("/")[1] in ("gradient", "union_joint"): print(k.ljust(26), v["equivalence"], v["precision"], v["false_positives"])
-    print("\nAUDIT (part des composantes de frontière vraies)")
+    print("\nAUDIT (share of the true boundary components)")
     for m, v in S["audit"].items():
         for t, x in v.items(): print(f"{m}/{t}".ljust(28), x)
-        print("  faux positifs", S["audit_false_positives"][m], "| motifs de rejet", S["audit_reject_reasons"][m])
-    print("\nVALIDATEUR (même vivier)"); [print(k.ljust(14), v) for k, v in S["validator"].items()]
-    print("\nDIVERSITÉ", {k: S["diversity"][k] for k in ("n_true_components", "union_recall")}); [print(k.ljust(14), v) for k, v in S["diversity"]["proposers"].items()]; print("Jaccard", S["diversity"]["jaccard"])
-    print("\nMESURES ACTIVES"); [print(k.ljust(18), v) for k, v in S["active"].items()]
-    print("\nCHAÎNE AVAL"); K = ("n", "primitive_equivalence", "component_recall", "primitive_precision", "n_literals", "candidate_functional", "final_095", "final_functional", "final_full", "fit_equivalents", "seconds")
+        print("  false positives", S["audit_false_positives"][m], "| rejection reasons", S["audit_reject_reasons"][m])
+    print("\nVALIDATOR (same pool)"); [print(k.ljust(14), v) for k, v in S["validator"].items()]
+    print("\nDIVERSITY", {k: S["diversity"][k] for k in ("n_true_components", "union_recall")}); [print(k.ljust(14), v) for k, v in S["diversity"]["proposers"].items()]; print("Jaccard", S["diversity"]["jaccard"])
+    print("\nACTIVE MEASUREMENTS"); [print(k.ljust(18), v) for k, v in S["active"].items()]
+    print("\nDOWNSTREAM CHAIN"); K = ("n", "primitive_equivalence", "component_recall", "primitive_precision", "n_literals", "candidate_functional", "final_095", "final_functional", "final_full", "fit_equivalents", "seconds")
     for k, v in S["chain"].items(): print(k.ljust(30), {x: v[x] for x in K})
     for k, v in S["chain_paired"].items(): print(k.ljust(52), {x: (y["diff"], y["ci95"]) if y else None for x, y in v.items()})
-    print("\npar profondeur"); [print(k.ljust(34), v) for k, v in S["chain_by_depth"].items()]
+    print("\nby depth"); [print(k.ljust(34), v) for k, v in S["chain_by_depth"].items()]
 
 
 def report(): show(json.load(open(SUMMARY)))
 
 
 def smoke():
-    """Démonstration locale courte (scènes de mise au point uniquement) : vérifie que la chaîne tourne de bout en bout."""
+    """Short local demonstration (tuning scenes only): checks that the chain runs end to end."""
     from core.deep_primitive_world import CATEGORIES
     from core.deep_robust_prim import BEST, REFERENCE, active, arm_row, audit, diversity, scene_at, validator_study
     n = int(os.environ.get("RP_SMOKE_SCENES", "1")); arms = os.environ.get("RP_SMOKE_ARMS", f"{REFERENCE},gradient_rv,ransac_rv,ransac_local_rv,union_rv,{BEST},union_all_joint,union_old,union_holdout,union_pairsplit").split(","); rows = []
@@ -143,7 +143,7 @@ def smoke():
 
 
 def diagnose():
-    """Mise au point (scènes 5000+) : pour chaque composante de frontière vraie, où se perd-elle ?"""
+    """Tuning (scenes 5000+): for each true boundary component, where does it get lost?"""
     import torch
     from core.deep_fit import DT, FitCounter
     from core.deep_primitive_eval import component_match, components
@@ -171,8 +171,8 @@ def diagnose():
 
 
 def tune():
-    """Réglage des seuils du validateur sur les scènes de MISE AU POINT (5000+). Critère fixé d'avance : moyenne
-    harmonique de l'équivalence et de la précision. Écrit results/deep_configs/robust_validator.json."""
+    """Tuning of the validator thresholds on the TUNING scenes (5000+). Criterion fixed in advance: harmonic
+    mean of the equivalence and of the precision. Writes results/deep_configs/robust_validator.json."""
     import itertools
     from core.deep_primitive_world import CATEGORIES
     from core.deep_primitives2 import CONFIG_FILE
@@ -182,15 +182,15 @@ def tune():
     from core.deep_robust_prim import ARMS, proposer
     nulls = {}
     for mode in ("points", "none"):
-        nz = sorted(null_max_z(proposer(ARMS[BEST][0]), trials=20, split=mode)); floor = round(nz[-2], 2); nulls[mode] = {"null_max_z": nz, "z_floor": floor}; print(mode, "contraste maximal sur étiquettes aléatoires :", [round(v, 2) for v in nz], "→ plancher (2ᵉ plus grand sur 20)", floor, flush=True)
+        nz = sorted(null_max_z(proposer(ARMS[BEST][0]), trials=20, split=mode)); floor = round(nz[-2], 2); nulls[mode] = {"null_max_z": nz, "z_floor": floor}; print(mode, "maximum contrast on random labels:", [round(v, 2) for v in nz], "→ floor (2nd largest out of 20)", floor, flush=True)
         for z, sup, pur, seg in itertools.product((floor, floor + 1.5), (5, 8), (0.55, 0.65), (2, 3)):
             cfg = {"split": mode, "z_oos": z, "min_support": sup, "min_purity": pur, "min_segments": seg, "prune_z": 3.0}; rows = [arm_row(sc, BEST, j, cfg) for sc, j in scenes]; e = _mean(r["equivalence"] for r in rows); p = _mean(r["precision"] if r["precision"] is not None else 0.0 for r in rows)
             res.append({"config": cfg, "equivalence": e, "precision": p, "false_positives": _mean(r["false_positives"] for r in rows), "score": round(2 * e * p / max(1e-9, e + p), 4)}); print(res[-1], flush=True)
-    best = max(res, key=lambda r: r["score"]); json.dump({"config": best["config"], "null_calibration": nulls, "selected_on": f"{len(scenes)} scènes de mise au point (indices 5000+)", "criterion": "moyenne harmonique équivalence / précision", "tuning": best, "grid": res}, open(CONFIG_FILE, "w"), indent=1); print("RETENU", best)
+    best = max(res, key=lambda r: r["score"]); json.dump({"config": best["config"], "null_calibration": nulls, "selected_on": f"{len(scenes)} tuning scenes (indices 5000+)", "criterion": "harmonic mean equivalence / precision", "tuning": best, "grid": res}, open(CONFIG_FILE, "w"), indent=1); print("SELECTED", best)
 
 
 def chain_smoke():
-    """Démonstration locale courte de la chaîne aval sur UNE tâche de mise au point (clé 499, hors évaluation)."""
+    """Short local demonstration of the downstream chain on ONE tuning task (key 499, outside evaluation)."""
     from core.deep_experiments import down_task
     from core.deep_robust_prim import CHAIN_ARMS, chain
     t = down_task(499, int(os.environ.get("RP_DEPTH", "3")), "standard")
@@ -198,16 +198,16 @@ def chain_smoke():
 
 
 def inspect():
-    """Mise au point : primitives retenues contre atomes vrais, scène par scène."""
+    """Tuning: retained primitives against true atoms, scene by scene."""
     from core.deep_primitive_eval import component_match, components
     from core.deep_primitives2 import discover_robust, load_config
     from core.deep_robust_prim import BEST, ARMS, proposer, scene_at, validator
     R = lambda cs: [tuple(round(v, 2) if isinstance(v, float) else v for v in c) for c in cs]
     for cat in os.environ.get("RP_CATS", "two,multi,noise").split(","):
         for j in range(int(os.environ.get("RP_SMOKE_SCENES", "2"))):
-            sc = scene_at(j, cat, tune=True); tc = [c for a in sc.atoms for c in components(a)]; cf = load_config(); d = discover_robust(sc.task.X, sc.task.y, proposer(ARMS[BEST][0]), validator(ARMS[BEST][1], cf), seed=j, joint=True, prune_z=cf["prune_z"], split=cf["split"]); print(f"\n{cat} {j} VRAI", R(tc))
+            sc = scene_at(j, cat, tune=True); tc = [c for a in sc.atoms for c in components(a)]; cf = load_config(); d = discover_robust(sc.task.X, sc.task.y, proposer(ARMS[BEST][0]), validator(ARMS[BEST][1], cf), seed=j, joint=True, prune_z=cf["prune_z"], split=cf["split"]); print(f"\n{cat} {j} TRUE", R(tc))
             for l in d.candidates:
-                if l["kept"]: cs = components(l["program"]); print("   ", "OK " if all(any(component_match(c, t) for t in tc) for c in cs) else "FP ", R(cs), l["source"], "tour", l["round"], "z_in %.1f z_oos %.1f pur %.2f sup %.0f seg %s" % (l["z_in"], l["z_oos"], l["purity"], l["support"], l["segments"]), l["reason"])
+                if l["kept"]: cs = components(l["program"]); print("   ", "OK " if all(any(component_match(c, t) for t in tc) for c in cs) else "FP ", R(cs), l["source"], "round", l["round"], "z_in %.1f z_oos %.1f pur %.2f sup %.0f seg %s" % (l["z_in"], l["z_oos"], l["purity"], l["support"], l["segments"]), l["reason"])
 
 
 if __name__ == "__main__":

@@ -1,8 +1,8 @@
-"""Agent de mesure dans le monde temporel : croyances temporelles + ensemble compatible pour l'identité +
-planificateur de mesures actives (gain d'information / coût / perturbation / arrêt). Six systèmes comparés.
+"""Measurement agent in the temporal world: temporal beliefs + compatible set for identity +
+active measurement planner (information gain / cost / disturbance / stopping). Six systems compared.
 
-L'agent n'accède JAMAIS à la vérité : les mesures actives passent par LatentWorldState (simulateur) qui compte
-toute lecture directe par l'agent (NO_HIDDEN_TRUTH_ACCESS).
+The agent NEVER accesses the truth: active measurements go through LatentWorldState (simulator), which counts
+every direct read by the agent (NO_HIDDEN_TRUTH_ACCESS).
 """
 from __future__ import annotations
 
@@ -26,13 +26,13 @@ SYSTEMS_M = ("last_observation", "static", "temporal", "temporal_passive", "temp
 COLOR_LIST = list(COLORS)
 HEIGHT_GRID = [0.0, 0.5, 1.0, 1.5, 2.0, 2.5]
 REGIONS = ["high", "low"]
-COMMIT = 0.9                 # seuil de RÉPONSE (sur la confiance calibrée)
-STOP_CONFIDENCE = 0.99       # règle d'ARRÊT des mesures (vérifier tant que l'utilité reste positive)
-WRONG_COST, ABSTAIN_COST = 20.0, 8.0     # coût d'abstention choisi sur la VALIDATION (succès max. sous 3 % de faux confiants)
+COMMIT = 0.9                 # ANSWER threshold (on the calibrated confidence)
+STOP_CONFIDENCE = 0.99       # STOPPING rule of the measurements (keep checking as long as the utility remains positive)
+WRONG_COST, ABSTAIN_COST = 20.0, 8.0     # abstention cost chosen on VALIDATION (max. success under 3 % false confident)
 NOMINAL = {"camera": 0.9, "color_cam": 0.95, "scale": 0.9, "camera_event": 0.85, "alice": 0.7, "bob": 0.7, "doc": 0.7}
 
 
-# ================================================================ entraînement (épisodes d'ENTRAÎNEMENT seulement)
+# ================================================================ training (TRAINING episodes only)
 
 def fit_training(episodes):
     trajs = []
@@ -62,10 +62,10 @@ def fit_training(episodes):
     return hz, rel
 
 
-# ================================================================ opérateur grossier (résolution : région)
+# ================================================================ coarse operator (resolution: region)
 
 class RegionOperator(MeasurementOperator):
-    """Position GROSSIÈRE : l'issue est une région (haut / bas) — résolution ≠ incertitude."""
+    """COARSE position: the outcome is a region (high / low) — resolution ≠ uncertainty."""
 
     def outcomes(self, grid=None): return list(REGIONS)
 
@@ -81,7 +81,7 @@ class RegionOperator(MeasurementOperator):
 
 
 class WeighOperator(MeasurementOperator):
-    """Pesée : informe sur la hauteur via la position, mais DESTRUCTIVE (l'objet est posé au sol)."""
+    """Weighing: informs about the height via the position, but DESTRUCTIVE (the object is put on the floor)."""
 
     def outcomes(self, grid=None): return list(HEIGHT_GRID)
 
@@ -97,7 +97,7 @@ class WeighOperator(MeasurementOperator):
 
 
 def _nearest_height_reliability(sigma, resolution):
-    """P(la lecture arrondie à la grille de 0,5 désigne la vraie hauteur) : bruit ET résolution (distincts)."""
+    """P(the reading rounded to the 0.5 grid denotes the true height): noise AND resolution (distinct)."""
     s = math.sqrt(sigma ** 2 + resolution ** 2 / 12.0)
     if s <= 0: return 0.99
     return min(0.99, math.erf(0.25 / (s * math.sqrt(2))))
@@ -110,17 +110,17 @@ class MeasurementAgent:
         self.system, self.hz, self.policy = system, hz, policy
         self.learned = system == "full_algebra"
         self.calibrators = calibrators if system == "full_algebra" else None
-        self.min_attribution = 0.9 if system == "full_algebra" else 0.0      # attribution prudente des témoignages
+        self.min_attribution = 0.9 if system == "full_algebra" else 0.0      # cautious attribution of testimonies
         self.rel = rel
         self.rng = random.Random(seed)
         self.graph = graph if graph is not None else new_graph(f"agent-{system}")
         self.stats = Counter()
-        self.value_model = None          # MeasurementValueLearner (politiques learned / hybrid)
-        self.collector = None            # liste : collecte (ENTRAÎNEMENT seulement) des valeurs réalisées des mesures
-        self._label = None               # vérité de la variable-réponse (ENTRAÎNEMENT seulement, pour l'étiquetage)
+        self.value_model = None          # MeasurementValueLearner (learned / hybrid policies)
+        self.collector = None            # list: collection (TRAINING only) of the realised values of the measurements
+        self._label = None               # truth of the answer variable (TRAINING only, for labelling)
 
     def r(self, source, key="loc"):
-        """Fiabilité utilisée : apprise et PRUDENTE (borne basse crédible) pour l'algèbre complète ; nominale sinon."""
+        """Reliability used: learned and CAUTIOUS (credible lower bound) for the full algebra; nominal otherwise."""
         if self.learned: return min(self.rel.effective(source, key, mode="lower") if hasattr(self.rel, "effective") else self.rel.estimate_for(source, key), 0.99)
         return NOMINAL.get(source, 0.7)
 
@@ -153,7 +153,7 @@ class MeasurementAgent:
                 if p is None: continue
                 w = self.identity_weights(p.description, ob["t"])
                 if self.min_attribution and (not w or max(w.values()) < self.min_attribution):
-                    self.stats["unattributed"] += 1; continue                 # identité incertaine : pas de répartition
+                    self.stats["unattributed"] += 1; continue                 # uncertain identity: no apportioning
                 if p.kind == "event":
                     for o, wo in w.items():
                         if wo > 0.01: self.loc[o].event(ob["t"], p.value, "camera_event", wo * self.r("camera_event"))
@@ -174,7 +174,7 @@ class MeasurementAgent:
         if (o, a) not in self.last or self.last[(o, a)][0] <= t: self.last[(o, a)] = (t, v, r)
         self.votes[(o, a)][v] += math.log(max(r, 0.01) * 4 / max(1 - r, 0.01))
 
-    # ---- identité ------------------------------------------------------------------------------
+    # ---- identity ------------------------------------------------------------------------------
     def candidates(self, desc):
         return [o for o, t in self.types.items() if desc.type is None or t == desc.type]
 
@@ -191,7 +191,7 @@ class MeasurementAgent:
         w = w / w.sum()
         return {o: float(x) for o, x in zip(cands, w)}
 
-    # ---- distributions par système ----------------------------------------------------------------
+    # ---- distributions per system ----------------------------------------------------------------
     def loc_dist(self, o, t, now):
         if self.system == "last_observation":
             past = [(tt, v, r) for (oo, a), (tt, v, r) in self.last.items() if oo == o and a == "loc" and tt <= t]
@@ -203,7 +203,7 @@ class MeasurementAgent:
             return {s: (math.exp(sc[s]) if s in sc else 1.0) / z for s in SUPPORTS}
         return self.loc[o].current(t) if t == now else self.loc[o].historical(t, now)
 
-    # ---- ensemble compatible pour une question ----------------------------------------------------
+    # ---- compatible set for a question ----------------------------------------------------
     def ensemble(self, intent, desc, cands, t):
         dom = {}
         for o in cands:
@@ -214,14 +214,14 @@ class MeasurementAgent:
             lw += torch.log(self.color[o].clamp_min(1e-12))[S.column((o, "color"))]
             ld = self.loc_dist(o, t, self.T)
             lw += torch.log(torch.tensor([ld[s] for s in SUPPORTS], dtype=torch.float64).clamp_min(1e-12))[S.column((o, "loc"))]
-        # référent (présupposition : exactement un candidat satisfait la description)
+        # referent (presupposition: exactly one candidate satisfies the description)
         if intent == "color_of_relational":
             match = torch.stack([S.column((o, "loc")) == SUPPORTS.index(desc.support) for o in cands], 1)
         elif desc.color is not None:
             match = torch.stack([S.column((o, "color")) == COLOR_LIST.index(desc.color) for o in cands], 1)
         else:
             match = torch.ones(len(S), len(cands), dtype=torch.bool) if len(cands) == 1 else None
-        if match is None:                                                     # type seul, plusieurs candidats : référent indéterminé
+        if match is None:                                                     # type alone, several candidates: undetermined referent
             ref = torch.full((len(S),), -1)
             ok = torch.zeros(len(S), dtype=torch.bool)
         else:
@@ -240,8 +240,8 @@ class MeasurementAgent:
         return S
 
     def operators(self, cands, intent=None):
-        """Mesures admissibles : une mesure PRÉSENTE n'observe pas le passé — pour une question datée, seules les
-        mesures d'IDENTITÉ (propriétés statiques : couleur) sont admissibles."""
+        """Admissible measurements: a PRESENT measurement does not observe the past — for a dated question, only the
+        IDENTITY measurements (static properties: colour) are admissible."""
         ops = []
         for o in cands:
             name, (attr, cost, r, dist) = "color", ACTIVE_MENU["color"]
@@ -272,13 +272,13 @@ class MeasurementAgent:
         return float(cal(p)) if cal is not None else p
 
     def measure_loop(self, S, cands, max_steps=4, intent=None):
-        """Boucle scientifique : hypothèses -> choisir une mesure -> observer -> conditionner -> recommencer / arrêter."""
+        """Scientific loop: hypotheses -> choose a measurement -> observe -> condition -> repeat / stop."""
         if self.system in ("temporal", "static", "last_observation"): return S, 0, 0.0, [], 0
         world = self.latent()
         policy = "fixed" if self.system == "temporal_passive" else self.policy
         planner = MeasurementPlanner(policy=policy, confidence=(1.01 if self.calibrators is not None else COMMIT), budget=2.0, seed=self.rng.randrange(10 ** 6),
                                      graph=self.graph, value_of_information=2.0)
-        if self.system == "full_algebra":                                    # utilité = valeur décisionnelle − coût
+        if self.system == "full_algebra":                                    # utility = decision value − cost
             planner.decision_costs = (WRONG_COST, ABSTAIN_COST)
             planner.calibrate = (lambda p, _i=intent: self.calibrated(_i, p))
         planner.value_model = self.value_model; planner.context = {"intent": intent}
@@ -286,7 +286,7 @@ class MeasurementAgent:
         target = ("ans", "value")
         while n < max_steps:
             ops = self.operators(cands, intent)
-            if self.calibrators is not None and max(S.marginal(target).values()) >= STOP_CONFIDENCE: break     # arrêt ≠ seuil de réponse
+            if self.calibrators is not None and max(S.marginal(target).values()) >= STOP_CONFIDENCE: break     # stopping ≠ answer threshold
             if self.system == "temporal_passive":
                 if n >= 2: break
                 ops = [op for op in ops if op.context.disturbance == PASSIVE]
@@ -311,14 +311,14 @@ class MeasurementAgent:
         return S.condition(rec)
 
     def realized_loss(self, S, target, intent):
-        """Perte décisionnelle RÉALISÉE (vérité connue : ENTRAÎNEMENT seulement)."""
+        """REALISED decision loss (truth known: TRAINING only)."""
         m = S.marginal(target); v, raw = max(m.items(), key=lambda kv: kv[1]); p = self.calibrated(intent, raw)
         if p < COMMIT: return ABSTAIN_COST
         return 0.0 if v == self._label else WRONG_COST
 
     def _collect(self, S, ops, target, intent, world):
-        """Pour CHAQUE mesure candidate : simuler la mesure sur une copie du monde latent (entraînement) et
-        enregistrer (caractéristiques, valeur réalisée = perte avant − perte après)."""
+        """For EACH candidate measurement: simulate the measurement on a copy of the latent world (training) and
+        record (features, realised value = loss before − loss after)."""
         from core.measurement import decision_value
         before = self.realized_loss(S, target, intent)
         for op in ops:
@@ -335,7 +335,7 @@ class MeasurementAgent:
         from core.measurement_value import features
         return features(S, op, target, ig, dv, {"intent": intent})
 
-    # ---- réponses -----------------------------------------------------------------------------------
+    # ---- answers -----------------------------------------------------------------------------------
     def answer(self, q):
         pq = parse_question(q["text"])
         if pq is None: return {"answer": None, "p": 0.0, "n": 0, "cost": 0.0, "steps": [], "destructive": 0}
@@ -347,7 +347,7 @@ class MeasurementAgent:
         if not cands: return {"answer": None, "p": 0.0, "n": 0, "cost": 0.0, "steps": [], "destructive": 0}
         S = self.ensemble(intent, desc, cands, t)
         n, cost, steps, destr = 0, 0.0, [], 0
-        if self.collector is not None and "truth" in q:          # étiquette (ENTRAÎNEMENT seulement)
+        if self.collector is not None and "truth" in q:          # label (TRAINING only)
             tr = self.ep["_truth"]
             self._label = tr["trajectories"][q["entity"]]["loc"][self.T] if intent == "height_now" and "entity" in q else q["truth"]
         if intent in ("where_now", "height_now", "color_of_relational") or (intent == "where_at" and desc.color is not None):
@@ -364,7 +364,7 @@ class MeasurementAgent:
                 if jd is None:
                     last = self.last.get((o, "height"))
                     jd = {h: (last[2] if last and h == last[1] else ((1 - last[2]) / 5 if last else 1 / 6)) for h in HEIGHT_GRID}
-                # fusion : hauteur déduite de la position mesurée × modèle propre de la hauteur (produit d'experts)
+                # fusion: height deduced from the measured position × own model of the height (product of experts)
                 stack_p = 1 - (getattr(self.hz, "mod_prior", [0.95])[0])
                 for loc, pl in m.items():
                     for sv, ps in ((0.0, 1 - stack_p), (0.5, stack_p)):
@@ -392,11 +392,11 @@ class MeasurementAgent:
         return {"answer": v if p >= COMMIT else None, "p": p, "raw_p": raw, "best": v, "n": 0, "cost": 0.0, "steps": [], "destructive": 0}
 
 
-# ================================================================ évaluation
+# ================================================================ evaluation
 
 def fit_calibrators(train, hz, rel, passes=2):
-    """Calibrateurs isotones de la confiance des réponses, PAR TYPE, sur les épisodes d'ENTRAÎNEMENT (vérité connue).
-    Ajustés AVEC la politique finale (point fixe en `passes` passes) : sinon la calibration reflète une autre politique."""
+    """Isotonic calibrators of the confidence of the answers, PER TYPE, on the TRAINING episodes (truth known).
+    Fitted WITH the final policy (fixed point in `passes` passes): otherwise the calibration reflects another policy."""
     from core.unified import IsotonicCalibrator
     cals = {}
     for _ in range(passes):
@@ -452,8 +452,8 @@ def metrics(rows):
 
 def multi_seed(seeds=range(16), n_eval=15, policies=("random", "fixed", "most_reliable", "max_ig", "max_utility"),
                ablation_seeds=8, log=print):
-    """Entraînement UNE fois (taux, fiabilités, calibrateurs : épisodes d'entraînement) ; évaluation sur des graines
-    d'épisodes indépendantes ; ablation des politiques de mesure sur l'algèbre complète."""
+    """Training ONCE (rates, reliabilities, calibrators: training episodes); evaluation on independent episode
+    seeds; ablation of the measurement policies on the full algebra."""
     from core.grounded_benchmark import paired, summarize_values
     from core.measurement_world import train_episodes, eval_episodes
     train = train_episodes(30)

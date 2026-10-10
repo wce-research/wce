@@ -1,6 +1,6 @@
-"""Rapport du sous-jalon Downstream Selection Loss (dev, vrais atomes fournis ; jamais le lot scellé).
-  aggregate : runs AWS `deepdown` → results/deep_downstream_summary.json
-  report    : tableaux
+"""Report of the Downstream Selection Loss sub-milestone (dev, true atoms provided; never the sealed set).
+  aggregate : AWS `deepdown` runs → results/deep_downstream_summary.json
+  report    : tables
 """
 from __future__ import annotations
 
@@ -30,7 +30,7 @@ def load_rows():
 
 
 def calibration(conf, hit, bins=5):
-    """ECE, Brier et courbe de fiabilité de la confiance interne (masse de la structure retenue)."""
+    """ECE, Brier and reliability curve of the internal confidence (mass of the selected structure)."""
     n = len(conf)
     if not n: return {}
     rel = []; ece = 0.0
@@ -74,27 +74,27 @@ def aggregate():
         x = [r for r in rows if r["regime"] == reg]
         if x: S["overall"][reg] = block(x)
     if rows: S["overall"]["all"] = block(rows)
-    json.dump(S, open(os.path.join(OUT, "deep_downstream_summary.json"), "w"), indent=1); print("tâches", len(rows), "unités en erreur", bad); return S
+    json.dump(S, open(os.path.join(OUT, "deep_downstream_summary.json"), "w"), indent=1); print("tasks", len(rows), "units in error", bad); return S
 
 
 def report():
     S = json.load(open(os.path.join(OUT, "deep_downstream_summary.json"))); C = S["cells"]; keys = list(C)
-    print("\ncauses par cellule"); [print(k.ljust(14), C[k]["n"], C[k]["causes"]) for k in keys]
-    print("\nseuils (part des tâches dont l'accord final ≥ seuil) + exact / équivalent"); [print(k.ljust(14), C[k]["thresholds"], "exact", C[k]["final_exact"], "équiv", C[k]["final_equivalent"], "accord", C[k]["final_accord"]) for k in keys]
-    print("\ntrajectoire : part des tâches avec un candidat ≥ 0,99 à chaque étape"); print("".ljust(14) + " ".join(s[:9].rjust(10) for s in STAGES))
+    print("\ncauses per cell"); [print(k.ljust(14), C[k]["n"], C[k]["causes"]) for k in keys]
+    print("\nthresholds (share of the tasks whose final agreement ≥ threshold) + exact / equivalent"); [print(k.ljust(14), C[k]["thresholds"], "exact", C[k]["final_exact"], "equiv", C[k]["final_equivalent"], "agreement", C[k]["final_accord"]) for k in keys]
+    print("\ntrajectory: share of the tasks with a candidate ≥ 0.99 at each stage"); print("".ljust(14) + " ".join(s[:9].rjust(10) for s in STAGES))
     for k in keys: print(k.ljust(14) + " ".join(f"{C[k]['good_at_stage'][s]:.2f}".rjust(10) for s in STAGES))
-    print("\ntrajectoire : meilleur accord moyen par étape")
+    print("\ntrajectory: best mean agreement per stage")
     for k in keys: print(k.ljust(14) + " ".join(f"{C[k]['trajectory'][s]:.3f}".rjust(10) for s in STAGES))
-    print("\nétape où la bonne solution est perdue"); [print(k.ljust(14), C[k]["good_lost_at"], "détruite", C[k]["destroyed"]) for k in keys]
+    print("\nstage where the good solution is lost"); [print(k.ljust(14), C[k]["good_lost_at"], "destroyed", C[k]["destroyed"]) for k in keys]
     for name in ("polish", "simplification", "truth_fit", "fitter"):
-        print(f"\n{name}"); [print(k.ljust(14), C[k][name]) for k in keys + []]; print("TOUT".ljust(14), S["overall"]["all"][name])
-    print("\ncontrefactuels (part ≥ 0,99)"); [print(k.ljust(14), {c: v["ge_099"] for c, v in C[k]["counterfactual"].items()}, "| actuel", C[k]["thresholds"]["0.99"]) for k in keys]
-    print("TOUT".ljust(14), {c: (v["ge_099"], v["ge_097"], v["accord"]) for c, v in S["overall"]["all"]["counterfactual"].items()}, "| actuel", S["overall"]["all"]["thresholds"])
-    print("\nclassement oracle (tout)"); [print(s.ljust(22), v) for s, v in S["overall"]["all"]["oracle_ranking"].items()]
-    print("\nmeilleur disponible − retenu (tout)", S["overall"]["all"]["best_minus_selected"])
-    print("\ncalibration ≥0,99", S["overall"]["all"]["calibration"]); print("calibration ≥0,97", S["overall"]["all"]["calibration_097"])
-    print("\ncauses (tout)", S["overall"]["all"]["causes"], "| standard", S["overall"]["standard"]["causes"], "| riche", S["overall"]["rich"]["causes"])
-    print("divers (tout)", {k: S["overall"]["all"][k] for k in ("canonicalization_changed_behavior", "dedup_removed", "functional_not_equivalent", "good_candidate_generated", "good_candidate_is_top_prefit", "seconds", "fit_equivalents")})
+        print(f"\n{name}"); [print(k.ljust(14), C[k][name]) for k in keys + []]; print("ALL".ljust(14), S["overall"]["all"][name])
+    print("\ncounterfactuals (share ≥ 0.99)"); [print(k.ljust(14), {c: v["ge_099"] for c, v in C[k]["counterfactual"].items()}, "| current", C[k]["thresholds"]["0.99"]) for k in keys]
+    print("ALL".ljust(14), {c: (v["ge_099"], v["ge_097"], v["accord"]) for c, v in S["overall"]["all"]["counterfactual"].items()}, "| current", S["overall"]["all"]["thresholds"])
+    print("\noracle ranking (all)"); [print(s.ljust(22), v) for s, v in S["overall"]["all"]["oracle_ranking"].items()]
+    print("\nbest available − selected (all)", S["overall"]["all"]["best_minus_selected"])
+    print("\ncalibration ≥0.99", S["overall"]["all"]["calibration"]); print("calibration ≥0.97", S["overall"]["all"]["calibration_097"])
+    print("\ncauses (all)", S["overall"]["all"]["causes"], "| standard", S["overall"]["standard"]["causes"], "| rich", S["overall"]["rich"]["causes"])
+    print("misc (all)", {k: S["overall"]["all"][k] for k in ("canonicalization_changed_behavior", "dedup_removed", "functional_not_equivalent", "good_candidate_generated", "good_candidate_is_top_prefit", "seconds", "fit_equivalents")})
 
 
 if __name__ == "__main__":

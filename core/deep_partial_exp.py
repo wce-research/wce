@@ -1,14 +1,14 @@
-"""Expériences du sous-jalon Partial-Observation Primitive Parameter Inference — module d'ÉVALUATION (dev uniquement ;
-il voit la vérité, rien n'en revient au système ; jamais le lot scellé).
+"""Experiments of the Partial-Observation Primitive Parameter Inference sub-milestone — EVALUATION module (dev only;
+it sees the truth, nothing of it returns to the system; never the sealed set).
 
-  mask    : une primitive vraie, progressivement masquée (0 / 20 / 40 / 60 / 80 % de frontière cachée), avec ou sans bruit
-            → fraction visible → erreur par paramètre → récupération fonctionnelle, par méthode d'estimation
-  active  : mesures dirigées vers les paramètres contre mesures aléatoires
-  chain   : type connu → paramètres inférés → structure candidate → récupération finale ; matrice d'oracles partiels ;
-            top-k ; échange primitive ↔ composition
+  mask    : one true primitive, progressively occluded (0 / 20 / 40 / 60 / 80 % of boundary hidden), with or without noise
+            → visible fraction → error per parameter → functional recovery, per estimation method
+  active  : measurements directed at the parameters versus random measurements
+  chain   : known type → inferred parameters → candidate structure → final recovery; matrix of partial oracles;
+            top-k; primitive ↔ composition exchange
 
-Graines : sous-plage dédiée de la partition dev (base + 300 000 ; mise au point : + 350 000).
-Tâches de composition : clés 500+ de `down_task` (jamais utilisées ; mise au point : clé 599).
+Seeds: dedicated sub-range of the dev partition (base + 300 000; tuning: + 350 000).
+Composition tasks: keys 500+ of `down_task` (never used; tuning: key 599).
 """
 from __future__ import annotations
 
@@ -41,8 +41,8 @@ MAIN, BASELINE = "arc_visible", "global_contrast"
 class MaskedScene:
     X: torch.Tensor
     y: torch.Tensor
-    target: BNode                   # primitive vraie (évaluation seulement)
-    occluder: Optional[BNode]       # masque vrai (évaluation, et bras oracle `ctx_oracle`)
+    target: BNode                   # true primitive (evaluation only)
+    occluder: Optional[BNode]       # true mask (evaluation, and oracle arm `ctx_oracle`)
     program: BNode
     kind: str
     mask: float
@@ -51,8 +51,8 @@ class MaskedScene:
 
 
 def _occluder(T: BNode, kind: str, mask: float, rng: random.Random) -> Optional[BNode]:
-    """Masque qui cache une fraction `mask` de la frontière de T (dans la zone observée) : demi-plan pour les primitives
-    circulaires, disque pour les primitives rectilignes (le masque n'est jamais du même type géométrique que la cible)."""
+    """Mask that hides a fraction `mask` of the boundary of T (in the observed zone): half-plane for circular
+    primitives, disc for rectilinear primitives (the mask is never of the same geometric type as the target)."""
     B = render(T, n=200, box=BOX); th = rng.uniform(-math.pi, math.pi); i0 = rng.randrange(max(1, len(B)))
     if mask <= 0 or len(B) < 20: return None
     if kind in ("disc", "antidisc", "ring"):
@@ -61,8 +61,8 @@ def _occluder(T: BNode, kind: str, mask: float, rng: random.Random) -> Optional[
 
 
 def masked_scene(index: int, kind: str, mask: float, noise: float, n=300, tune=False) -> MaskedScene:
-    """Scène déterministe. La primitive et la direction du masque ne dépendent que de (index, type) : les niveaux de
-    masquage et de bruit sont donc APPARIÉS sur la même primitive."""
+    """Deterministic scene. The primitive and the direction of the mask depend only on (index, type): the levels of
+    occlusion and of noise are therefore PAIRED on the same primitive."""
     from core.deep_primitive_world import atom
     seed = (PO_TUNE if tune else PO_BASE) + int(index) * 131 + KINDS.index(kind) * 17; X = obs_region(n, torch.Generator().manual_seed(seed + 1))
     for attempt in range(200):
@@ -78,10 +78,10 @@ def true_visible_fraction(sc: MaskedScene) -> float:
     B = render(sc.target, n=200, box=BOX); return 1.0 if sc.occluder is None or not len(B) else float(predict(sc.occluder, B.float()).float().mean())
 
 
-# ================================================================ erreurs par paramètre
+# ================================================================ errors per parameter
 
 def param_errors(true: BNode, hyp: BNode) -> dict:
-    """Erreur absolue par paramètre géométrique nommé (indépendante de la polarité)."""
+    """Absolute error per named geometric parameter (independent of polarity)."""
     a, b = geometry(true), geometry(hyp)
     if a["kind"] != b["kind"]: return {}
     if a["kind"] == "circle":
@@ -109,10 +109,10 @@ def functional(true: BNode, hyp: BNode, P=None) -> float:
     P = _probe() if P is None else P; a = float((predict(true, P) == predict(hyp, P)).float().mean()); return max(a, 1 - a) if atom_name(true) == "dot.le" else a
 
 
-# ================================================================ méthodes d'estimation (type connu)
+# ================================================================ estimation methods (known type)
 
 def given_of(true: BNode, what: str) -> dict:
-    """Oracle PARTIEL : une seule famille de paramètres vrais est fournie."""
+    """PARTIAL oracle: a single family of true parameters is provided."""
     g = geometry(true)
     if what == "center": return {"center": g["center"]} if g["kind"] in ("circle", "sector") else {}
     if what == "orientation": return {"orientation": g["angle"]} if g["kind"] == "line" else {"orientation": g["direction"]} if g["kind"] == "sector" else {}
@@ -121,26 +121,26 @@ def given_of(true: BNode, what: str) -> dict:
 
 
 def estimate(sc: MaskedScene, method: str, seed=0, k=5):
-    """Renvoie (hypothèses classées [BNode], hypothèses évaluées, équivalents-ajustement, objets Hypothesis ou None)."""
+    """Returns (ranked hypotheses [BNode], hypotheses evaluated, fit-equivalents, Hypothesis objects or None)."""
     X, y = sc.X, sc.y; sk = sc.target.skeleton()
-    if method == "global_contrast":                                               # optimisation globale actuelle : contraste, initialisations génériques
+    if method == "global_contrast":                                               # current global optimisation: contrast, generic initialisations
         g = torch.Generator().manual_seed(seed + 31); pairs = close_pairs(X, y); th, obj = contrast_fit(sk, pairs, torch.stack([v.to(DT) for v in _inits(sk, X.float(), y.long(), 6, g)]), steps=60)
         return [sk.with_params(th[i].tolist()) for i in obj.argsort(descending=True).tolist()][:k], 6, 6 * 0.6, None
-    if method == "global_target":                                                 # gradient direct sur la cible
+    if method == "global_target":                                                 # direct gradient on the target
         d = FitData.build(X, y, 0.10); th, ll = fit_batch(sk, d, heuristic_inits(sk, d, 6, seed), steps=60); return [sk.with_params(th[i].tolist()) for i in ll.argsort(descending=True).tolist()][:k], 6, 6 * 0.6, None
     ob = observe(X, y)
     if method.startswith("arc_"):
         e = method[4:]; h = infer(sk, ob, k, score="visible" if e == "visible" else "global", joint=e in ("joint", "visible"), estimator=e if e in ("kasa", "taubin", "normals") else "geometric", seed=seed); return [x.program for x in h], len(h), 0.0, h
     if method.startswith("given_"):
         g = given_of(sc.target, method[6:]); h = infer(sk, ob, k, given=g, seed=seed) if g else []; return [x.program for x in h], len(h), 0.0, h
-    if method == "minimal_components":                                            # base minimale : les composantes seules, sans contrainte partagée
+    if method == "minimal_components":                                            # minimal basis: the components alone, without shared constraint
         base = BNode("pred", "dot", "le") if geometry(sc.target)["kind"] != "circle" else BNode("translate", children=(BNode("pred", "norm", "le"),)); h = infer(base, ob, k, seed=seed); return [x.program for x in h], len(h), 0.0, h
     h = infer(sk, ob, k, seed=seed); hp = [x.program for x in h]
     if not hp: return [], 0, 0.0, h
-    if method == "ctx_oracle":                                                    # contexte VRAI fourni : rendu contrefactuel de AND(hypothèse, masque vrai)
+    if method == "ctx_oracle":                                                    # TRUE context provided: counterfactual rendering of AND(hypothesis, true mask)
         return sorted(hp, key=lambda p: rendering_errors(p if sc.occluder is None else BNode("and", children=(p, sc.occluder)), X, y)), len(hp), 0.0, h
-    if method == "ctx_joint":                                                     # structure connue, masque INFÉRÉ : choix conjoint puis échange primitive ↔ composition
-        if sc.occluder is None: return sorted(hp, key=lambda p: rendering_errors(p, X, y)), len(hp), 0.0, h      # structure connue : la primitive seule
+    if method == "ctx_joint":                                                     # known structure, INFERRED mask: joint choice then primitive ↔ composition exchange
+        if sc.occluder is None: return sorted(hp, key=lambda p: rendering_errors(p, X, y)), len(hp), 0.0, h      # known structure: the primitive alone
         ho = [x.program for x in infer(sc.occluder.skeleton(), ob, k, seed=seed)]
         if not ho: return hp, len(hp), 0.0, h
         best, _, n = joint_select([hp, ho], BNode("and", children=(hp[0], ho[0])), X, y); ex = exchange(best, ob, {repr(sk): hp}); top = ex.program.children[0]
@@ -163,14 +163,14 @@ def mask_row(sc: MaskedScene, method: str, seed=0) -> dict:
             if g["kind"] == "circle": gh = geometry(h0.program); rr = min(g["radii"], key=lambda v: min(abs(v - q) for q in gh["radii"])); truth["r"] = rr
             if g["kind"] == "line": ta = g["angle"]; lo, hi = r.intervals["angle"]; ta = min((ta, ta + math.pi, ta - math.pi, ta + 2 * math.pi, ta - 2 * math.pi), key=lambda v: abs(v - (lo + hi) / 2)); truth = {"angle": ta}
             row.update({"region_covers": r.contains(**truth), "identifiability": ids, "widths": r.widths(), "posterior_sd": {k_: v[1] for k_, v in r.posterior.items()}, "sensitivity": r.sensitivity, "region_size": len(r.hypotheses)})
-    if method == MAIN and sc.kind == "sector":                                    # autopsie des secteurs
+    if method == MAIN and sc.kind == "sector":                                    # autopsy of the sectors
         pairs = close_pairs(sc.X, sc.y); cs = components(T); ob = observe(sc.X, sc.y); from core.deep_partial import line_components; ls = [("line", c.params[0], c.params[1]) for c in line_components(ob, seed=seed)]
         B = render(T, n=200, box=BOX); vis = predict(sc.occluder, B.float()).bool() if sc.occluder is not None else torch.ones(len(B), dtype=torch.bool); half = len(B) // 2
         row["sector"] = {"true_z": contrast(T, pairs, use_weight=False)["z"], "rays_found": sum(any(component_match(c, d) for d in ls) for c in cs), "ray_visible_length": [round(4.5 * float(vis[:half].float().mean()), 2), round(4.5 * float(vis[half:].float().mean()), 2)] if len(B) else [0, 0], "lines_proposed": len(ls)}
     return row
 
 
-# ================================================================ mesures actives pour les paramètres
+# ================================================================ active measurements for the parameters
 
 def active_row(sc: MaskedScene, policy: str, seed=0, budget=16) -> dict:
     X, y = sc.X, sc.y; g = torch.Generator().manual_seed(seed + 77); sk = sc.target.skeleton()
@@ -188,16 +188,16 @@ def active_row(sc: MaskedScene, policy: str, seed=0, budget=16) -> dict:
     r = mask_row(MaskedScene(X, y, sc.target, sc.occluder, sc.program, sc.kind, sc.mask, sc.noise, sc.seed), MAIN, seed); return {"method": f"active_{policy}", "kind": sc.kind, "mask": sc.mask, "queries": 0 if policy == "none" else budget, **{k: r.get(k) for k in ("recovered_1", "recovered_5", "functional_1", "errors")}}
 
 
-# ================================================================ chaîne aval : type connu → paramètres → structure → fonction
+# ================================================================ downstream chain: known type → parameters → structure → function
 
-# (nom, source des littéraux, k, oracle partiel, politique d'ajustement)
+# (name, source of the literals, k, partial oracle, fitting policy)
 CHAIN_ARMS = (("reference", "reference", 0, None, "always"), ("true", "true", 0, None, "always"), ("types_old", "true_types", 0, None, "always"), ("partial_old", "partial", 0, None, "always"), ("robust_none", "robust", 0, None, "always"),
               ("po_type_k1", "po", 1, None, "always"), ("po_type_k3", "po", 3, None, "always"), ("po_type_k5", "po", 5, None, "always"), ("po_center_k1", "po", 1, "center", "always"), ("po_orientation_k1", "po", 1, "orientation", "always"),
               ("po_size_k1", "po", 1, "size", "always"), ("po_type_k3_global", "po_global", 3, None, "always"), ("reference_validated", "reference", 0, None, "validated"), ("true_validated", "true", 0, None, "validated"), ("po_type_k3_validated", "po", 3, None, "validated"))
 
 
 def po_literals(task, k, what=None, score="visible", seed=0):
-    """Type de chaque feuille vraie fourni ; paramètres inférés depuis la frontière partiellement observée (top-k)."""
+    """Type of each true leaf provided; parameters inferred from the partially observed boundary (top-k)."""
     from core.deep_reachability import leaves
     ob = observe(task.X, task.y); out = []; per_leaf = []
     for a in leaves(task.world.truth):
@@ -227,7 +227,7 @@ def chain(task, arm: str, seed=0) -> dict:
         out = DeepSearch("factorized", budget=150.0, seed=seed, max_depth=depth, validated=E2E_POLICIES[policy], **kw).run(data); best = out.best().program; acc = [A(h.program) for h in out.all.values()]; best_acc = A(best); fe = out.stats["fit_equivalents"]
         pool = lits if lits is not None else [l for h in out.all.values() for l in leaves(h.program)]; alt = {}
         for p in pool: alt.setdefault(repr(p.skeleton()), []).append(p)
-        ex = exchange(best, observe(X, y), {s: v[:12] for s, v in alt.items()}); loop_acc = A(ex.program)                 # échange primitive ↔ composition, borné, validé par le rendu
+        ex = exchange(best, observe(X, y), {s: v[:12] for s, v in alt.items()}); loop_acc = A(ex.program)                 # primitive ↔ composition exchange, bounded, validated by the rendering
         if lits is None: lits = pool
     m = primitive_metrics(tl, lits, X, y, _probe()) if lits else {"equivalence": 0.0, "component_recall": 0.0, "precision": None}
     return {"experiment": "chain", "arm": arm, "primitive_equivalence": m["equivalence"], "component_recall": m["component_recall"], "primitive_precision": m["precision"], "n_literals": len(lits), "leaves": per_leaf,
@@ -235,7 +235,7 @@ def chain(task, arm: str, seed=0) -> dict:
             "loop_commits": sum(l["action"] == "commit" for l in ex.log) if ex else 0, "loop_evaluations": ex.evaluations if ex else 0, "loop_errors": [ex.errors_before, ex.errors_after] if ex else None, "fit_equivalents": fe, "seconds": round(time.time() - t0, 2)}
 
 
-# ================================================================ sous-unités AWS
+# ================================================================ AWS sub-units
 
 def subunits(key):
     from core.deep_experiments import DOWN_DEPTHS, GEN_REGIMES, _row, down_task

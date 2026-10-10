@@ -32,13 +32,13 @@ PREPOSITIONS = {
     "a",
 }
 
-# Mots de conjonction pour les vecteurs 2D
+# Conjunction words for 2D vectors
 CONJUNCTIONS = {
     "avec": "with",
     "et": "and",
 }
 
-# Mots de direction pour les axes
+# Direction words for the axes
 DIRECTIONS = {
     "horizontalement": "x",
     "vers": "direction",
@@ -77,8 +77,8 @@ def canonical(token: str) -> str:
 
 def _get_axis_sign(direction: str) -> tuple[str, float]:
     """
-    Convertit une direction en axe et signe.
-    Retourne (axis, sign) où axis est 'x' ou 'y' et sign est +1 ou -1.
+    Converts a direction into an axis and a sign.
+    Returns (axis, sign) where axis is 'x' or 'y' and sign is +1 or -1.
     """
     if direction in {"+x", "droite", "x"}:
         return ("x", +1)
@@ -89,13 +89,13 @@ def _get_axis_sign(direction: str) -> tuple[str, float]:
     elif direction in {"-y", "bas"}:
         return ("y", -1)
     else:
-        return ("y", +1)  # par défaut vertical positif
+        return ("y", +1)  # positive vertical by default
 
 
 def _parse_component(tokens: list[str], start_index: int) -> tuple[float, str, int]:
     """
-    Parse une composante de force/impulsion à partir des tokens.
-    Retourne (value, direction, next_index).
+    Parses a force/impulse component from the tokens.
+    Returns (value, direction, next_index).
     """
     canonical_tokens = [canonical(token) for token in tokens]
     index = start_index
@@ -115,7 +115,7 @@ def _parse_component(tokens: list[str], start_index: int) -> tuple[float, str, i
             index += 1
             continue
         
-        # Essayer de lire une valeur numérique
+        # Try to read a numeric value
         if value is None:
             try:
                 value = float(token)
@@ -124,13 +124,13 @@ def _parse_component(tokens: list[str], start_index: int) -> tuple[float, str, i
             except ValueError:
                 pass
         
-        # Lire l'unité
+        # Read the unit
         if unit is None and token in UNITS:
             unit = UNITS[token]
             index += 1
             continue
         
-        # Lire la direction
+        # Read the direction
         if token in DIRECTIONS:
             if token == "vers":
                 if index + 1 < len(canonical_tokens):
@@ -151,21 +151,21 @@ def _parse_component(tokens: list[str], start_index: int) -> tuple[float, str, i
                 index += 1
                 continue
         
-        # Si on a une valeur mais pas d'unité, on suppose que c'est la fin de la composante
+        # If we have a value but no unit, we assume it is the end of the component
         if value is not None:
             break
         
         index += 1
     
     if value is None:
-        raise ParseError(f"Valeur manquante pour la composante à {tokens[start_index]!r}")
+        raise ParseError(f"Missing value for the component at {tokens[start_index]!r}")
     
     if unit is None:
-        unit = "n"  # par défaut newton pour push/impulse
+        unit = "n"  # newton by default for push/impulse
     
-    # Normaliser la direction
+    # Normalise the direction
     if direction is None:
-        direction = "haut"  # par défaut vertical
+        direction = "haut"  # vertical by default
     
     return (value, direction, index)
 
@@ -174,7 +174,7 @@ def extract_intent(text: str) -> Intent:
     tokens = tokenize(text)
 
     if not tokens:
-        raise ParseError("Commande vide")
+        raise ParseError("Empty command")
 
     canonical_tokens = [
         canonical(token)
@@ -185,7 +185,7 @@ def extract_intent(text: str) -> Intent:
 
     if verb_token not in VERBS:
         raise ParseError(
-            f"Verbe inconnu : {tokens[0]!r}"
+            f"Unknown verb: {tokens[0]!r}"
         )
 
     action = VERBS[verb_token]
@@ -195,25 +195,25 @@ def extract_intent(text: str) -> Intent:
     unit = None
     direction = None
 
-    # Vérifier si c'est une phrase avec "avec ... et ..."
-    # Pattern : "Pousse la balle avec 10 N vers la droite et 5 N vers le haut"
+    # Check whether it is a sentence with "avec ... et ..."
+    # Pattern: "Pousse la balle avec 10 N vers la droite et 5 N vers le haut"
     if action in {"push", "impulse"}:
-        # Trouver l'index de "avec" si présent
+        # Find the index of "avec" if present
         try:
             with_index = canonical_tokens.index("avec")
         except ValueError:
             with_index = -1
         
         if with_index > 0:
-            # Parser comme phrase vectorielle
-            # Trouver l'index de "et"
+            # Parse as a vector sentence
+            # Find the index of "et"
             try:
                 and_index = canonical_tokens.index("et", with_index + 1)
             except ValueError:
                 and_index = -1
             
             if and_index > with_index:
-                # Parser les deux composantes
+                # Parse the two components
                 try:
                     value1, direction1, next_idx1 = _parse_component(
                         tokens, with_index + 1
@@ -225,31 +225,31 @@ def extract_intent(text: str) -> Intent:
                     axis1, sign1 = _get_axis_sign(direction1)
                     axis2, sign2 = _get_axis_sign(direction2)
                     
-                    # Créer l'Intent avec les composantes
+                    # Create the Intent with the components
                     intent = Intent(
                         action=action,
-                        entity=None,  # sera rempli ci-dessous
+                        entity=None,  # will be filled in below
                         quantity=None,
                         direction=None,
                     )
                     
-                    # Déterminer l'entité (devrait être avant "avec")
-                    # Parser l'entité entre le verbe et "avec"
+                    # Determine the entity (should be before "avec")
+                    # Parse the entity between the verb and "avec"
                     for i in range(1, with_index):
                         token = canonical_tokens[i]
                         if token not in ARTICLES and token not in PREPOSITIONS:
-                            entity = tokens[i]  # utiliser le token original
+                            entity = tokens[i]  # use the original token
                             break
                     
                     if entity is None:
-                        raise ParseError("Entité manquante")
+                        raise ParseError("Missing entity")
                     
                     intent.entity = entity
                     
-                    # Normaliser les unités (par défaut "n" pour force, "ns" pour impulsion)
+                    # Normalise the units ("n" by default for force, "ns" for impulse)
                     default_unit = "n" if action == "push" else "ns"
                     
-                    # Traiter la première composante
+                    # Process the first component
                     if axis1 == "x":
                         intent.force_x = value1 * sign1 if action == "push" else None
                         intent.impulse_x = value1 * sign1 if action == "impulse" else None
@@ -257,7 +257,7 @@ def extract_intent(text: str) -> Intent:
                         intent.force_y = value1 * sign1 if action == "push" else None
                         intent.impulse_y = value1 * sign1 if action == "impulse" else None
                     
-                    # Traiter la deuxième composante
+                    # Process the second component
                     if axis2 == "x":
                         intent.force_x = (intent.force_x or 0) + (value2 * sign2 if action == "push" else 0)
                         intent.impulse_x = (intent.impulse_x or 0) + (value2 * sign2 if action == "impulse" else 0)
@@ -267,7 +267,7 @@ def extract_intent(text: str) -> Intent:
                     
                     return intent
                 except (ValueError, IndexError):
-                    # Si le parsing vectoriel échoue, continuer avec l'ancien parsing
+                    # If the vector parsing fails, continue with the old parsing
                     pass
 
     index = 1
@@ -283,15 +283,15 @@ def extract_intent(text: str) -> Intent:
             index += 1
             continue
 
-        # Vérifier si c'est un mot de direction
+        # Check whether it is a direction word
         if token in DIRECTIONS:
-            # Cas spécial : "vers la droite" ou "vers la gauche"
+            # Special case: "vers la droite" or "vers la gauche"
             if token == "vers":
-                # Regarder le prochain token
+                # Look at the next token
                 if index + 1 < len(canonical_tokens):
                     next_token = canonical_tokens[index + 1]
                     if next_token in ARTICLES:
-                        # "vers la droite" ou "vers la gauche" ou "vers le haut" ou "vers le bas"
+                        # "vers la droite" or "vers la gauche" or "vers le haut" or "vers le bas"
                         if index + 2 < len(canonical_tokens):
                             direction_token = canonical_tokens[index + 2]
                             if direction_token in {"droite", "gauche", "haut", "bas"}:
@@ -330,11 +330,11 @@ def extract_intent(text: str) -> Intent:
             continue
 
         raise ParseError(
-            f"Élément non compris : {tokens[index]!r}"
+            f"Element not understood: {tokens[index]!r}"
         )
 
     if entity is None:
-        raise ParseError("Entité manquante")
+        raise ParseError("Missing entity")
 
     quantity = None
 
@@ -362,12 +362,12 @@ def compile_intent(intent: Intent):
     if intent.action == "lift":
         if intent.quantity is None:
             raise ParseError(
-                "Hauteur manquante pour l'action lift"
+                "Missing height for the lift action"
             )
 
         if intent.quantity.dimension != "length":
             raise ParseError(
-                "L'action lift attend une longueur"
+                "The lift action expects a length"
             )
 
         return LiftAction(
@@ -376,7 +376,7 @@ def compile_intent(intent: Intent):
         )
 
     if intent.action == "push":
-        # Si les composantes vectorielles sont déjà remplies, les utiliser
+        # If the vector components are already filled in, use them
         if intent.force_x is not None or intent.force_y is not None:
             return PushAction(
                 entity_name=intent.entity,
@@ -384,20 +384,20 @@ def compile_intent(intent: Intent):
                 force_x=intent.force_x or 0.0,
             )
         
-        # Sinon, utiliser l'ancienne méthode (une seule quantité)
+        # Otherwise, use the old method (a single quantity)
         if intent.quantity is None:
             raise ParseError(
-                "Force manquante pour l'action push"
+                "Missing force for the push action"
             )
 
         if intent.quantity.dimension != "force":
             raise ParseError(
-                "L'action push attend une force"
+                "The push action expects a force"
             )
 
         magnitude = intent.quantity.value
 
-        # Déterminer la direction
+        # Determine the direction
         if intent.direction in {"x", "horizontalement", "+x", "droite"}:
             return PushAction(
                 entity_name=intent.entity,
@@ -423,7 +423,7 @@ def compile_intent(intent: Intent):
                 force_y=-magnitude,
             )
         else:
-            # Par défaut : force verticale (comportement existant)
+            # By default: vertical force (existing behaviour)
             return PushAction(
                 entity_name=intent.entity,
                 force_y=magnitude,
@@ -431,7 +431,7 @@ def compile_intent(intent: Intent):
             )
 
     if intent.action == "impulse":
-        # Si les composantes vectorielles sont déjà remplies, les utiliser
+        # If the vector components are already filled in, use them
         if intent.impulse_x is not None or intent.impulse_y is not None:
             return ImpulseAction(
                 entity_name=intent.entity,
@@ -439,20 +439,20 @@ def compile_intent(intent: Intent):
                 impulse_x=intent.impulse_x or 0.0,
             )
         
-        # Sinon, utiliser l'ancienne méthode (une seule quantité)
+        # Otherwise, use the old method (a single quantity)
         if intent.quantity is None:
             raise ParseError(
-                "Impulsion manquante"
+                "Missing impulse"
             )
 
         if intent.quantity.dimension != "impulse":
             raise ParseError(
-                "L'action impulse attend une impulsion"
+                "The impulse action expects an impulse"
             )
 
         magnitude = intent.quantity.value
 
-        # Gérer la direction pour l'impulsion
+        # Handle the direction for the impulse
         if intent.direction in {"+x", "droite", "x"}:
             return ImpulseAction(
                 entity_name=intent.entity,
@@ -478,7 +478,7 @@ def compile_intent(intent: Intent):
                 impulse_y=-magnitude,
             )
         else:
-            # Par défaut : impulsion verticale
+            # By default: vertical impulse
             return ImpulseAction(
                 entity_name=intent.entity,
                 impulse_y=magnitude,
@@ -486,7 +486,7 @@ def compile_intent(intent: Intent):
             )
 
     raise ParseError(
-        f"Action inconnue : {intent.action!r}"
+        f"Unknown action: {intent.action!r}"
     )
 
 

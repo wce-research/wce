@@ -1,11 +1,11 @@
-"""Banc ADVERSARIAL des sources (bibliothèque standard seulement ; aucun composant de WCE).
+"""ADVERSARIAL bench for sources (standard library only; no WCE component).
 
-Chaque épisode : des faits (clé -> valeur), des sources au comportement caché, une phase d'HISTORIQUE étiquetée
-(la vérité est révélée : c'est le passé des sources) puis une phase de TEST non étiquetée, et des questions.
-Comportements : fiable qui ment parfois, mauvaise parfois juste, copieuse (corrélée), dérive, rare, conflit entre deux
-sources fiables, bonne sur les couleurs / mauvaise sur les positions, capteur d'ancrage.
-Référence (attendu) : postérieure IDÉALE avec les vraies fiabilités, la copieuse comptée une seule fois avec sa source ;
-valeur si ≥ 0,9 ET vraie, « conflit » si deux valeurs gardent chacune ≥ 0,2, sinon « ? ».
+Each episode: facts (key -> value), sources with hidden behaviour, a labelled HISTORY phase
+(the truth is revealed: it is the sources' past) then an unlabelled TEST phase, and questions.
+Behaviours: reliable that sometimes lies, bad that is sometimes right, copier (correlated), drift, rare, conflict between two
+reliable sources, good on colours / bad on positions, anchor sensor.
+Reference (expected): IDEAL posterior with the true reliabilities, the copier counted only once with its source;
+value if ≥ 0.9 AND true, "conflit" if two values each keep ≥ 0.2, otherwise "?".
 """
 from __future__ import annotations
 
@@ -45,7 +45,7 @@ def episode(seed, n_history=300, n_test=150):
             if "copies" in b: continue
             if rng.random() >= b["rate"]: continue
             if "r_by_key" in b: r = b["r_by_key"][kind]
-            elif "r_after" in b and (phase == "test" or t > 2 * n_history // 3): r = b["r_after"]     # dérive fin d'historique
+            elif "r_after" in b and (phase == "test" or t > 2 * n_history // 3): r = b["r_after"]     # drift at the end of the history
             else: r = b["r"]
             v = value if rng.random() < r else _corrupt(rng, kind, value)
             out.append({"source": name, "key": key, "kind": kind, "value": v, "t": t, "phase": phase})
@@ -62,7 +62,7 @@ def episode(seed, n_history=300, n_test=150):
     for i in range(n_test):
         kind, value = fact(); key = f"k{i}"; truth[key] = value
         emit("test", i, key, kind, value, claims)
-    # conflit contrôlé : deux sources fiables disent deux valeurs différentes, rien d'autre
+    # controlled conflict: two reliable sources state two different values, nothing else
     for j in range(10):
         kind = "color"; value = rng.choice(COLORS); key = f"c{j}"; truth[key] = value
         other = _corrupt(rng, kind, value)
@@ -75,7 +75,7 @@ def episode(seed, n_history=300, n_test=150):
 def _true_r(source, kind, t, n_test):
     b = BEHAVIORS[source]
     if "r_by_key" in b: return b["r_by_key"][kind]
-    if "r_after" in b: return b["r_after"]                    # en test, la source a dérivé
+    if "r_after" in b: return b["r_after"]                    # in test, the source has drifted
     if "copies" in b: return BEHAVIORS[b["copies"]]["r"]
     return b["r"]
 
@@ -89,7 +89,7 @@ def _questions(claims, truth, n_test=150):
         votes = {}
         for c in cs:
             src = "original" if c["source"] == "copier" and any(x["source"] == "original" for x in cs) else c["source"]
-            if src in votes and c["source"] == "copier": continue                # la copie ne compte pas en plus
+            if src in votes and c["source"] == "copier": continue                # the copy does not count in addition
             votes[src] = c
         scores = {}
         for s, c in votes.items():
@@ -116,4 +116,4 @@ def sealed_hash():
     return hashlib.sha256(json.dumps(sealed_episodes(), sort_keys=True).encode()).hexdigest()
 
 
-SEALED_SHA256 = "88f9fe41043db602ab2ed1f6dfe6fbc8e31318eabc7cc3f07d222aee8f2362d4"   # empreinte du lot scellé (figée à sa création)
+SEALED_SHA256 = "88f9fe41043db602ab2ed1f6dfe6fbc8e31318eabc7cc3f07d222aee8f2362d4"   # fingerprint of the sealed set (frozen at its creation)

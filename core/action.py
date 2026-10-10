@@ -103,7 +103,7 @@ class PushAction(Action):
 
         changes = []
 
-        # Gérer la composante horizontale
+        # Handle the horizontal component
         before_x = entity.properties.get("external_force_x")
         if before_x is None:
             before_x = 0.0
@@ -118,7 +118,7 @@ class PushAction(Action):
                 )
             )
 
-        # Gérer la composante verticale
+        # Handle the vertical component
         before_y = entity.properties.get("external_force_y")
         if before_y is None:
             before_y = 0.0
@@ -171,13 +171,13 @@ class ImpulseAction(Action):
 
         if mass <= 0:
             raise ValueError(
-                f"Masse invalide pour {self.entity_name!r}: {mass}"
+                f"Invalid mass for {self.entity_name!r}: {mass}"
             )
 
         changes = []
         relation_changes = []
 
-        # Impulsion verticale
+        # Vertical impulse
         old_vy = float(
             entity.properties.get(
                 "vy",
@@ -197,7 +197,7 @@ class ImpulseAction(Action):
                 )
             )
 
-        # Impulsion horizontale
+        # Horizontal impulse
         old_vx = float(
             entity.properties.get(
                 "vx",
@@ -217,7 +217,7 @@ class ImpulseAction(Action):
                 )
             )
 
-        # Si impulsion verticale positive, quitter le support
+        # If the vertical impulse is positive, leave the support
         if self.impulse_y > 0:
             for relation in world.relations:
                 if (

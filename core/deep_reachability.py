@@ -1,15 +1,15 @@
-"""Diagnostic de REACHABILITY (sous-jalon Deep Candidate Generation) — module d'ÉVALUATION.
+"""REACHABILITY diagnostic (Deep Candidate Generation sub-milestone) — EVALUATION module.
 
-Il reçoit la vraie structure : il sert UNIQUEMENT à répondre « cette structure est-elle représentable, atteignable par
-nos opérateurs, et où la recherche réelle s'en écarte-t-elle ? ». Rien de ce module n'est appelé par le système
-d'inférence ni par une méthode évaluée (test : aucun import depuis core/deep_search, deep_generation, deep_structure…).
+It receives the true structure: it serves ONLY to answer "is this structure representable, reachable by
+our operators, and where does the actual search depart from it?". Nothing in this module is called by the inference
+system nor by an evaluated method (test: no import from core/deep_search, deep_generation, deep_structure…).
 
-Notions :
+Notions:
   Reachability            REPRESENTABLE_AND_REACHABLE / REPRESENTABLE_BUT_NOT_REACHED /
                           UNREACHABLE_WITH_CURRENT_OPERATORS / NOT_REPRESENTABLE
-  oracle de génération    séquence minimale de compositions qui construit la vraie structure
-  parent closure          tous les intermédiaires nécessaires existent-ils comme objets de recherche ?
-  taxonomie d'erreur      une cause principale par échec
+  generation oracle       minimal sequence of compositions that builds the true structure
+  parent closure          do all the necessary intermediates exist as search objects?
+  error taxonomy          one main cause per failure
 """
 from __future__ import annotations
 
@@ -33,12 +33,12 @@ ERROR_TAXONOMY = ("GRAMMAR_UNREPRESENTABLE", "OPERATORS_INSUFFICIENT", "TRUE_PAR
                   "FRAGMENT_MISSING", "TYPE_MISMATCH", "FIT_FAILURE", "RANKING_FAILURE", "OBSERVATIONAL_NON_IDENTIFIABILITY")
 RECOVERED = "RECOVERED"
 
-# Opérateurs de génération de chaque stratégie (lecture du code, vérifiée par les tests de couverture).
-#   extend_atom    : parent ∘ atome           (chaînes : tout nœud interne a au moins un enfant atome)
-#   anchor_atom    : atome ∘ (reste)          (descente : même classe d'arbres que extend_atom)
-#   extend_fragment: parent ∘ fragment de la bibliothèque
-#   compose_pair   : composition de deux sous-structures déjà construites (arbres équilibrés)
-#   synthesize     : synthèse booléenne sur signatures (toute forme d'arbre sur les atomes candidats)
+# Generation operators of each strategy (read from the code, verified by the coverage tests).
+#   extend_atom    : parent ∘ atom            (chains: every internal node has at least one atom child)
+#   anchor_atom    : atom ∘ (rest)            (descent: same class of trees as extend_atom)
+#   extend_fragment: parent ∘ library fragment
+#   compose_pair   : composition of two substructures already built (balanced trees)
+#   synthesize     : boolean synthesis over signatures (any tree shape over the candidate atoms)
 OPERATORS = {"baseline": ("extend_atom",), "flat": ("extend_atom",), "bottom_up": ("extend_atom", "compose_pair"), "top_down": ("anchor_atom",),
              "bidirectional": ("extend_atom", "anchor_atom", "meet_existing"), "best_first": ("extend_atom", "compose_pair"), "factorized": ("synthesize",)}
 
@@ -52,8 +52,8 @@ def leaves(n: BNode):
 
 
 def representable(truth: Optional[BNode], max_depth=6, allowed=None):
-    """La structure est-elle exprimable dans la grammaire : atomes connus, combinateurs connus, profondeur et budget
-    compact respectés ? Renvoie (bool, raison)."""
+    """Is the structure expressible in the grammar: known atoms, known combinators, depth and compact
+    budget respected? Returns (bool, reason)."""
     if truth is None: return False, "aucun programme de la grammaire (monde hors classe)"
     G = grammar_atom_keys(allowed); miss = [skel_key(l) for l in leaves(truth) if skel_key(l) not in G]
     if miss: return False, f"atome absent de la grammaire : {miss[0][:60]}"
@@ -63,7 +63,7 @@ def representable(truth: Optional[BNode], max_depth=6, allowed=None):
 
 
 def flatten(n: BNode):
-    """Arbre n-aire à associativité près : ('and'|'or'|'xor', [enfants]) | ('atom', clé)."""
+    """N-ary tree up to associativity: ('and'|'or'|'xor', [children]) | ('atom', key)."""
     if not is_composite(n): return ("atom", skel_key(n))
     items = []
     def flat(z):
@@ -74,8 +74,8 @@ def flatten(n: BNode):
 
 
 def chain_reachable(truth: BNode):
-    """Atteignable par des opérateurs qui n'ajoutent qu'UN ATOME à la fois : il doit exister une ré-association en
-    chaîne, c'est-à-dire que chaque nœud (aplati) a au plus un enfant composite, récursivement."""
+    """Reachable by operators that add only ONE ATOM at a time: there must exist a re-association into a
+    chain, that is, each (flattened) node has at most one composite child, recursively."""
     def ok(t):
         if t[0] == "atom": return True
         comp = [c for c in t[1] if c[0] != "atom"]; return len(comp) <= 1 and all(ok(c) for c in comp)
@@ -83,13 +83,13 @@ def chain_reachable(truth: BNode):
 
 
 def operator_reachable(truth: BNode, operators: Sequence[str], library_forms: Iterable[str] = ()):
-    """Existe-t-il AU MOINS UNE séquence valide des opérateurs donnés qui produit la structure (sans budget) ?
-    Renvoie (bool, opérateur manquant | '')."""
+    """Does AT LEAST ONE valid sequence of the given operators exist that produces the structure (without budget)?
+    Returns (bool, missing operator | '')."""
     ops = set(operators); lib = set(library_forms)
     if "synthesize" in ops or "compose_pair" in ops: return True, ""
     if chain_reachable(truth): return True, ""
     if "extend_fragment" in ops or "meet_existing" in ops:
-        def ok(t):                                             # un enfant composite supplémentaire est permis s'il est fourni (bibliothèque / rencontre)
+        def ok(t):                                             # one additional composite child is allowed if it is supplied (library / meeting)
             if not is_composite(t): return True
             kids = _flat_children(t); comp = [c for c in kids if is_composite(c)]; free = [c for c in comp if algebraic_form(c) not in lib]
             return (len(free) <= 1 or "meet_existing" in ops) and all(ok(c) for c in comp)
@@ -108,16 +108,16 @@ def _flat_children(n: BNode):
 
 
 def strahler(n: BNode):
-    """Largeur nécessaire : nombre de résultats partiels à détenir simultanément pour construire l'arbre (nombre de
-    Strahler). Chaîne → 2 ; arbre équilibré à 4 feuilles → 3."""
+    """Required width: number of partial results to hold simultaneously to build the tree (Strahler
+    number). Chain → 2; balanced tree with 4 leaves → 3."""
     if not is_composite(n): return 1
     a, b = strahler(n.children[0]), strahler(n.children[1]); return max(a, b) if a != b else a + 1
 
 
 def oracle_path(truth: BNode, n_atom_types=8, pool=8):
-    """ORACLE DE GÉNÉRATION (diagnostic seulement) : séquence minimale d'opérations qui construit la vraie structure,
-    en post-ordre. Chaque étape donne la forme produite et le nombre de CHOIX ALTERNATIFS qu'un générateur non guidé
-    aurait à cet endroit."""
+    """GENERATION ORACLE (diagnostic only): minimal sequence of operations that builds the true structure,
+    in post-order. Each step gives the form produced and the number of ALTERNATIVE CHOICES that an unguided generator
+    would have at that point."""
     steps = []
     def build(n):
         if not is_composite(n): steps.append({"op": "fit_atom", "form": algebraic_form(n), "size": 1, "alternatives": n_atom_types}); return
@@ -130,8 +130,8 @@ def oracle_path(truth: BNode, n_atom_types=8, pool=8):
 
 
 def parent_closure(truth: BNode, max_depth=6):
-    """Tous les intermédiaires nécessaires (préfixes, suffixes, sous-arbres, compositions partielles) sont-ils des
-    objets de recherche valides : représentables, et identifiables par leur clé canonique sans collision ?"""
+    """Are all the necessary intermediates (prefixes, suffixes, subtrees, partial compositions)
+    valid search objects: representable, and identifiable by their canonical key without collision?"""
     subs = subtrees(truth, min_atoms=1); out = {"subtrees": len(subs), "invalid": [], "collisions": []}; seen: Dict[str, str] = {}
     for s in subs:
         ok, why = representable(s, max_depth)
@@ -140,7 +140,7 @@ def parent_closure(truth: BNode, max_depth=6):
         if k in seen and seen[k] != f: out["collisions"].append(k[:80])
         seen[k] = f
     flat = flatten(truth); partial = []
-    def walk(t):                                                  # compositions partielles d'un nœud n-aire : tout sous-ensemble d'enfants est un objet valide
+    def walk(t):                                                  # partial compositions of an n-ary node: any subset of children is a valid object
         if t[0] != "atom":
             partial.append(len(t[1]))
             for c in t[1]: walk(c)
@@ -149,8 +149,8 @@ def parent_closure(truth: BNode, max_depth=6):
 
 
 def space_size(depth: int, n_atom_types=8):
-    """Nombre de formes algébriques distinctes à `depth` atomes (arbres binaires à commutativité près ; borne haute car
-    l'associativité fusionne encore des formes). T(1) = types ; T(d) = 3 · Σ_{i ≤ d−i} T(i)·T(d−i) (÷2 si i = d−i)."""
+    """Number of distinct algebraic forms at `depth` atoms (binary trees up to commutativity; upper bound because
+    associativity merges further forms). T(1) = types; T(d) = 3 · Σ_{i ≤ d−i} T(i)·T(d−i) (÷2 if i = d−i)."""
     T = {1: float(n_atom_types)}
     for d in range(2, depth + 1):
         s = 0.0
@@ -160,13 +160,13 @@ def space_size(depth: int, n_atom_types=8):
     return T[depth]
 
 
-# ================================================================ analyse d'une recherche réelle
+# ================================================================ analysis of an actual search
 
 def forms_of(programs: Iterable[BNode]) -> Set[str]: return {algebraic_form(p) for p in programs}
 
 
 def parents_used(programs: Iterable[BNode]) -> Set[str]:
-    """Formes qui ont servi de PARENT : enfant direct de la racine d'au moins un candidat généré."""
+    """Forms that served as a PARENT: direct child of the root of at least one generated candidate."""
     out = set()
     for p in programs:
         if is_composite(p):
@@ -175,8 +175,8 @@ def parents_used(programs: Iterable[BNode]) -> Set[str]:
 
 
 def first_divergence(truth: BNode, generated: Set[str], used_as_parent: Set[str]):
-    """Premier point où la recherche réelle quitte le chemin oracle. Parcourt les intermédiaires vrais par taille
-    croissante. Renvoie {'size', 'kind'} avec kind ∈ {not_generated, not_extended, none}."""
+    """First point where the actual search leaves the oracle path. Walks through the true intermediates by increasing
+    size. Returns {'size', 'kind'} with kind ∈ {not_generated, not_extended, none}."""
     inter = sorted({algebraic_form(s): n_atoms(s) for s in subtrees(truth, min_atoms=1)}.items(), key=lambda kv: kv[1]); full = algebraic_form(truth)
     for form, size in inter:
         if form == full: continue
@@ -189,7 +189,7 @@ def first_divergence(truth: BNode, generated: Set[str], used_as_parent: Set[str]
 
 def classify(truth: Optional[BNode], strategy: str, generated_programs: Dict[str, BNode], ranked_programs: Sequence[BNode], selected: Optional[BNode], well_fitted: bool,
              budget_exhausted: bool, class_forms: Iterable[str] = (), max_depth=6, library_forms: Iterable[str] = (), top_k=5, type_rejected: Iterable[str] = ()):
-    """Reachability, rappels de la vraie structure à chaque étape, et CAUSE PRINCIPALE d'un échec (taxonomie)."""
+    """Reachability, recalls of the true structure at each stage, and MAIN CAUSE of a failure (taxonomy)."""
     ok, why = representable(truth, max_depth)
     if not ok: return {"reachability": Reachability.NOT_REPRESENTABLE, "cause": "GRAMMAR_UNREPRESENTABLE", "detail": why, **{k: False for k in RECALLS}}
     form = algebraic_form(truth); gen = forms_of(generated_programs.values()); used = parents_used(generated_programs.values()); ranked = [algebraic_form(p) for p in ranked_programs]
@@ -217,9 +217,9 @@ RECALLS = ("recall_generated", "recall_pre_pruning", "recall_post_pruning", "rec
 
 
 def basis_quality(truth: BNode):
-    """Qualité de la base : la structure contient-elle des atomes REDONDANTS (exprimables par composition d'atomes
-    plus simples) ? band = half ∧ half (parallèles), ring = disc ∧ antidisc (concentriques), sector = half ∧ half
-    (par l'apex). Profondeur en base minimale {demi-plan, disque} et nombre de paramètres liés."""
+    """Basis quality: does the structure contain REDUNDANT atoms (expressible by composition of simpler
+    atoms)? band = half ∧ half (parallel), ring = disc ∧ antidisc (concentric), sector = half ∧ half
+    (through the apex). Depth in the minimal basis {half-plane, disc} and number of tied parameters."""
     red = {("dot", "in"): 2, ("norm", "in"): 2, ("angle", "in"): 2}; minimal = 0; redundant = 0
     for l in leaves(truth):
         x = l

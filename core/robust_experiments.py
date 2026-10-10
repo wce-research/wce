@@ -1,4 +1,4 @@
-"""Expériences « Robust Structural Reconstruction » — une graine × un type de job = une unité de calcul AWS."""
+""""Robust Structural Reconstruction" experiments — one seed × one job type = one AWS compute unit."""
 from __future__ import annotations
 
 import math
@@ -34,7 +34,7 @@ def evaluate_prog(prog, task, g):
 
 
 class _Oracle:
-    """Politique de mesure ORACLE (borne haute) : interroge là où la structure MAP courante se trompe (vérité utilisée)."""
+    """ORACLE measurement policy (upper bound): queries where the current MAP structure is wrong (truth used)."""
     def __init__(self, task): self.task = task; self.criterion = "oracle"; self.world_noise = task.spec.rate; self.sensors = ("standard",); self.lam = 0.0; self.allow_repeat = False
 
     def choose(self, css, pool, history, probes, budget_left):
@@ -70,11 +70,11 @@ def run_method(m, task, seed, monitor=None):
                   "answer_unknown": r.answer == "UNKNOWN", "discrepancy": r.discrepancy.get("label"), "trace": r.trace, "entropy": r.css.entropy()}
 
 
-# ================================================================ sous-unités reproductibles (checkpoints)
-# Chaque job = liste ORDONNÉE de sous-unités (identifiant, fonction → lignes). Une sous-unité ne dépend que de
-# (type, graine, identifiant) : aucun état aléatoire partagé, donc reprise après interruption = mêmes résultats.
+# ================================================================ reproducible sub-units (checkpoints)
+# Each job = ORDERED list of sub-units (identifier, function → rows). A sub-unit depends only on
+# (type, seed, identifier): no shared random state, so resuming after an interruption = same results.
 
-MAIN_SPECS = [(nz, d) for nz in (0.08, 0.12) for d in (1, 2, 3, 4, 0)]          # d = 0 : non représentable
+MAIN_SPECS = [(nz, d) for nz in (0.08, 0.12) for d in (1, 2, 3, 4, 0)]          # d = 0: not representable
 
 
 def main_task(seed, k):
@@ -108,7 +108,7 @@ NOISE_SWEEP_KINDS = ("iid", "grouped_outliers", "boundary")
 
 
 def _noise_sub(seed, nz, kind, m):
-    # graine de tâche déterministe (corrigé : `hash(kind)` dépendait de PYTHONHASHSEED, donc du processus)
+    # deterministic task seed (fixed: `hash(kind)` depended on PYTHONHASHSEED, hence on the process)
     task = make_task(seed * 1000 + int(nz * 1000) + NOISE_SWEEP_KINDS.index(kind), noise=nz, kind=kind, depth=1 + (seed + int(nz * 100)) % 3)
     prog, info = run_method(m, task, seed * 7 + int(nz * 100)); info.pop("trace", None)
     return [{"noise": nz, "kind": kind, "method": m, **evaluate_prog(prog, task, torch.Generator().manual_seed(12)), **{k: info[k] for k in ("queries", "evaluations", "seconds")},
@@ -121,7 +121,7 @@ def noise_subunits(seed):
 
 
 def _hard_sub(seed, ci, name):
-    """AA — A : simple + 8 % de bruit ; B : complexe + 0 %. Taille de l'AST retenue (vs vraie) et attribution."""
+    """AA — A: simple + 8 % noise; B: complex + 0 %. Size of the retained AST (vs true) and attribution."""
     case = ("simple_noisy", "complex_clean")[ci]; task = hard_noise_pair(seed + 500)[ci]; obs = obs_of(task)
     kw = {"naive_threshold": dict(likelihood="naive", depth_rule="threshold"), "robust_bayes": dict()}[name]
     r = RobustStructuralReconstruction(seed=seed, **kw).run(obs); p = r.css.best().program
@@ -144,10 +144,10 @@ def repeat_subunits(seed):
     return [(f"n{int(nz * 100)}_d{d}_{'rep' if allow else 'norep'}", (lambda nz=nz, d=d, allow=allow: _repeat_sub(seed, nz, d, allow))) for nz in (0.12, 0.15) for d in (1, 2) for allow in (True, False)]
 
 
-# ================================================================ calibration de P(règle fausse)
+# ================================================================ calibration of P(rule wrong)
 
 def rule_cases(task_seed, noise):
-    """Règles correctes / fausses + P(règle fausse) brut (ancre sensible au bruit) — vérité pour l'étiquette."""
+    """Correct / wrong rules + raw P(rule wrong) (noise-sensitive anchor) — truth for the label."""
     from core.active_structure import sequential_truth_test
     task = make_task(task_seed, noise=noise, depth=1 + task_seed % 3); obs = obs_of(task); out = []
     r = RobustStructuralReconstruction(seed=task_seed).run(obs)
@@ -167,13 +167,13 @@ CAL_NOISES = (0.05, 0.08, 0.12)
 
 
 def caltrain_subunits(key):
-    """Cas d'apprentissage des calibrateurs (TRAIN + VALIDATION, graines 700000+), calculés UNE fois (6 unités × 10 graines)
-    au lieu d'être recalculés à l'identique dans chacune des 16 graines de test."""
+    """Training cases for the calibrators (TRAIN + VALIDATION, seeds 700000+), computed ONCE (6 units × 10 seeds)
+    instead of being recomputed identically in each of the 16 test seeds."""
     return [(f"s{s}", (lambda s=s: [{"split": "train", "task_seed": s, **c} for c in rule_cases(s, CAL_NOISES[s % 3])])) for s in TRAIN_CAL_SEEDS[key * 10:(key + 1) * 10]]
 
 
 def calibration_subunits(seed):
-    """Cas de TEST de la graine. Les calibrateurs sont ajustés à l'agrégation sur les seuls cas `caltrain`."""
+    """TEST cases of the seed. The calibrators are fitted at aggregation time on the `caltrain` cases only."""
     return [(f"k{k}", (lambda k=k: [{"split": "test", "task_seed": 800000 + seed * 10 + k, **c} for c in rule_cases(800000 + seed * 10 + k, CAL_NOISES[k % 3])])) for k in range(6)]
 
 
@@ -186,12 +186,12 @@ def fit_calibrators(train, test):
     return out
 
 
-# ================================================================ validation active des familles
+# ================================================================ active validation of the families
 
 def _family_sub(seed, k):
-    """Q/R — famille candidate = squelette découvert sur une instance ; promotion par (a) REGROUPEMENT : signature
-    canonique identique à celle d'un 2e programme découvert ; (b) VALIDATION ACTIVE : sur une NOUVELLE instance, la
-    reconstruction a priori-famille (squelette ajusté + vérification active) réussit et coûte moins."""
+    """Q/R — candidate family = skeleton discovered on one instance; promotion by (a) CLUSTERING: canonical
+    signature identical to that of a 2nd discovered program; (b) ACTIVE VALIDATION: on a NEW instance, the
+    family-prior reconstruction (fitted skeleton + active verification) succeeds and costs less."""
     from core.active_structure import program_signature
     rows = []
     if True:
@@ -203,12 +203,12 @@ def _family_sub(seed, k):
         g = torch.Generator().manual_seed(seed); same.y = __import__("core.robust_world", fromlist=["corrupt"]).corrupt(same.world, same.X, SENSORS["standard"], same.spec, g)
         other = make_task(seed * 50 + k + 13, noise=0.05, depth=2)
         rA = RobustStructuralReconstruction(planner=RobustMeasurementPlanner("efa", world_noise=0.05), seed=seed).run(obs_of(base), lambda x, s, gg: base.oracle(x, s, gg), full_region, full_region(400, g), g)
-        fam = rA.css.best().program.skeleton(); fam_init = rA.css.best().program.param_vector()   # famille = squelette + paramètres typiques (a priori)
+        fam = rA.css.best().program.skeleton(); fam_init = rA.css.best().program.param_vector()   # family = skeleton + typical parameters (prior)
         for tgt, is_same in ((same, True), (other, False)):
             rB = RobustStructuralReconstruction(planner=RobustMeasurementPlanner("efa", world_noise=0.05), seed=seed).run(obs_of(tgt), lambda x, s, gg: tgt.oracle(x, s, gg), full_region, full_region(400, g), g)
             cluster = program_signature(rA.css.best().program).distance(program_signature(rB.css.best().program), canonical=True) <= 0.08
             o = obs_of(tgt); p, ll = fit_robust(fam, o, n_init=6, init=fam_init); e_fam = log_evidence(p, o, ll); e_search = rB.css.best().evidence
-            Xn = full_region(60, g)                                         # mêmes points pour X et y (corrigé : ils étaient tirés séparément)
+            Xn = full_region(60, g)                                         # same points for X and y (fixed: they were drawn separately)
             ppc = posterior_predictive_check(p, Observations.build(Xn, tgt.oracle(Xn, "standard", g), SENSOR_MODELS["standard"], 0.05), g=g)
             active = e_fam >= e_search - 2.0 and not ppc["reject"]
             rows.append({"same_structure": is_same, "promote_cluster": cluster, "promote_active": active,
@@ -220,7 +220,7 @@ def _family_sub(seed, k):
 def family_subunits(seed): return [(f"k{k}", (lambda k=k: _family_sub(seed, k))) for k in range(3)]
 
 
-# ================================================================ capacité, compression du résidu
+# ================================================================ capacity, compression of the residual
 
 def _capacity_sub(seed, k):
     rows = []
@@ -228,7 +228,7 @@ def _capacity_sub(seed, k):
         task = make_task(seed * 9 + k, noise=0.08, depth=1 + k % 4)
         prog, info = run_method("full", task, seed * 9 + k); info.pop("trace", None)
         X = task.X[task.y >= 0]; y = task.y[task.y >= 0]; err = X[predict(prog, X) != y]
-        # AH — résidus : brut à porte (points stockés), prototypes (k-moyennes, 4), petit modèle local, aucun
+        # AH — residuals: raw gated (stored points), prototypes (k-means, 4), small local model, none
         from core.active_structure import gated_residual
         gp, cost, gate = gated_residual(prog, X, y, steps=200)
         protos = _kmeans(err, 4) if len(err) >= 4 else err
@@ -256,7 +256,7 @@ def _kmeans(P, k, iters=20):
     return C
 
 
-# ================================================================ identifiabilité
+# ================================================================ identifiability
 
 IDENT_SPECS = ((True, 1), (True, 3), (True, 4), (False, 0))
 
@@ -309,12 +309,12 @@ def subunit_ids(kind, key): return [sid for sid, _ in ALL_SUBUNITS[kind](int(key
 
 
 def run_subunit(kind, key, sid):
-    """Exécute UNE sous-unité (déterministe en (type, clé, identifiant)) et renvoie ses lignes."""
+    """Runs ONE sub-unit (deterministic in (type, key, identifier)) and returns its rows."""
     return dict(ALL_SUBUNITS[kind](int(key)))[sid]()
 
 
 def run_job(kind, key, done=None):
-    """Unité complète = concaténation ordonnée des sous-unités ; `done` = {identifiant: lignes} déjà calculées (reprise)."""
+    """Full unit = ordered concatenation of the sub-units; `done` = {identifier: rows} already computed (resume)."""
     done = done or {}; rows = []
     for sid, fn in ALL_SUBUNITS[kind](int(key)): rows += done[sid] if sid in done else fn()
     return rows

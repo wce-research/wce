@@ -1,13 +1,13 @@
-"""Système de compétences CONTINU (sans task_id, sans énumération, sans données brutes anciennes pour le système
-complet) : Skill = (GenerativeCertificate, invariants, géométrie de stabilité, macro, dépendances).
+"""CONTINUOUS skill system (no task_id, no enumeration, no old raw data for the full
+system): Skill = (GenerativeCertificate, invariants, stability geometry, macro, dependencies).
 
-Planificateur (par lot d'un régime) :
-  contexte connu & compétence OK            → réactivation
-  contexte connu & écart                     → BRUIT (réparé par nettoyage robuste) | DÉRIVE graduelle (raffinement en
-                                               place, sûr au 1er / 2nd ordre) | changement ABRUPT (nouvelle compétence)
-  contexte nouveau / abrupt                  → réutilisation > composition > règle découverte > adaptateur > nouveau module
-Puis certificats (génératifs ou sondes stockées), gestion de capacité (élagage, fusion, distillation sous budget),
-régénération sans instantané. Neuf méthodes comparées (4 monolithiques + 5 configurations du système).
+Planner (per batch of a regime):
+  known context & skill OK                  → reactivation
+  known context & gap                        → NOISE (repaired by robust cleaning) | gradual DRIFT (refinement in
+                                               place, safe at 1st / 2nd order) | ABRUPT change (new skill)
+  new / abrupt context                       → reuse > composition > discovered rule > adapter > new module
+Then certificates (generative or stored probes), capacity management (pruning, merging, distillation under budget),
+regeneration without snapshot. Nine methods compared (4 monolithic + 5 configurations of the system).
 """
 from __future__ import annotations
 
@@ -52,7 +52,7 @@ def train(p, X, y, steps=200, lr=0.03, seed=0, project=None):
     return {k: v.detach() for k, v in q.items()}
 
 
-# ================================================================ découverte de règles (bibliothèque de familles)
+# ================================================================ rule discovery (library of families)
 
 def fit_halfspace(X, y, steps=300):
     w = torch.zeros(D, requires_grad=True); b = torch.zeros(1, requires_grad=True); opt = torch.optim.Adam([w, b], lr=0.1)
@@ -110,8 +110,8 @@ Rule.__call__ = lambda self, X: _eval_ext(self, X)
 
 
 def discover_rule(X, y, Xv, yv, target):
-    """Recherche bornée sur les familles d'hypothèses (demi-espace, ellipsoïde, secteur, boîte) ; renvoie la
-    meilleure règle et son exactitude de validation (mémorisation vs règle compositionnelle)."""
+    """Bounded search over the hypothesis families (half-space, ellipsoid, sector, box); returns the
+    best rule and its validation accuracy (memorisation vs compositional rule)."""
     Xc, Xvc = clean_inputs(X), clean_inputs(Xv); best = None; evals = 0
     for fit in (fit_halfspace, fit_ellipsoid, fit_sector, fit_box):
         r = fit(Xc, y); evals += 1; acc = float((r(Xvc) == yv).float().mean())
@@ -120,7 +120,7 @@ def discover_rule(X, y, Xv, yv, target):
     return best[0], best[1], evals
 
 
-# ================================================================ système
+# ================================================================ system
 
 @dataclass
 class Config:
@@ -130,12 +130,12 @@ class Config:
     compose: bool = True
     adapter: bool = True
     discovery: bool = True
-    drift: str = "auto"                   # regrow | refine1 | refine2 | auto (2nd ordre + détection bruit/dérive)
-    capacity: Optional[int] = None        # budget (paramètres neuronaux) ; None = illimité
+    drift: str = "auto"                   # regrow | refine1 | refine2 | auto (2nd order + noise/drift detection)
+    capacity: Optional[int] = None        # budget (neural parameters); None = unlimited
     capacity_mgmt: bool = True
     target: float = 0.93
     steps: int = 300
-    robust: bool = True                   # nettoyage robuste (NaN, outliers) avant décision
+    robust: bool = True                   # robust cleaning (NaN, outliers) before decision
 
 
 @dataclass
@@ -145,7 +145,7 @@ class Ctx:
     count: int
     skill: Optional[str] = None
     history: List[float] = field(default_factory=list)
-    ref_acc: float = 1.0                  # exactitude de validation de la compétence à son acquisition / raffinement
+    ref_acc: float = 1.0                  # validation accuracy of the skill at its acquisition / refinement
 
 
 class ContinuumSystem:
@@ -156,7 +156,7 @@ class ContinuumSystem:
         self.counters = Counter(); self.compute = Counter(); self.macros = Counter()
         self.g = torch.Generator().manual_seed(seed)
 
-    # ---- exécution des compétences -------------------------------------------------------------
+    # ---- skill execution -------------------------------------------------------------
     def logits(self, skill, X):
         prog = self.skills[skill]; k = prog[0]; Xc = clean_inputs(X)
         if k == "expert": return mlp(self.modules[prog[1]], Xc)
@@ -190,7 +190,7 @@ class ContinuumSystem:
     def neural_params(self): return sum(nparams(p) for p in self.modules.values())
     def symbolic_floats(self): return sum(p[1].size() for p in self.skills.values() if p[0] == "rule")
 
-    # ---- routeur ---------------------------------------------------------------------------------
+    # ---- router ---------------------------------------------------------------------------------
     def route(self, C):
         if not self.contexts: return torch.full((len(C),), -1, dtype=torch.long)
         P = torch.stack([c.proto for c in self.contexts]); return torch.cdist(C, P).argmin(1)
@@ -218,7 +218,7 @@ class ContinuumSystem:
             with torch.no_grad(): out[m] = torch.softmax(self.logits(s, X[m]), 1).max(1).values
         return out
 
-    # ---- certificats -----------------------------------------------------------------------------
+    # ---- certificates -----------------------------------------------------------------------------
     def certify(self, skill, X, t):
         if self.cfg.cert == "none": return
         if self.cfg.cert == "stored":
@@ -245,7 +245,7 @@ class ContinuumSystem:
             ok &= o
         return ok
 
-    # ---- apprentissage d'un lot ------------------------------------------------------------------
+    # ---- learning of one batch ------------------------------------------------------------------
     def learn(self, X, C, y, t=0):
         cfg = self.cfg; ctx, new = self.discover(C); self.counters["t"] = t
         n = len(X); cut = int(0.75 * n); Xt, yt, Xv, yv = X[:cut], y[:cut], X[cut:], y[cut:]
@@ -253,7 +253,7 @@ class ContinuumSystem:
         steps0 = self.compute["train"]
         if not new and ctx.skill is not None:
             acc = float((self.predict_skill(ctx.skill, Xv) == yv).float().mean()); rec["acc_before"] = acc
-            if acc >= min(cfg.target - 0.03, ctx.ref_acc - 0.06):          # écart relatif à la référence de la compétence
+            if acc >= min(cfg.target - 0.03, ctx.ref_acc - 0.06):          # gap relative to the reference of the skill
                 rec["kind"] = "reactivate"; ctx.history.append(acc); return self._done(rec, steps0)
             regime = self.classify_change(ctx, X, y, acc)
             rec["change"] = regime
@@ -268,8 +268,8 @@ class ContinuumSystem:
         rec["steps"] = self.compute["train"] - steps0; rec["params_after"] = self.neural_params(); self.log.append(rec); return rec
 
     def classify_change(self, ctx, X, y, acc):
-        """Bruit vs vrai changement de régime : si l'exactitude se rétablit sur les exemples PROPRES (sans NaN ni
-        outliers ni dimension corrompue détectable), c'est du bruit ; sinon dérive graduelle (≥ 0,6) ou abrupte."""
+        """Noise vs true regime change: if the accuracy recovers on the CLEAN examples (without NaN or
+        outliers or detectable corrupted dimension), it is noise; otherwise gradual drift (≥ 0.6) or abrupt."""
         if self.cfg.drift == "auto" and self.cfg.robust:
             Xc = X.clone(); bad = torch.isnan(Xc).any(1) | (Xc.abs() > 4.5).any(1)
             if int((~bad).sum()) > 30:
@@ -278,9 +278,9 @@ class ContinuumSystem:
         return "drift" if (ctx.ref_acc - acc) <= 0.3 and acc >= 0.6 else "abrupt"
 
     def refine(self, ctx, Xt, yt, Xv, yv, rec):
-        """Raffinement EN PLACE d'une compétence dérivée. Règle : réajustement des paramètres symboliques.
-        Expert : gradient de la nouvelle perte, projeté (1er ordre) hors des directions sensibles des compétences
-        DÉPENDANTES, puis amplitude contrôlée au 2nd ordre (refine2 / auto). Adaptateur : seul l'adaptateur bouge."""
+        """IN-PLACE refinement of a drifted skill. Rule: refit of the symbolic parameters.
+        Expert: gradient of the new loss, projected (1st order) out of the sensitive directions of the DEPENDENT
+        skills, then amplitude controlled at 2nd order (refine2 / auto). Adapter: only the adapter moves."""
         s = ctx.skill; prog = self.skills[s]; cfg = self.cfg
         if prog[0] == "rule":
             r, acc, ev = discover_rule(Xt, yt, Xv, yv, cfg.target); self.compute["search"] += ev * len(Xt)
@@ -288,7 +288,7 @@ class ContinuumSystem:
                 self.skills[s] = ("rule", r); ctx.ref_acc = acc; self.certify(s, torch.cat([Xt, Xv]), rec["t"]); self.counters["refine"] += 1
                 rec.update(kind="refine_rule", acc=acc); return True
             return False
-        if prog[0] == "adapter":                                   # adaptateur : seul l'adaptateur bouge (base partagée intacte)
+        if prog[0] == "adapter":                                   # adapter: only the adapter moves (shared base intact)
             base, an = prog[1], prog[2]; old = self.modules[an]
             self.modules[an] = train_adapter(self.modules[base], Xt, yt, cfg.steps, self.seed, init=old); self.compute["train"] += cfg.steps
             acc = float((self.predict_skill(s, Xv) == yv).float().mean()); rec["refine_gain"] = acc - rec.get("acc_before", 0.0)
@@ -302,7 +302,7 @@ class ContinuumSystem:
             probes = torch.cat([self.certs[d].generator.sample(48, self.g) for d in deps if d in self.certs])
             yp = torch.cat([self.predict_skill(d, self.certs[d].generator.sample(0, self.g)) for d in []] or [torch.zeros(0, dtype=torch.long)])
         if probes is not None and len(probes):
-            yp = self.predict_skill(s, probes)      # comportement actuel du module sur la région des dépendants
+            yp = self.predict_skill(s, probes)      # current behaviour of the module on the region of the dependents
             project, _ = null_projector(p0, probes, yp)
         new = train(p0, Xt, yt, cfg.steps, seed=self.seed, project=project); self.compute["train"] += cfg.steps
         delta = flat(new) - flat(p0)
@@ -349,7 +349,7 @@ class ContinuumSystem:
             name = f"exp_{ctx.name}_{t}"; p = train(new_expert(self.seed + t), Xt, yt, cfg.steps, seed=self.seed); self.compute["train"] += cfg.steps
             ac = accv(self.predict_fn_params(p, Xv)); p = train(p, torch.cat([Xt, Xv]), torch.cat([yt, yv]), cfg.steps // 4, seed=self.seed); self.compute["train"] += cfg.steps // 4
             cands.append(("grow", ac, nparams(p), lambda name=name, p=p: (self.modules.__setitem__(name, p), self._add(f"skill_{name}", ("expert", name)))[1]))
-        # coût : erreur + paramètres ; à exactitude ≥ cible, préférer reuse > compose > rule > adapter > grow
+        # cost: error + parameters; at accuracy ≥ target, prefer reuse > compose > rule > adapter > grow
         order = {"reuse": 0, "compose": 1, "rule": 2, "adapter": 3, "grow": 4}
         good = [c for c in cands if c[1] >= cfg.target]
         pick = min(good, key=lambda c: (order[c[0]], -c[1])) if good else max(cands, key=lambda c: (c[1] - 0.00005 * c[2]))
@@ -364,7 +364,7 @@ class ContinuumSystem:
         if name not in self.skills: self.skills[name] = prog
         return name
 
-    # ---- capacité : élagage, fusion, distillation -------------------------------------------------
+    # ---- capacity: pruning, merging, distillation -------------------------------------------------
     def manage_capacity(self, rec):
         budget = self.cfg.capacity; rep = Counter()
         if self.neural_params() <= budget: return
@@ -383,12 +383,12 @@ class ContinuumSystem:
         if self.neural_params() > budget: self._distill_symbolic(rep, budget)
         if self.neural_params() > budget and self.counters["t"] >= self.counters["distill_cooldown_until"]:
             before = self.counters["distill_rejected"]; self._distill(rep)
-            if self.counters["distill_rejected"] > before: self.counters["distill_cooldown_until"] = self.counters["t"] + 5   # pas de nouvel essai avant 5 régimes
+            if self.counters["distill_rejected"] > before: self.counters["distill_cooldown_until"] = self.counters["t"] + 5   # no new attempt before 5 regimes
         rec["capacity"] = dict(rep)
 
     def _merge(self, rep):
-        """Fusion de compétences atomiques ÉQUIVALENTES sur leurs régions génératives (sorties ≥ 97 % identiques
-        sur les échantillons des deux certificats) et sans conflit de dépendances ; validée par les certificats."""
+        """Merging of atomic skills that are EQUIVALENT on their generative regions (outputs ≥ 97 % identical
+        on the samples of both certificates) and without dependency conflict; validated by the certificates."""
         atoms = [s for s, p in self.skills.items() if p[0] in ("expert", "adapter")]
         for a, b in itertools.combinations(atoms, 2):
             if a not in self.skills or b not in self.skills: continue
@@ -412,9 +412,9 @@ class ContinuumSystem:
                 for c, s in zip(self.contexts, saved[1]): c.skill = s
 
     def _distill(self, rep, hidden=None, steps=2500, n=1500):
-        """Distille plusieurs experts vers UN module multi-têtes, entraîné sur des échantillons GÉNÉRÉS par leurs
-        certificats (étiquettes = références) ; essais par groupes de 6 puis 4 puis 3 ; conservé seulement si TOUS
-        les certificats passent (sinon rollback)."""
+        """Distils several experts into ONE multi-head module, trained on samples GENERATED by their
+        certificates (labels = references); attempts by groups of 6 then 4 then 3; kept only if ALL
+        the certificates pass (otherwise rollback)."""
         for k in (6, 4, 3):
             experts = [s for s, p in self.skills.items() if p[0] == "expert" and not self.dependents_other(s)
                        and isinstance(self.certs.get(s), GenerativeInvariantCertificate)][:k]
@@ -424,7 +424,7 @@ class ContinuumSystem:
                 c = self.certs[s]; Z = torch.cat([c.generator.sample(n, self.g), c.generator.sample_boundary(n // 3, self.g, c.reference), c.generator.sample_rare(n // 6, self.g)])
                 Xs.append(Z); Ys.append(c.reference(Z))
             self.compute["generation"] += sum(len(x) for x in Xs)
-            h = hidden or (10 * k + 8)                                  # ≈ 10 unités par compétence (vs 16 par expert)
+            h = hidden or (10 * k + 8)                                  # ≈ 10 units per skill (vs 16 per expert)
             p = new_expert(self.seed + 777, h, D, 2 * len(experts)); q = {kk: v.clone().requires_grad_(True) for kk, v in p.items()}
             opt = torch.optim.Adam(q.values(), lr=0.02)
             for _ in range(steps):
@@ -444,8 +444,8 @@ class ContinuumSystem:
             self.skills = saved; self.modules.pop(name); self.modules.update(old_mods); self.counters["distill_rejected"] += 1
 
     def _distill_symbolic(self, rep, budget):
-        """Distillation SYMBOLIQUE : un expert est remplacé par une règle de la bibliothèque ajustée sur des
-        échantillons GÉNÉRÉS (étiquettes = référence du certificat), seulement si TOUS les certificats passent."""
+        """SYMBOLIC distillation: an expert is replaced by a rule of the library fitted on
+        GENERATED samples (labels = reference of the certificate), only if ALL the certificates pass."""
         for s in [s for s, p in self.skills.items() if p[0] == "expert" and not self.dependents_other(s)]:
             if self.neural_params() <= budget: return
             c = self.certs.get(s)
@@ -461,16 +461,16 @@ class ContinuumSystem:
     def dependents_other(self, s):
         m = self.skills[s][1]; return [d for d in self.dependents(m) if d != s]
 
-    # ---- régénération 2.0 --------------------------------------------------------------------------
+    # ---- regeneration 2.0 --------------------------------------------------------------------------
     def regenerate(self, module, steps=1500, n=2400):
-        """Reconstruction d'un module corrompu SANS instantané : échantillons générés par les certificats de toutes
-        les compétences qui en dépendent (centre + frontière + rares), étiquetés par leurs références (règle ou
-        substitut), réajustement conjoint en partant des poids corrompus ; vérification par certificats."""
+        """Reconstruction of a corrupted module WITHOUT snapshot: samples generated by the certificates of all
+        the skills that depend on it (centre + boundary + rare), labelled by their references (rule or
+        surrogate), joint refit starting from the corrupted weights; verification by certificates."""
         deps = [s for s in self.dependents(module) if isinstance(self.certs.get(s), GenerativeInvariantCertificate)
                 and self.skills[s][0] in ("expert", "head", "adapter")]
         if not deps: return False
         cur = self.modules[module]; h, d = cur["w1"].shape; o = cur["w2"].shape[0]
-        fresh = new_expert(self.seed + 991, h, d, o)                         # poids corrompus abandonnés (tanh saturé) : réinitialisation
+        fresh = new_expert(self.seed + 991, h, d, o)                         # corrupted weights discarded (saturated tanh): reinitialisation
         q = {k: v.clone().requires_grad_(True) for k, v in fresh.items()}; opt = torch.optim.Adam(q.values(), lr=0.02)
         data = []
         for s in deps:
@@ -489,7 +489,7 @@ class ContinuumSystem:
         self.modules[module] = {k: v.detach() for k, v in q.items()}; self.compute["train"] += steps; self.compute["generation"] += len(deps) * n * 3 // 2
         return self.check_certs(deps)
 
-    # ---- comptabilité mémoire -----------------------------------------------------------------------
+    # ---- memory accounting -----------------------------------------------------------------------
     def memory(self):
         cert = sum(c.memory_bytes() for c in self.certs.values())
         return {"neural_params": self.neural_params(), "neural_bytes": FLOAT_BYTES * self.neural_params(),
@@ -524,7 +524,7 @@ def train_adapter(p, X, y, steps, seed, rank=2, init=None):
     return {k: v.detach() for k, v in q.items()}
 
 
-# ================================================================ bases monolithiques
+# ================================================================ monolithic baselines
 
 MONO_H = 64
 
@@ -536,7 +536,7 @@ def mono_init(seed):
 
 
 class Monolithic:
-    """vanilla | raw_replay | generative_replay | first_order (projection espace nul aux sondes générées)."""
+    """vanilla | raw_replay | generative_replay | first_order (null-space projection at the generated probes)."""
 
     def __init__(self, kind, seed=0, steps=200):
         self.kind, self.seed, self.steps = kind, seed, steps; self.p = mono_init(seed); self.buf = []; self.gens = []; self.basis = None
@@ -616,7 +616,7 @@ def ece(conf, correct, bins=10):
 
 
 def run_stream(method, regs, seed=0, capacity=None, checkpoints=(10, 25, 50, 100), n_support=512, eval_n=384):
-    """Exécute un flux ; renvoie métriques finales + points de contrôle (mise à l'échelle)."""
+    """Runs a stream; returns final metrics + checkpoints (scaling)."""
     sysm = make(method, seed, capacity); g = torch.Generator().manual_seed(seed + 11)
     tests = [r.test_set(seed * 1000 + i, eval_n) for i, r in enumerate(regs)]
     learn_acc, recs, cps, t0 = [], [], {}, time.time()

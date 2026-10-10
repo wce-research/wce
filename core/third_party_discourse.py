@@ -1,20 +1,20 @@
-"""Banc de discours « tiers » : écrit séparément du résolveur, avec ses PROPRES conventions.
+""""Third-party" discourse bench: written separately from the resolver, with its OWN conventions.
 
-Ce module n'importe AUCUN composant de WCE (ni analyseur, ni résolveur, ni grammaire, ni planificateur) :
-bibliothèque standard seulement (vérifié par test AST). Il décrit des scénarios dans son propre format :
+This module imports NO component of WCE (no parser, no resolver, no grammar, no planner):
+standard library only (verified by an AST test). It describes scenarios in its own format:
 
-    objets   : {"A": {"sorte": "cube", "teinte": "rouge", "lieu": "table"}, ...}      (vérité, jamais montrée)
-    capteurs : faits rapportés par le capteur au début (liste de (objet, champ))
-    historique : bilan passé des locuteurs {"bob": (justes, fausses)} — une donnée d'entrée, pas la vérité
-    tours    : ("dit", locuteur, phrase) | ("capteur", objet, champ, valeur) | ("demande", phrase, attendu)
+    objets   : {"A": {"sorte": "cube", "teinte": "rouge", "lieu": "table"}, ...}      (truth, never shown)
+    capteurs : facts reported by the sensor at the start (list of (object, field))
+    historique : past record of the speakers {"bob": (right, wrong)} — an input datum, not the truth
+    tours    : ("dit", speaker, sentence) | ("capteur", object, field, value) | ("demande", sentence, expected)
 
-Attendus (conventions tierces) : un mot de lieu ("table", "étagère", "sol", "boîte"), une teinte ("rouge"…),
-"oui" / "non", "agir:A" (commande sur l'objet A), "?" (il faut demander ou s'abstenir),
-"présupposé" (la description ne désigne rien), "conflit" (sources contradictoires, pas d'engagement).
+Expected values (third-party conventions): a place word ("table", "étagère", "sol", "boîte"), a hue ("rouge"…),
+"oui" / "non", "agir:A" (command on object A), "?" (one must ask or abstain),
+"présupposé" (the description designates nothing), "conflit" (contradictory sources, no commitment).
 
-Deux parties : (1) scénarios écrits à la main (adversariaux, 12 catégories) ; (2) un second générateur,
-indépendant des gabarits de reference_world, qui fait varier l'ordre, la redondance, les omissions,
-les reformulations, les retours à un ancien référent et les interruptions.
+Two parts: (1) hand-written scenarios (adversarial, 12 categories); (2) a second generator,
+independent of the reference_world templates, which varies the order, the redundancy, the omissions,
+the rephrasings, the returns to an earlier referent and the interruptions.
 """
 from __future__ import annotations
 
@@ -37,13 +37,13 @@ def S(id, cat, objets, capteurs, tours, historique=None, note=""):
 def O(sorte, teinte, lieu): return {"sorte": sorte, "teinte": teinte, "lieu": lieu}
 
 
-# ================================================================ (1) scénarios écrits à la main
+# ================================================================ (1) hand-written scenarios
 
 def scenarios_main():
     X = []
     fiable = {"alice": (30, 1), "carla": (30, 1)}
     douteux = {"alice": (30, 1), "bob": (2, 8)}
-    # --- référents implicites ---
+    # --- implicit referents ---
     X.append(S("m01", "implicite", {"A": O("cube", "rouge", "table"), "B": O("balle", "bleu", "sol")},
                [("A", "sorte"), ("B", "sorte")],
                [("dit", "alice", "Un cube est sur la table."), ("demande", "Où est le cube ?", "table"),
@@ -52,7 +52,7 @@ def scenarios_main():
                [("A", "sorte"), ("B", "sorte"), ("B", "teinte")],
                [("dit", "alice", "Le cube rouge est sur la table."), ("demande", "Où est le cube rouge ?", "table"),
                 ("demande", "Où est le cube bleu ?", "?")], fiable))
-    # --- descriptions incomplètes ---
+    # --- incomplete descriptions ---
     X.append(S("m03", "incomplète", {"A": O("cube", "rouge", "table"), "B": O("cube", "bleu", "étagère")},
                [("A", "sorte"), ("B", "sorte")],
                [("dit", "alice", "Le cube est sur la table."), ("demande", "Où est le cube rouge ?", "?"),
@@ -60,7 +60,7 @@ def scenarios_main():
     X.append(S("m04", "incomplète", {"A": O("livre", "vert", "étagère"), "B": O("livre", "jaune", "table")},
                [("A", "sorte"), ("B", "sorte"), ("A", "teinte"), ("B", "teinte")],
                [("demande", "Prends le livre.", "?"), ("demande", "Prends le livre vert.", "agir:A")], fiable))
-    # --- descriptions contradictoires ---
+    # --- contradictory descriptions ---
     X.append(S("m05", "contradictoire", {"A": O("cube", "rouge", "table"), "B": O("cube", "bleu", "sol")},
                [("A", "sorte"), ("B", "sorte"), ("A", "teinte"), ("B", "teinte")],
                [("dit", "alice", "Le cube rouge est bleu."), ("demande", "De quelle couleur est le cube rouge ?", "rouge")], fiable,
@@ -68,7 +68,7 @@ def scenarios_main():
     X.append(S("m06", "contradictoire", {"A": O("balle", "vert", "table")}, [("A", "sorte")],
                [("dit", "alice", "La balle est verte."), ("dit", "carla", "La balle est rouge."),
                 ("demande", "De quelle couleur est la balle ?", "conflit")], fiable))
-    # --- deux entités très similaires ---
+    # --- two very similar entities ---
     X.append(S("m07", "similaires", {"A": O("clé", "jaune", "table"), "B": O("clé", "jaune", "étagère")},
                [("A", "sorte"), ("B", "sorte"), ("A", "teinte"), ("B", "teinte"), ("A", "lieu"), ("B", "lieu")],
                [("demande", "Où est la clé jaune ?", "?"), ("demande", "Prends la clé sur l'étagère.", "agir:B")], fiable))
@@ -76,7 +76,7 @@ def scenarios_main():
                [("A", "sorte"), ("B", "sorte"), ("A", "lieu"), ("B", "lieu")],
                [("demande", "Le cube sur le sol est-il bleu ?", "?"), ("capteur", "B", "teinte", "bleu"),
                 ("demande", "Le cube sur le sol est-il bleu ?", "oui")], fiable))
-    # --- pronoms éloignés ---
+    # --- distant pronouns ---
     X.append(S("m09", "pronom_éloigné", {"A": O("cube", "rouge", "table"), "B": O("balle", "bleu", "sol")},
                [("A", "sorte"), ("B", "sorte"), ("A", "teinte")],
                [("dit", "alice", "Le cube rouge est sur la table."), ("dit", "alice", "La balle est sur le sol."),
@@ -87,7 +87,7 @@ def scenarios_main():
                [("dit", "alice", "Le cube vert est sur l'étagère."), ("dit", "alice", "Le cube jaune est sur la table."),
                 ("dit", "alice", "Il tombe."), ("demande", "Où est le cube jaune ?", "sol"),
                 ("demande", "Où est le cube vert ?", "étagère")], fiable))
-    # --- changement d'état ---
+    # --- change of state ---
     X.append(S("m11", "changement_état", {"A": O("balle", "rouge", "sol"), "B": O("balle", "bleu", "table")},
                [("A", "sorte"), ("B", "sorte"), ("A", "teinte"), ("B", "teinte"), ("A", "lieu")],
                [("capteur", "A", "lieu", "table"), ("dit", "alice", "La balle rouge tombe."),
@@ -96,25 +96,25 @@ def scenarios_main():
     X.append(S("m12", "changement_état", {"A": O("cube", "rouge", "étagère")}, [("A", "sorte"), ("A", "teinte")],
                [("dit", "alice", "Le cube est sur la table."), ("capteur", "A", "lieu", "étagère"),
                 ("demande", "Où est le cube ?", "étagère"), ("demande", "Le cube rouge est-il sur l'étagère ?", "oui")], fiable))
-    # --- faux présupposés ---
+    # --- false presuppositions ---
     X.append(S("m13", "faux_présupposé", {"A": O("cube", "rouge", "table"), "B": O("cube", "bleu", "sol")},
                [("A", "sorte"), ("B", "sorte"), ("A", "teinte"), ("B", "teinte")],
                [("demande", "Où est le cube vert ?", "présupposé"), ("demande", "Prends le cube jaune.", "présupposé")], fiable))
     X.append(S("m14", "faux_présupposé", {"A": O("balle", "rouge", "table")}, [("A", "sorte"), ("A", "teinte")],
                [("demande", "Où est le livre ?", "présupposé"), ("demande", "De quelle couleur est la balle ?", "rouge")], fiable))
-    # --- source non fiable ---
+    # --- unreliable source ---
     X.append(S("m15", "source_douteuse", {"A": O("cube", "rouge", "table"), "B": O("cube", "bleu", "sol")},
                [("A", "sorte"), ("B", "sorte"), ("A", "teinte"), ("B", "teinte")],
                [("dit", "bob", "Le cube rouge est sur l'étagère."), ("demande", "Où est le cube rouge ?", "?")], douteux))
     X.append(S("m16", "source_douteuse", {"A": O("balle", "vert", "table")}, [("A", "sorte")],
                [("dit", "bob", "La balle est jaune."), ("dit", "alice", "La balle est verte."),
                 ("demande", "De quelle couleur est la balle ?", "vert")], douteux))
-    # --- source contradictoire ---
+    # --- contradictory source ---
     X.append(S("m17", "sources_contraires", {"A": O("livre", "rouge", "table")}, [("A", "sorte"), ("A", "teinte")],
                [("dit", "alice", "Le livre est sur la table."), ("dit", "carla", "Le livre est sur l'étagère."),
                 ("demande", "Où est le livre ?", "conflit"), ("capteur", "A", "lieu", "table"),
                 ("demande", "Où est le livre ?", "table")], fiable))
-    # --- « l'autre » ---
+    # --- "l'autre" (the other one) ---
     X.append(S("m18", "autre", {"A": O("cube", "rouge", "table"), "B": O("cube", "bleu", "étagère")},
                [("A", "sorte"), ("B", "sorte"), ("A", "teinte"), ("B", "teinte")],
                [("dit", "alice", "Le cube rouge tombe."), ("dit", "alice", "L'autre reste sur l'étagère."),
@@ -123,7 +123,7 @@ def scenarios_main():
                [("A", "sorte"), ("B", "sorte"), ("C", "sorte"), ("A", "teinte")],
                [("dit", "alice", "La balle rouge est sur la table."), ("dit", "alice", "L'autre est sur le sol."),
                 ("demande", "Où est la balle verte ?", "?")], fiable, "« l'autre » parmi trois : non déterminé"))
-    # --- descriptions relationnelles ---
+    # --- relational descriptions ---
     X.append(S("m20", "relationnelle", {"A": O("cube", "rouge", "table"), "B": O("cube", "bleu", "étagère")},
                [("A", "sorte"), ("B", "sorte"), ("A", "lieu"), ("B", "lieu"), ("A", "teinte"), ("B", "teinte")],
                [("demande", "De quelle couleur est le cube sur la table ?", "rouge"),
@@ -132,7 +132,7 @@ def scenarios_main():
     X.append(S("m21", "relationnelle", {"A": O("clé", "vert", "table"), "B": O("clé", "rouge", "table")},
                [("A", "sorte"), ("B", "sorte"), ("A", "lieu"), ("B", "lieu")],
                [("demande", "De quelle couleur est la clé sur la table ?", "?")], fiable))
-    # --- ellipses simples ---
+    # --- simple ellipses ---
     X.append(S("m22", "ellipse", {"A": O("cube", "rouge", "table"), "B": O("cube", "bleu", "sol")},
                [("A", "sorte"), ("B", "sorte"), ("A", "teinte"), ("B", "teinte")],
                [("dit", "alice", "Le rouge est sur la table."), ("demande", "Où est le cube rouge ?", "table")], fiable))
@@ -140,10 +140,10 @@ def scenarios_main():
                [("A", "sorte"), ("B", "sorte"), ("A", "teinte"), ("B", "teinte")],
                [("dit", "alice", "La jaune est sur l'étagère."), ("dit", "alice", "La verte est sur le sol."),
                 ("demande", "Où est la balle verte ?", "sol"), ("demande", "Où est la balle jaune ?", "étagère")], fiable))
-    # --- mots inconnus : l'abstention est la bonne réponse ---
+    # --- unknown words: abstention is the right answer ---
     X.append(S("m24", "hors_lexique", {"A": O("cube", "rouge", "table")}, [("A", "sorte")],
                [("dit", "alice", "Le cube est sur le rayon."), ("demande", "Où est le cube ?", "?")], fiable))
-    # --- auto-correction : une réponse probable est révisée par une contradiction fiable ---
+    # --- self-correction: a likely answer is revised by a reliable contradiction ---
     X.append(S("m25", "correction", {"A": O("cube", "rouge", "étagère"), "B": O("cube", "bleu", "sol")},
                [("A", "sorte"), ("B", "sorte"), ("B", "teinte")],
                [("dit", "alice", "Un cube est sur la table."), ("dit", "alice", "Il est rouge."),
@@ -156,7 +156,7 @@ def scenarios_main():
 
 
 def scenarios_aveugles():
-    """Second lot écrit à la main APRÈS la mise au point : évalué une seule fois, sans retouche du système."""
+    """Second hand-written set written AFTER tuning: evaluated only once, with no adjustment of the system."""
     X = []
     f = {"alice": (30, 1), "carla": (30, 1)}
     d = {"alice": (30, 1), "bob": (2, 8)}
@@ -215,7 +215,7 @@ def scenarios_aveugles():
     return X
 
 
-# ================================================================ (2) second générateur (conventions différentes)
+# ================================================================ (2) second generator (different conventions)
 
 VARIATIONS = ("ordre", "redondance", "omission", "reformulation", "retour", "interruption")
 
@@ -243,13 +243,13 @@ def scenario_genere(i, rng: random.Random, variation):
     capteurs = [("A", "sorte"), ("B", "sorte"), ("C", "sorte"), ("B", "teinte")]
     hist = {"dora": (25, 1)}
     tours = []
-    # le locuteur situe A par sa teinte (B est connu du capteur : A est déterminé par élimination de teinte)
+    # the speaker locates A by its hue (B is known to the sensor: A is determined by hue elimination)
     phrase_a = f"{_cap(_np(s1, t1))} est sur {ARTICLE_LIEU[l1]}."
     if variation == "reformulation":
         tours.append(("dit", "dora", f"{_cap(_np(s1, defini=False))} est sur {ARTICLE_LIEU[l1]}."))
         tours.append(("dit", "dora", f"{_pron(s1)} est {ACCORD[(t1, FEMININ[s1])]}."))
     elif variation == "omission":
-        tours.append(("dit", "dora", f"{_cap(_np(s1))} est sur {ARTICLE_LIEU[l1]}."))       # teinte omise
+        tours.append(("dit", "dora", f"{_cap(_np(s1))} est sur {ARTICLE_LIEU[l1]}."))       # hue omitted
     else:
         tours.append(("dit", "dora", phrase_a))
     if variation == "redondance": tours.append(("dit", "dora", phrase_a))
@@ -278,7 +278,7 @@ def scenarios_generes(n=120, seed=7):
 
 
 def scenarios_trompeurs(n=60, seed=3, taux=0.4):
-    """Un locuteur à bon historique se trompe parfois de lieu (la vérité n'est révélée que par le capteur)."""
+    """A speaker with a good record is sometimes wrong about the place (the truth is revealed only by the sensor)."""
     rng = random.Random(seed)
     out = []
     for i in range(n):
@@ -295,7 +295,7 @@ def scenarios_trompeurs(n=60, seed=3, taux=0.4):
 
 
 def scenarios_commandes(n=60, seed=5):
-    """Commande sur un objet décrit ; les teintes ne sont pas observées : l'identité doit être établie (0,99)."""
+    """Command on a described object; the hues are not observed: the identity must be established (0.99)."""
     rng = random.Random(seed)
     out = []
     for i in range(n):

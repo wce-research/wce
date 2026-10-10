@@ -1,14 +1,14 @@
-"""Expériences du sous-jalon Fragment Attribution & Primitive Type Inference — module d'ÉVALUATION (dev uniquement ; il
-voit la vérité, rien n'en revient au système ; jamais le lot scellé).
+"""Experiments of the Fragment Attribution & Primitive Type Inference sub-milestone — EVALUATION module (dev only; it
+sees the truth, nothing flows back to the system; never the sealed set).
 
-  group   : qualité de l'attribution des milieux à leur source vraie, par mécanisme de regroupement
-  type    : inférence du type (sans paramètres comme problème principal), matrice oracle fragments × type
-  own     : propriété du masquage (cachée / hors domaine / bruit / absente)
-  active  : mesure additionnelle pour lever une ambiguïté de type
-  chain   : attribution → type → paramètres → structure candidate → fonction, SANS oracle de type
+  group   : quality of the attribution of midpoints to their true source, per grouping mechanism
+  type    : type inference (without parameters as the main problem), oracle matrix fragments × type
+  own     : occlusion ownership (hidden / out of domain / noise / absent)
+  active  : additional measurement to resolve a type ambiguity
+  chain   : attribution → type → parameters → candidate structure → function, WITHOUT a type oracle
 
-Scènes : celles du banc de masquage (sous-plage dev + 300 000), indices 100+ jamais utilisés ; mise au point : + 350 000.
-Tâches de composition : clés 600+ de `down_task` (jamais utilisées ; mise au point : clé 699).
+Scenes: those of the occlusion bench (dev sub-range + 300,000), indices 100+ never used; tuning: + 350,000.
+Composition tasks: keys 600+ of `down_task` (never used; tuning: key 699).
 """
 from __future__ import annotations
 
@@ -27,7 +27,7 @@ from core.deep_primitive_eval import _ray_as_line, component_match, components, 
 from core.deep_primitives import Pairs, atom_name
 from core.deep_world import obs_region
 
-SCENE_OFFSET = 100                      # indices de scène 100+ : jamais utilisés par le sous-jalon précédent (0–31)
+SCENE_OFFSET = 100                      # scene indices 100+: never used by the previous sub-milestone (0–31)
 VARIANTS = ("hier", "hier_no_negative", "hier_naive_negative", "hier_loop", "flat_fragments", "flat_scene")
 MAIN = "hier"
 
@@ -35,7 +35,7 @@ MAIN = "hier"
 def scene_at(index, kind, mask, noise, tune=False): return masked_scene((0 if tune else SCENE_OFFSET) + int(index), kind, mask, noise, tune=tune)
 
 
-# ================================================================ sources vraies et qualité d'attribution
+# ================================================================ true sources and attribution quality
 
 def _dist(c: tuple, M: torch.Tensor) -> torch.Tensor:
     if c[0] == "circle": return ((M - torch.tensor(c[1:3], dtype=DT)).norm(dim=1) - c[3]).abs()
@@ -44,15 +44,15 @@ def _dist(c: tuple, M: torch.Tensor) -> torch.Tensor:
 
 
 def true_sources(M: torch.Tensor, atoms: Sequence[BNode], tol=0.25):
-    """Source vraie de chaque milieu : (indice d'atome, indice de composante) de la frontière vraie la plus proche à moins
-    de `tol` ; −1 sinon (bruit). Renvoie (composante [m], atome [m])."""
+    """True source of each midpoint: (atom index, component index) of the nearest true boundary within
+    `tol`; −1 otherwise (noise). Returns (component [m], atom [m])."""
     cs = [(i, c) for i, a in enumerate(atoms) for c in components(a)]
     if not len(M) or not cs: return torch.full((len(M),), -1, dtype=torch.long), torch.full((len(M),), -1, dtype=torch.long)
     D = torch.stack([_dist(c, M) for _, c in cs], 1); d, j = D.min(1); comp = torch.where(d < tol, j, torch.full_like(j, -1)); atom = torch.tensor([cs[int(x)][0] if x >= 0 else -1 for x in comp], dtype=torch.long); return comp, atom
 
 
 def pair_scores(lab: torch.Tensor, src: torch.Tensor) -> dict:
-    """Précision / rappel par paires de milieux : « même groupe » contre « même source vraie » (milieux de source connue)."""
+    """Precision / recall over pairs of midpoints: "same group" versus "same true source" (midpoints of known source)."""
     m = src >= 0; lab, src = lab[m], src[m]
     if len(lab) < 2: return {"precision": None, "recall": None, "f1": None, "assigned": None}
     sg = (lab[:, None] == lab[None, :]) & (lab[:, None] >= 0); ss = src[:, None] == src[None, :]; off = ~torch.eye(len(lab), dtype=torch.bool); tp = float((sg & ss & off).sum()); p = tp / max(1.0, float((sg & off).sum())); r = tp / max(1.0, float((ss & off).sum()))
@@ -63,21 +63,21 @@ def group_rows(sc: MaskedScene, seed=0) -> List[dict]:
     ob = observe(sc.X, sc.y); atoms = [sc.target] + ([sc.occluder] if sc.occluder is not None else []); comp, atom = true_sources(ob.points, atoms); out = []
     for mode in GROUPINGS + ("typed",):
         t0 = time.time(); lab = typed_labels(ob, seed) if mode == "typed" else group_points(ob, mode, seed=seed); s = pair_scores(lab, comp)
-        mixed = [float((atom[lab == g] == 0).float().mean()) for g in torch.unique(lab).tolist() if g >= 0 and int(((lab == g) & (atom >= 0)).sum()) >= 4]            # part « cible » de chaque groupe : 0 ou 1 = pur
+        mixed = [float((atom[lab == g] == 0).float().mean()) for g in torch.unique(lab).tolist() if g >= 0 and int(((lab == g) & (atom >= 0)).sum()) >= 4]            # "target" share of each group: 0 or 1 = pure
         out.append({"grouping": mode, "kind": sc.kind, "mask": sc.mask, "noise": sc.noise, **s, "groups": int(len(torch.unique(lab[lab >= 0]))), "mixed_groups": sum(0.1 < v < 0.9 for v in mixed) / max(1, len(mixed)), "seconds": round(time.time() - t0, 4)})
     return out
 
 
-# ================================================================ inférence de type et matrice oracle
+# ================================================================ type inference and oracle matrix
 
 def restrict(ob: ObservedBoundary, keep: torch.Tensor) -> ObservedBoundary:
-    """Frontière observée réduite aux milieux d'une source (oracle « fragments vrais »)."""
+    """Observed boundary restricted to the midpoints of one source ("true fragments" oracle)."""
     from core.deep_partial import link_fragments
     return ObservedBoundary(ob.points[keep], ob.normals[keep], link_fragments(ob.points[keep]), ob.pairs, ob.X, ob.y)
 
 
 def _overlap(p: BNode, M: torch.Tensor, is_target: torch.Tensor) -> float:
-    """Part des milieux soutenant l'hypothèse (à moins de 0,25 de sa frontière) qui viennent de la primitive cible."""
+    """Share of the midpoints supporting the hypothesis (within 0.25 of its boundary) that come from the target primitive."""
     B = render(p, n=160, box=(-9.0, 9.0, -9.0, 9.0), reach=6.0)
     if not len(B) or not len(M): return 0.0
     s = torch.cdist(M, B).min(1).values < 0.25; return float(is_target[s].float().mean()) if int(s.sum()) >= 3 else 0.0
@@ -88,34 +88,34 @@ def _equivalent(T: BNode, hyps: Sequence[BNode]) -> bool:
 
 
 def run_variant(ob: ObservedBoundary, variant: str, k=3, seed=0):
-    """Renvoie (hypothèses classées, statistiques). k = types gardés par groupe."""
+    """Returns (ranked hypotheses, statistics). k = types kept per group."""
     if variant == "flat_scene": t0 = time.time(); H = flat_types(ob, k, seed); return H, {"types_tested": len(H), "seconds": round(time.time() - t0, 3), "fragments": 0, "groups": 0}
     inf = infer_types(ob, k, negative={"hier_no_negative": "none", "hier_naive_negative": "naive"}.get(variant, "ownership"), hierarchical=variant != "flat_fragments", iters=1 if variant == "hier_loop" else 0, seed=seed)
     return inf.selected, {**inf.stats, "loop": [l["action"] for l in inf.log[1:]]}
 
 
 def type_row(sc: MaskedScene, variant: str, seed=0) -> dict:
-    """Banc d'inférence de type. `n` = nombre de primitives vraies de la scène (cible, plus le masque s'il existe) ;
-    « top-1 » = parmi les n premières hypothèses, « top-3 » = parmi les 3n premières.
-      exact       même type ET frontières dans la tolérance
-      type        même type, soutenu majoritairement par des milieux de la cible (les paramètres ne sont pas jugés)
-      equivalent  toutes les frontières de la cible sont retrouvées par les hypothèses retenues, quel que soit leur type
-      functional  accord fonctionnel ≥ 0,95 avec la cible"""
+    """Type inference bench. `n` = number of true primitives in the scene (target, plus the occluder if there is one);
+    "top-1" = among the first n hypotheses, "top-3" = among the first 3n.
+      exact       same type AND boundaries within tolerance
+      type        same type, supported mostly by midpoints of the target (the parameters are not judged)
+      equivalent  all the boundaries of the target are recovered by the retained hypotheses, whatever their type
+      functional  functional agreement ≥ 0.95 with the target"""
     T = sc.target; ob = observe(sc.X, sc.y); atoms = [T] + ([sc.occluder] if sc.occluder is not None else []); comp, atom = true_sources(ob.points, atoms); is_t = atom == 0; n = len(atoms); P = _probe(); tt = type_of(T)
     H, st = run_variant(ob, variant, 3, seed); row = {"variant": variant, "kind": sc.kind, "mask": sc.mask, "noise": sc.noise, "n_hypotheses": len(H), **{k: st.get(k) for k in ("types_tested", "fragments", "groups", "seconds")}}
     for name, top in (("1", n), ("3", 3 * n)):
         L = H[:top]; row[f"exact_{name}"] = any(h.type == tt and recovered(T, h.program) for h in L); row[f"type_{name}"] = any(h.type == tt and _overlap(h.program, ob.points, is_t) > 0.5 for h in L)
         row[f"equivalent_{name}"] = _equivalent(T, [h.program for h in L]); row[f"functional_{name}"] = any(functional(T, h.program, P) >= 0.95 for h in L)
-    own = [(h, _overlap(h.program, ob.points, is_t)) for h in H]; own = [x for x in own if x[1] > 0.5]                         # hypothèses attribuées à la cible : la mieux classée donne le type prédit
+    own = [(h, _overlap(h.program, ob.points, is_t)) for h in H]; own = [x for x in own if x[1] > 0.5]                         # hypotheses attributed to the target: the best-ranked one gives the predicted type
     row["predicted"] = own[0][0].type if own else "none"; row["confidence"] = own[0][0].confidence if own else None; row["correct"] = bool(own) and own[0][0].type == tt
     if own: row["signals"] = {k: v for k, v in own[0][0].signals.items() if v is not None}
     return row
 
 
 def oracle_row(sc: MaskedScene, seed=0) -> dict:
-    """Matrice oracle (récupération exacte de la cible en première hypothèse) :
-      TT fragments vrais + type vrai      TI fragments vrais + type inféré
-      ET fragments estimés + type vrai    EI fragments estimés + type inféré"""
+    """Oracle matrix (exact recovery of the target as first hypothesis):
+      TT true fragments + true type        TI true fragments + inferred type
+      ET estimated fragments + true type    EI estimated fragments + inferred type"""
     T = sc.target; ob = observe(sc.X, sc.y); atoms = [T] + ([sc.occluder] if sc.occluder is not None else []); _, atom = true_sources(ob.points, atoms); tt = type_of(T); n = len(atoms); obt = restrict(ob, atom == 0); sk = T.skeleton()
     hit = lambda hs: bool(hs) and recovered(T, hs[0])
     TT = [h.program for h in infer(sk, obt, 3, seed=seed, regions=False)] if len(obt.points) >= 4 else []; ET = [h.program for h in infer(sk, ob, 3, seed=seed, regions=False)]
@@ -124,11 +124,11 @@ def oracle_row(sc: MaskedScene, seed=0) -> dict:
             "EI": any(h.type == tt and recovered(T, h.program) for h in ei[:n]), "target_points": int((atom == 0).sum())}
 
 
-# ================================================================ propriété du masquage
+# ================================================================ occlusion ownership
 
 def own_row(sc: MaskedScene, seed=0) -> dict:
-    """La primitive VRAIE est donnée ; le système doit dire pourquoi ses portions manquantes manquent. Les autres
-    hypothèses (candidats masques) sont celles que le système a inférées lui-même."""
+    """The TRUE primitive is given; the system must say why its missing portions are missing. The other
+    hypotheses (occluder candidates) are those the system inferred itself."""
     ob = observe(sc.X, sc.y); H = infer_types(ob, 2, seed=seed).hypotheses; others = [h.program for h in H if not recovered(sc.target, h.program)][:8]; o = ownership(sc.target, ob, others); B = render(sc.target, n=96, box=(-9.0, 9.0, -9.0, 9.0), reach=6.0)
     hidden = ~predict(sc.occluder, B.float()).bool() if sc.occluder is not None else torch.zeros(len(B), dtype=torch.bool); inside = (B[:, 0] >= BOX[0]) & (B[:, 0] <= BOX[1]) & (B[:, 1] >= BOX[2]) & (B[:, 1] <= BOX[3]); lab = o.labels
     th = hidden & inside; tv = ~hidden & inside; f = lambda m, names: (sum(1 for l, x in zip(lab, m.tolist()) if x and l in names) / max(1, int(m.sum()))) if int(m.sum()) else None
@@ -136,7 +136,7 @@ def own_row(sc: MaskedScene, seed=0) -> dict:
             "owner_found": o.owner is not None, "owner_is_occluder": o.owner is not None and sc.occluder is not None and (recovered(sc.occluder, others[o.owner]) or functional(sc.occluder, others[o.owner]) >= 0.9), **{f"frac_{k}": v for k, v in o.fractions.items()}}
 
 
-# ================================================================ branche secteur
+# ================================================================ sector branch
 
 def sector_row(sc: MaskedScene, seed=0) -> dict:
     T = sc.target; ob = observe(sc.X, sc.y); inf = infer_types(ob, 3, seed=seed); rays = components(T); g = geometry_of(T); fr = [f for f in inf.fragments if f.straight]; lines = [("line", f.params[0], f.params[1]) for f in fr]
@@ -152,7 +152,7 @@ def geometry_of(p):
     return geometry(p)
 
 
-# ================================================================ mesure active pour lever une ambiguïté de type
+# ================================================================ active measurement to resolve a type ambiguity
 
 def active_row(sc: MaskedScene, policy: str, seed=0, budget=16) -> dict:
     X, y = sc.X, sc.y; g = torch.Generator().manual_seed(seed + 91)
@@ -160,15 +160,15 @@ def active_row(sc: MaskedScene, policy: str, seed=0, budget=16) -> dict:
         pool = obs_region(600, g)
         if policy == "random": idx = torch.randperm(len(pool), generator=g)[:budget]
         else:
-            H = infer_types(observe(X, y), 3, seed=seed).selected[:6]; idx = parameter_queries([h.program for h in H], pool, budget, [max(1e-6, h.score) for h in H])            # là où les TYPES concurrents prédisent des étiquettes différentes
+            H = infer_types(observe(X, y), 3, seed=seed).selected[:6]; idx = parameter_queries([h.program for h in H], pool, budget, [max(1e-6, h.score) for h in H])            # where the competing TYPES predict different labels
             if len(idx) < budget: rest = torch.tensor([i for i in torch.randperm(len(pool), generator=g).tolist() if i not in set(idx.tolist())][: budget - len(idx)], dtype=torch.long); idx = torch.cat([idx, rest])
         x = pool[idx]; yn = predict(sc.program, x); flip = torch.rand(len(x), generator=g) < sc.noise; X, y = torch.cat([X, x]), torch.cat([y, torch.where(flip, 1 - yn, yn)])
     r = type_row(MaskedScene(X, y, sc.target, sc.occluder, sc.program, sc.kind, sc.mask, sc.noise, sc.seed), MAIN, seed); return {"policy": policy, "kind": sc.kind, "mask": sc.mask, **{k: r[k] for k in ("correct", "exact_1", "type_1", "functional_1")}}
 
 
-# ================================================================ chaîne aval SANS oracle de type
+# ================================================================ downstream chain WITHOUT a type oracle
 
-# (nom, source, k, politique)
+# (name, source, k, policy)
 CHAIN_ARMS = (("reference", "reference", 0, "always"), ("true", "true", 0, "always"), ("po_type_k3", "po", 3, "always"), ("robust_none", "robust", 0, "always"),
               ("hier_k1", "hier", 1, "always"), ("hier_k3", "hier", 3, "always"), ("hier_k3_no_negative", "hier_no_negative", 3, "always"), ("hier_k3_loop", "hier_loop", 3, "always"), ("flat_fragments_k3", "flat_fragments", 3, "always"),
               ("flat_scene_k1", "flat_scene", 1, "always"), ("flat_scene_k3", "flat_scene", 3, "always"), ("hier_k3_resid", "hier+resid", 3, "always"), ("flat_scene_k3_resid", "flat_scene+resid", 3, "always"),
@@ -189,7 +189,7 @@ def chain(task, arm: str, seed=0) -> dict:
     if base == "true": lits = list(tl)
     elif base == "robust": c = load_config(); d = discover_robust(X, y, proposer("union"), validator("full", c), seed=seed, joint=True, prune_z=c["prune_z"], split=c["split"]); lits = literals_of(d, alternatives=2)
     elif base == "po": lits, _ = po_literals(task, k, None, "visible", seed)
-    elif base in ("oracle_tt", "oracle_ti"):                                       # fragments VRAIS : les milieux de chaque feuille sont isolés
+    elif base in ("oracle_tt", "oracle_ti"):                                       # TRUE fragments: the midpoints of each leaf are isolated
         lits = []
         for i, a in enumerate(tl):
             sub = restrict(ob, atom == i)
@@ -210,7 +210,7 @@ def chain(task, arm: str, seed=0) -> dict:
             "groups": st.get("groups"), "inference_seconds": st.get("seconds"), "fit_equivalents": fe, "seconds": round(time.time() - t0, 2)}
 
 
-# ================================================================ sous-unités AWS
+# ================================================================ AWS sub-units
 
 def subunits(key):
     from core.deep_experiments import DOWN_DEPTHS, GEN_REGIMES, _row, down_task

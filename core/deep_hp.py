@@ -1,29 +1,29 @@
-"""High-Precision Primitive Estimation — rendre chaque primitive assez précise pour la composition, sans oracle.
+"""High-Precision Primitive Estimation — making each primitive precise enough for composition, without an oracle.
 
-Constat de mise au point (clés 1090–1099, voir le rapport) : les objectifs LOCAUX à une seule primitive (contraste de
-paires voisines, plancher sur une grille spatiale) ne sont pas alignés avec la fonction — en partant de la vraie
-primitive, ils s'en éloignent. L'objectif aligné est CONJOINT et sans structure : le plancher par cellules,
+Tuning finding (keys 1090–1099, see the report): the LOCAL single-primitive objectives (contrast of
+neighboring pairs, floor on a spatial grid) are not aligned with the function — starting from the true
+primitive, they move away from it. The aligned objective is JOINT and structure-free: the per-cell floor,
 
-    plancher(ensemble) = Σ_cellules min(positifs, négatifs),   cellule = vecteur des valeurs des atomes
+    floor(set) = Σ_cells min(positives, negatives),   cell = vector of the values of the atoms
 
-c'est-à-dire le plus petit nombre d'erreurs atteignable par une fonction booléenne QUELCONQUE de ces atomes. C'est
-exactement ce que la composition sur classes d'équivalence peut exploiter ; il est indépendant de la polarité.
+that is, the smallest number of errors attainable by ANY Boolean function of these atoms. This is
+exactly what composition over equivalence classes can exploit; it is independent of polarity.
 
-    vivier (rappel d'abord) → ensembles compatibles
-        → raffinement conjoint des paramètres sur le plancher      (local, borné, point initial conservé)
-        → naissance : primitive manquante cherchée dans l'espace des paramètres par gain de plancher,
-                      orientée par la morphologie du résidu
-        → élagage conditionnel → validation par sous-échantillonnage répété → commit / rollback
-        → même aval fort que les autres chaînes (ensembles → composition sur classes → finalisation validée)
+    pool (recall first) → compatible sets
+        → joint refinement of the parameters on the floor          (local, bounded, initial point kept)
+        → birth: missing primitive searched for in parameter space by floor gain,
+                 guided by the morphology of the residual
+        → conditional pruning → validation by repeated subsampling → commit / rollback
+        → same strong downstream as the other chains (sets → composition over classes → validated finalization)
 
-Objets :
-  PrimitiveEstimate        estimation centrale, incertitude, région compatible, stabilité, provenance, identifiabilité
-  ResidualMorphology       forme du résidu : linéaire, arc, paire parallèle, paire concentrique, radiale
-  SetImprovement           journal d'un ensemble : plancher et erreur validée avant / après, naissances, décision
-  HPRecovery               résultat de la chaîne complète
+Objects:
+  PrimitiveEstimate        central estimate, uncertainty, compatible region, stability, provenance, identifiability
+  ResidualMorphology       shape of the residual: linear, arc, parallel pair, concentric pair, radial
+  SetImprovement           log of a set: floor and validated error before / after, births, decision
+  HPRecovery               result of the complete chain
 
-Toute transformation suit le Validated Transformation Principle : proposer → évaluer sur un critère valide (erreur
-hors-échantillon du plancher, sous-échantillonnage répété) → commit ou rollback. Aucune vérité de monde ; aucun oracle.
+Every transformation follows the Validated Transformation Principle: propose → evaluate on a valid criterion (out-of-sample
+error of the floor, repeated subsampling) → commit or rollback. No world truth; no oracle.
 """
 from __future__ import annotations
 
@@ -43,29 +43,29 @@ CONFIG_FILE = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__fil
 DEFAULTS = {"k": 5, "sources": ("flat", "components"), "curves": True, "lines": 12, "circles": 10, "band_factor": 0.8, "cos_normal": 0.5, "joint": True, "n_refine_sets": 3, "sweeps": 2, "samples": 48, "scale": 0.08, "margin": 1.5, "births": 2, "birth_samples": 1500, "birth_top": 4, "birth_gain": 3.0,
             "birth_per_param": 1.4, "prune_gain": 1.5, "cv_repeats": 24, "cv_fraction": 0.2, "validate": "holdout", "holdout_repeats": 3, "holdout_fraction": 0.3, "holdout_z": 1.64, "refine": True, "morphology": True, "describe": False}
 IDENT = ("IDENTIFIABLE", "PARTIALLY_IDENTIFIABLE", "UNIDENTIFIABLE")
-IDENT_TOL = 0.10                 # demi-largeur de région compatible en dessous de laquelle un paramètre est dit identifié (fixée a priori)
+IDENT_TOL = 0.10                 # half-width of the compatible region below which a parameter is said to be identified (fixed a priori)
 MORPHOLOGIES = ("linear", "arc", "parallel", "concentric", "radial", "none")
-BIRTH_TYPES = ("half", "band", "disc", "ring", "sector")          # l'anti-disque est le complément du disque : même cellule, même plancher
+BIRTH_TYPES = ("half", "band", "disc", "ring", "sector")          # the anti-disc is the complement of the disc: same cell, same floor
 MORPH_TYPES = {"linear": ("half", "sector", "band"), "arc": ("disc", "ring"), "parallel": ("band", "half"), "concentric": ("ring", "disc"), "radial": ("sector", "half"), "none": BIRTH_TYPES}
 PI = math.pi
 _hard = lambda z: (z >= 0).to(DT)
 
 
 def load_config() -> dict:
-    """Réglages choisis sur les tâches de MISE AU POINT uniquement ; valeurs par défaut sinon."""
+    """Settings chosen on the TUNING tasks only; default values otherwise."""
     try:
         with open(CONFIG_FILE) as fh: return {**DEFAULTS, **json.load(fh)["config"]}
     except (OSError, ValueError, KeyError): return dict(DEFAULTS)
 
 
-# ================================================================ familles de paramètres
+# ================================================================ parameter families
 
 def strip(p: BNode) -> BNode: return p.children[0] if p.kind == "not" else p
 
 
 def families(p: BNode) -> List[str]:
-    """Famille géométrique de chaque paramètre du vecteur de `p` : centre, rayon, orientation, décalage, direction,
-    demi-ouverture. Les tolérances, les incertitudes et la carte de sensibilité sont rapportées par famille."""
+    """Geometric family of each parameter of the vector of `p`: center, radius, orientation, offset, direction,
+    half-aperture. Tolerances, uncertainties and the sensitivity map are reported per family."""
     p = strip(p); l = p.children[0] if p.kind == "translate" else p; pre = ["center", "center"] if p.kind == "translate" else []
     if l.feat == "dot": return pre + ["orientation"] + ["offset"] * (len(l.params) - 1)
     if l.feat == "norm": return pre + ["radius"] * len(l.params)
@@ -77,17 +77,17 @@ def type_name(p: BNode) -> str:
     return type_of(strip(p))
 
 
-# ================================================================ estimateurs spécialisés : courbes de frontière
+# ================================================================ specialized estimators: boundary curves
 
 def spacing(X: torch.Tensor) -> float:
-    """Espacement médian des observations : fixe l'échelle de localisation d'une frontière (aucune constante de scène)."""
+    """Median spacing of the observations: sets the localization scale of a boundary (no scene constant)."""
     D = torch.cdist(X.to(DT), X.to(DT)); D.fill_diagonal_(float("inf")); return float(D.min(1).values.median())
 
 
 def _sequential(inl: torch.Tensor, top: int, min_inliers: int, refit) -> list:
-    """Consensus SÉQUENTIEL (« qui explique quoi ») : la meilleure hypothèse est ré-estimée sur ses éléments, gardée,
-    puis ses éléments sont retirés du décompte des suivantes. Une courbe courte n'est donc pas noyée sous les
-    variantes d'une courbe longue."""
+    """SEQUENTIAL consensus ("who explains what"): the best hypothesis is re-estimated on its elements, kept,
+    then its elements are removed from the count of the following ones. A short curve is therefore not drowned under the
+    variants of a long curve."""
     alive = torch.ones(inl.shape[1], dtype=torch.bool); out = []
     for _ in range(top):
         sc = (inl & alive[None]).sum(1); k = int(sc.argmax())
@@ -99,10 +99,10 @@ def _sequential(inl: torch.Tensor, top: int, min_inliers: int, refit) -> list:
 
 
 def extract_lines(ob, top=12, seed=0, band_factor=0.6, cos_normal=0.8, min_inliers=4, n_pairs=1500) -> list:
-    """Demi-plan — orientation puis décalage. Votes : chaque élément de frontière propose SA droite (normale locale),
-    plus des droites par deux éléments voisins. Un élément ne soutient une droite que s'il en est proche ET si sa
-    normale locale s'accorde (cela écarte les croisements). Ré-estimation par moindres carrés totaux, consensus
-    séquentiel. La bande suit l'espacement des observations."""
+    """Half-plane — orientation then offset. Votes: each boundary element proposes ITS line (local normal),
+    plus lines through two neighboring elements. An element supports a line only if it is close to it AND if its
+    local normal agrees (this discards crossings). Re-estimation by total least squares, sequential
+    consensus. The band follows the spacing of the observations."""
     from core.deep_partial import Component, line_tls
     M, N = ob.points, ob.normals; m = len(M)
     if m < min_inliers: return []
@@ -121,9 +121,9 @@ def extract_lines(ob, top=12, seed=0, band_factor=0.6, cos_normal=0.8, min_inlie
 
 
 def extract_circles(ob, top=10, seed=0, band_factor=0.6, cos_normal=0.8, min_inliers=5, n_triplets=3000, reach=1.6, r_range=(0.2, 3.5)) -> list:
-    """Disque / anti-disque — centre puis rayon. Cercles par trois éléments d'un même voisinage (un arc) ; un élément ne
-    soutient un cercle que s'il est sur la bande ET si sa normale locale est RADIALE. Ré-estimation Taubin puis
-    géométrique, consensus séquentiel."""
+    """Disc / anti-disc — center then radius. Circles through three elements of the same neighborhood (an arc); an element
+    supports a circle only if it is on the band AND if its local normal is RADIAL. Taubin then geometric
+    re-estimation, sequential consensus."""
     from core.deep_partial import Component, circle_geometric, circle_taubin
     M, N = ob.points, ob.normals; m = len(M)
     if m < min_inliers: return []
@@ -148,13 +148,13 @@ def extract_circles(ob, top=10, seed=0, band_factor=0.6, cos_normal=0.8, min_inl
 
 
 def assemble(ob, lines: list, circles: list, k=5, joint=True) -> List[Tuple[BNode, float, str]]:
-    """Courbes → primitives, par FAMILLE, les primitives riches étant des compositions contraintes de courbes simples :
-      demi-plan   une droite                              disque / anti-disque   un cercle (les deux polarités)
-      bande       deux droites parallèles, orientation partagée (`joint`) ou droites indépendantes
-      anneau      deux cercles concentriques, centre partagé (`joint`) ou cercles indépendants
-      secteur     deux demi-droites de même sommet : le sommet est l'intersection, et chaque droite doit porter des
-                  éléments du côté de SA demi-droite (c'est ce qui distingue un secteur de deux demi-plans sécants)
-    Au plus `k` hypothèses par type composé, classées par score tolérant au masquage."""
+    """Curves → primitives, by FAMILY, the rich primitives being constrained compositions of simple curves:
+      half-plane  one line                                disc / anti-disc       one circle (both polarities)
+      band        two parallel lines, shared orientation (`joint`) or independent lines
+      ring        two concentric circles, shared center (`joint`) or independent circles
+      sector      two rays with the same vertex: the vertex is the intersection, and each line must carry
+                  elements on the side of ITS ray (this is what distinguishes a sector from two intersecting half-planes)
+    At most `k` hypotheses per compound type, ranked by occlusion-tolerant score."""
     from core.deep_fragments import SKELETONS
     from core.deep_partial import _wrap, build, concentric_fit, orient, parallel_fit, visible_score
     M = ob.points; out: Dict[str, list] = {t: [] for t in SKELETONS}
@@ -196,16 +196,16 @@ def assemble(ob, lines: list, circles: list, k=5, joint=True) -> List[Tuple[BNod
 
 
 def curve_pool(X: torch.Tensor, y: torch.Tensor, k=5, seed=0, cfg: Optional[dict] = None) -> List[Tuple[BNode, float, str]]:
-    """Vivier des estimateurs spécialisés : droites et cercles par votes avec normales et consensus séquentiel, puis
-    assemblage par famille. Budget compact : au plus `lines` droites et `circles` cercles."""
+    """Pool of the specialized estimators: lines and circles by votes with normals and sequential consensus, then
+    assembly by family. Compact budget: at most `lines` lines and `circles` circles."""
     from core.deep_partial import observe
     c = {**load_config(), **(cfg or {})}; ob = observe(X, y); return assemble(ob, extract_lines(ob, c["lines"], seed, c["band_factor"], c["cos_normal"]), extract_circles(ob, c["circles"], seed, c["band_factor"], c["cos_normal"]), k, c["joint"])
 
 
-# ================================================================ plancher par cellules (vectorisé)
+# ================================================================ per-cell floor (vectorized)
 
 def evaluate_batch(skel: BNode, TH: torch.Tensor, Xd: torch.Tensor) -> torch.Tensor:
-    """[K, n] valeurs 0/1 de K paramétrisations d'un même squelette."""
+    """[K, n] 0/1 values of K parameterizations of the same skeleton."""
     return compile_skeleton(skel)(TH, Xd, _hard)
 
 
@@ -221,7 +221,7 @@ def cell_code(bits: Sequence[torch.Tensor], n: int, skip: Optional[int] = None) 
 
 
 def floor_batch(B: torch.Tensor, others: torch.Tensor, y: torch.Tensor, ncell: int) -> torch.Tensor:
-    """Plancher de K candidats [K, n] ajoutés à un contexte de cellules `others` [n] : Σ min(positifs, négatifs)."""
+    """Floor of K candidates [K, n] added to a context of cells `others` [n]: Σ min(positives, negatives)."""
     K, n = B.shape; cell = others[None] * 2 + B.long(); yy = y[None].to(DT).expand(K, n)
     pos = torch.zeros(K, ncell * 2, dtype=DT).scatter_add_(1, cell, yy); tot = torch.zeros(K, ncell * 2, dtype=DT).scatter_add_(1, cell, torch.ones(K, n, dtype=DT)); return torch.minimum(pos, tot - pos).sum(1)
 
@@ -231,24 +231,24 @@ def set_floor(bits: Sequence[torch.Tensor], y: torch.Tensor) -> float:
 
 
 def floor_prediction(bits: Sequence[torch.Tensor], y: torch.Tensor) -> torch.Tensor:
-    """Étiquette majoritaire de la cellule de chaque observation : la meilleure fonction booléenne de ces atomes."""
+    """Majority label of the cell of each observation: the best Boolean function of these atoms."""
     n = len(y); c = cell_code(bits, n); nc = 2 ** len(bits); pos = torch.zeros(nc, dtype=DT).scatter_add_(0, c, y.to(DT)); tot = torch.zeros(nc, dtype=DT).scatter_add_(0, c, torch.ones(n, dtype=DT)); return (2 * pos > tot)[c].long()
 
 
 def cv_floor(bits: Sequence[torch.Tensor], y: torch.Tensor, repeats=24, fraction=0.2, seed=0) -> float:
-    """Critère VALIDE (auto-cohérence) : taux d'erreur HORS-ÉCHANTILLON du plancher, par sous-échantillonnage répété —
-    l'étiquette majoritaire de chaque cellule est apprise sur 1 − `fraction` des observations et jugée sur le reste.
-    Plus puissant qu'une coupe unique en deux moitiés ; les mêmes tirages servent avant et après une transformation."""
+    """VALID criterion (self-consistency): OUT-OF-SAMPLE error rate of the floor, by repeated subsampling —
+    the majority label of each cell is learned on 1 − `fraction` of the observations and judged on the rest.
+    More powerful than a single split into two halves; the same draws are used before and after a transformation."""
     n = len(y); g = torch.Generator().manual_seed(seed); c = cell_code(bits, n); nc = 2 ** len(bits); test = torch.rand(repeats, n, generator=g) < fraction; tr = (~test).to(DT); yy = y.to(DT)[None].expand(repeats, n); cc = c[None].expand(repeats, n)
     pos = torch.zeros(repeats, nc, dtype=DT).scatter_add_(1, cc, yy * tr); tot = torch.zeros(repeats, nc, dtype=DT).scatter_add_(1, cc, tr); gmaj = ((yy * tr).sum(1, keepdim=True) * 2 > tr.sum(1, keepdim=True)).to(DT)
     lab = torch.where(2 * pos == tot, gmaj.expand(repeats, nc), (2 * pos > tot).to(DT)); pred = lab.gather(1, cc); return float(((pred != yy) & test).sum() / test.sum().clamp_min(1))
 
 
-# ================================================================ raffinement conjoint, local et borné
+# ================================================================ joint refinement, local and bounded
 
 def _climb(skel: BNode, th: torch.Tensor, others: torch.Tensor, Xd, y, ncell: int, g, iters: int, K: int, scale: float, margin=0.0) -> Tuple[torch.Tensor, float, int]:
-    """Montée locale sans gradient : K perturbations gaussiennes par pas, échelle décroissante ; le point courant reste
-    candidat (jamais de dégradation). Une perturbation n'est prise que si elle gagne plus de `margin` erreurs."""
+    """Gradient-free local climb: K Gaussian perturbations per step, decreasing scale; the current point remains
+    a candidate (never any degradation). A perturbation is taken only if it gains more than `margin` errors."""
     f = float(floor_batch(evaluate_batch(skel, th[None], Xd), others, y, ncell)[0]); ev = 1
     for it in range(iters):
         C = th[None] + torch.randn(K, len(th), generator=g, dtype=DT) * scale * (0.7 ** it); v = floor_batch(evaluate_batch(skel, C, Xd), others, y, ncell); i = int(v.argmin()); ev += K
@@ -257,8 +257,8 @@ def _climb(skel: BNode, th: torch.Tensor, others: torch.Tensor, Xd, y, ncell: in
 
 
 def joint_refine(programs: Sequence[BNode], X: torch.Tensor, y: torch.Tensor, seed=0, sweeps=2, samples=48, scale=0.08, margin=1.5) -> Tuple[List[BNode], dict]:
-    """Raffinement CONJOINT d'un ensemble : chaque primitive est ajustée à tour de rôle, les autres fixées, sur le
-    plancher par cellules. Local (échelle `scale`), borné (`sweeps` passages), point initial conservé."""
+    """JOINT refinement of a set: each primitive is adjusted in turn, the others fixed, on the
+    per-cell floor. Local (scale `scale`), bounded (`sweeps` passes), initial point kept."""
     P = [strip(p) for p in programs]; n = len(y); Xd = X.to(DT)[None]; g = torch.Generator().manual_seed(seed); bits = [bits_of(p, Xd) for p in P]; f0 = set_floor(bits, y); ev = 0; moved = 0
     for sw in range(sweeps):
         for i, p in enumerate(P):
@@ -267,14 +267,14 @@ def joint_refine(programs: Sequence[BNode], X: torch.Tensor, y: torch.Tensor, se
     return P, {"floor_before": f0, "floor_after": set_floor(bits, y), "evaluations": ev, "moves": moved}
 
 
-# ================================================================ morphologie du résidu
+# ================================================================ morphology of the residual
 
 @dataclass
 class ResidualMorphology:
-    """Forme de ce que l'ensemble courant n'explique pas. Oriente la FAMILLE de primitive à proposer."""
+    """Shape of what the current set does not explain. Guides the FAMILY of primitive to propose."""
     label: str                                  # linear | arc | parallel | concentric | radial | none
     n_errors: int
-    points: torch.Tensor                        # milieux des frontières du résidu
+    points: torch.Tensor                        # midpoints of the boundaries of the residual
     support: Dict[str, int] = field(default_factory=dict)
 
     @property
@@ -282,9 +282,9 @@ class ResidualMorphology:
 
 
 def residual_morphology(X: torch.Tensor, residual: torch.Tensor, seed=0) -> ResidualMorphology:
-    """structured residual → forme. Le résidu est l'étiquette « l'ensemble se trompe ici » ; ses frontières sont celles
-    de la primitive manquante. Droites et cercles de consensus y sont cherchés ; deux droites parallèles → paire
-    parallèle, deux cercles de même centre → paire concentrique, deux droites sécantes dans le domaine → radiale."""
+    """structured residual → shape. The residual is the label "the set is wrong here"; its boundaries are those
+    of the missing primitive. Consensus lines and circles are searched for in it; two parallel lines → parallel
+    pair, two circles with the same center → concentric pair, two lines intersecting within the domain → radial."""
     from core.deep_partial import _wrap, circle_components, line_components, observe
     ne = int(residual.sum())
     if ne < 6 or ne > len(residual) - 6: return ResidualMorphology("none", ne, torch.zeros(0, 2, dtype=DT))
@@ -298,27 +298,27 @@ def residual_morphology(X: torch.Tensor, residual: torch.Tensor, seed=0) -> Resi
     return ResidualMorphology(lab, ne, ob.points, sup)
 
 
-# ================================================================ naissance d'une primitive par gain de plancher
+# ================================================================ birth of a primitive by floor gain
 
 def sample_params(t: str, K: int, M: torch.Tensor, g, box=(-3.0, 3.0, -3.0, 3.0)) -> torch.Tensor:
-    """K paramétrisations du type `t` dont la frontière PASSE par un point de `M` (milieux de frontière). Plages
-    génériques, liées à la taille du domaine seulement."""
+    """K parameterizations of type `t` whose boundary PASSES through a point of `M` (boundary midpoints). Generic
+    ranges, tied to the size of the domain only."""
     U = lambda lo, hi: torch.rand(K, generator=g, dtype=DT) * (hi - lo) + lo; coin = lambda: (torch.rand(K, generator=g) < 0.5).to(DT)
     c = M[torch.randint(0, len(M), (K,), generator=g)] if len(M) else torch.stack([U(box[0], box[1]), U(box[2], box[3])], 1); a = U(-PI, PI)
     if t == "half": return torch.stack([a, torch.cos(a) * c[:, 0] + torch.sin(a) * c[:, 1]], 1)
     if t == "band": b = torch.cos(a) * c[:, 0] + torch.sin(a) * c[:, 1]; w = U(0.3, 2.4); s = coin(); return torch.stack([a, b - s * w, b + (1 - s) * w], 1)
     if t in ("disc", "antidisc"): r = U(0.3, 2.5); return torch.stack([c[:, 0] + r * torch.cos(a), c[:, 1] + r * torch.sin(a), r], 1)
     if t == "ring": r = U(0.3, 2.5); w = U(0.3, 1.5); s = coin(); return torch.stack([c[:, 0] + r * torch.cos(a), c[:, 1] + r * torch.sin(a), (r - s * w).clamp_min(0.15), r + (1 - s) * w], 1)
-    l = U(0.0, 2.5); w = U(0.2, 1.5); s = 2 * coin() - 1; return torch.stack([c[:, 0] - l * torch.cos(a), c[:, 1] - l * torch.sin(a), a + s * w, w], 1)        # secteur : une demi-droite du sommet passe par le point
+    l = U(0.0, 2.5); w = U(0.2, 1.5); s = 2 * coin() - 1; return torch.stack([c[:, 0] - l * torch.cos(a), c[:, 1] - l * torch.sin(a), a + s * w, w], 1)        # sector: one ray from the vertex passes through the point
 
 
 def birth(programs: Sequence[BNode], X: torch.Tensor, y: torch.Tensor, scene_points: Optional[torch.Tensor] = None, seed=0, samples=1500, top=4, gain=3.0, per_param=1.4, morphology=True) -> Tuple[Optional[BNode], dict]:
     """structured residual → missing primitive hypothesis.
 
-    La primitive manquante est cherchée DANS L'ESPACE DES PARAMÈTRES, par le gain de plancher qu'elle apporte À
-    L'ENSEMBLE COURANT (utilité conditionnelle), et non par son score isolé. Les candidats passent par les frontières
-    du résidu (et, pour moitié, par celles de la scène) ; la morphologie du résidu répartit le budget entre familles.
-    Acceptée seulement si le gain dépasse `gain` + `per_param` erreurs par paramètre."""
+    The missing primitive is searched for IN PARAMETER SPACE, by the floor gain it brings TO
+    THE CURRENT SET (conditional utility), and not by its isolated score. The candidates pass through the boundaries
+    of the residual (and, for half of them, through those of the scene); the morphology of the residual splits the budget between families.
+    Accepted only if the gain exceeds `gain` + `per_param` errors per parameter."""
     from core.deep_fragments import SKELETONS
     P = [strip(p) for p in programs]; n = len(y); Xd = X.to(DT)[None]; g = torch.Generator().manual_seed(seed); bits = [bits_of(p, Xd) for p in P]; others = cell_code(bits, n); nc = 2 ** len(bits); f0 = set_floor(bits, y)
     mo = residual_morphology(X, floor_prediction(bits, y) != y, seed); M = mo.points if scene_points is None or len(scene_points) == 0 else torch.cat([mo.points, scene_points]) if len(mo.points) else scene_points
@@ -333,8 +333,8 @@ def birth(programs: Sequence[BNode], X: torch.Tensor, y: torch.Tensor, scene_poi
 
 
 def prune(programs: Sequence[BNode], X: torch.Tensor, y: torch.Tensor, gain=1.5) -> List[BNode]:
-    """Élagage CONDITIONNEL : une primitive n'est retirée que si l'ensemble SANS elle ne perd presque rien. Une primitive
-    faible isolément mais utile en interaction (opérande d'un ou exclusif) est donc conservée."""
+    """CONDITIONAL pruning: a primitive is removed only if the set WITHOUT it loses almost nothing. A primitive
+    weak in isolation but useful in interaction (operand of an exclusive or) is therefore kept."""
     P = list(programs); Xd = X.to(DT)[None]; bits = [bits_of(p, Xd) for p in P]
     while len(P) > 1:
         f = set_floor(bits, y); loss = [set_floor(bits[:i] + bits[i + 1:], y) - f for i in range(len(P))]; i = min(range(len(P)), key=lambda j: loss[j])
@@ -343,21 +343,21 @@ def prune(programs: Sequence[BNode], X: torch.Tensor, y: torch.Tensor, gain=1.5)
     return P
 
 
-# ================================================================ incertitude, stabilité, identifiabilité
+# ================================================================ uncertainty, stability, identifiability
 
 @dataclass
 class PrimitiveEstimate:
-    """Une primitive candidate n'est jamais un point nu : la composition peut savoir qu'un paramètre est incertain."""
+    """A candidate primitive is never a bare point: composition can know that a parameter is uncertain."""
     program: BNode
     type: str
     families: List[str]
     central: List[float]
-    uncertainty: List[float]                    # écart-type des paramétrisations compatibles, par paramètre
-    region: List[Tuple[float, float]]           # intervalle compatible, par paramètre
-    stability: float                            # accord fonctionnel moyen des réestimations sur rééchantillonnages
+    uncertainty: List[float]                    # standard deviation of the compatible parameterizations, per parameter
+    region: List[Tuple[float, float]]           # compatible interval, per parameter
+    stability: float                            # mean functional agreement of the re-estimations on resamplings
     provenance: str
     identifiability: str
-    consensus: Optional[BNode] = None           # médiane des réestimations (bootstrap)
+    consensus: Optional[BNode] = None           # median of the re-estimations (bootstrap)
 
     def by_family(self) -> Dict[str, float]:
         out: Dict[str, float] = {}
@@ -366,12 +366,12 @@ class PrimitiveEstimate:
 
 
 def describe(programs: Sequence[BNode], X: torch.Tensor, y: torch.Tensor, seed=0, slack=2.0, samples=96, boots=6, provenance: Optional[Sequence[str]] = None, tol=IDENT_TOL) -> List[PrimitiveEstimate]:
-    """Pour chaque primitive d'un ensemble, le reste fixé :
-      région compatible   paramétrisations dont le plancher ne dépasse pas le meilleur de plus de `slack` erreurs
-      incertitude         écart-type de ces paramétrisations, par paramètre
-      stabilité           réestimation sur `boots` rééchantillonnages des observations ; accord fonctionnel moyen
-      consensus           médiane des réestimations
-      identifiabilité     tous les paramètres identifiés (demi-largeur ≤ tol) / certains / aucun."""
+    """For each primitive of a set, the rest fixed:
+      compatible region   parameterizations whose floor does not exceed the best by more than `slack` errors
+      uncertainty         standard deviation of these parameterizations, per parameter
+      stability           re-estimation on `boots` resamplings of the observations; mean functional agreement
+      consensus           median of the re-estimations
+      identifiability     all parameters identified (half-width ≤ tol) / some / none."""
     P = [strip(p) for p in programs]; n = len(y); Xd = X.to(DT)[None]; g = torch.Generator().manual_seed(seed); bits = [bits_of(p, Xd) for p in P]; out = []
     for i, p in enumerate(P):
         sk = p.skeleton(); th = torch.tensor(p.param_vector(), dtype=DT); others = cell_code(bits, n, i); nc = 2 ** (len(P) - 1); f0 = float(floor_batch(bits[i][None].to(DT), others, y, nc)[0])
@@ -386,13 +386,13 @@ def describe(programs: Sequence[BNode], X: torch.Tensor, y: torch.Tensor, seed=0
 
 
 def consensus(programs: Sequence[BNode], X: torch.Tensor, y: torch.Tensor, seed=0, boots=8, validate=True) -> Tuple[List[BNode], dict]:
-    """Consensus au lieu d'un ajustement unique : chaque primitive est remplacée par la MÉDIANE de ses réestimations sur
-    rééchantillonnages. Validé : la médiane n'est gardée que si l'erreur hors-échantillon du plancher ne monte pas."""
+    """Consensus instead of a single fit: each primitive is replaced by the MEDIAN of its re-estimations on
+    resamplings. Validated: the median is kept only if the out-of-sample error of the floor does not rise."""
     E = describe(programs, X, y, seed, boots=boots); P = [strip(p) for p in programs]; Q = [e.consensus for e in E]; Xd = X.to(DT)[None]; a = cv_floor([bits_of(p, Xd) for p in P], y, seed=seed); b = cv_floor([bits_of(p, Xd) for p in Q], y, seed=seed); ok = (b <= a) or not validate
     return (Q if ok else P), {"cv_before": a, "cv_after": b, "committed": bool(ok)}
 
 
-# ================================================================ amélioration validée d'un ensemble
+# ================================================================ validated improvement of a set
 
 @dataclass
 class SetImprovement:
@@ -408,8 +408,8 @@ class SetImprovement:
 
 
 def transfer_errors(programs: Sequence[BNode], Xa, ya, Xb, yb) -> torch.Tensor:
-    """Erreurs, point par point sur (Xb, yb), de la meilleure fonction booléenne des atomes apprise sur (Xa, ya) :
-    étiquette majoritaire de chaque cellule, apprise d'un côté, jugée de l'autre (cellule inconnue → majorité globale)."""
+    """Errors, point by point on (Xb, yb), of the best Boolean function of the atoms learned on (Xa, ya):
+    majority label of each cell, learned on one side, judged on the other (unknown cell → global majority)."""
     if not len(yb): return torch.zeros(0, dtype=torch.bool)
     A = [bits_of(p, Xa.to(DT)[None]) for p in programs]; B = [bits_of(p, Xb.to(DT)[None]) for p in programs]; nc = 2 ** len(programs); ca = cell_code(A, len(ya)); cb = cell_code(B, len(yb))
     pos = torch.zeros(nc, dtype=DT).scatter_add_(0, ca, ya.to(DT)); tot = torch.zeros(nc, dtype=DT).scatter_add_(0, ca, torch.ones(len(ya), dtype=DT)); lab = torch.where(2 * pos == tot, torch.full((nc,), float(2 * ya.sum() > len(ya)), dtype=DT), (2 * pos > tot).to(DT))
@@ -433,16 +433,16 @@ def _improve(P0: Sequence[BNode], X, y, seed, c, scene_points, max_atoms):
 
 
 def improve_set(programs: Sequence[BNode], X: torch.Tensor, y: torch.Tensor, seed=0, cfg: Optional[dict] = None, scene_points: Optional[torch.Tensor] = None, max_atoms=6) -> SetImprovement:
-    """primitive set → raffinement conjoint → [résidu structuré → naissance → raffinement]* → élagage → validation.
+    """primitive set → joint refinement → [structured residual → birth → refinement]* → pruning → validation.
 
-    Boucle bornée (`births` naissances au plus). Validation (Validated Transformation Principle), au choix :
-      "holdout"  la PROCÉDURE entière est rejouée sur des sous-échantillons d'apprentissage (`holdout_repeats` coupes) et
-                 jugée sur les observations qu'elle n'a pas vues ; elle n'est appliquée à toutes les observations que si
-                 elle y corrige significativement plus d'erreurs qu'elle n'en crée (test apparié, z ≥ `holdout_z`) ;
-      "cv"       erreur hors-échantillon du plancher par sous-échantillonnage répété, mêmes tirages avant et après
-                 (optimiste : les paramètres ont vu toutes les observations) ;
-      False      aucune.
-    Sans gain validé, l'ensemble INITIAL est rendu tel quel (rollback)."""
+    Bounded loop (at most `births` births). Validation (Validated Transformation Principle), one of:
+      "holdout"  the entire PROCEDURE is replayed on training subsamples (`holdout_repeats` splits) and
+                 judged on the observations it has not seen; it is applied to all the observations only if
+                 it corrects significantly more errors there than it creates (paired test, z ≥ `holdout_z`);
+      "cv"       out-of-sample error of the floor by repeated subsampling, same draws before and after
+                 (optimistic: the parameters have seen all the observations);
+      False      none.
+    Without a validated gain, the INITIAL set is returned as is (rollback)."""
     c = {**load_config(), **(cfg or {})}; P0 = [strip(p) for p in programs]; Xd = X.to(DT)[None]; b0 = [bits_of(p, Xd) for p in P0]; f0 = set_floor(b0, y); n = len(y); ev = 0; mode = c["validate"]
     if mode == "holdout":
         g = torch.Generator().manual_seed(seed + 991); before, after = [], []; fixed = 0; broken = 0
@@ -457,18 +457,18 @@ def improve_set(programs: Sequence[BNode], X: torch.Tensor, y: torch.Tensor, see
     return SetImprovement(P if ok else P0, prov if ok else ["initial"] * len(P0), f0, f1, cv0, cv1, bool(ok), births, ev)
 
 
-# ================================================================ chaîne complète
+# ================================================================ complete chain
 
 def hp_pool(X: torch.Tensor, y: torch.Tensor, seed=0, cfg: Optional[dict] = None) -> List[Tuple[BNode, float, str]]:
-    """Vivier « rappel d'abord » : estimateurs existants (plusieurs paramétrisations par type) ET estimateurs spécialisés.
-    Aucune élimination ; l'aval départage."""
+    """Recall-first pool: existing estimators (several parameterizations per type) AND specialized estimators.
+    No elimination; the downstream decides."""
     from core.deep_lpr import pool
     c = {**load_config(), **(cfg or {})}; return (pool(X, y, c["k"], seed, tuple(c["sources"])) if c["sources"] else []) + (curve_pool(X, y, c["k"], seed, c) if c["curves"] else [])
 
 
 @dataclass
 class HPRecovery:
-    recovery: object                            # LatentRecovery de l'aval fort
+    recovery: object                            # LatentRecovery of the strong downstream
     improvements: List[SetImprovement]
     estimates: List[PrimitiveEstimate]
     added: List[Tuple[BNode, float, str]]
@@ -479,10 +479,10 @@ class HPRecovery:
 
 
 def recover(X: torch.Tensor, y: torch.Tensor, seed=0, cfg: Optional[dict] = None, discovered: Optional[Sequence[Tuple[BNode, float, str]]] = None) -> HPRecovery:
-    """observations → primitives de haute précision → ensemble → composition sur classes → finalisation validée.
+    """observations → high-precision primitives → set → composition over classes → validated finalization.
 
-    Les primitives raffinées et nées REJOIGNENT le vivier (les originales restent) ; l'aval fort — le même que pour
-    les autres chaînes — choisit. Rien n'est détruit."""
+    The refined and born primitives JOIN the pool (the originals remain); the strong downstream — the same as for
+    the other chains — chooses. Nothing is destroyed."""
     from core.deep_e2e import hypotheses_from
     from core.deep_lpr import load_config as lpr_config, pool, select_sets, strong_downstream
     from core.deep_partial import observe
@@ -491,7 +491,7 @@ def recover(X: torch.Tensor, y: torch.Tensor, seed=0, cfg: Optional[dict] = None
     for j, s in enumerate(sets.sets[:c["n_refine_sets"]]):
         im = improve_set(s.programs, X, y, seed + j, c, M, d["max_atoms"]); imps.append(im)
         if im.committed: added += [(p, 2.0 - 0.1 * j, "hp:" + src) for p, src in zip(im.programs, im.provenance)]
-    if not sets.sets and c["births"] > 0:                                          # vivier vide : la naissance part de rien
+    if not sets.sets and c["births"] > 0:                                          # empty pool: the birth starts from nothing
         im = improve_set([], X, y, seed, c, M, d["max_atoms"]); imps.append(im); added += [(p, 2.0, "hp:" + src) for p, src in zip(im.programs, im.provenance)]
     R = strong_downstream(disc + added, X, y, {"fit": d["fit"]}); est = describe(R.chosen.programs, X, y, seed, provenance=R.chosen.provenance) if c["describe"] and R.chosen else []
     return HPRecovery(R, imps, est, added, {"pool": len(disc), "added": len(added), "committed_sets": sum(i.committed for i in imps), "births": sum(b.get("accepted", False) for i in imps for b in i.births), "evaluations": sum(i.evaluations for i in imps), "seconds": round(time.time() - t0, 3)})

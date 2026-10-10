@@ -1,18 +1,18 @@
-"""Banc ATOMIQUE pour la découverte de primitives — module d'ÉVALUATION (dev uniquement, graines propres).
+"""ATOMIC bench for primitive discovery — EVALUATION module (dev only, own seeds).
 
-Profondeur structurelle minimale (composition plate) pour isoler la découverte atomique de la composition :
-  single     un seul atome
-  two        deux atomes (XOR : toutes les frontières restent visibles)
-  multi      trois ou quatre atomes
-  close      deux atomes proches (centres voisins)
-  nested     atomes imbriqués (un disque dans un disque)
-  redundant  atomes redondants de la grammaire, écrits en base minimale (bande = deux demi-plans, anneau = deux disques)
-  noise      bruit élevé
-  outliers   outliers groupés
-  partial    frontières partiellement observées (atomes à cheval sur la limite de la zone observée)
+Minimal structural depth (flat composition) to isolate atomic discovery from composition:
+  single     a single atom
+  two        two atoms (XOR: all the boundaries remain visible)
+  multi      three or four atoms
+  close      two close atoms (neighbouring centres)
+  nested     nested atoms (a disc inside a disc)
+  redundant  redundant atoms of the grammar, written in the minimal basis (band = two half-planes, ring = two discs)
+  noise      high noise
+  outliers   grouped outliers
+  partial    partially observed boundaries (atoms straddling the limit of the observed zone)
 
-Hors distribution (pour un proposeur appris) : positions, tailles, orientations, densités, bruit nouveaux.
-Le lot scellé n'est jamais touché : graines de la partition dev, base dédiée.
+Out of distribution (for a learned proposer): new positions, sizes, orientations, densities, noise.
+The sealed set is never touched: seeds of the dev partition, dedicated base.
 """
 from __future__ import annotations
 
@@ -29,15 +29,15 @@ from core.robust_world import SENSORS
 
 CATEGORIES = ("single", "two", "multi", "close", "nested", "redundant", "noise", "outliers", "partial")
 OOD_SHIFTS = ("position", "size", "orientation", "density", "noise")
-ATOMIC_BASE = SPLIT_BASE["dev"] + 500_000                 # sous-plage de la partition dev réservée au banc atomique
-TRAIN_BASE = SPLIT_BASE["dev"] + 700_000                  # scènes d'entraînement du proposeur neuronal (dev, disjointes)
+ATOMIC_BASE = SPLIT_BASE["dev"] + 500_000                 # sub-range of the dev partition reserved for the atomic bench
+TRAIN_BASE = SPLIT_BASE["dev"] + 700_000                  # training scenes of the neural proposer (dev, disjoint)
 
 
 def _T(c, ch): return BNode("translate", params=(float(c[0]), float(c[1])), children=(ch,))
 
 
 def atom(rng: random.Random, kind: str, shift: Optional[str] = None):
-    """Atome aléatoire ; `shift` déplace UNE plage de paramètres hors de la distribution nominale."""
+    """Random atom; `shift` moves ONE parameter range out of the nominal distribution."""
     cx = rng.uniform(0.3, 1.0) if shift == "position" else rng.uniform(-2.0, 0.2); cy = rng.uniform(1.6, 2.6) * rng.choice((-1, 1)) if shift == "position" else rng.uniform(-1.6, 1.6)
     s = rng.choice((0.55, 1.6)) if shift == "size" else 1.0; a = rng.uniform(-0.4, 0.4) if shift == "orientation" else rng.uniform(-math.pi, math.pi)
     if kind == "half": return BNode("pred", "dot", "le", (a, math.cos(a) * cx + math.sin(a) * cy))
@@ -61,13 +61,13 @@ def _xor(atoms):
 @dataclass
 class Scene:
     task: DeepTask
-    atoms: List[BNode]              # atomes vrais (évaluation seulement)
+    atoms: List[BNode]              # true atoms (evaluation only)
     category: str
     shift: Optional[str]
 
 
 def make_scene(index: int, category: str, shift: Optional[str] = None, n=300, base=ATOMIC_BASE) -> Scene:
-    """Scène déterministe en (index, catégorie, décalage)."""
+    """Deterministic scene in (index, category, shift)."""
     seed = base + index * 97 + CATEGORIES.index(category) * 7 + (0 if shift is None else 1000 * (1 + OOD_SHIFTS.index(shift))); probe = obs_region(1500, torch.Generator().manual_seed(seed))
     rate, kind = 0.05, "iid"
     if category == "noise" or shift == "noise": rate = 0.12

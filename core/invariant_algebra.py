@@ -1,14 +1,14 @@
-"""Invariants de première classe, signatures, stabilisateurs, orbites, classes d'équivalence, formes canoniques.
+"""First-class invariants, signatures, stabilizers, orbits, equivalence classes, canonical forms.
 
-Dualité transformation ↔ invariant **inspirée de Galois** (Galois-inspired transformation/invariant duality) :
-Stabilizer(I) = ensemble des transformations CONNUES qui préservent l'invariant I, établi EMPIRIQUEMENT sur des
-objets d'essai (et non par une correspondance de Galois au sens strict : pas de groupe, pas d'extension de corps,
-les transformations ne forment en général même pas un groupe — certaines ne sont pas inversibles).
+**Galois-inspired** transformation ↔ invariant duality (Galois-inspired transformation/invariant duality):
+Stabilizer(I) = set of the KNOWN transformations that preserve the invariant I, established EMPIRICALLY on
+trial objects (and not by a Galois correspondence in the strict sense: no group, no field extension,
+the transformations do not in general even form a group — some are not invertible).
 
-Domaines : équations algébriques, phrases, séquences, géométrie 2D, mini-domaine de code (AST minimal).
+Domains: algebraic equations, sentences, sequences, 2D geometry, mini code domain (minimal AST).
 
-NB : `InvariantSet` est ici un ensemble d'invariants VÉRIFIABLES (fonctions de signature) ; il est distinct de
-`core.invariants.InvariantSet` (ensemble d'étiquettes déclarées par une TransformationSpec).
+NB: `InvariantSet` is here a set of CHECKABLE invariants (signature functions); it is distinct from
+`core.invariants.InvariantSet` (set of labels declared by a TransformationSpec).
 """
 from __future__ import annotations
 
@@ -26,11 +26,11 @@ from core.algebra import Add, Divide, Equation, Multiply, Number, Power, Subtrac
 from core.transformations import TransformationDomain, TransformationSpec
 
 
-# ================================================================ invariants vérifiables
+# ================================================================ checkable invariants
 
 @dataclass(frozen=True)
 class CheckedInvariant:
-    """Invariant de première classe : nom, domaine, fonction de signature (valeur hachable), tolérance éventuelle."""
+    """First-class invariant: name, domain, signature function (hashable value), optional tolerance."""
     name: str
     domain: str
     signature_fn: Callable[[Any], Any] = field(compare=False, hash=False)
@@ -44,7 +44,7 @@ class CheckedInvariant:
 
 
 class InvariantSet:
-    """Ensemble d'invariants vérifiables (output equivalence, task accuracy, logical consistency, solution set,
+    """Set of checkable invariants (output equivalence, task accuracy, logical consistency, solution set,
     topology, semantic meaning, old-skill performance, unit consistency, probability normalization, …)."""
 
     def __init__(self, invariants: Iterable[CheckedInvariant] = ()):
@@ -76,7 +76,7 @@ def _freeze(v):
 
 @dataclass(frozen=True)
 class InvariantSignature:
-    """Empreinte d'un état relativement à un ensemble d'invariants : deux états différents peuvent la partager."""
+    """Fingerprint of a state relative to a set of invariants: two different states may share it."""
     items: Tuple[Tuple[str, Any], ...]
 
     def restrict(self, names): return InvariantSignature(tuple(kv for kv in self.items if kv[0] in names))
@@ -86,10 +86,10 @@ class InvariantSignature:
         return self.restrict(set(names)) == other.restrict(set(names))
 
 
-# ================================================================ transformations de domaine (TransformationSpec)
+# ================================================================ domain transformations (TransformationSpec)
 
 class DomainTransformation(TransformationSpec):
-    """Transformation nommée d'un domaine (fonction pure x -> x'), traçable comme TransformationSpec."""
+    """Named transformation of a domain (pure function x -> x'), traceable as a TransformationSpec."""
 
     def __init__(self, name, fn, domain="generic", invertible=False, params=None):
         object.__setattr__(self, "name", name); object.__setattr__(self, "fn", fn); object.__setattr__(self, "dname", domain)
@@ -106,12 +106,12 @@ class DomainTransformation(TransformationSpec):
     def __repr__(self): return f"T({self.name})"
 
 
-# ================================================================ dualité (index bidirectionnel), stabilisateur
+# ================================================================ duality (bidirectional index), stabilizer
 
 class DualityIndex:
-    """Index bidirectionnel transformation ↔ invariant, établi EMPIRIQUEMENT sur des objets d'essai.
-    preserves(T) : invariants conservés par T sur TOUS les essais ; stabilizer(I) : transformations conservant I.
-    `support` garde le nombre d'essais ; `counterexamples` garde un contre-exemple (vérifiabilité)."""
+    """Bidirectional transformation ↔ invariant index, established EMPIRICALLY on trial objects.
+    preserves(T): invariants kept by T on ALL trials; stabilizer(I): transformations keeping I.
+    `support` keeps the number of trials; `counterexamples` keeps one counterexample (checkability)."""
 
     def __init__(self, invariants: InvariantSet, transformations: Sequence[DomainTransformation], samples: Sequence[Any]):
         self.invariants, self.transformations = invariants, list(transformations)
@@ -138,7 +138,7 @@ class DualityIndex:
         return Stabilizer(name, frozenset(t for (t, i), ok in self.table.items() if i == name and ok))
 
     def chain_preserves(self, chain: Sequence[str]) -> FrozenSet[str]:
-        """Prédiction compositionnelle : une chaîne préserve I si chaque maillon est dans Stabilizer(I)."""
+        """Compositional prediction: a chain preserves I if every link is in Stabilizer(I)."""
         out = frozenset(self.invariants.items)
         for t in chain: out &= self.preserves(t)
         return out
@@ -149,7 +149,7 @@ class DualityIndex:
 
 @dataclass(frozen=True)
 class Stabilizer:
-    """Stabilizer(I) — analogue (inspiré de Galois) du stabilisateur : transformations connues préservant I."""
+    """Stabilizer(I) — (Galois-inspired) analogue of the stabilizer: known transformations preserving I."""
     invariant: str
     transformations: FrozenSet[str]
 
@@ -158,10 +158,10 @@ class Stabilizer:
     def admissible(self, chain): return all(t in self for t in chain)
 
 
-# ================================================================ orbites, classes d'équivalence, formes canoniques
+# ================================================================ orbits, equivalence classes, canonical forms
 
 class TransformationOrbit:
-    """Orbit(x, G) : états accessibles depuis x sous les transformations G (parcours en largeur borné)."""
+    """Orbit(x, G): states reachable from x under the transformations G (bounded breadth-first traversal)."""
 
     def __init__(self, x, G: Sequence[DomainTransformation], key=None, max_states=500, max_depth=4):
         self.key = key or _default_key
@@ -190,7 +190,7 @@ def _default_key(x):
 
 
 class EquivalenceClass:
-    """Classe d'équivalence relative à un sous-ensemble d'invariants : même signature restreinte."""
+    """Equivalence class relative to a subset of invariants: same restricted signature."""
 
     def __init__(self, invariants: InvariantSet, names=None):
         self.invariants, self.names = invariants, sorted(names or invariants.items)
@@ -202,34 +202,34 @@ class EquivalenceClass:
     def __len__(self): return len(self.classes)
 
     def canonical(self, x, cost=None):
-        """Représentant canonique : membre de la classe de x minimisant `cost` (puis ordre lexical)."""
+        """Canonical representative: member of the class of x minimising `cost` (then lexical order)."""
         cost = cost or (lambda y: (len(str(y)), str(y)))
         members = self.classes.get(self.signature(x)) or [x]
         return min(members, key=cost)
 
 
 def canonical_form(x, G, key=None, cost=None, max_states=500, max_depth=4):
-    """Forme canonique = élément de coût minimal de l'orbite (déterministe)."""
+    """Canonical form = minimal-cost element of the orbit (deterministic)."""
     orb = TransformationOrbit(x, G, key, max_states, max_depth)
     cost = cost or (lambda y: (len(str(y)), str(y)))
     return min(orb.states.values(), key=cost), orb
 
 
 def compression(items, canon, encode=None):
-    """Mémoire : stocker tous les exemples vs (formes canoniques uniques + chemins de transformations).
-    Retourne octets bruts, octets compressés, ratio."""
+    """Memory: storing all examples vs (unique canonical forms + transformation paths).
+    Returns raw bytes, compressed bytes, ratio."""
     encode = encode or (lambda y: len(str(y).encode()))
     raw = sum(encode(x) for x in items)
     classes, paths = {}, 0
     for x in items:
         c, path = canon(x)
-        classes.setdefault(str(c), c); paths += 2 * len(path) + 1          # ~2 octets / identifiant de transformation
+        classes.setdefault(str(c), c); paths += 2 * len(path) + 1          # ~2 bytes / transformation identifier
     stored = sum(encode(c) for c in classes.values()) + paths
     return {"items": len(items), "classes": len(classes), "raw_bytes": raw, "compressed_bytes": stored,
             "ratio": round(raw / max(1, stored), 3)}
 
 
-# ================================================================ domaine : algèbre (équations linéaires en x)
+# ================================================================ domain: algebra (linear equations in x)
 
 X = Symbol("x")
 GRID = [Fraction(k, 2) for k in range(-24, 25)]
@@ -250,7 +250,7 @@ def eval_expr(e, x):
 
 
 def solution_set(eq: Equation):
-    """Ensemble des solutions sur une grille de rationnels (0 solution, quelques-unes, ou « toutes »)."""
+    """Solution set over a grid of rationals (0 solutions, a few, or "all")."""
     sols = []
     for g in GRID:
         try:
@@ -260,8 +260,8 @@ def solution_set(eq: Equation):
 
 
 def canonical_equation(eq: Equation):
-    """Forme canonique d'une équation LINÉAIRE pour l'invariant solution_set : « x = s » (s rationnel exact) ;
-    une équation non linéaire ou dégénérée est renvoyée telle quelle."""
+    """Canonical form of a LINEAR equation for the solution_set invariant: "x = s" (s exact rational);
+    a non-linear or degenerate equation is returned as is."""
     try:
         f0 = eval_expr(eq.left, Fraction(0)) - eval_expr(eq.right, Fraction(0))
         f1 = eval_expr(eq.left, Fraction(1)) - eval_expr(eq.right, Fraction(1))
@@ -276,10 +276,10 @@ def _count_nodes(e): return 1 + (_count_nodes(e.left) + _count_nodes(e.right) if
 
 
 ALG_INVARIANTS = InvariantSet([
-    CheckedInvariant("solution_set", "algebra", solution_set, "ensemble des solutions"),
-    CheckedInvariant("equality_form", "algebra", lambda e: isinstance(e, Equation), "reste une équation"),
-    CheckedInvariant("surface_form", "algebra", str, "écriture exacte"),
-    CheckedInvariant("size", "algebra", lambda e: _count_nodes(e), "taille de l'arbre"),
+    CheckedInvariant("solution_set", "algebra", solution_set, "solution set"),
+    CheckedInvariant("equality_form", "algebra", lambda e: isinstance(e, Equation), "remains an equation"),
+    CheckedInvariant("surface_form", "algebra", str, "exact written form"),
+    CheckedInvariant("size", "algebra", lambda e: _count_nodes(e), "size of the tree"),
 ])
 
 
@@ -293,7 +293,7 @@ def algebra_transformations(values=(2, 3, -1)):
     for v in values:
         G += [_both(Add, Number(v), f"AddBothSides({v})"), _both(Subtract, Number(v), f"SubtractBothSides({v})"),
               _both(Multiply, Number(v), f"MultiplyBothSides({v})"), _both(Divide, Number(v), f"DivideBothSides({v})")]
-    # transformations HORS stabilisateur du solution set (à détecter, pas à interdire a priori)
+    # transformations OUTSIDE the stabilizer of the solution set (to be detected, not forbidden a priori)
     G += [_both(Multiply, Number(0), "MultiplyBothSides(0)", False), _both(Multiply, X, "MultiplyBothSides(x)", False),
           _both(Power, Number(2), "SquareBothSides", False),
           DomainTransformation("DropConstantLeft", lambda e: Equation(e.left.left if isinstance(e.left, (Add, Subtract)) else e.left, e.right), "algebra"),
@@ -313,7 +313,7 @@ def algebra_samples():
 def algebra_key(e): return str(e)
 
 
-# ================================================================ domaine : langage (phrases contrôlées)
+# ================================================================ domain: language (controlled sentences)
 
 LEX_ENTITY = {"la balle": "ball", "le ballon": "ball", "le bloc": "block", "le cube": "cube", "la boule": "ball"}
 LEX_ACTION = {"tombe": "FALL", "chute": "FALL", "dégringole": "FALL", "roule": "ROLL", "glisse": "SLIDE"}
@@ -361,13 +361,13 @@ LANG_SAMPLES = ["la balle tombe", "la balle chute", "le bloc tombe", "le cube ro
 
 
 def canonical_sentence(s):
-    """Forme linguistique canonique : (entité, action) -> phrase de référence."""
+    """Canonical linguistic form: (entity, action) -> reference sentence."""
     e = LEX_ENTITY[sentence_parts(s)[0]]; a = LEX_ACTION[sentence_parts(s)[1]]
     np = {"ball": "la balle", "block": "le bloc", "cube": "le cube"}[e]; v = {"FALL": "tombe", "ROLL": "roule", "SLIDE": "glisse"}[a]
     return f"{np} {v}"
 
 
-# ================================================================ domaine : séquences
+# ================================================================ domain: sequences
 
 SEQ_INVARIANTS = InvariantSet([
     CheckedInvariant("multiset", "sequence", lambda s: tuple(sorted(s))),
@@ -389,7 +389,7 @@ def sequence_transformations():
 SEQ_SAMPLES = [[3, 1, 4, 1, 5], [2, 7, 1, 8], [9, 2, 6, 5, 3, 5], [1, 2, 3, 4]]
 
 
-# ================================================================ domaine : géométrie 2D (nuages de points)
+# ================================================================ domain: 2D geometry (point clouds)
 
 def _pairwise(P): return torch.cdist(P, P)
 
@@ -425,15 +425,15 @@ def geometry_samples(n=4, seed=0):
 
 
 def canonical_geometry(P):
-    """Configuration normalisée : centrée, premier point sur l'axe x positif, orientation fixée (si possible)."""
+    """Normalised configuration: centred, first point on the positive x axis, orientation fixed (if possible)."""
     Q = P - P.mean(0)
     a = math.atan2(float(Q[0, 1]), float(Q[0, 0])); Q = Q @ _rot(-a).T
     if len(Q) > 2 and float(Q[1, 1]) < 0: Q = Q * torch.tensor([1.0, -1.0], dtype=torch.float64)
     return Q
 
 
-# ================================================================ mini-domaine : code (AST minimal)
-# programme = liste d'instructions (cible, expr) ; expr = int | nom | (op, expr, expr) ; dernière var = sortie.
+# ================================================================ mini-domain: code (minimal AST)
+# program = list of statements (target, expr); expr = int | name | (op, expr, expr); last var = output.
 
 def _vars(e):
     if isinstance(e, str): return {e}
@@ -462,7 +462,7 @@ def type_valid(prog):
 
 
 def data_dependencies(prog):
-    """Graphe def-use en positions (indépendant des noms) : instruction i dépend de la dernière définition de chaque var lue."""
+    """Def-use graph by positions (independent of names): statement i depends on the last definition of each var read."""
     last, deps = {}, []
     for i, (tgt, e) in enumerate(prog):
         deps.append(tuple(sorted(last[v] for v in _vars(e) if v in last))); last[tgt] = i
@@ -470,7 +470,7 @@ def data_dependencies(prog):
 
 
 def _dep_shape(prog, deps):
-    # forme canonique du DAG : multiensemble des (profondeur, nb d'entrées) — insensible à l'ordre des instructions indépendantes
+    # canonical form of the DAG: multiset of (depth, number of inputs) — insensitive to the order of independent statements
     depth = []
     for i, d in enumerate(deps): depth.append(1 + max((depth[j] for j in d), default=0))
     return tuple(sorted((depth[i], len(d), _op_sig(prog[i][1])) for i, d in enumerate(deps)))
@@ -505,7 +505,7 @@ def rename_variable(prog):
 
 
 def rename_capture(prog):
-    """Renommage FAUTIF : renomme la 1re variable avec le nom d'une autre (capture)."""
+    """FAULTY renaming: renames the 1st variable with the name of another one (capture)."""
     names = [t for t, _ in prog]
     return _rename(prog, names[0], names[1]) if len(set(names)) > 1 else prog
 
@@ -522,9 +522,9 @@ def constant_fold(prog): return [(t, _fold(e)) for t, e in prog]
 
 
 def reorder_independent(prog):
-    """Échange la 1re paire d'instructions adjacentes indépendantes (ni lecture ni écriture croisées)."""
+    """Swaps the 1st pair of independent adjacent statements (no cross read nor cross write)."""
     p = list(prog)
-    for i in range(len(p) - 2):          # la dernière instruction (sortie) reste en place
+    for i in range(len(p) - 2):          # the last statement (output) stays in place
         (t1, e1), (t2, e2) = p[i], p[i + 1]
         if t1 not in _vars(e2) and t2 not in _vars(e1) and t1 != t2:
             p[i], p[i + 1] = p[i + 1], p[i]; return p
@@ -532,14 +532,14 @@ def reorder_independent(prog):
 
 
 def reorder_any(prog):
-    """Réordonnancement FAUTIF : échange les deux premières instructions sans vérifier les dépendances."""
+    """FAULTY reordering: swaps the first two statements without checking the dependencies."""
     p = list(prog)
     if len(p) > 2: p[0], p[1] = p[1], p[0]
     return p
 
 
 def extract_expression(prog):
-    """Extrait la 1re sous-expression binaire imbriquée dans une variable temporaire."""
+    """Extracts the 1st nested binary sub-expression into a temporary variable."""
     p = list(prog)
     for i, (t, e) in enumerate(p):
         if isinstance(e, tuple):
@@ -568,7 +568,7 @@ CODE_SAMPLES = [
 
 
 def canonical_program(prog):
-    """Programme normalisé : constantes repliées, variables renommées v0, v1, … dans l'ordre de définition."""
+    """Normalised program: constants folded, variables renamed v0, v1, … in definition order."""
     p = constant_fold(prog); mapping = {}
     for t, _ in p: mapping.setdefault(t, f"v{len(mapping)}")
     def r(e):
@@ -578,7 +578,7 @@ def canonical_program(prog):
     return [(mapping[t], r(e)) for t, e in p]
 
 
-# ================================================================ registre des domaines
+# ================================================================ domain registry
 
 DOMAINS = {
     "algebra": (ALG_INVARIANTS, algebra_transformations, algebra_samples),

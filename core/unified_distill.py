@@ -1,11 +1,11 @@
-"""Distillation du classement des identités (observation ET question, sensible à la source).
+"""Distillation of identity ranking (observation AND question, source-sensitive).
 
-L'élève (modèle linéaire, quelques paramètres) classe les candidats à partir de traits LOCAUX peu coûteux :
-compatibilité locale (type, attribut, état daté), soutien des croyances, fiabilité de la source, hypothèse ∅,
-1/n. Le maître est la formule d'identité complète (recherche jointe vectorisée). WCE décide toujours :
-l'élève ne propose que ; sa proposition est acceptée seulement si sa marge est nette ET si la vérification
-locale réussit, sinon on revient au maître. On mesure l'accord des DÉCISIONS (engager / ne pas engager, entité)
-et le coût (évaluations de candidats).
+The student (linear model, a few parameters) ranks the candidates from cheap LOCAL features:
+local compatibility (type, attribute, dated state), belief support, source reliability, hypothesis ∅,
+1/n. The teacher is the full identity formula (vectorised joint search). WCE always decides:
+the student only proposes; its proposal is accepted only if its margin is clear AND the local
+check succeeds, otherwise we fall back to the teacher. We measure the agreement of the DECISIONS (commit / do not commit, entity)
+and the cost (candidate evaluations).
 """
 from __future__ import annotations
 
@@ -25,7 +25,7 @@ class IdentityStudent(torch.nn.Module):
     @property
     def parameter_count(self): return sum(p.numel() for p in self.parameters())
 
-    def forward(self, feats, mask):                      # [B, C, F], [B, C] -> probabilités [B, C]
+    def forward(self, feats, mask):                      # [B, C, F], [B, C] -> probabilities [B, C]
         s = self.lin(feats).squeeze(-1).masked_fill(~mask, -1e9)
         return torch.softmax(s, -1)
 
@@ -50,7 +50,7 @@ def pad(examples):
 
 
 def local_features(u: UnifiedCognitiveState, rid, source):
-    """Traits locaux (sans recherche jointe) pour chaque candidat ; renvoie (candidats, traits, coût)."""
+    """Local features (without joint search) for each candidate; returns (candidates, features, cost)."""
     ref = u.state.entities_mentioned[rid]
     cands = u.entities(ref.type) or u.entities()
     presup = ref.introduced in ("def", "other") and ref.type is not None
@@ -66,7 +66,7 @@ def local_features(u: UnifiedCognitiveState, rid, source):
 
 
 def collect(lexicon, bench, run_scenario):
-    """Exemples (traits locaux, choix du maître, décision du maître) sur un banc (partition d'entraînement)."""
+    """Examples (local features, teacher's choice, teacher's decision) on a benchmark (training split)."""
     examples = []
     orig = UnifiedCognitiveState.identity
 
@@ -87,7 +87,7 @@ def collect(lexicon, bench, run_scenario):
 
 
 def evaluate(student, examples, margin=0.9):
-    """Élève propose -> vérification locale -> accepté si net, sinon maître. Accord des décisions et coût."""
+    """Student proposes -> local check -> accepted if clear, otherwise teacher. Decision agreement and cost."""
     feats, mask, y = pad(examples)
     with torch.no_grad(): p = student(feats, mask)
     top = p.argmax(1); conf = p.max(1).values
@@ -95,9 +95,9 @@ def evaluate(student, examples, margin=0.9):
     accept = (conf >= margin) & ok_local
     n_cands = mask.sum(1).float()
     agree_entity = (top == y)
-    # décision finale : acceptée -> entité de l'élève (engagement si le maître aurait engagé : même seuil) ; sinon maître
+    # final decision: accepted -> the student's entity (commitment if the teacher would have committed: same threshold); otherwise teacher
     final_ok = torch.where(accept, agree_entity, torch.ones_like(agree_entity))
-    teacher_cost = sum(max(1, ex[2][3]) for ex in examples) + float(n_cands.sum())      # candidats + recherche jointe
+    teacher_cost = sum(max(1, ex[2][3]) for ex in examples) + float(n_cands.sum())      # candidates + joint search
     student_cost = float(n_cands.sum()) + float(accept.sum()) + sum(max(1, ex[2][3]) + 0 for ex, a in zip(examples, accept) if not a)
     return {"decisions": len(examples), "accepted_from_student": int(accept.sum()),
             "fallback_to_teacher": int((~accept).sum()), "decision_agreement": round(float(final_ok.float().mean()), 4),

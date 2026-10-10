@@ -1,9 +1,9 @@
-"""Épisodes de discours pour la référence (générateur INDÉPENDANT : aucun import WCE).
+"""Discourse episodes for reference (INDEPENDENT generator: no WCE import).
 
-Chaque épisode : des entités cachées, des faits donnés à l'agent (partiels), des tours de parole.
-La référence de chaque mention est fixée PAR CONSTRUCTION du gabarit (entité, AMBIGUOUS,
-NONEXISTENT, HYPOTHETICAL). Un simulateur répond aux demandes de clarification.
-Domaines : physique, inventaire, famille fictive.
+Each episode: hidden entities, facts given to the agent (partial), speech turns.
+The reference of each mention is fixed BY CONSTRUCTION of the template (entity, AMBIGUOUS,
+NONEXISTENT, HYPOTHETICAL). A simulator answers the clarification requests.
+Domains: physical, inventory, fictional family.
 """
 from __future__ import annotations
 
@@ -33,16 +33,16 @@ class REntity:
     id: str
     kind: str
     attr: Optional[str]
-    loc: Optional[Tuple[str, str]] = None        # état au début du discours
-    loc0: Optional[Tuple[str, str]] = None       # état passé (avant le discours)
+    loc: Optional[Tuple[str, str]] = None        # state at the start of the discourse
+    loc0: Optional[Tuple[str, str]] = None       # past state (before the discourse)
 
 
 @dataclass
 class Turn:
     text: str
-    mentions: List[Dict[str, Any]]               # [{"head": mot, "gold": entité | AMBIGUOUS | ...}] dans l'ordre du texte
+    mentions: List[Dict[str, Any]]               # [{"head": word, "gold": entity | AMBIGUOUS | ...}] in text order
     kind: str = "statement"                      # statement | question | command
-    clarify_target: Optional[str] = None         # entité visée (pour le simulateur)
+    clarify_target: Optional[str] = None         # intended entity (for the simulator)
 
 
 @dataclass
@@ -90,7 +90,7 @@ def cap(s): return s[0].upper() + s[1:]
 def m(head, gold, **kw): return {"head": head, "gold": gold, **kw}
 
 
-# ================================================================ scènes
+# ================================================================ scenes
 
 def scene(rng, domain, n_same=2, extra=1, distinct_attr=True):
     kinds = list(DOMAINS[domain]["kinds"])
@@ -121,7 +121,7 @@ def given_attrs(ents, ids=None): return [(("attr", e.id), e.attr) for e in ents.
 def given_locs(ents, ids=None): return [(("loc", e.id, "now"), e.loc) for e in ents.values() if e.loc and (ids is None or e.id in ids)]
 
 
-# ================================================================ gabarits (référence fixée par construction)
+# ================================================================ templates (reference fixed by construction)
 
 def build(category, domain, rng) -> Optional[Episode]:
     places = list(DOMAINS[domain]["places"])
@@ -178,8 +178,8 @@ def build(category, domain, rng) -> Optional[Episode]:
                    Turn(f"{cap(pron(g))} est {attr_form(domain, e1.attr, g)}.", [m(pron(g), "e1")])], given_attrs(ents))
     if category == "cross_sentence":
         fall = " tombe." if domain == "physical" else " est là."
-        stay = (" reste " + place_phrase(domain, e2.loc[1]) + ".") if places else " reste là."   # position réelle de e2
-        if places: e1.loc = (e1.loc[0], places[0])        # la phrase décrit la position RÉELLE de l'entité visée
+        stay = (" reste " + place_phrase(domain, e2.loc[1]) + ".") if places else " reste là."   # real position of e2
+        if places: e1.loc = (e1.loc[0], places[0])        # the sentence describes the REAL position of the intended entity
         return ep([Turn(cap(np(domain, e1, definite=False, with_attr=False)) + (" " + place_phrase(domain, places[0]) if places else "") + " est là.",
                         [m(w, "AMBIGUOUS", intended="e1")]),
                    Turn(cap(np(domain, e1)) + fall, [m(w, "e1")]),
@@ -208,7 +208,7 @@ def build(category, domain, rng) -> Optional[Episode]:
 
 
 def long_episode(n_sentences, domain="physical", seed=0):
-    """Discours de N phrases : 2 entités de même type + 1 autre ; la référence de chaque mention est suivie par construction."""
+    """Discourse of N sentences: 2 entities of the same type + 1 other; the reference of each mention is tracked by construction."""
     rng = random.Random(seed)
     main, ents = scene(rng, domain, n_same=2, extra=1)
     ids = list(ents)
@@ -234,7 +234,7 @@ def long_episode(n_sentences, domain="physical", seed=0):
 
 
 def reference_benchmark(n_per_category=12, seed=0, domains=("physical", "inventory", "family"), noise=0.0):
-    """noise : probabilité qu'un attribut DONNÉ à l'agent soit faux (test de robustesse ; le texte reste vrai)."""
+    """noise: probability that an attribute GIVEN to the agent is false (robustness test; the text remains true)."""
     rng = random.Random(seed)
     episodes = []
     for domain in domains:
@@ -257,7 +257,7 @@ def reference_benchmark(n_per_category=12, seed=0, domains=("physical", "invento
 
 
 class ClarificationSimulator:
-    """Utilisateur simulé : répond à « Quel X ? » en donnant l'attribut de l'entité visée."""
+    """Simulated user: answers « Quel X ? » by giving the attribute of the intended entity."""
 
     def __init__(self, episode: Episode): self.ep = episode; self.questions = 0
 
@@ -267,7 +267,7 @@ class ClarificationSimulator:
         return f"{det(g)} {attr_form(self.ep.domain, e.attr, g)}"
 
     def reveal(self, key):
-        """Réponse à une demande d'information (apprentissage actif d'identité)."""
+        """Answer to a request for information (active identity learning)."""
         self.questions += 1
         e = self.ep.entities.get(key[1])
         if e is None: return None
@@ -275,7 +275,7 @@ class ClarificationSimulator:
 
 
 def family_captions(n=120, seed=0):
-    """Légendes (phrase, structure perçue) pour le domaine famille — mêmes conventions que les autres légendes."""
+    """Captions (sentence, perceived structure) for the family domain — same conventions as the other captions."""
     rng = random.Random(seed)
     out = []
     for i in range(n):

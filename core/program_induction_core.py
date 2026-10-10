@@ -1,10 +1,10 @@
-"""CŒUR d'induction de programmes INDÉPENDANT du domaine : rechercher → composer → ajuster → tester →
-anti-unifier → promouvoir → certifier. Seules les primitives changent selon le domaine (algèbre, langage,
-mini-code, séquences) ; la mécanique (énumération par complexité, objectif type MDL, anti-unification d'arbres,
-cycle de vie des familles, certificat) est commune.
+"""Domain-INDEPENDENT program induction CORE: search → compose → fit → test →
+anti-unify → promote → certify. Only the primitives change with the domain (algebra, language,
+mini-code, sequences); the mechanics (enumeration by complexity, MDL-type objective, tree anti-unification,
+family life cycle, certificate) are shared.
 
-Un programme = arbre (op, paramètre, enfants). Les primitives d'un domaine déclarent : nom, valeurs de paramètres
-candidates (l'ajustement est une énumération finie), arité, et une sémantique `apply(param, *args, x)`.
+A program = tree (op, parameter, children). The primitives of a domain declare: name, candidate parameter
+values (the fit is a finite enumeration), arity, and a semantics `apply(param, *args, x)`.
 """
 from __future__ import annotations
 
@@ -19,8 +19,8 @@ from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple
 @dataclass(frozen=True)
 class Prim:
     name: str
-    params: Tuple[Any, ...]                    # valeurs candidates (ajustement par énumération)
-    arity: int                                 # 0 : feuille appliquée à x ; 1 : transforme le résultat d'un enfant ; 2 : combine
+    params: Tuple[Any, ...]                    # candidate values (fit by enumeration)
+    arity: int                                 # 0: leaf applied to x; 1: transforms the result of a child; 2: combines
     fn: Callable = field(compare=False, hash=False, repr=False)
 
 
@@ -52,7 +52,7 @@ def _walk(p):
 
 
 def enumerate_programs(prims: Dict[str, Prim], max_depth=3, max_size=6, commutative=()):
-    """Énumération par profondeur croissante, PARAMÈTRES INCLUS (ajustement par énumération des valeurs)."""
+    """Enumeration by increasing depth, PARAMETERS INCLUDED (fit by enumeration of the values)."""
     level = {1: [Prog(p.name, v) for p in prims.values() if p.arity == 0 for v in (p.params or (None,))]}
     seen = set(level[1])
     for d in range(2, max_depth + 1):
@@ -85,8 +85,8 @@ class InductionResult:
 
 
 def induce(prims, examples, max_depth=3, max_size=6, lam=0.01, adequacy=1.0, commutative=(), equal=lambda a, b: a == b, macros=None):
-    """Recherche ordonnée par complexité ; score = erreur + λ·L ; arrêt au premier programme cohérent (adequacy)
-    si on parcourt par complexité croissante. macros : squelettes de familles induites, essayés d'abord."""
+    """Search ordered by complexity; score = error + λ·L; stops at the first consistent program (adequacy)
+    if traversal is by increasing complexity. macros: skeletons of induced families, tried first."""
     evals = 0; scored = []
     def score(q):
         nonlocal evals
@@ -107,8 +107,8 @@ def induce(prims, examples, max_depth=3, max_size=6, lam=0.01, adequacy=1.0, com
 
 
 def anti_unify(progs: Sequence[Prog]):
-    """Plus petit généralisant d'arbres : mêmes opérateurs → conservés ; paramètres différents → variable '?' ;
-    opérateurs différents → trou '□'."""
+    """Least general generalization of trees: same operators → kept; different parameters → variable '?';
+    different operators → hole '□'."""
     def lgg(a, b):
         if a.op != b.op or len(a.children) != len(b.children): return Prog("□")
         return Prog(a.op, a.param if a.param == b.param else "?", tuple(lgg(x, y) for x, y in zip(a.children, b.children)))
@@ -141,8 +141,8 @@ class FamilyHypothesis:
 # ================================================================ domaines
 
 def domain_algebra():
-    """Transformations d'équations a·x + b = c représentées par (a, b, c) ; découvrir la composition qui mène
-    d'une forme à une autre."""
+    """Transformations of equations a·x + b = c represented by (a, b, c); discover the composition that leads
+    from one form to another."""
     P = {
         "sub_both": Prim("sub_both", (1, 2, 3), 1, lambda v, e, x: (e[0], e[1] - v, e[2] - v)),
         "add_both": Prim("add_both", (1, 2, 3), 1, lambda v, e, x: (e[0], e[1] + v, e[2] + v)),
@@ -153,7 +153,7 @@ def domain_algebra():
 
 
 def domain_language():
-    """Règle d'acceptation de phrases (jetons) : prédicats atomiques + ET / OU / NON."""
+    """Acceptance rule for sentences (tokens): atomic predicates + AND / OR / NOT."""
     ENT, VERB = ("balle", "bloc", "cube"), ("tombe", "roule", "glisse")
     P = {
         "has": Prim("has", ENT + VERB + ("ne",), 0, lambda v, x: v in x.split()),
@@ -165,7 +165,7 @@ def domain_language():
 
 
 def domain_code():
-    """Condition logique d'un mini-programme (variables entières) : comparaisons + ET / OU."""
+    """Logical condition of a mini-program (integer variables): comparisons + AND / OR."""
     P = {
         "gt": Prim("gt", tuple((v, t) for v in ("a", "b") for t in (0, 2, 4)), 0, lambda p, x: x[p[0]] > p[1]),
         "even": Prim("even", ("a", "b"), 0, lambda v, x: x[v] % 2 == 0),
@@ -205,8 +205,8 @@ def random_target(name, rng: random.Random, depth=2):
 
 
 def cross_domain_experiment(seed=0, tasks_per_domain=6, n_examples=16):
-    """Pour chaque domaine : cibles cachées de profondeur 2 ; induction depuis exemples ; test sur entrées
-    nouvelles ; anti-unification des solutions d'une même structure -> famille ; famille testée sur nouvelles cibles."""
+    """For each domain: hidden targets of depth 2; induction from examples; test on new
+    inputs; anti-unification of the solutions sharing one structure -> family; family tested on new targets."""
     rng = random.Random(seed); out = {}
     for name, mk in DOMAINS.items():
         prims, comm, eq = mk(); solved = gen = evals = 0; sols = []

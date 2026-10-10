@@ -1,15 +1,15 @@
-"""Frontière épistémique : VRAI ≠ OBSERVÉ ≠ INFÉRABLE ≠ AFFIRMABLE.
+"""Epistemic boundary: TRUE ≠ OBSERVED ≠ INFERABLE ≠ ASSERTABLE.
 
-IdealAgent : référence épistémique INDÉPENDANTE du système testé (n'importe ni analyseur, ni résolveur, ni grammaire).
-Il reçoit la vue PUBLIQUE des observations :
-  - observations structurées (capteurs : ils voient l'objet, l'identifiant est public) ;
-  - phrases réduites à leur CONTENU : descripteur du sujet (type, couleur dite) + prédicat, SANS identifiant d'objet
-    (qui est une information cachée du générateur) ; les couleurs « impliquées » par le générateur ne sont pas fournies.
-Il applique des règles publiques : vote par source pondéré par la fiabilité, résolution d'un descripteur par type unique
-(niveau 0) ou par élimination explicite (niveau 1), le descripteur étant une affirmation de la même source.
+IdealAgent: epistemic reference INDEPENDENT of the tested system (imports neither parser, nor resolver, nor grammar).
+It receives the PUBLIC view of the observations:
+  - structured observations (sensors: they see the object, the identifier is public);
+  - sentences reduced to their CONTENT: descriptor of the subject (type, stated colour) + predicate, WITHOUT object identifier
+    (which is hidden information of the generator); the colours "implied" by the generator are not provided.
+It applies public rules: per-source vote weighted by reliability, resolution of a descriptor by unique type
+(level 0) or by explicit elimination (level 1), the descriptor being an assertion of the same source.
 
-Réétiquetage : chaque item est rejugé avec la même logique que le générateur, mais en remplaçant l'oracle « knowable »
-(qui lisait l'identité cachée des phrases et n'acceptait les couleurs décrites que pour les types uniques) par l'IdealAgent.
+Relabelling: each item is re-judged with the same logic as the generator, but replacing the "knowable" oracle
+(which read the hidden identity of the sentences and accepted the described colours only for unique types) by the IdealAgent.
 """
 from __future__ import annotations
 
@@ -25,13 +25,13 @@ L0, L1, L2, L3 = 0, 1, 2, 3
 LEVEL_NAMES = {L0: "direct observation", L1: "deterministic inference", L2: "probabilistic inference", L3: "speculative"}
 
 
-# ================================================================ vue publique
+# ================================================================ public view
 
 @dataclass(frozen=True)
 class Desc:
     type: str
     color: Optional[str] = None
-    place: Optional[str] = None            # support (identifiant public : table, étagère, sol)
+    place: Optional[str] = None            # support (public identifier: table, shelf, floor)
 
 
 @dataclass
@@ -40,8 +40,8 @@ class PublicText:
     time: int
     kind: str                               # color | loc | height | owner | event
     subject: Desc
-    value: Any                              # valeur ; pour loc/event : (rel, Desc cible)
-    loc_time: Any = None                    # 0 | "now" pour loc
+    value: Any                              # value; for loc/event: (rel, target Desc)
+    loc_time: Any = None                    # 0 | "now" for loc
     event_index: Optional[int] = None
 
 
@@ -60,11 +60,11 @@ def _desc(world, oid, with_color=True):
 
 
 def public_view(world, observations, hidden=False):
-    """Réécrit les observations sous forme publique (évaluation : seul ce module lit le monde pour RENDRE le contenu
-    des phrases, exactement ce que le texte dit ; aucun identifiant d'objet n'est transmis pour le texte)."""
+    """Rewrites the observations in public form (evaluation: only this module reads the world to RENDER the content
+    of the sentences, exactly what the text says; no object identifier is transmitted for the text)."""
     structured, texts, inventory = [], [], {}
     for ob in observations:
-        if hidden and (ob.implied or ob.text is not None):        # contrôle : l'ancien oracle lisait l'identité cachée
+        if hidden and (ob.implied or ob.text is not None):        # control: the old oracle read the hidden identity
             if ob.key[0] != "type": structured.append(PublicStructured(ob.source, ob.key, ob.value, ob.time))
             continue
         if ob.implied: continue
@@ -84,16 +84,16 @@ def public_view(world, observations, hidden=False):
     return inventory, structured, texts
 
 
-# ================================================================ règle explicite d'élimination
+# ================================================================ explicit elimination rule
 
 @dataclass
 class EliminateCandidates:
-    """Conclusion par élimination, auditée comme telle."""
+    """Conclusion by elimination, audited as such."""
     descriptor: Tuple
     candidates: List[str]
-    excluded: Dict[str, Any]               # candidat -> couleur établie (prémisse)
+    excluded: Dict[str, Any]               # candidate -> established colour (premise)
     remaining: Optional[str]
-    premises: List[Tuple] = field(default_factory=list)   # (clé, valeur, postérieure)
+    premises: List[Tuple] = field(default_factory=list)   # (key, value, posterior)
     provenance: str = ""
     confidence: float = 0.0
     level: int = L1
@@ -103,7 +103,7 @@ class EliminateCandidates:
 
 
 def eliminate(descriptor, candidates, known_color, premise_posterior, provenance=""):
-    """candidats d'un type ; les objets dont la couleur ÉTABLIE diffère sont exclus ; conclusion si un seul reste."""
+    """candidates of a type; the objects whose ESTABLISHED colour differs are excluded; conclusion if only one remains."""
     typ, color = descriptor
     excluded = {o: known_color[o] for o in candidates if o in known_color and known_color[o] != color}
     matching = [o for o in candidates if known_color.get(o) == color]
@@ -116,18 +116,18 @@ def eliminate(descriptor, candidates, known_color, premise_posterior, provenance
     return EliminateCandidates(descriptor, list(candidates), excluded, None, premises, provenance, 0.0, L3)
 
 
-# ================================================================ agent idéal
+# ================================================================ ideal agent
 
 class IdealAgent:
     def __init__(self, reliability: Dict[str, float], threshold=0.9, iterations=3):
         self.rel = dict(reliability); self.threshold = threshold; self.iterations = iterations
         self.inventory: Dict[str, str] = {}
-        self.votes: Dict[Tuple, Dict[str, Tuple[Any, int, str]]] = defaultdict(dict)   # clé -> source -> (valeur, niveau, provenance)
+        self.votes: Dict[Tuple, Dict[str, Tuple[Any, int, str]]] = defaultdict(dict)   # key -> source -> (value, level, provenance)
         self.rules: List[EliminateCandidates] = []
 
     def r(self, s): return min(max(self.rel.get(s, 0.7), 0.01), 0.99)
 
-    # ---- postérieure publique (mêmes formules que les sources, sans identité cachée) ---------------
+    # ---- public posterior (same formulas as the sources, without hidden identity) ---------------
     def posterior(self, key):
         votes = self.votes.get(key, {})
         if not votes: return None, 0.0, {}
@@ -153,7 +153,7 @@ class IdealAgent:
         second = sorted(dist.values(), reverse=True)[1] if len(dist) > 1 else 0.0
         return CONFLICTED if second >= 0.2 else UNKNOWN
 
-    # ---- résolution publique d'un descripteur ---------------------------------------------------
+    # ---- public resolution of a descriptor ---------------------------------------------------
     def objects_of(self, typ): return [o for o, k in self.inventory.items() if k == typ]
 
     def resolve(self, d: Desc, provenance=""):
@@ -168,7 +168,7 @@ class IdealAgent:
         if rule.conclusive: return rule.remaining, rule.level, rule
         return None, L3, rule
 
-    # ---- apprentissage sur un monde -------------------------------------------------------------
+    # ---- learning on one world -------------------------------------------------------------
     def observe(self, inventory, structured, texts):
         self.inventory = dict(inventory)
         base = defaultdict(dict)
@@ -180,7 +180,7 @@ class IdealAgent:
             base[key][ob.source] = (value, L0, "capteur")
         for key in list(base): self.votes[key] = dict(base[key])
         self.events = {}
-        for _ in range(self.iterations):                           # identités -> votes -> croyances (point fixe)
+        for _ in range(self.iterations):                           # identities -> votes -> beliefs (fixed point)
             votes = defaultdict(dict, {k: dict(v) for k, v in base.items()})
             self.rules = []
             events = {}
@@ -188,7 +188,7 @@ class IdealAgent:
                 o, lvl, rule = self.resolve(t.subject, f"{t.source}:{t.kind}")
                 if rule is not None: self.rules.append(rule)
                 if o is None: continue
-                if t.subject.color is not None and t.subject.place is None:     # le descripteur est une affirmation de la source
+                if t.subject.color is not None and t.subject.place is None:     # the descriptor is an assertion of the source
                     votes[("color", o)].setdefault(t.source, (t.subject.color, lvl, "descripteur"))
                 if t.kind in ("loc", "event"):
                     rel, tgt = t.value
@@ -205,14 +205,14 @@ class IdealAgent:
             self.votes = votes; self.events = events
         return self
 
-    # ---- valeurs publiques ---------------------------------------------------------------------
+    # ---- public values ---------------------------------------------------------------------
     def value(self, key):
-        """Valeur idéalement connaissable (ou None), niveau et statut."""
+        """Ideally knowable value (or None), level and status."""
         if key[0] == "loc" and key[2] == "now":
             ev = self.known(("event", key[1]))
             if ev is not None: return ev, self.level(("event", key[1])), KNOWABLE
             last = self.events.get(key[1], {})
-            if last:                                               # événement textuel (jamais corrompu : même règle de vote)
+            if last:                                               # textual event (never corrupted: same voting rule)
                 i = max(last); (val, src, lvl) = last[i]
                 self.votes[("event_text", key[1])] = {src: (val, lvl, "texte")}
                 p = self.posterior(("event_text", key[1]))[1]
@@ -225,7 +225,7 @@ class IdealAgent:
         return v, self.level(key), self.status(key)
 
     def ref_status(self, oid, with_color=True, pool=None):
-        """Une description (type [+ couleur]) est-elle résoluble d'après les observations publiques ? ok / ASK / UNKNOWN."""
+        """Is a description (type [+ colour]) resolvable from the public observations? ok / ASK / UNKNOWN."""
         if oid in SUPPORT_HEIGHT: return "ok"
         kind = self.inventory.get(oid)
         same = [m for m in (pool or self.inventory) if self.inventory.get(m) == kind]
@@ -235,7 +235,7 @@ class IdealAgent:
         return "ok_if_distinct", same
 
 
-# ================================================================ frontière de connaissance
+# ================================================================ knowledge boundary
 
 @dataclass
 class KnowledgeBoundary:
@@ -264,13 +264,13 @@ def boundary(key, truth, ideal: IdealAgent, oracle_value):
                              lvl if v is not None else L3, v, st, v is not None and v != truth)
 
 
-# ================================================================ réétiquetage des items avec l'agent idéal
+# ================================================================ relabelling of the items with the ideal agent
 
 def _fmt_loc(v): return f"{v[0]}:{v[1]}"
 
 
 class Relabeler:
-    """Même logique d'attendus que le générateur ; l'oracle de connaissabilité est l'IdealAgent (observations publiques)."""
+    """Same expected-answer logic as the generator; the knowability oracle is the IdealAgent (public observations)."""
 
     def __init__(self, world, observations, reliability, hidden=False):
         inv, st, tx = public_view(world, observations, hidden)
@@ -279,7 +279,7 @@ class Relabeler:
         self.facts = world.facts()
 
     def knowable(self, key):
-        """Valeur connaissable ET vraie (même convention que le générateur : une preuve trompeuse ne rend rien connaissable)."""
+        """Knowable AND true value (same convention as the generator: misleading evidence makes nothing knowable)."""
         if key[0] == "loc" and key[2] == "now":
             truth = self.world.loc(key[1], "now")
         elif key[0] == "height": truth = self.world.height(key[1], "now")
@@ -293,7 +293,7 @@ class Relabeler:
         _, same = r
         color = self.world.objects[o].color
         if sum(1 for m in same if self.world.objects[m].color == color) > 1: return "ASK"
-        others = same if pool is not None else [m for m in same if m != o]       # inventaire : toutes les couleurs (générateur)
+        others = same if pool is not None else [m for m in same if m != o]       # inventory: all the colours (generator)
         return "ok" if all(self.knowable(("color", m)) is not None for m in others) else "UNKNOWN"
 
     def gated(self, gold, *objs, pool=None):
@@ -309,7 +309,7 @@ class Relabeler:
         return "SUPPORTED" if same else "REFUTED"
 
     def relabel(self, it):
-        """(attendu idéal, réétiqueté ?)."""
+        """(ideal expected answer, relabelled?)."""
         m, g = it.meta, it.gold
         if g in ("UNKNOWN_WORD", "REJECT") and "refs" not in m: return g, False
         pool = self.world.items if m.get("item_ref") else None
@@ -340,7 +340,7 @@ class Relabeler:
                 return self.gated(f"{v:g}" if v is not None else "UNKNOWN", m["subject"]), True
             if it.intent == "claim" and "claimed" in m:
                 gold = self.claim(m["key"], m["claimed"])
-                if m["key"][0] == "color": return gold, True               # affirmations de couleur : type unique, non filtrées
+                if m["key"][0] == "color": return gold, True               # colour assertions: unique type, not filtered
                 return self.gated(gold, m["subject"], pool=pool), True
             if it.intent == "command" and "refs" in m:
                 gold = m["ungated"]
@@ -372,7 +372,7 @@ class Relabeler:
 
 
 def relabel_dataset(data, reliability, hidden=False):
-    """Attendus idéaux pour tous les mondes : {id(item): (attendu idéal, réétiqueté)}."""
+    """Ideal expected answers for all the worlds: {id(item): (ideal expected answer, relabelled)}."""
     out = {}
     for x in data:
         rl = Relabeler(x["world"], x["observations"], reliability, hidden)
@@ -382,6 +382,6 @@ def relabel_dataset(data, reliability, hidden=False):
 
 
 def true_reliabilities():
-    """Fiabilités publiées des sources (connaissance publique, comme le générateur les déclare)."""
+    """Published reliabilities of the sources (public knowledge, as the generator declares them)."""
     from core.independent_world import SOURCE_BY_NAME
     return {s: v.reliability for s, v in SOURCE_BY_NAME.items()}

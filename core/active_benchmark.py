@@ -1,4 +1,4 @@
-"""Multi-graines, agrégation, hypothèses PRÉ-ENREGISTRÉES (docs/hypotheses_active_structure.md), lot scellé."""
+"""Multi-seed runs, aggregation, PREREGISTERED hypotheses (docs/hypotheses_active_structure.md), sealed set."""
 from __future__ import annotations
 
 import math
@@ -49,7 +49,7 @@ def aggregate(results):
     S["diffs"] = {"interleaved_vs_after_recovery": diff("full", "after_search", HD, "recovery"), "full_vs_random_queries_extrap": diff("full", "full_random_queries", HD + ("hard_negative",), "extrapolation"),
                   "full_vs_passive_extrap": diff("full", "passive", HD, "extrapolation"), "proposer_evals_ratio": _ci([cell(s, "full", ("depth34",), "evaluations") / max(1, cell(s, "interleaved_functional", ("depth34",), "evaluations")) for s in seeds]),
                   "depth_recovery_guided": _ci([cell(s, "full", ("depth34",), "recovery") for s in seeds]), "depth_recovery_unguided": _ci([cell(s, "interleaved_functional", ("depth34",), "recovery") for s in seeds])}
-    # H2 : réduction de l'entropie structurelle après 8 requêtes
+    # H2: reduction of the structural entropy after 8 queries
     qp = [r for s in sorted(by["qp"]) for r in by["qp"][s]]
     def red(r, k=8):
         e = r["entropy"]; i = min(k, len(e) - 1); return (e[0] - e[i]) / max(1e-9, e[0]) if e[0] > 1e-9 else 0.0
@@ -128,7 +128,7 @@ def hypotheses(S, seeds):
     return H
 
 
-# ================================================================ lot scellé
+# ================================================================ sealed set
 
 def sealed_job(args):
     fam_idx, noise = args; torch.set_num_threads(1)

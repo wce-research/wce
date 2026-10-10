@@ -1,14 +1,14 @@
-"""Expériences du sous-jalon End-to-End Composition with Discovered Atoms — module d'ÉVALUATION (dev uniquement ; il
-voit la vérité pour MESURER ; jamais le lot scellé).
+"""Experiments of the sub-milestone End-to-End Composition with Discovered Atoms — EVALUATION module (dev only; it
+sees the truth in order to MEASURE; never the sealed set).
 
-  chain    : les trois chaînes pré-enregistrées (A pipeline gelé, B flat_scene_k3 + aval actuel, C flat_scene_k3 +
-             composition sur classes + finalisation validée) et les variantes de C, sans aucun oracle
-  source   : d'autres sources de primitives dans le même moteur
-  reduce   : mécanismes de réduction des littéraux ; moteur large et composition hiérarchique
-  robust   : cas contrôlés (vrais atomes, faux ajoutés, atomes approximatifs, atomes manquants) — diagnostic à oracle
-  boundary : KNOWN / UNKNOWN / NONE_OF_THE_ABOVE, en classe, atomes manquants, hors classe
+  chain    : the three preregistered chains (A frozen pipeline, B flat_scene_k3 + current downstream, C flat_scene_k3 +
+             composition over classes + validated finalisation) and the variants of C, with no oracle at all
+  source   : other primitive sources in the same engine
+  reduce   : literal reduction mechanisms; wide engine and hierarchical composition
+  robust   : controlled cases (true atoms, false ones added, approximate atoms, missing atoms) — oracle diagnostic
+  boundary : KNOWN / UNKNOWN / NONE_OF_THE_ABOVE, in class, missing atoms, out of class
 
-Tâches : clés 900–931 de `down_task`, profondeurs 1 à 6 (jamais utilisées ; mise au point : clés 990–999).
+Tasks: keys 900–931 of `down_task`, depths 1 to 6 (never used; tuning: keys 990–999).
 """
 from __future__ import annotations
 
@@ -61,15 +61,15 @@ def _truth_obs(task): return task.world.label(task.X, 1.0)
 
 
 def _structure(prog: Optional[BNode], task) -> dict:
-    """Arbre exact (à associativité / commutativité près) ; classe équivalente : mêmes valeurs que la vérité sur toutes
-    les observations (étiquettes vraies, sans bruit)."""
+    """Exact tree (up to associativity / commutativity); equivalent class: same values as the truth on all
+    the observations (true labels, without noise)."""
     from core.deep_structure import algebraic_form, n_atoms
     if prog is None or task.world.truth is None: return {"exact": False, "class_equal": False, "obs_agreement": 0.0, "size": 0}
     ag = float((predict(prog, task.X.float()) == _truth_obs(task)).float().mean()); return {"exact": algebraic_form(prog) == algebraic_form(task.world.truth), "class_equal": ag >= 1.0, "obs_agreement": ag, "size": n_atoms(prog)}
 
 
 def atom_recall(programs: Sequence[BNode], task) -> Optional[float]:
-    """Part des vrais atomes qu'une primitive donnée reproduit (accord fonctionnel ≥ 0,95 sur la région observée)."""
+    """Share of the true atoms that a given primitive reproduces (functional agreement ≥ 0.95 on the observed region)."""
     from core.deep_partial_exp import _probe, functional
     from core.deep_reachability import leaves
     if task.world.truth is None: return None
@@ -83,11 +83,11 @@ def _false_used(prog: Optional[BNode], task) -> int:
     P = _probe(); tl = leaves(task.world.truth); return sum(not any(functional(a, l, P) >= 0.95 for a in tl) for l in leaves(prog))
 
 
-# ================================================================ les trois chaînes
+# ================================================================ the three chains
 
 def chain_ab(task, arm: str, seed=0) -> dict:
-    """A : pipeline gelé (aucun littéral fourni). B : littéraux de flat_scene_k3, aval actuel. Profondeur maximale 6 pour
-    les deux : aucune information sur la taille vraie."""
+    """A: frozen pipeline (no literal supplied). B: literals of flat_scene_k3, current downstream. Maximum depth 6 for
+    both: no information on the true size."""
     from core.deep_fragments import flat_types, literals
     from core.deep_partial import observe
     from core.deep_reachability import leaves
@@ -101,7 +101,7 @@ def chain_ab(task, arm: str, seed=0) -> dict:
 
 
 def _attribute(task, e2e, regions, row) -> str:
-    """Cause principale d'un échec de la chaîne C (diagnostic : utilise la vérité)."""
+    """Main cause of a failure of chain C (diagnostic: uses the truth)."""
     if row["functional"]: return "recovered"
     if row["atom_recall_literals"] is not None and row["atom_recall_literals"] < 1.0: return "primitive_absent"
     if row["atom_recall_kept"] is not None and row["atom_recall_kept"] < 1.0: return "primitive_eliminated"
@@ -112,13 +112,13 @@ def _attribute(task, e2e, regions, row) -> str:
 
 
 def chain_c(task, variant="C", seed=0, discovered=None) -> dict:
-    """Chaîne C et ses variantes : découverte réelle → hypothèses → réduction → composition sur classes → finalisation."""
+    """Chain C and its variants: real discovery → hypotheses → reduction → composition over classes → finalisation."""
     t0 = time.time(); regions = _regions(task); cfg = {**load_config(), **C_VARIANTS.get(variant, {})}; e = run_chain(task.X, task.y, seed, cfg, discovered); row = {"experiment": "chain", "arm": variant, **_acc(e.program, regions), **_structure(e.program, task)}
     atoms = [h.program for h in e.kept]; R = e.result; units = getattr(R, "units", atoms); pre = to_program(R.selected.tree, units) if R and R.selected else None; row.update({"prefit_accord": _acc(pre, regions)["accord"], "prefit_functional": _acc(pre, regions)["functional"], "literals": e.stats["literals"], "hypotheses": e.stats["hypotheses"], "kept": e.stats["kept"],
                 "classes": e.stats.get("classes"), "considered": e.stats.get("considered"), "label": e.label, "gap": e.decision["gap"], "rivals": e.decision["rivals"], "fit_committed": bool(e.finalization.committed) if e.finalization else False,
                 "atom_recall_literals": atom_recall([h.program for h in e.hypotheses] + [a for h in e.hypotheses for a in h.alternatives], task), "atom_recall_kept": atom_recall(atoms, task), "false_kept": sum(1 for a in atoms if (atom_recall([a], task) or 0) == 0) if task.world.truth is not None else None,
                 "false_used": _false_used(e.program, task), "n_alternatives": sum(h.n_alternatives for h in e.hypotheses), "seconds": round(time.time() - t0, 2), "discover_seconds": e.stats["discover_seconds"]})
-    # rappel des candidats : bonne classe générée / dans le top-k / retenue
+    # candidate recall: good class generated / in the top-k / selected
     gen99 = gen97 = False; top5 = top20 = False; best_good = None; unseen = 0.0
     if atoms:
         T = R.table; sp = T.space; masks, sizes, idx = T.all(); sc = class_scores(sp, masks, sizes); o = order_by(sc, cfg["selector"]); F, lF = regions[0]; codes = sp.codes_of(F); unseen = sp.unseen_mass(F); lab = lF.numpy().astype(bool)
@@ -130,7 +130,7 @@ def chain_c(task, variant="C", seed=0, discovered=None) -> dict:
     row["cause"] = _attribute(task, e, regions, row) if task.world.truth is not None else None; return row
 
 
-# ================================================================ sources de primitives
+# ================================================================ primitive sources
 
 def source_literals(task, source: str, seed=0):
     from core.deep_fragments import flat_types, infer_types
@@ -143,7 +143,7 @@ def source_literals(task, source: str, seed=0):
         from core.deep_primitives2 import discover_robust, literals_of, load_config
         from core.deep_robust_prim import proposer, validator
         c = load_config(); d = discover_robust(X, y, proposer("union"), validator("full", c), seed=seed, joint=True, prune_z=c["prune_z"], split=c["split"]); L = literals_of(d, alternatives=2); return [(p, float(len(L) - i), "robust") for i, p in enumerate(L)]
-    if source == "frozen_atoms":                                                   # atomes du pipeline gelé : feuilles de ses hypothèses, pondérées par l'évidence de l'hypothèse
+    if source == "frozen_atoms":                                                   # atoms of the frozen pipeline: leaves of its hypotheses, weighted by the evidence of the hypothesis
         from core.deep_search import DeepSearch
         out = DeepSearch("factorized", budget=150.0, seed=seed, max_depth=6).run(FitData.build(X, y, 0.10)); hs = sorted(out.all.values(), key=lambda h: -h.evidence); seen = set(); L = []
         for r, h in enumerate(hs):
@@ -158,11 +158,11 @@ def source_row(task, source: str, seed=0) -> dict:
     t0 = time.time(); disc = source_literals(task, source, seed); r = chain_c(task, "C", seed, disc); return {**r, "experiment": "source", "arm": source, "source_seconds": round(time.time() - t0, 2)}
 
 
-# ================================================================ réduction, passage à l'échelle, composition hiérarchique
+# ================================================================ reduction, scaling, hierarchical composition
 
 def reduce_rows(task, seed=0) -> List[dict]:
-    """Mêmes littéraux (flat_scene_k3), mécanismes de réduction différents ; puis moteur large et composition
-    hiérarchique sur davantage d'atomes. Aucun ajustement : seule la composition est comparée."""
+    """Same literals (flat_scene_k3), different reduction mechanisms; then wide engine and hierarchical
+    composition on more atoms. No fit: only the composition is compared."""
     regions = _regions(task); disc = discover(task.X, task.y, 3, seed); H = hypotheses_from(disc, task.X); out = []; base = {"experiment": "reduce", "literals": len(disc), "hypotheses": len(H), "atom_recall_literals": atom_recall([h.program for h in H], task)}
     for m in REDUCTIONS:
         t0 = time.time(); kept, info = reduce(H, task.y, m); atoms = [h.program for h in kept]; R = compose(atoms, task.X, task.y, "bic") if atoms else None; prog = to_program(R.selected.tree, R.units) if R else None
@@ -176,10 +176,10 @@ def reduce_rows(task, seed=0) -> List[dict]:
     return out
 
 
-# ================================================================ cas contrôlés : faux atomes, atomes approximatifs, atomes manquants
+# ================================================================ controlled cases: false atoms, approximate atoms, missing atoms
 
 def robust_atoms(task, condition: str, seed=0):
-    """Atomes de départ d'un cas contrôlé (DIAGNOSTIC : part des vrais atomes)."""
+    """Starting atoms of a controlled case (DIAGNOSTIC: starts from the true atoms)."""
     from core.deep_reachability import leaves
     from core.deep_world import ATOM_TYPES, atom
     tl = list(leaves(task.world.truth)); rng = random.Random(seed * 7919 + ROBUST.index(condition)); fake = lambda k: [atom(rng, rng.choice(ATOM_TYPES)) for _ in range(k)]
@@ -199,15 +199,15 @@ def robust_row(task, condition: str, seed=0) -> dict:
     return {"experiment": "robust", "arm": condition, "given": len(atoms), "n_true": n_true, **{k: r.get(k) for k in ("accord", "accord_out", "functional", "functional_097", "label", "gap", "kept", "false_kept", "false_used", "cause", "atom_recall_kept")}, "applicable": bool(atoms) or condition.startswith("missing")}
 
 
-# ================================================================ frontière de classe
+# ================================================================ class boundary
 
 def boundary_row(task, kind: str, seed=0) -> dict:
-    """Décision de la chaîne C sur une tâche hors classe (aucune structure représentable n'est la vérité)."""
+    """Decision of chain C on an out-of-class task (no representable structure is the truth)."""
     e = run_chain(task.X, task.y, seed); regions = _regions(task); a = _acc(e.program, regions)
     return {"experiment": "boundary", "arm": kind, "label": e.label, "gap": e.decision["gap"], "knn_error_rate": e.decision["knn_error_rate"], "error_rate": e.decision["error_rate"], "rivals": e.decision["rivals"], "accord": a["accord"], "kept": e.stats["kept"]}
 
 
-# ================================================================ sous-unités AWS
+# ================================================================ AWS sub-units
 
 def subunits(key):
     from core.deep_experiments import _row

@@ -1,6 +1,6 @@
-"""Expériences ciblées du jalon : pression de capacité (H6), régénération 2.0 (H7), sondes adversariales,
-nouveauté en monde ouvert (AB), découverte de structure latente (AC), induction de compétences (AD), format de
-certificat commun inter-domaines (AI), lois de croissance et de réutilisation (AM, AN), transfert avant (AO–AQ)."""
+"""Targeted experiments of the milestone: capacity pressure (H6), regeneration 2.0 (H7), adversarial probes,
+open-world novelty (AB), latent structure discovery (AC), skill induction (AD), common cross-domain
+certificate format (AI), growth and reuse laws (AM, AN), forward transfer (AO–AQ)."""
 from __future__ import annotations
 
 import copy
@@ -15,11 +15,11 @@ from core.continuum import Config, ContinuumSystem, mlp, run_stream
 from core.generative_certificate import (ContinuousGenerator, GenerativeInvariantCertificate, SymbolicGenerator, clean_inputs)
 
 
-# ================================================================ H6 — pression de capacité
+# ================================================================ H6 — capacity pressure
 
 def capacity_both(seed=0):
-    """Deux flux sous pression : « neural » (familles hors bibliothèque, budget 1300) et « mixed » (flux standard,
-    découverte à l'acquisition désactivée pour forcer des experts, budget 400)."""
+    """Two streams under pressure: "neural" (families outside the library, budget 1300) and "mixed" (standard stream,
+    discovery at acquisition disabled to force experts, budget 400)."""
     a = capacity_experiment(seed)
     regs = stream(seed + 700, 40); out = {}
     for name, cap in (("unlimited", None), ("pressure", 400)):
@@ -34,9 +34,9 @@ def capacity_both(seed=0):
 
 
 def capacity_experiment(seed=0, n=40, budget=1300, drift="auto"):
-    """Flux de familles NON couvertes par la bibliothèque de règles (distance relative, sinus, boîte) : les experts
-    neuronaux sont nécessaires. Même configuration avec budget serré vs illimité. drift="regrow" : les anciennes
-    versions dérivées deviennent obsolètes (non référencées) — situation où l'élagage a de la matière."""
+    """Stream of families NOT covered by the rule library (relative distance, sine, box): the neural
+    experts are necessary. Same configuration with tight vs unlimited budget. drift="regrow": the old
+    drifted versions become obsolete (unreferenced) — a situation where pruning has material to work on."""
     regs = stream(seed + 300, n, families=("reldist", "box", "sine"), p_novel=0.0)
     out = {}
     for name, cap in (("unlimited", None), ("pressure", budget)):
@@ -61,11 +61,11 @@ def run_stream_cfg(cfg, regs, seed, n_support=512):
     return checkpoint_metrics(s, regs, tests, la, recs), s
 
 
-# ================================================================ H7 — régénération 2.0
+# ================================================================ H7 — regeneration 2.0
 
 def regeneration_experiment(seed=0, n=30):
-    """Système (experts neuronaux nécessaires) ; chaque module corrompu tour à tour → certificats en échec →
-    régénération depuis les certificats génératifs (sans instantané) → récupération sur les compétences protégées."""
+    """System (neural experts necessary); each module corrupted in turn → failing certificates →
+    regeneration from the generative certificates (without snapshot) → recovery on the protected skills."""
     regs = stream(seed + 400, n, families=("reldist", "box", "sine", "ball"), p_novel=0.0)
     cfg = Config("regen", cert="generative", discovery=False, drift="auto")
     o, s = run_stream_cfg(cfg, regs, seed)
@@ -94,11 +94,11 @@ def regeneration_experiment(seed=0, n=30):
             "regenerated": round(sum(r["regenerated"] for r in res) / max(1, len(res)), 4), "per_module": res}
 
 
-# ================================================================ sondes adversariales et taux de violation
+# ================================================================ adversarial probes and violation rate
 
 def adversarial_experiment(seed=0, n=30):
-    """Pour chaque compétence certifiée (expert neuronal) : taux de violation trouvé par (a) sondes centrales,
-    (b) sondes de frontière, (c) recherche ADVERSARIALE (désaccord maximal avec la référence)."""
+    """For each certified skill (neural expert): violation rate found by (a) central probes,
+    (b) boundary probes, (c) ADVERSARIAL search (maximal disagreement with the reference)."""
     regs = stream(seed + 500, n, families=("reldist", "box", "sine", "ball"), p_novel=0.0)
     o, s = run_stream_cfg(Config("adv", cert="generative", discovery=False), regs, seed)
     g = torch.Generator().manual_seed(seed); out = Counter()
@@ -112,11 +112,11 @@ def adversarial_experiment(seed=0, n=30):
     return {k: round(v / max(1, out["n"]), 4) for k, v in out.items() if k != "n"} | {"skills": out["n"]}
 
 
-# ================================================================ AB — nouveauté en monde ouvert
+# ================================================================ AB — open-world novelty
 
 def novelty_classification(seed=0, n=60):
-    """Décision du système vs vérité : récurrence connue / composition / petite dérive / nouvelle tâche / nouveau
-    domaine (famille hors bibliothèque)."""
+    """Decision of the system vs truth: known recurrence / composition / small drift / new task / new
+    domain (family outside the library)."""
     regs = stream(seed + 600, n, p_novel=0.15)
     o, s = run_stream_cfg(Config("open", cert="generative", discovery=True, drift="auto"), regs, seed)
     def sysclass(r):
@@ -137,11 +137,11 @@ def novelty_classification(seed=0, n=60):
     return {"accuracy": round(ok / len(regs), 3), "per_class_recall": per, "confusion": {f"{a}->{b}": v for (a, b), v in conf.items()}}
 
 
-# ================================================================ AC — structure latente : facteurs pertinents
+# ================================================================ AC — latent structure: relevant factors
 
 def latent_factors(seed=0, n=12):
-    """Pour de nouvelles familles : facteurs pertinents découverts = dimensions à forte sensibilité (gradient
-    d'entrée moyen de l'expert) comparées aux dimensions réellement utilisées par la règle cachée."""
+    """For new families: discovered relevant factors = dimensions with high sensitivity (mean input
+    gradient of the expert) compared with the dimensions actually used by the hidden rule."""
     from core.continuous_world import Regime, random_rule, D
     from core.continuum import new_expert, train
     rng = random.Random(seed); g = torch.Generator().manual_seed(seed); hits = []
@@ -162,12 +162,12 @@ def _used_dims(rule):
     return list(range(16))
 
 
-# ================================================================ AI — format de certificat commun inter-domaines
+# ================================================================ AI — common cross-domain certificate format
 
 def cross_domain_certificates(seed=0):
-    """Même GenerativeInvariantCertificate pour langage, algèbre, mini-code, séquences : générateur SYMBOLIQUE appris
-    par anti-unification des exemples vus, référence = programme canonique de la compétence ; on vérifie (a) qu'une
-    compétence intacte passe, (b) qu'une compétence altérée (primitive remplacée) échoue, (c) la compression."""
+    """Same GenerativeInvariantCertificate for language, algebra, mini-code, sequences: SYMBOLIC generator learned
+    by anti-unification of the seen examples, reference = canonical program of the skill; we check (a) that an
+    intact skill passes, (b) that an altered skill (primitive replaced) fails, (c) the compression."""
     from core.symbolic_plasticity import DOMAINS, Prim
     rng = random.Random(seed); g = torch.Generator().manual_seed(seed); out = {}
     tok = {"language": (str.split, " ".join, lambda s: s), "algebra": None, "code": None, "strings": (list, "".join, lambda s: s)}
@@ -189,17 +189,17 @@ def cross_domain_certificates(seed=0):
 
 
 class _StructGenerator(SymbolicGenerator):
-    """Générateur structurel pour objets non textuels (équations, programmes) : on ré-échantillonne via le
-    générateur d'entrées du domaine avec des paramètres appris (bornes) — ici, l'échantillonneur de domaine, borné."""
+    """Structural generator for non-textual objects (equations, programs): we resample through the
+    input generator of the domain with learned parameters (bounds) — here, the domain sampler, bounded."""
     def __init__(self, dom, xs): super().__init__(); self.dom = dom; self.n_seen = len(xs)
     def sample(self, n, g, rare=False): return self.dom.inputs(random.Random(int(torch.randint(0, 10 ** 9, (1,), generator=g))), n)
     def memory_bytes(self): return 64
 
 
-# ================================================================ AM / AN / AO — lois empiriques
+# ================================================================ AM / AN / AO — empirical laws
 
 def fit_growth(ns, params):
-    """Ajuste params(N) = a·N^b (log-log) et linéaire ; renvoie b, R² des deux, et l'IC grossier de b."""
+    """Fits params(N) = a·N^b (log-log) and linear; returns b, R² of both, and the rough CI of b."""
     xs = [math.log(n) for n in ns]; ys = [math.log(max(1, p)) for p in params]
     mx, my = sum(xs) / len(xs), sum(ys) / len(ys); sxx = sum((x - mx) ** 2 for x in xs)
     b = sum((x - mx) * (y - my) for x, y in zip(xs, ys)) / sxx; a = my - b * mx
@@ -211,7 +211,7 @@ def fit_growth(ns, params):
 
 
 def lifetime_cost(learning_curve, kinds, window=10):
-    """Coût d'acquisition (pas d'entraînement) par NOUVELLE compétence le long de la vie + pente."""
+    """Acquisition cost (training steps) per NEW skill along the lifetime + slope."""
     pts = [(i, c) for i, (c, k) in enumerate(zip(learning_curve, kinds)) if k not in ("reactivate", "noise_ignored")]
     if len(pts) < 3: return {"slope": None}
     xs, ys = zip(*pts); mx, my = sum(xs) / len(xs), sum(ys) / len(ys)

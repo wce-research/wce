@@ -1,8 +1,8 @@
-"""Rapports du sous-jalon Deep Composition & Final Reconstruction with Oracle Atoms (dev uniquement).
+"""Reports of the Deep Composition & Final Reconstruction with Oracle Atoms sub-milestone (dev only).
 
-  smoke     : démonstration locale courte sur la clé de MISE AU POINT (899)
-  aggregate : agrège les runs AWS `deepdc` → results/deep_composition_oracle_summary.json
-  report    : imprime les tableaux
+  smoke     : short local demonstration on the TUNING key (899)
+  aggregate : aggregates the AWS `deepdc` runs → results/deep_composition_oracle_summary.json
+  report    : prints the tables
 """
 from __future__ import annotations
 
@@ -37,7 +37,7 @@ def summarize(rows, bad=0):
     from core.deep_compose_exp import BEAMS, BUDGETS
     S = {"n_rows": len(rows), "units_in_error": bad}; co = [r for r in rows if r["experiment"] == "compose"]; rf = [r for r in rows if r["experiment"] == "ref"]; tr = [r for r in rows if r["experiment"] == "trace"]; depths = sorted({r["n_atoms"] for r in co})
     groups = [("all", lambda r: True)] + [(f"d{d}", (lambda r, d=d: r["n_atoms"] == d)) for d in depths]
-    # ---- espace et programmation dynamique
+    # ---- space and dynamic programming
     S["space"] = {g: {"n": sum(f(r) for r in co), **{k: _mean(r.get(k) for r in co if f(r)) for k in ("cells", "cells_extended", "dp_classes", "classes_extended", "classes_merged_by_observation", "dp_considered", "dp_seconds", "unseen_mass_full", "unseen_mass_out", "noise_rate", "truth_generated", "truth_is_majority", "classes_better_or_equal", "classes_strictly_better", "classes_quasi_equivalent", "seconds")},
                          "dp_classes_max": max((r["dp_classes"] for r in co if f(r)), default=None), "dp_considered_max": max((r["dp_considered"] for r in co if f(r)), default=None), "dp_seconds_max": max((r["dp_seconds"] for r in co if f(r)), default=None)} for g, f in groups}
     sc = defaultdict(lambda: defaultdict(list))
@@ -60,7 +60,7 @@ def summarize(rows, bad=0):
         S["shape"][sh] = {"n": len(x), "dp_functional": _mean(r["dp_errors_functional"] for r in x), "dp_exact": _mean(r["dp_errors_exact"] for r in x), "dp_classes": _mean(r["dp_classes"] for r in x), "rank_errors": _mean(r["rank_errors"] for r in x), "ref_functional": _mean(r["functional"] for r in y), "ref_accord": _mean(r["accord"] for r in y), "ref_good_in_pool": _mean(r["good_in_pool"] for r in y)}
     for name, key in (("operators", "truth_operators"), ("strahler", "truth_strahler"), ("n_xor", "truth_n_xor")):
         S[f"by_{name}"] = {str(v): {"n": sum(r[key] == v for r in co), "dp_functional": _mean(r["dp_errors_functional"] for r in co if r[key] == v), "ref_functional": _mean(r["functional"] for r in rf if r[key] == v and r["arm"] == "ref_b150"), "ref_accord": _mean(r["accord"] for r in rf if r[key] == v and r["arm"] == "ref_b150")} for v in sorted({r[key] for r in co})}
-    # ---- pipeline existant
+    # ---- existing pipeline
     arms = sorted({r["arm"] for r in rf}); R = ("functional", "functional_097", "accord", "accord_out", "exact", "equivalent", "truth_form_in_pool", "good_in_pool", "good_found_then_lost", "candidate_best", "candidates", "size", "fit_equivalents", "seconds")
     S["reference"] = {f"{g}/{a}": {"n": sum(f(r) and r["arm"] == a for r in rf), **{k: _mean(r.get(k) for r in rf if f(r) and r["arm"] == a) for k in R}} for g, f in groups for a in arms}
     cb = {a: {r["task_id"]: r for r in rf if r["arm"] == a} for a in arms}; cd = {r["task_id"]: r for r in co}; S["paired"] = {}
@@ -71,7 +71,7 @@ def summarize(rows, bad=0):
             if a != "ref_b150": ts = sorted(set(cb[a]) & set(cb["ref_b150"])); S["paired"][f"{a} − ref_b150"] = {k: paired_ci([cb["ref_b150"][t][k] for t in ts], [cb[a][t][k] for t in ts]) for k in ("functional", "accord", "good_in_pool", "candidate_best")}
     for a, b in (("errors", "bic"), ("errors", "posterior"), ("errors", "likelihood")): S["paired"][f"dp_{b} − dp_{a}"] = {"functional": paired_ci([r[f"dp_{a}_functional"] for r in co], [r[f"dp_{b}_functional"] for r in co]), "accord": paired_ci([r[f"dp_{a}_accord"] for r in co], [r[f"dp_{b}_accord"] for r in co])}
     for h in (2, 3): S["paired"][f"mitm{h} − dp_errors"] = {"functional": paired_ci([r["dp_errors_functional"] for r in co], [r[f"mitm{h}_functional"] for r in co]), "accord": paired_ci([r["dp_errors_accord"] for r in co], [r[f"mitm{h}_accord"] for r in co])}
-    # ---- trace par étape du pipeline existant
+    # ---- trace per stage of the existing pipeline
     S["trace"] = {g: {"n": sum(f(r) for r in tr), "causes": dict(Counter(r["cause"] for r in tr if f(r))), "final_accord": _mean(r["final_accord"] for r in tr if f(r)), "n_candidates": _mean(r["n_candidates"] for r in tr if f(r)), "good_before_fit": _mean(r["n_good_candidates"] > 0 for r in tr if f(r)),
                       "good_candidate_rank": _median(r.get("good_candidate_rank") for r in tr if f(r)), "final_good": _mean(r["final_accord"] >= 0.99 for r in tr if f(r)),
                       **{f"cf_{k}": _mean((r.get("counterfactual") or {}).get(k) for r in tr if f(r)) for k in ("hold_best", "no_simplification", "pre_fit_top_score", "best_available")}, "truth_fit_accord": _mean((r.get("truth_fit") or {}).get("accord") for r in tr if f(r))} for g, f in groups}
@@ -79,19 +79,19 @@ def summarize(rows, bad=0):
 
 
 def aggregate():
-    rows, bad = load_rows(); S = summarize(rows, bad); json.dump(S, open(SUMMARY, "w"), indent=1); print("lignes", len(rows), "unités en erreur", bad); return S
+    rows, bad = load_rows(); S = summarize(rows, bad); json.dump(S, open(SUMMARY, "w"), indent=1); print("rows", len(rows), "units in error", bad); return S
 
 
 def show(S):
     ci = lambda v: {x: (y["diff"], y["ci95"]) if y else None for x, y in v.items()}
-    print("\nESPACE DE COMPOSITION"); [print(k.ljust(6), v) for k, v in S["space"].items()]; print("\nloi d'échelle"); [print(k.ljust(12), v) for k, v in S["scaling"].items()]
-    print("\nSÉLECTEURS (programmation dynamique exhaustive)"); [print(k.ljust(18), v) for k, v in S["selectors"].items()]; print("\nune feuille de plus"); [print(k.ljust(14), v) for k, v in S["plus_one"].items()]
-    print("\nFAISCEAU SUR LES CLASSES"); [print(k.ljust(16), v) for k, v in S["beam"].items()]; print("\nBUDGET"); [print(k.ljust(20), v) for k, v in S["budget"].items()]; print("\nRENCONTRE AU MILIEU"); [print(k.ljust(12), v) for k, v in S["mitm"].items()]
-    print("\nAJUSTEMENTS (A aucun, B atomes seuls, C composite, D composite validé)"); [print(k.ljust(14), v) for k, v in S["fit"].items()]; [print(k.ljust(22), ci(v)) for k, v in S["fit_paired"].items()]
-    print("\nFORME DE L'ARBRE"); [print(k.ljust(10), v) for k, v in S["shape"].items()]
-    for n in ("operators", "strahler", "n_xor"): print(f"par {n}", S[f"by_{n}"])
-    print("\nPIPELINE EXISTANT (vrais atomes)"); [print(k.ljust(26), v) for k, v in S["reference"].items()]; print("\nappariées"); [print(k.ljust(34), ci(v)) for k, v in S["paired"].items()]
-    print("\nTRACE PAR ÉTAPE"); [print(k.ljust(6), v) for k, v in S["trace"].items()]
+    print("\nCOMPOSITION SPACE"); [print(k.ljust(6), v) for k, v in S["space"].items()]; print("\nscaling law"); [print(k.ljust(12), v) for k, v in S["scaling"].items()]
+    print("\nSELECTORS (exhaustive dynamic programming)"); [print(k.ljust(18), v) for k, v in S["selectors"].items()]; print("\none more leaf"); [print(k.ljust(14), v) for k, v in S["plus_one"].items()]
+    print("\nBEAM OVER THE CLASSES"); [print(k.ljust(16), v) for k, v in S["beam"].items()]; print("\nBUDGET"); [print(k.ljust(20), v) for k, v in S["budget"].items()]; print("\nMEET IN THE MIDDLE"); [print(k.ljust(12), v) for k, v in S["mitm"].items()]
+    print("\nFITS (A none, B atoms alone, C composite, D validated composite)"); [print(k.ljust(14), v) for k, v in S["fit"].items()]; [print(k.ljust(22), ci(v)) for k, v in S["fit_paired"].items()]
+    print("\nSHAPE OF THE TREE"); [print(k.ljust(10), v) for k, v in S["shape"].items()]
+    for n in ("operators", "strahler", "n_xor"): print(f"by {n}", S[f"by_{n}"])
+    print("\nEXISTING PIPELINE (true atoms)"); [print(k.ljust(26), v) for k, v in S["reference"].items()]; print("\npaired"); [print(k.ljust(34), ci(v)) for k, v in S["paired"].items()]
+    print("\nTRACE PER STAGE"); [print(k.ljust(6), v) for k, v in S["trace"].items()]
 
 
 def report(): show(json.load(open(SUMMARY)))

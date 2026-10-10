@@ -1,6 +1,6 @@
-"""Banc du jalon « certificats génératifs » : flux continus de 100 régimes, 9 méthodes, mise à l'échelle
-(10/25/50/100), expériences ciblées, hypothèses pré-enregistrées (docs/hypotheses_generative_certificates.md),
-multi-graines et lot scellé (évalué une fois)."""
+"""Benchmark of the "generative certificates" milestone: continuous streams of 100 regimes, 9 methods, scaling
+(10/25/50/100), targeted experiments, preregistered hypotheses (docs/hypotheses_generative_certificates.md),
+multi-seed and sealed set (evaluated once)."""
 from __future__ import annotations
 
 import hashlib
@@ -18,7 +18,7 @@ MAIN_KEYS = ("average_accuracy", "new_task", "retention", "forgetting", "backwar
 
 
 def seed_run(seed, n=100, methods=tuple(METHODS), capacity_full=1500):
-    """Une graine : flux de n régimes pour toutes les méthodes + toutes les expériences ciblées."""
+    """One seed: stream of n regimes for all the methods + all the targeted experiments."""
     from core.continuum_experiments import (adversarial_experiment, capacity_both, cross_domain_certificates, fit_growth, latent_factors, lifetime_cost,
                                             novelty_classification, regeneration_experiment, reuse_law)
     from core.discovery import discover_invariants, law_discovery_experiment, rot, transformation_discovery_experiment
@@ -51,7 +51,7 @@ def seed_run(seed, n=100, methods=tuple(METHODS), capacity_full=1500):
 
 
 def forward_transfer(kinds, steps):
-    """Coût d'acquisition des nouvelles compétences : moitié précoce vs tardive (pas d'entraînement, et part sans entraînement)."""
+    """Acquisition cost of new skills: early vs late half (training steps, and share without training)."""
     new = [(i, s, k) for i, (s, k) in enumerate(zip(steps, kinds)) if k not in ("reactivate", "noise_ignored")]
     half = len(steps) // 2
     e = [s for i, s, k in new if i < half]; l = [s for i, s, k in new if i >= half]
@@ -59,7 +59,7 @@ def forward_transfer(kinds, steps):
     return {"early_steps": round(sum(e) / max(1, len(e)), 1), "late_steps": round(sum(l) / max(1, len(l)), 1), "early_zero_train": z(e), "late_zero_train": z(l)}
 
 
-# ================================================================ lot scellé
+# ================================================================ sealed set
 
 def sealed_streams(): return [stream(990500 + i, 100, p_novel=0.1, p_drift=0.3) for i in range(2)]
 
@@ -69,7 +69,7 @@ def sealed_hash():
                                       for r in s] for s in sealed_streams()], sort_keys=True).encode()).hexdigest()
 
 
-SEALED_SHA256 = "0260f9c4802d331b92daaa393cdb2fbf5c75f5d10433230c806e44c6426ec385"   # figée AVANT toute évaluation
+SEALED_SHA256 = "0260f9c4802d331b92daaa393cdb2fbf5c75f5d10433230c806e44c6426ec385"   # frozen BEFORE any evaluation
 
 
 def sealed_eval():
@@ -86,7 +86,7 @@ def sealed_eval():
     return out
 
 
-# ================================================================ agrégation et hypothèses
+# ================================================================ aggregation and hypotheses
 
 def _ci(xs):
     n = len(xs); m = sum(xs) / n
@@ -132,7 +132,7 @@ def aggregate(per):
 
 
 def hypotheses(per, S):
-    """Évaluation STRICTE selon les critères pré-enregistrés (non modifiés)."""
+    """STRICT evaluation according to the preregistered criteria (unmodified)."""
     M = lambda m, k, c=25: [p["methods"][m]["checkpoints"][str(c) if str(c) in p["methods"][m]["checkpoints"] else c][k] for p in per]
     H = {}
     gc, rr = M("generative_certificates", "retention"), M("raw_replay", "retention")

@@ -1,7 +1,7 @@
-"""Évaluation de l'état unifié sur le banc tiers (adaptateur : seul endroit qui connaît les deux conventions).
+"""Evaluation of the unified state on the third-party bench (adapter: the only place that knows both conventions).
 
-Le banc (core.third_party_discourse) ne connaît pas l'agent ; l'agent ne voit jamais la vérité des scénarios :
-il reçoit les faits capteurs, les phrases des locuteurs et l'historique déclaré des locuteurs.
+The bench (core.third_party_discourse) does not know the agent; the agent never sees the truth of the scenarios:
+it receives the sensor facts, the speakers' sentences and the declared record of the speakers.
 """
 from __future__ import annotations
 
@@ -44,7 +44,7 @@ def new_state(lexicon, scenario, source_calibrated=True, policy=True, calibrator
                               answer_calibrator=answer_calibrator)
     u.reliability.stats["capteur"] = [60.0, 1.0]
     for src, (ok, bad) in scenario["historique"].items(): u.reliability.stats[src] = [3.0 + ok, 1.5 + bad]
-    for obj, champs in scenario["objets"].items():               # types d'abord (inventaire), puis capteurs déclarés
+    for obj, champs in scenario["objets"].items():               # types first (inventory), then declared sensors
         if ("sorte" in [c for o, c in scenario["capteurs"] if o == obj]):
             k, v = _fact(obj, "sorte", champs["sorte"]); u.observe("capteur", k, v)
     for obj, champ in scenario["capteurs"]:
@@ -54,7 +54,7 @@ def new_state(lexicon, scenario, source_calibrated=True, policy=True, calibrator
 
 
 def to_third_party(ans, intent):
-    """Réponse de l'agent -> conventions du banc."""
+    """Agent answer -> bench conventions."""
     out = ans.output
     if ans.action == ANSWER:
         if intent == "command": return f"agir:{ans.value}"
@@ -113,7 +113,7 @@ def run_scenario(lexicon, scenario, **kw):
 
 
 def _identity_correct(scenario, text, entity):
-    """Vérité (évaluation) : objets du scénario compatibles avec les mots de la question."""
+    """Truth (evaluation): scenario objects compatible with the words of the question."""
     if entity in (None, AMBIGUOUS, NONEXISTENT, HYPOTHETICAL): return None
     words = text.lower().replace("'", " ").replace("?", " ").replace(".", " ").split()
     match = []
@@ -169,7 +169,7 @@ def by(rows, key):
 
 
 def answer_calibration(rows):
-    """Réponse finale : confiance annoncée vs exactitude (réponses engagées ET « probables »)."""
+    """Final answer: stated confidence vs accuracy (committed AND "likely" answers)."""
     pts = [(r["confidence"], r["got"] == r["expected"] or (r["likely"] and _likely_ok(r))) for r in rows if r["committed"] or r["likely"]]
     return calibration_report([c for c, _ in pts], [y for _, y in pts])
 
@@ -183,10 +183,10 @@ def _likely_ok(r):
     return v == r["expected"]
 
 
-# ================================================================ observation active, auto-correction, distillation
+# ================================================================ active observation, self-correction, distillation
 
 def active_commands(lexicon, bench=None, max_requests=3):
-    """Commandes à identité incertaine : passif (ASK / abstention) vs actif (observations demandées au capteur)."""
+    """Commands with uncertain identity: passive (ASK / abstention) vs active (observations requested from the sensor)."""
     from core.third_party_discourse import scenarios_commandes
     bench = bench or scenarios_commandes()
     out = Counter()
@@ -214,7 +214,7 @@ def active_commands(lexicon, bench=None, max_requests=3):
 
 
 def active_observation(lexicon, bench=None):
-    """Questions non résolues par identité : demander une observation (couleur / position) au simulateur capteur."""
+    """Questions not resolved by identity: request an observation (colour / position) from the sensor simulator."""
     bench = bench or banc_tiers()
     out = Counter()
     for scn in bench:
@@ -246,14 +246,14 @@ def active_observation(lexicon, bench=None):
 
 
 def self_correction(lexicon, bench=None):
-    """Par défaut : banc tiers + scénarios « trompeurs » (réponses réellement fausses à corriger)."""
+    """By default: third-party bench + "misleading" scenarios (genuinely wrong answers to correct)."""
     from core.third_party_discourse import scenarios_trompeurs
     return _self_correction(lexicon, bench or (banc_tiers() + scenarios_trompeurs()))
 
 
 def _self_correction(lexicon, bench):
-    """Réponse engagée ou probable, fausse -> une observation fiable la contredit -> dépendances -> recalcul.
-    Contrôle de nocivité : une confirmation fiable sur une réponse juste ne doit pas la dégrader."""
+    """Committed or likely answer, wrong -> a reliable observation contradicts it -> dependencies -> recomputation.
+    Harm control: a reliable confirmation on a right answer must not degrade it."""
     bench = bench or banc_tiers()
     c = Counter()
     for scn in bench:
@@ -300,13 +300,13 @@ def _word(v):
 
 
 def calibration_bench(n=120, seed=11):
-    """Partition de CALIBRATION : même second générateur, autre graine ; jamais les scénarios de test."""
+    """CALIBRATION partition: same second generator, other seed; never the test scenarios."""
     from core.third_party_discourse import scenarios_generes
     return scenarios_generes(n, seed)
 
 
 def calibrate_on(lexicon, calib_bench=None):
-    """Calibrateurs isotones (identité, réponse) + seuil de question par risque empirique, sur la calibration."""
+    """Isotonic calibrators (identity, answer) + question threshold by empirical risk, on the calibration."""
     calib_bench = calib_bench or calibration_bench()
     rows, ident = [], []
     for scn in calib_bench:
@@ -322,7 +322,7 @@ def calibrate_on(lexicon, calib_bench=None):
 
 
 def memory_scaling(lexicon, lengths=(50, 100, 500), seed=0):
-    """Longs discours (générateur de reference_world, indépendant du banc tiers) au travers de l'état unifié."""
+    """Long discourses (reference_world generator, independent of the third-party bench) through the unified state."""
     from core.reference_world import long_episode
     out = {}
     for n in lengths:
@@ -350,8 +350,8 @@ def memory_scaling(lexicon, lengths=(50, 100, 500), seed=0):
 
 
 def minimal_self_correction(lexicon, bench=None):
-    """Contestation sans nouvelle observation (« non, c'est faux ») sur des réponses FAUSSES : la révision minimale
-    doit trouver la dépendance fautive (source trompeuse / identité) et ne réviser qu'elle."""
+    """Challenge without a new observation ("non, c'est faux") on WRONG answers: the minimal revision
+    must find the faulty dependency (misleading source / identity) and revise only that one."""
     from core.third_party_discourse import scenarios_trompeurs
     bench = bench or scenarios_trompeurs()
     c = Counter(); sizes = []; causes = Counter()

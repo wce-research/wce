@@ -1,10 +1,10 @@
-"""PLASTICITÉ COMPOSITIONNELLE : but + modèle + invariants à préserver → espace de transformations admissibles →
-composition (AdaptationProgram) → croissance si nécessaire → vérification → consolidation.
+"""COMPOSITIONAL PLASTICITY: goal + model + invariants to preserve → space of admissible transformations →
+composition (AdaptationProgram) → growth if necessary → verification → consolidation.
 
-Ordre de préférence (partie Q) : réutilisation > composition > petite adaptation locale (adaptateur bas rang) >
-nouveau module ; jamais d'adaptation dense d'un module partagé. La rétropropagation n'est autorisée que sur les
-paramètres choisis par le planificateur (adaptateur ou nouveau module). La protection des compétences anciennes
-repose sur des CERTIFICATS (sondes synthétisées + signatures), sans aucune donnée brute ancienne.
+Order of preference (part Q): reuse > composition > small local adaptation (low-rank adapter) >
+new module; never a dense adaptation of a shared module. Backpropagation is allowed only on the
+parameters chosen by the planner (adapter or new module). The protection of the old skills
+relies on CERTIFICATES (synthesised probes + signatures), without any old raw data.
 """
 from __future__ import annotations
 
@@ -24,11 +24,11 @@ from core.skillnet import (
 )
 
 
-# ================================================================ adaptateur bas rang (nouvelle banque de poids rapides)
+# ================================================================ low-rank adapter (new bank of fast weights)
 
 class AddAdapter(AdaptationTransformation):
-    """Adaptateur bas rang propre à une nouvelle compétence : w1' = w1 + u vᵀ, w2' = w2 + du (paramètres neufs ;
-    le module de base, partagé, reste INTACT)."""
+    """Low-rank adapter specific to a new skill: w1' = w1 + u vᵀ, w2' = w2 + du (new parameters;
+    the base module, shared, remains INTACT)."""
     family = "AllocateSubspace"
     def execute(self, net):
         net.modules[self.adapter] = self.params; net.skills[self.skill] = ("adapter", self.base, self.adapter)
@@ -40,7 +40,7 @@ def train_adapter(net, base, X, y, rank=1, steps=200, lr=0.05, seed=0):
     a = {"u": (torch.randn(h, rank, generator=g) * 0.1), "v": torch.randn(rank, X.shape[1], generator=g) * 0.1,
          "db1": torch.zeros(h), "dw2": torch.zeros_like(p["w2"]), "db2": torch.zeros(2)}
     q = {k: v.clone().requires_grad_(True) for k, v in a.items()}; opt = torch.optim.Adam(q.values(), lr=lr)
-    for _ in range(steps):                                     # backprop LOCALE : seuls les paramètres de l'adaptateur
+    for _ in range(steps):                                     # LOCAL backprop: only the parameters of the adapter
         opt.zero_grad()
         w = {"w1": p["w1"] + q["u"] @ q["v"], "b1": p["b1"] + q["db1"], "w2": p["w2"] + q["dw2"], "b2": p["b2"] + q["db2"]}
         torch.nn.functional.cross_entropy(expert_forward(w, X), y).backward(); opt.step()
@@ -48,7 +48,7 @@ def train_adapter(net, base, X, y, rank=1, steps=200, lr=0.05, seed=0):
     return {k: v.detach() for k, v in q.items()}
 
 
-# ================================================================ programmes d'adaptation
+# ================================================================ adaptation programs
 
 @dataclass
 class ProgramStep:
@@ -63,7 +63,7 @@ class ProgramStep:
 
 @dataclass
 class AdaptationProgram:
-    """T_n ∘ … ∘ T_1 : étapes avec préconditions, gain attendu, survie attendue des invariants, coût, réversibilité."""
+    """T_n ∘ … ∘ T_1: steps with preconditions, expected gain, expected survival of the invariants, cost, reversibility."""
     kind: str
     steps: List[ProgramStep]
     build: Callable[[SkillNet], None] = field(repr=False, default=None)
@@ -79,7 +79,7 @@ class AdaptationProgram:
         return w_err * (1 - self.expected_acc) + w_violation * (1 - surv) + w_param * self.params_added + w_compute * self.compute + sum(s.cost for s in self.steps)
 
 
-# ================================================================ planificateur de plasticité
+# ================================================================ plasticity planner
 
 @dataclass
 class PlannerConfig:
@@ -96,16 +96,16 @@ class PlannerConfig:
 
 
 class PlasticityPlanner:
-    """Recherche BORNÉE best-first sur des programmes candidats (coût = erreur nouvelle tâche + violation
-    d'invariants + coût structurel + calcul). Réutilisation et composition sont évaluées exactement (sans
-    entraînement) ; adaptateurs et croissance sont entraînés localement puis VÉRIFIÉS contre tous les certificats."""
+    """BOUNDED best-first search over candidate programs (cost = new-task error + invariant
+    violation + structural cost + compute). Reuse and composition are evaluated exactly (without
+    training); adapters and growth are trained locally then VERIFIED against all the certificates."""
 
     def __init__(self, config: PlannerConfig = None, stabilizer=None, library=None, seed=0):
         self.cfg = config or PlannerConfig(); self.stabilizer = stabilizer; self.library = library; self.seed = seed
         self.log: List[dict] = []; self.programs: List[AdaptationProgram] = []
         self.evaluations = 0
 
-    # ---- candidats -----------------------------------------------------------------------------
+    # ---- candidates ----------------------------------------------------------------------------
     def _skill_preds(self, net, X):
         return {s: net.skill_predict(s, X) for s in net.skills}
 
@@ -142,7 +142,7 @@ class PlasticityPlanner:
         (Xt, yt), (Xv, yv) = _split(X, y)
         params = train_adapter(net, base, Xt, yt, steps=self.cfg.adapter_steps, seed=self.seed)
         n2 = copy.copy(net); n2.modules = dict(net.modules); n2.modules[aname] = params; n2.skills = dict(net.skills)
-        n2.skills[name] = ("adapter", base, aname); acc = float((n2.skill_predict(name, Xv) == yv).float().mean())   # exactitude de VALIDATION
+        n2.skills[name] = ("adapter", base, aname); acc = float((n2.skill_predict(name, Xv) == yv).float().mean())   # VALIDATION accuracy
         surv = self._predicted_survival("AllocateSubspace", net, base)
         return AdaptationProgram("adapter", [ProgramStep("AllocateSubspace", {"base": base}, acc, surv, 0.3),
                                              ProgramStep("FastWeightUpdate", {"module": aname, "rank": 1}, acc, 1.0, 0.0),
@@ -156,7 +156,7 @@ class PlasticityPlanner:
         (Xt, yt), (Xv, yv) = _split(X, y)
         p = train_params(new_expert(self.cfg.expert_hidden, self.seed + len(net.modules)), Xt, yt, self.cfg.train_steps, seed=self.seed)
         acc = float((expert_forward(p, Xv).argmax(1) == yv).float().mean())                                   # validation
-        p = train_params(p, X, y, self.cfg.train_steps // 5, seed=self.seed)                                  # puis tout le support
+        p = train_params(p, X, y, self.cfg.train_steps // 5, seed=self.seed)                                  # then the whole support
         net.counters["train_steps"] += self.cfg.train_steps + self.cfg.train_steps // 5
         def build(n):
             n.apply(AddModule(module=m, hidden=self.cfg.expert_hidden, seed=0)); n.modules[m] = p
@@ -166,9 +166,9 @@ class PlasticityPlanner:
                                           ProgramStep("ReuseSkill", {"skill": name}, acc, 1.0, 0.0)], build, acc, n_params(p), self.cfg.train_steps)
 
     def refine_inplace(self, net, ctx, X, y, certificates, coupling_max=0.5):
-        """Raffinement d'une compétence existante dans SON module, par gradient projeté dans l'espace nul des
-        sondes des AUTRES compétences qui partagent le module (J_old Δθ ≈ 0) ; évité si le module est fortement couplé
-        (graphe d'interaction) à des compétences fragiles. Budget de stabilité réparti par certificat."""
+        """Refinement of an existing skill in ITS OWN module, by gradient projected into the null space of the
+        probes of the OTHER skills that share the module (J_old Δθ ≈ 0); avoided if the module is strongly coupled
+        (interaction graph) to fragile skills. Stability budget allotted per certificate."""
         from core.skillnet import null_space_projector, ParameterUpdate
         m = net.skills[ctx.skill][1]
         others = [s for s in net.module_users(m) if s != ctx.skill and s in certificates]
@@ -183,7 +183,7 @@ class PlasticityPlanner:
         acc = float((net.skill_predict(ctx.skill, X) == y).float().mean())
         ok = acc >= self.cfg.target and all(certificates[s].check(net)[0] for s in certificates if s != ctx.skill)
         if not ok: _restore(net, snap); net.counters["rollbacks"] += 1; return None
-        for s in others: certificates[s].budget -= certificates[s].check(net)[1]          # consommation du budget
+        for s in others: certificates[s].budget -= certificates[s].check(net)[1]          # consumption of the budget
         certificates[ctx.skill] = certify(net, ctx.skill, self.cfg.probe_k)
         return {"kind": "refine_inplace", "acc": acc, "program": ("AllocateSubspace", "ParameterUpdate"), "params_added": 0}
 
@@ -191,15 +191,15 @@ class PlasticityPlanner:
         if self.stabilizer is None: return 1.0
         return self.stabilizer.predict_family(family, net, module)
 
-    # ---- apprentissage d'une tâche ---------------------------------------------------------------
+    # ---- learning one task -------------------------------------------------------------------------
     def learn(self, net: SkillNet, X, C, y, certificates: Dict[str, InvariantCertificate]):
         ctx, is_new = net.discover(C)
         rec = {"context": ctx.name, "new_context": is_new, "kind": None, "steps": 0, "rollback": 0}
         if not is_new and ctx.skill is not None:
             acc = float((net.skill_predict(ctx.skill, X) == y).float().mean())
-            if acc >= self.cfg.target - 0.05:                             # récurrence : réactivation immédiate (tolérance d'échantillon)
+            if acc >= self.cfg.target - 0.05:                             # recurrence: immediate reactivation (sample tolerance)
                 rec.update(kind="reactivate", acc=acc); self.log.append(rec); return rec
-            if net.skills[ctx.skill][0] == "expert":                       # contexte connu mais tâche dérivée : raffinement EN PLACE
+            if net.skills[ctx.skill][0] == "expert":                       # known context but drifted task: IN-PLACE refinement
                 r = self.refine_inplace(net, ctx, X, y, certificates)
                 if r is not None: rec.update(r); self.log.append(rec); return rec
         preds = self._skill_preds(net, X) if net.skills else {}
@@ -218,9 +218,9 @@ class PlasticityPlanner:
             elif kind == "grow": cands.append(self.grow_candidate(net, ctx, X, y))
             rec["steps"] += net.counters["train_steps"] - before
             good = [c for c in cands if c.expected_acc >= self.cfg.target]
-            if good: break                                                # recherche bornée : on s'arrête au premier niveau suffisant
+            if good: break                                                # bounded search: we stop at the first sufficient level
         cands.sort(key=lambda c: c.total_cost())
-        for prog in cands:                                                # vérifier ; rollback si un certificat casse
+        for prog in cands:                                                # verify; rollback if a certificate breaks
             snapshot = _snapshot(net)
             prog.build(net)
             ok = all(cert.check(net)[0] for cert in certificates.values())
@@ -241,8 +241,8 @@ def _split(X, y, frac=0.75):
 
 
 def coupling(net, certificates, module, skills, mag=0.1, trials=4):
-    """Couplage module ↔ compétences (PerturbationInteractionGraph réduit) : fraction de sondes changées sous une
-    petite perturbation relative du module."""
+    """Module ↔ skills coupling (reduced PerturbationInteractionGraph): fraction of probes changed under a
+    small relative perturbation of the module."""
     out = 0.0
     for t in range(trials):
         g = torch.Generator().manual_seed(t); n2 = copy.copy(net); n2.modules = dict(net.modules)
@@ -262,17 +262,17 @@ def _restore(net, snap):
 
 
 def _context_signature(preds, y):
-    """Signature du contexte d'apprentissage (sans identifiant de tâche) : meilleure réutilisation / négation."""
+    """Signature of the learning context (without task identifier): best reuse / negation."""
     if not preds: return ("empty",)
     best = max(max(float((p == y).float().mean()), 1 - float((p == y).float().mean())) for p in preds.values())
     return ("reuse_ok",) if best >= 0.95 else ("near",) if best >= 0.8 else ("far",)
 
 
-# ================================================================ gestion de capacité : fusion, distillation, élagage
+# ================================================================ capacity management: merging, distillation, pruning
 
 def equivalent_modules(net):
-    """Classes d'équivalence de compétences atomiques par signature de sortie sur TOUT l'espace d'entrée
-    (Invariant Algebra : même signature d'invariant ⇒ fusion admissible)."""
+    """Equivalence classes of atomic skills by output signature over the WHOLE input space
+    (Invariant Algebra: same invariant signature ⇒ merging admissible)."""
     from core.invariant_algebra import CheckedInvariant, EquivalenceClass, InvariantSet
     atomic = {s: p[1] for s, p in net.skills.items() if p[0] == "expert"}
     inv = InvariantSet([CheckedInvariant("output", "skill", lambda s: tuple(net.skill_predict(s, ALL_DATA).tolist()))])
@@ -282,20 +282,20 @@ def equivalent_modules(net):
 
 
 def manage_capacity(net, certificates, capacity):
-    """Quand le budget est dépassé : fusionner (équivalence d'invariants), distiller les compositions profondes,
-    élaguer les modules non référencés. Toute opération est vérifiée par les certificats (rollback sinon)."""
+    """When the budget is exceeded: merge (invariant equivalence), distil the deep compositions,
+    prune the unreferenced modules. Every operation is verified by the certificates (rollback otherwise)."""
     report = Counter()
     used = set().union(*[skill_modules(net, s) for s in net.skills]) if net.skills else set()
-    for m in [m for m in net.modules if m not in used and not m.startswith("adapter_")]:          # élagage
+    for m in [m for m in net.modules if m not in used and not m.startswith("adapter_")]:          # pruning
         net.modules.pop(m); report["pruned"] += 1
     if net.parameter_count() <= capacity: return report
-    for group in equivalent_modules(net):                                                      # fusion
+    for group in equivalent_modules(net):                                                      # merging
         keep = group[0]
         for b in group[1:]:
             snap = _snapshot(net); net.apply(MergeModule(a=keep, b=b))
             if all(c.check(net)[0] for c in certificates.values()): report["merged"] += 1
             else: _restore(net, snap)
-    if net.parameter_count() > capacity:                                                       # distillation compacte
+    if net.parameter_count() > capacity:                                                       # compact distillation
         for s, prog in list(net.skills.items()):
             if prog[0] != "expert" or net.modules[prog[1]]["w1"].shape[0] <= 8: continue
             snap = _snapshot(net); m = prog[1] + "_d"
@@ -307,13 +307,13 @@ def manage_capacity(net, certificates, capacity):
     return report
 
 
-# ================================================================ anti-unification et macros
+# ================================================================ anti-unification and macros
 
 VAR = "?"
 
 
 def anti_unify_args(a, b, env):
-    """Plus petit généralisant commun de deux valeurs : identiques → valeur ; sinon variable (cohérente via env)."""
+    """Least common generalisation of two values: identical → value; otherwise variable (consistent via env)."""
     if a == b: return a
     key = (repr(a), repr(b))
     if key not in env: env[key] = f"{VAR}v{len(env)}"
@@ -321,8 +321,8 @@ def anti_unify_args(a, b, env):
 
 
 def anti_unify(p1: List[ProgramStep], p2: List[ProgramStep]):
-    """Anti-unification STRUCTURELLE de deux programmes : alignement des familles par plus longue sous-suite
-    commune ; arguments différents → variables partagées. Renvoie (gabarit, variables) ou None."""
+    """STRUCTURAL anti-unification of two programs: alignment of the families by longest common
+    subsequence; differing arguments → shared variables. Returns (template, variables) or None."""
     f1, f2 = [s.family for s in p1], [s.family for s in p2]
     L = [[0] * (len(f2) + 1) for _ in range(len(f1) + 1)]
     for i in range(len(f1) - 1, -1, -1):
@@ -354,7 +354,7 @@ class ParameterizedAdaptationMacro:
 
 
 def induce_macros(programs: List[AdaptationProgram]):
-    """Regroupe les programmes réussis par signature de familles et anti-unifie chaque groupe en une macro."""
+    """Groups the successful programs by family signature and anti-unifies each group into a macro."""
     groups = defaultdict(list)
     for p in programs: groups[p.signature()].append(p)
     macros = []
@@ -368,8 +368,8 @@ def induce_macros(programs: List[AdaptationProgram]):
 
 
 class StrategyLibrary:
-    """Méta-apprentissage sans gros réseau : signature de contexte → statistiques des macros réussies → ordre
-    d'essai des niveaux (reuse / compose / adapter / grow)."""
+    """Meta-learning without a large network: context signature → statistics of the successful macros → order
+    in which the levels are tried (reuse / compose / adapter / grow)."""
 
     def __init__(self): self.stats = defaultdict(Counter)
 
@@ -384,13 +384,13 @@ class StrategyLibrary:
     def size(self): return sum(len(c) for c in self.stats.values())
 
 
-# ================================================================ régénération sans instantané complet
+# ================================================================ regeneration without a full snapshot
 
 def regenerate(net, certificates, module, seed=0, steps=600, lr=0.02):
-    """Module corrompu → certificats en échec → reconstruction depuis les sources FONCTIONNELLES (sans instantané) :
-    (1) compétences composées : programme (macro) rétabli ; (2) module atomique : réajusté CONJOINTEMENT sur les
-    sondes canoniques de TOUTES les compétences qui l'utilisent (directes ou via adaptateur, adaptateurs fixés),
-    en partant des poids corrompus ; vérification finale par les certificats."""
+    """Corrupted module → failing certificates → reconstruction from the FUNCTIONAL sources (without snapshot):
+    (1) composed skills: program (macro) restored; (2) atomic module: refitted JOINTLY on the
+    canonical probes of ALL the skills that use it (direct or via adapter, adapters fixed),
+    starting from the corrupted weights; final verification by the certificates."""
     failing = [s for s, c in certificates.items() if not c.check(net)[0]]
     for s in failing:
         cert = certificates[s]

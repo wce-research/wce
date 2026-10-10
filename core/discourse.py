@@ -1,12 +1,12 @@
-"""Mémoire de discours et d'identité : mentions -> référents de discours -> entités du monde.
+"""Discourse and identity memory: mentions -> discourse referents -> world entities.
 
-TEXTE -> Mentions -> DiscourseState (référents, focus, historique) -> contraintes inter-phrases
--> résolution conjointe (satisfaction de contraintes, vectorisée) -> EntityIdentityGraph -> révisions.
+TEXT -> Mentions -> DiscourseState (referents, focus, history) -> cross-sentence constraints
+-> joint resolution (constraint satisfaction, vectorized) -> EntityIdentityGraph -> revisions.
 
-Identité ≠ état : un référent garde son identité quand ses propriétés mutables (position) changent.
-Aucune identité n'est forcée : sous 0,9 de probabilité, les hypothèses restent ouvertes (branches pondérées).
-Inné déclaré : déterminants (défini / indéfini / démonstratif), « autre », pronoms, nombres « deux/trois »,
-deux verbes d'état du discours (« tombe », « reste »). Le reste (noms, attributs, relations) vient du lexique appris.
+Identity ≠ state: a referent keeps its identity when its mutable properties (position) change.
+No identity is forced: below 0.9 probability, the hypotheses stay open (weighted branches).
+Declared innate: determiners (definite / indefinite / demonstrative), « autre », pronouns, numbers « deux/trois »,
+two discourse state verbs (« tombe », « reste »). The rest (nouns, attributes, relations) comes from the learned lexicon.
 """
 from __future__ import annotations
 
@@ -30,7 +30,7 @@ COMMIT = 0.9
 AMBIGUOUS, NONEXISTENT, HYPOTHETICAL = "AMBIGUOUS", "NONEXISTENT", "HYPOTHETICAL"
 
 
-# ================================================================ représentations
+# ================================================================ representations
 
 @dataclass
 class Mention:
@@ -41,14 +41,14 @@ class Mention:
     definiteness: Optional[str] = None
     type: Optional[str] = None
     attrs: Dict[str, str] = field(default_factory=dict)
-    relation: Optional[Tuple[str, str, str]] = None     # (rel, lieu, temps)
+    relation: Optional[Tuple[str, str, str]] = None     # (rel, place, tense)
     role: str = "object"
     sentence: int = 0
     position: int = 0
     gender: Optional[str] = None
     number: int = 1
     referent: Optional[str] = None
-    alternatives: List[str] = field(default_factory=list)   # référents concurrents (pronom ambigu)
+    alternatives: List[str] = field(default_factory=list)   # competing referents (ambiguous pronoun)
     candidates: Dict[str, float] = field(default_factory=dict)
 
 
@@ -58,15 +58,15 @@ class Referent:
     type: Optional[str]
     gender: Optional[str]
     introduced: str
-    attrs: Dict[str, str] = field(default_factory=dict)          # propriétés affirmées (identitaires stables)
-    states: List[Tuple[int, str, Tuple[str, str]]] = field(default_factory=list)  # (phrase, temps, (rel, lieu)) : état mutable
+    attrs: Dict[str, str] = field(default_factory=dict)          # asserted properties (stable, identity-bearing)
+    states: List[Tuple[int, str, Tuple[str, str]]] = field(default_factory=list)  # (sentence, tense, (rel, place)): mutable state
     events: List[Tuple[int, str]] = field(default_factory=list)
     different_from: Set[str] = field(default_factory=set)
     mentions: List[str] = field(default_factory=list)
     group: Optional[str] = None
     hypothetical: bool = False
     last_sentence: int = 0
-    frozen: Optional[str] = None      # identité consolidée (mémoire) : exclue de la recherche jointe, réversible
+    frozen: Optional[str] = None      # consolidated identity (memory): excluded from the joint search, reversible
 
 
 @dataclass
@@ -102,10 +102,10 @@ class DiscourseState:
 
 
 class EntityIdentityGraph:
-    """Nœuds : mentions, référents, entités du monde. Arêtes : SAME_AS, POSSIBLY_SAME_AS, DIFFERENT_FROM, REFERS_TO, CONTRADICTS."""
+    """Nodes: mentions, referents, world entities. Edges: SAME_AS, POSSIBLY_SAME_AS, DIFFERENT_FROM, REFERS_TO, CONTRADICTS."""
 
     def __init__(self):
-        self.edges: List[Tuple[str, str, str, float, int]] = []   # (type, a, b, confiance, phrase)
+        self.edges: List[Tuple[str, str, str, float, int]] = []   # (type, a, b, confidence, sentence)
 
     def add(self, kind, a, b, conf=1.0, sentence=0): self.edges.append((kind, a, b, conf, sentence))
 
@@ -126,7 +126,7 @@ class EntityIdentityGraph:
         return [c for c in classes.values() if len(c) > 1]
 
     def invariant_violations(self, state: DiscourseState, resolution):
-        """Transitivité SAME_AS, incompatibilité SAME_AS/DIFFERENT_FROM, unicité au même instant, attributs exclusifs."""
+        """SAME_AS transitivity, SAME_AS/DIFFERENT_FROM incompatibility, uniqueness at the same instant, exclusive attributes."""
         v = []
         classes = self.same_as_classes()
         cls_of = {x: i for i, c in enumerate(classes) for x in c}
@@ -144,7 +144,7 @@ class EntityIdentityGraph:
         return v
 
 
-# ================================================================ résolveur
+# ================================================================ resolver
 
 class DiscourseResolver:
     def __init__(self, lexicon_agent, given: List[Tuple[Tuple, Any]] = ()):
@@ -162,12 +162,12 @@ class DiscourseResolver:
         self.clarifications = 0
         self._n_mentions = 0
         self._n_refs = 0
-        self.predicates: List[Tuple] = []     # (phrase, référent, nature, valeur, temps) : contenu affirmé, pas descriptif
+        self.predicates: List[Tuple] = []     # (sentence, referent, kind, value, tense): asserted content, not descriptive
         self.predicate_enabled = True
-        self.predicate_attrs_identity = True  # False (état unifié) : attribut / état AFFIRMÉ = preuve pondérée, pas contrainte dure
+        self.predicate_attrs_identity = True  # False (unified state): ASSERTED attribute / state = weighted evidence, not a hard constraint
         for key, value in given: self.add_fact(key, value)
 
-    # ---- connaissances du monde (données) ------------------------------------------
+    # ---- world knowledge (data) ------------------------------------------
     def add_fact(self, key, value):
         if key[0] == "type": self.world[key[1]]["type"] = value
         elif key[0] == "attr": self.world[key[1]]["attr"] = value
@@ -180,7 +180,7 @@ class DiscourseResolver:
         cands = [e for e, f in self.world.items() if f.get("type") == type_ and (attr is None or f.get("attr") in (None, attr))]
         return cands[0] if len(cands) == 1 else (type_ if type_ in PLACE_TYPES else None)
 
-    # ---- lexique -------------------------------------------------------------------
+    # ---- lexicon -------------------------------------------------------------------
     def meaning(self, tok):
         m = self.lx.word_meaning(tok)[0]
         if m is None and tok.endswith("s") and len(tok) > 3:
@@ -193,7 +193,7 @@ class DiscourseResolver:
         g = self.lx.grammar.gender_of(head)
         return g
 
-    # ---- extraction des mentions ---------------------------------------------------------
+    # ---- mention extraction ---------------------------------------------------------
     def extract(self, tokens, sentence):
         meanings = [self.meaning(t) for t in tokens]
         cls = [token_class(m) for m in meanings]
@@ -221,7 +221,7 @@ class DiscourseResolver:
                     kind = "place" if typ in PLACE_TYPES else "np"
                     mm = new(surface=" ".join(tokens[i:k]), head=tokens[j], kind=kind, definiteness=d, type=typ, attrs=attrs,
                              gender=self.gender_of(tokens[j]), position=j)
-                    # modificateur relationnel : « le cube sur la table », « le cube qui était sur la table »
+                    # relational modifier: « le cube sur la table », « le cube qui était sur la table »
                     tense = "now"
                     if k < len(tokens) and tokens[k] == "qui" and k + 1 < len(tokens) and tokens[k + 1] in ("était", "est"):
                         tense = "past" if tokens[k + 1] == "était" else "now"; k += 2
@@ -244,7 +244,7 @@ class DiscourseResolver:
             return ("entity", typ, attr), k2
         return None, k
 
-    # ---- référents de discours ------------------------------------------------------------
+    # ---- discourse referents ------------------------------------------------------------
     def _new_referent(self, mention, introduced):
         self._n_refs += 1
         r = Referent(f"d{self._n_refs}", mention.type, mention.gender, introduced, dict(mention.attrs), last_sentence=mention.sentence)
@@ -271,7 +271,7 @@ class DiscourseResolver:
             if focus is None: return None
             mention.type = focus.type
             group = self.state.groups.get(focus.group) if focus.group else None
-            # « l'autre » = un référent CONNU comme distinct du focus (pas seulement un autre référent : il pourrait coréférer)
+            # « l'autre » = a referent KNOWN to be distinct from the focus (not merely another referent: it could corefer)
             known_distinct = lambda r: r.id in focus.different_from or (
                 self.resolution.get(r.id, AMBIGUOUS) not in (AMBIGUOUS, NONEXISTENT, HYPOTHETICAL)
                 and self.resolution.get(focus.id, AMBIGUOUS) not in (AMBIGUOUS, NONEXISTENT, HYPOTHETICAL)
@@ -284,7 +284,7 @@ class DiscourseResolver:
             return r
         if mention.kind == "adj":
             typed = sorted([r for r in refs.values() if r.type], key=lambda r: -r.last_sentence)
-            if not typed:                                    # ellipse sans antécédent : « le rouge » = l'objet rouge du monde
+            if not typed:                                    # ellipsis without antecedent: « le rouge » = the red object of the world
                 exact = [r for r in refs.values() if r.type is None and r.attrs.get("attr") == mention.attrs.get("attr")
                          and r.gender in (None, mention.gender)]
                 return exact[0] if exact else self._new_referent(mention, "def")
@@ -307,7 +307,7 @@ class DiscourseResolver:
             return self._new_referent(mention, "def")
         return None
 
-    # ---- tour de parole ---------------------------------------------------------------------
+    # ---- speaking turn ---------------------------------------------------------------------
     def process(self, text):
         s = self.state.time = self.state.time + 1
         tokens = tokenize(text)
@@ -371,14 +371,14 @@ class DiscourseResolver:
                         self.predicates.append((s, r.id, "loc", (meanings[i + 1].split(":")[1], place), tense))
                 return
 
-    # ---- résolution conjointe (satisfaction de contraintes vectorisée) --------------------------
+    # ---- joint resolution (vectorized constraint satisfaction) --------------------------
     def _compatible(self, r: Referent, e: str):
         f = self.world[e]
         if r.type and f.get("type") != r.type: return False
         if "attr" in r.attrs and f.get("attr") is not None and f["attr"] != r.attrs["attr"]: return False
         fell_before = lambda s: any(es < s and kind == "fall" for es, kind in r.events)
         for s, tense, (rel, place) in r.states:
-            if isinstance(place, tuple):                       # relation vers une autre entité décrite (ex. boîte)
+            if isinstance(place, tuple):                       # relation to another described entity (e.g. box)
                 _, ptype, pattr = place
                 targets = [x for x, fx in self.world.items() if fx.get("type") == ptype and (pattr is None or fx.get("attr") in (None, pattr))]
                 known = f.get("loc")
@@ -387,12 +387,12 @@ class DiscourseResolver:
             if tense == "past":
                 if f.get("loc0") and f["loc0"] != (rel, place): return False
             elif tense == "now" and not fell_before(s):
-                if f.get("loc") and f["loc"] != (rel, place) and f.get("loc_time", 0) <= s: return False   # état plus récent : a pu bouger
+                if f.get("loc") and f["loc"] != (rel, place) and f.get("loc_time", 0) <= s: return False   # more recent state: may have moved
         return True
 
     def solve(self, sentence, reason=""):
         refs = [r for r in self.state.entities_mentioned.values()]
-        # propriétés exclusives affirmées -> référents distincts
+        # asserted exclusive properties -> distinct referents
         for a, b in itertools.combinations(refs, 2):
             if a.type == b.type and "attr" in a.attrs and "attr" in b.attrs and a.attrs["attr"] != b.attrs["attr"]:
                 a.different_from.add(b.id); b.different_from.add(a.id)
@@ -415,7 +415,7 @@ class DiscourseResolver:
             if total <= 200000:
                 grids = torch.cartesian_prod(*[torch.arange(n) for n in sizes]) if len(sizes) > 1 else torch.arange(sizes[0]).view(-1, 1)
                 grids = grids.view(-1, len(sizes))
-                # entités choisies (indices globaux) pour tester DIFFERENT_FROM
+                # chosen entities (global indices) to test DIFFERENT_FROM
                 universe = sorted({e for n in names for e in n}); uid = {e: i for i, e in enumerate(universe)}
                 maps = [torch.tensor([uid[e] for e in n]) for n in names]
                 chosen = torch.stack([maps[j][grids[:, j]] for j in range(len(names))], 1)
@@ -444,7 +444,7 @@ class DiscourseResolver:
                     new_dists[r.id] = {HYPOTHETICAL: 1.0}
                 else:
                     new_dists[r.id] = {NONEXISTENT: 1.0}
-        # révisions (jamais silencieuses)
+        # revisions (never silent)
         for rid, dist in new_dists.items():
             before = self.resolution.get(rid)
             after, conf = self._decide(dist)
@@ -474,7 +474,7 @@ class DiscourseResolver:
         for e, rs in by_entity.items():
             for a, b in zip(rs, rs[1:]): self.graph.add("SAME_AS", a, b, 1.0, sentence)
 
-    # ---- interrogation ---------------------------------------------------------------------------
+    # ---- querying ---------------------------------------------------------------------------
     def mention_resolution(self, mention_id):
         mm = self.state.mentions[mention_id]
         if mm.referent is None: return AMBIGUOUS if mm.kind == "pron" else NONEXISTENT
@@ -488,17 +488,17 @@ class DiscourseResolver:
         return e if p >= COMMIT or e in (NONEXISTENT, HYPOTHETICAL) else AMBIGUOUS
 
     def branches(self, referent_id):
-        """Hypothèses d'identité maintenues (représentation classique pondérée, sans choix arbitraire)."""
+        """Maintained identity hypotheses (weighted classical representation, without arbitrary choice)."""
         return [ConfigurationAmplitude(e, None, p) for e, p in sorted(self.dists.get(referent_id, {}).items(), key=lambda t: -t[1])]
 
     def presupposition(self, mention_id):
-        """Distingue existence / propriété / relation pour une question à présupposition."""
+        """Distinguishes existence / property / relation for a presupposition question."""
         mm = self.state.mentions[mention_id]
         r = self.state.entities_mentioned.get(mm.referent) if mm.referent else None
         exists = bool(r) and self.resolution.get(r.id) not in (NONEXISTENT,)
         return {"entity_exists": exists, "property_supported": exists and bool(mm.attrs), "relation_supported": exists and mm.relation is not None}
 
-    # ---- clarification et apprentissage actif d'identité ---------------------------------------
+    # ---- clarification and active identity learning ---------------------------------------
     def clarification_question(self, mention_id):
         mm = self.state.mentions[mention_id]
         rid = mm.referent
@@ -529,8 +529,8 @@ class DiscourseResolver:
         return -sum(p * math.log(p) for p in dist.values() if p > 0)
 
     def best_information_request(self, rid, attr_domain, places=None):
-        """Gain d'information : quelle révélation (attribut OU position d'une entité candidate) réduit le plus
-        l'entropie de l'identité ? IG = H(avant) − E[H(après)], issues équiprobables."""
+        """Information gain: which revelation (attribute OR position of a candidate entity) reduces the
+        identity entropy the most? IG = H(before) − E[H(after)], equiprobable outcomes."""
         r = self.state.entities_mentioned[rid]
         before = self.identity_entropy(rid)
         places = places or [e for e, f in self.world.items() if f.get("type") in PLACE_TYPES]
@@ -551,9 +551,9 @@ class DiscourseResolver:
                 if gain > best_gain + 1e-9: best, best_gain = ((slot, e) if slot == "attr" else ("loc", e, "now")), gain
         return best, round(best_gain, 3)
 
-    # ---- mémoire consolidée ---------------------------------------------------------------------------
+    # ---- consolidated memory ---------------------------------------------------------------------------
     def consolidated(self):
-        """Discours compressé : entités, faits, identités, références non résolues — sans le texte brut."""
+        """Compressed discourse: entities, facts, identities, unresolved references — without the raw text."""
         records = defaultdict(lambda: {"mentions": 0, "attrs": {}, "states": [], "referents": []})
         unresolved = []
         for rid, r in self.state.entities_mentioned.items():

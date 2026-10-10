@@ -1,14 +1,14 @@
-"""Expériences du sous-jalon Boundary Ownership & Fragment Attribution — module d'ÉVALUATION (dev uniquement ; il voit
-la vérité, rien n'en revient au système ; jamais le lot scellé).
+"""Experiments of the sub-milestone Boundary Ownership & Fragment Attribution — EVALUATION module (dev only; it sees
+the truth, nothing of it returns to the system; never the sealed set).
 
-  attr    : attribution par méthode (pureté, rappel, morcellement, appartenance top-1 / top-3, calibration)
-  oracle  : matrice appartenance vraie / estimée × type vrai / inféré
-  vis     : score de visibilité contrefactuelle contre contraste ; détection du masque
-  sector  : les secteurs échouent-ils par attribution ou par paramétrage ?
-  chain   : appartenance → primitives → structure candidate → fonction, et CONFIRMATION de `flat_scene_k3`
+  attr    : attribution per method (purity, recall, fragmentation, top-1 / top-3 ownership, calibration)
+  oracle  : matrix true / estimated ownership × true / inferred type
+  vis     : counterfactual visibility score versus contrast; detection of the occluder
+  sector  : do the sectors fail through attribution or through parameterisation?
+  chain   : ownership → primitives → candidate structure → function, and CONFIRMATION of `flat_scene_k3`
 
-Scènes : banc de masquage, indices 200+ (jamais utilisés) ; mise au point : sous-plage + 350 000.
-Tâches de composition : clés 700–731 de `down_task` (jamais utilisées ; mise au point : clé 799).
+Scenes: occlusion bench, indices 200+ (never used); tuning: sub-range + 350,000.
+Composition tasks: keys 700–731 of `down_task` (never used; tuning: key 799).
 """
 from __future__ import annotations
 
@@ -30,10 +30,10 @@ from core.deep_primitives import atom_name
 
 SCENE_OFFSET = 200
 METHODS = ("tangent", "shared", "consensus", "solver", "solver_no_chance", "solver_local", "solver_no_smooth", "solver_absent", "solver_absent_naive", "composition")
-# `solver` : configuration retenue en mise au point (terme « absent » à zéro). `solver_absent` : preuve négative limitée à la
-# frontière attendue visible (masques explicites) ; `solver_absent_naive` : toute frontière manquante compte.
-# `solver_no_chance` : sans le coût de calibration par le hasard (meilleur en mise au point, mais attribue 96 % des milieux
-# sur des étiquettes aléatoires).
+# `solver`: configuration retained in tuning ("absent" term at zero). `solver_absent`: negative evidence limited to the
+# visible expected boundary (explicit occluders); `solver_absent_naive`: every missing boundary counts.
+# `solver_no_chance`: without the calibration-by-chance cost (better in tuning, but attributes 96% of the midpoints
+# on random labels).
 SOLVER_CFG = {"solver": {}, "solver_no_chance": {"chance": 0.0}, "solver_local": {"long_range": False}, "solver_no_smooth": {"beta": 0.0}, "solver_absent": {"gamma": 1.0, "occlusion": True}, "solver_absent_naive": {"gamma": 1.0, "occlusion": False}}
 MAIN = "solver"
 
@@ -45,10 +45,10 @@ def _atoms(sc: MaskedScene): return [sc.target] + ([sc.occluder] if sc.occluder 
 def _comp(o): return ("circle", *o.params) if o.kind == "circle" else ("line", *o.params)
 
 
-# ================================================================ attribution : pureté, morcellement, appartenance
+# ================================================================ attribution: purity, fragmentation, ownership
 
 def fragmentation(lab: torch.Tensor, src: torch.Tensor, M: torch.Tensor) -> dict:
-    """Pureté moyenne des groupes, nombre de morceaux par vraie frontière, longueur moyenne des groupes."""
+    """Mean purity of the groups, number of pieces per true boundary, mean length of the groups."""
     groups = [g for g in torch.unique(lab).tolist() if g >= 0 and int((lab == g).sum()) >= 2]; pur = []; ln = []
     for g in groups:
         m = lab == g; s = src[m]; s = s[s >= 0]; pur.append(float(torch.bincount(s).max()) / len(s) if len(s) else None); ln.append(float(torch.cdist(M[m], M[m]).max()))
@@ -57,8 +57,8 @@ def fragmentation(lab: torch.Tensor, src: torch.Tensor, M: torch.Tensor) -> dict
 
 
 def compose_small(prims: Sequence[BNode], X, y, top=4):
-    """Petite hypothèse de composition, SANS vérité : la meilleure primitive seule, ou la meilleure combinaison ET / OU /
-    OU exclusif de deux primitives, selon l'erreur du rendu sur les observations."""
+    """Small composition hypothesis, WITHOUT truth: the best single primitive, or the best AND / OR /
+    exclusive OR combination of two primitives, according to the error of the rendering on the observations."""
     P = list(prims)[:top]; best, be = None, len(y) + 1
     for i, a in enumerate(P):
         for cand in [a] + [BNode(k, children=(a, b)) for b in P[i + 1:] for k in ("and", "or", "xor")] + [BNode("and", children=(a, BNode("not", children=(b,)))) for b in P[i + 1:]] + [BNode("and", children=(b, BNode("not", children=(a,)))) for b in P[i + 1:]]:
@@ -68,8 +68,8 @@ def compose_small(prims: Sequence[BNode], X, y, top=4):
 
 
 def ownership_accuracy(sol: OwnershipSolution, src: torch.Tensor, comps: Sequence[tuple]) -> dict:
-    """Appartenance par milieu de source connue : la courbe attribuée (top-1) ou l'une des trois plus probables (top-3)
-    coïncide-t-elle avec la vraie frontière du milieu ? Avec histogramme de calibration et score de Brier."""
+    """Ownership per midpoint of known source: does the attributed curve (top-1) or one of the three most probable (top-3)
+    coincide with the true boundary of the midpoint? With calibration histogram and Brier score."""
     m = src >= 0; n = int(m.sum()); K = len(sol.owners)
     if n == 0: return {"top1": None, "top3": None, "brier": None, "cal": None}
     ok = torch.zeros(len(src), K + 1, dtype=torch.bool)
@@ -90,7 +90,7 @@ def attr_rows(sc: MaskedScene, seed=0) -> List[dict]:
             if meth == MAIN:
                 main = sol; H = ownership_hypotheses(sol, ob); extra["fragments"] = len(H); extra["ambiguous_fragments"] = sum(h.ambiguous for h in H) / max(1, len(H)); occ = sol.occlusions; tc = components(sc.target); oc = components(sc.occluder) if sc.occluder is not None else []
                 extra["occlusion_found"] = bool(occ); extra["occlusion_correct"] = any(any(component_match(_comp(sol.owners[o.occluded]), c) for c in tc) and any(component_match(_comp(sol.owners[o.occluder]), c) for c in oc) for o in occ)
-        elif meth == "composition":                                               # la composition ré-attribue : feuilles du petit composite, visibilité prise en compte
+        elif meth == "composition":                                               # the composition re-attributes: leaves of the small composite, visibility taken into account
             sel, _ = primitives_from(main, ob, 1); prog, _ = compose_small([h.program for h in sel], sc.X, sc.y) if sel else (None, None)
             lab = ownership_from_program(prog, ob)[0] if prog is not None else torch.full((len(ob.points),), -1, dtype=torch.long)
         else: lab = group_points(ob, meth, seed=seed)
@@ -98,15 +98,15 @@ def attr_rows(sc: MaskedScene, seed=0) -> List[dict]:
     return out
 
 
-# ================================================================ matrice oracle
+# ================================================================ oracle matrix
 
 def oracle_row(sc: MaskedScene, seed=0) -> dict:
-    """Récupération exacte de la cible en première hypothèse (n premières pour le type inféré, n = primitives vraies).
-      TT appartenance vraie + type vrai            TI appartenance vraie + type inféré
-      ET appartenance estimée + type vrai          EI appartenance estimée + type inféré
-      NT / NI : aucune attribution (inférence sur la scène entière), type vrai / inféré
-    L'appartenance estimée sert de VALIDATION : seules les hypothèses dont toutes les frontières sont des courbes
-    possédées sont gardées. `OWN` : primitives construites directement depuis les courbes possédées."""
+    """Exact recovery of the target as first hypothesis (first n for the inferred type, n = true primitives).
+      TT true ownership + true type                TI true ownership + inferred type
+      ET estimated ownership + true type           EI estimated ownership + inferred type
+      NT / NI: no attribution (inference on the whole scene), true / inferred type
+    The estimated ownership serves as VALIDATION: only the hypotheses whose boundaries are all owned
+    curves are kept. `OWN`: primitives built directly from the owned curves."""
     T = sc.target; ob = observe(sc.X, sc.y); atoms = _atoms(sc); _, atom = true_sources(ob.points, atoms); tt = type_of(T); n = len(atoms); sk = T.skeleton(); obt = restrict(ob, atom == 0); sol = solve(ob, None, seed)
     hit = lambda hs, k=1: any(type_of(h) == tt and recovered(T, h) for h in hs[:k])
     nt = [h.program for h in infer(sk, ob, 5, seed=seed, regions=False)]; ni = [h.program for h in flat_types(ob, 3, seed)]; enough = len(obt.points) >= 4
@@ -115,11 +115,11 @@ def oracle_row(sc: MaskedScene, seed=0) -> dict:
             "kept_fraction": len(filter_by_ownership(ni, sol)) / max(1, len(ni)), "target_owned": owned(T, sol)}
 
 
-# ================================================================ visibilité contrefactuelle contre contraste
+# ================================================================ counterfactual visibility versus contrast
 
 def vis_row(sc: MaskedScene, seed=0) -> dict:
-    """Même vivier d'hypothèses (type vrai, 5 hypothèses), trois classements : contraste global ; visibilité
-    contrefactuelle avec les masques trouvés par l'attribution ; visibilité contrefactuelle avec le masque VRAI."""
+    """Same pool of hypotheses (true type, 5 hypotheses), three rankings: global contrast; counterfactual
+    visibility with the occluders found by the attribution; counterfactual visibility with the TRUE occluder."""
     T = sc.target; ob = observe(sc.X, sc.y); H = [h.program for h in infer(T.skeleton(), ob, 5, score="global", seed=seed, regions=False)]; sol = solve(ob, None, seed)
     def occluders(p):
         from core.deep_ownership import _curves
@@ -129,7 +129,7 @@ def vis_row(sc: MaskedScene, seed=0) -> dict:
             "visible_no_occluder": best(lambda p: -visible_support(p, ob, [])["score"]), "visible_true_occluder": best(lambda p: -visible_support(p, ob, [(sc.occluder, False)] if sc.occluder is not None else [])["score"]), "pool_has_truth": any(recovered(T, p) for p in H), "n": len(H)}
 
 
-# ================================================================ secteurs : attribution ou paramétrage ?
+# ================================================================ sectors: attribution or parameterisation?
 
 def sector_row(sc: MaskedScene, seed=0) -> dict:
     T = sc.target; ob = observe(sc.X, sc.y); atoms = _atoms(sc); comps = [c for a in atoms for c in components(a)]; src, atom = true_sources(ob.points, atoms); sol = solve(ob, None, seed); acc = ownership_accuracy(sol, torch.where(atom == 0, src, torch.full_like(src, -1)), comps)
@@ -140,7 +140,7 @@ def sector_row(sc: MaskedScene, seed=0) -> dict:
             "tt_center_error": e.get("center"), "tt_direction_error": e.get("direction"), "tt_width_error": e.get("half_width")}
 
 
-# ================================================================ chaîne aval et confirmation de flat_scene_k3
+# ================================================================ downstream chain and confirmation of flat_scene_k3
 
 CHAIN_ARMS = ("reference", "flat_scene_k3", "own_k3", "own_nc_k3", "flat_owned_k3", "flat_own_union_k3", "true", "true_own_type", "true_own_infer", "po_type_k3", "po_owned_k3")
 PREREGISTERED = ("reference", "flat_scene_k3", "own_k3")
@@ -172,7 +172,7 @@ def chain(task, arm: str, seed=0) -> dict:
     else:
         out = DeepSearch("factorized", budget=150.0, seed=seed, max_depth=depth, validated=None, **kw).run(data); acc = [A(h.program) for h in out.all.values()]; best = out.best().program; best_acc = A(best); fe = out.stats["fit_equivalents"]
         if lits is None: lits = [l for h in out.all.values() for l in leaves(h.program)]
-    if arm == "own_k3" and best is not None:                                      # la composition aide-t-elle à ré-attribuer ?
+    if arm == "own_k3" and best is not None:                                      # does the composition help to re-attribute?
         cl, lv = ownership_from_program(best, ob); extra["comp_f1"] = pair_scores(cl, src)["f1"]; m = src >= 0
         ok = torch.tensor([any(component_match(c, comps[int(s)]) for c in components(lv[int(l)])) if l >= 0 else False for l, s in zip(cl[m], src[m])]); extra["comp_top1"] = float(ok.float().mean()) if len(ok) else None
     P = _probe(); m = primitive_metrics(tl, lits, X, y, P) if lits else {"equivalence": 0.0, "precision": None}
@@ -181,7 +181,7 @@ def chain(task, arm: str, seed=0) -> dict:
             "candidate_functional": max(acc, default=0.0) >= 0.97, "candidate_best": max(acc, default=0.0), "final_full": best_acc, "final_099": best_acc >= 0.99, "final_095": best_acc >= 0.95, "fit_equivalents": fe, "seconds": round(time.time() - t0, 2)}
 
 
-# ================================================================ sous-unités AWS
+# ================================================================ AWS sub-units
 
 def subunits(key):
     from core.deep_experiments import DOWN_DEPTHS, GEN_REGIMES, _row, down_task

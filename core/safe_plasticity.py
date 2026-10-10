@@ -1,12 +1,12 @@
-"""Plasticité SÛRE : adaptation candidate (poids rapides = zone de perturbation temporaire) → contrôles d'invariants
-→ rayon de stabilité → interactions dangereuses → consolidation (CommitFastWeights) OU retour arrière
-(ClearFastWeights). Banc d'apprentissage continu : 5 méthodes comparées.
+"""SAFE plasticity: candidate adaptation (fast weights = temporary perturbation zone) → invariant checks
+→ stability radius → dangerous interactions → consolidation (CommitFastWeights) OR rollback
+(ClearFastWeights). Continual-learning benchmark: 5 methods compared.
 
-Tâches (entrée 12 bits = 10 bits de données + 2 bits de code de tâche) :
-  A (code 10) : (b0 xor b1) or b2       — ancienne
-  C (code 01) : parité(b4, b6, b8)      — ancienne
-  B (code 11) : majorité(b5..b9) xor b3 — nouvelle
-La rétropropagation n'est utilisée que LOCALEMENT (ajustement des poids rapides, sensibilité des paramètres).
+Tasks (12-bit input = 10 data bits + 2 task-code bits):
+  A (code 10) : (b0 xor b1) or b2       — old
+  C (code 01) : parity(b4, b6, b8)      — old
+  B (code 11) : majority(b5..b9) xor b3 — new
+Backpropagation is used only LOCALLY (fitting of the fast weights, parameter sensitivity).
 """
 from __future__ import annotations
 
@@ -40,7 +40,7 @@ def task_data(task, seed=0, train_fraction=0.6):
 
 
 def old_model(seed=0, steps=400):
-    """Modèle maîtrisant A et C (apprentissage initial, déclaré global)."""
+    """Model that has mastered A and C (initial training, declared global)."""
     from core.model_state import AdaptWeights
     m = build_base_model(input_dim=DIM, seed=seed)
     xa, ya, _, _ = task_data("A", seed); xc, yc, _, _ = task_data("C", seed)
@@ -55,8 +55,8 @@ def _forward_with(model, deltas):
 
 
 def train_fast(model, modules, x, y, steps=300, lr=0.03, seed=0, anchors=None, lam=0.0, mask=None, replay=None):
-    """Entraîne des deltas RAPIDES (poids lents intacts). anchors=(x_old, sorties de référence) : contrainte
-    d'équivalence de sortie (invariant) ; mask : paramètres autorisés (1) ; replay=(x, y) : rejeu."""
+    """Trains FAST deltas (slow weights intact). anchors=(x_old, reference outputs): output-equivalence
+    constraint (invariant); mask: allowed parameters (1); replay=(x, y): replay."""
     torch.manual_seed(seed)
     deltas = {m: {k: torch.zeros_like(model.modules[m].slow[k], requires_grad=True) for k in PARAM_NAMES} for m in modules}
     opt = torch.optim.Adam([t for d in deltas.values() for t in d.values()], lr=lr)
@@ -81,12 +81,12 @@ def changed_parameters(deltas, tol=1e-6):
     return sum(int((v.abs() > tol).sum()) for d in deltas.values() for v in d.values())
 
 
-# ================================================================ invariants de l'ancien savoir
+# ================================================================ invariants of the old knowledge
 
 @dataclass
 class OldSkillInvariants:
-    """Invariants protégés : performance des anciennes tâches ≥ référence − tolérance ; normalisation (softmax :
-    toujours vraie, contrôlée) ; topologie inchangée."""
+    """Protected invariants: performance on the old tasks ≥ reference − tolerance; normalization (softmax:
+    always true, checked); topology unchanged."""
     tests: Dict[str, tuple]
     reference: Dict[str, float]
     tolerance: float = 0.02
@@ -110,7 +110,7 @@ def make_invariants(model, seed=0, tolerance=0.02):
     return OldSkillInvariants(tests, {t: model.accuracy(*tests[t]) for t in tests}, tolerance, tuple(model.topological_order()))
 
 
-# ================================================================ consolidation sûre
+# ================================================================ safe consolidation
 
 @dataclass
 class ConsolidationReport:
@@ -125,8 +125,8 @@ class ConsolidationReport:
 
 def safe_consolidate(model, deltas, x_new, y_new, inv: OldSkillInvariants, base_new_acc, min_gain=0.05,
                      radius_ratio=0.5, interaction_max=0.05, check_radius=True, trials=8):
-    """1 gain de tâche ; 2 anciens invariants ; 3 rayon de stabilité (ne pas trop rétrécir) ; 4 interaction
-    dangereuse (adaptation × petite perturbation) ; 5 consolider (Commit) ou retour arrière (Clear)."""
+    """1 task gain; 2 old invariants; 3 stability radius (must not shrink too much); 4 dangerous
+    interaction (adaptation × small perturbation); 5 consolidate (Commit) or rollback (Clear)."""
     load(model, deltas)
     gain = model.accuracy(x_new, y_new) - base_new_acc
     checks = inv.check(model); reasons = []
@@ -141,7 +141,7 @@ def safe_consolidate(model, deltas, x_new, y_new, inv: OldSkillInvariants, base_
         model.fast_parameters = snapshot_fast
         ra = stability_radius(accuracy_invariant(model, xa, ya, ("enc", "expert_a", "head"), floor), 0.9, hi=0.4, trials=trials, iters=3).radius
         if rb > 0 and ra < radius_ratio * rb: reasons.append(f"rayon de stabilité rétréci ({rb:.3f} -> {ra:.3f})")
-        # interaction : perte d'exactitude sous (adaptation + bruit) au-delà de la somme des pertes séparées
+        # interaction: accuracy loss under (adaptation + noise) beyond the sum of the separate losses
         base = model.accuracy(xa, ya); mag = max(rb, 1e-3) * 0.5
         noisy = sum(perturbed_model(model, ("enc", "expert_a", "head"), mag, s).accuracy(xa, ya) for s in range(4)) / 4
         model.fast_parameters, saved = {}, model.fast_parameters
@@ -157,13 +157,13 @@ def safe_consolidate(model, deltas, x_new, y_new, inv: OldSkillInvariants, base_
     return ConsolidationReport("consolidate", gain, checks, rb, ra, inter, ["acceptable"])
 
 
-# ================================================================ banc d'apprentissage continu
+# ================================================================ continual-learning benchmark
 
 METHODS = ("vanilla", "fast_weights", "replay", "invariant_constrained", "perturbation_guided")
 
 
 def parameter_sensitivity(model, x_old, n_dirs=4, eps=0.05):
-    """Sensibilité de la sortie ancienne à chaque paramètre : |∂sortie/∂θ| moyenné (outil LOCAL différentiable)."""
+    """Sensitivity of the old output to each parameter: averaged |∂output/∂θ| (LOCAL differentiable tool)."""
     params = {m: {k: model.modules[m].slow[k].clone().requires_grad_(True) for k in PARAM_NAMES} for m in model.topological_order()}
     out = model.forward(x_old, params)
     g = torch.autograd.grad((out ** 2).sum(), [t for d in params.values() for t in d.values()])
@@ -182,10 +182,10 @@ def run_method(method, seed=0, steps=600, base=None):
     modules = tuple(model.topological_order())
     before = {m: {k: v.clone() for k, v in model.modules[m].slow.items()} for m in modules}
     rollbacks, cost, report = 0, steps, None
-    old_x = torch.cat([task_data(t, seed)[0][:300] for t in ("A", "C")])      # entrées anciennes stockées (sans étiquettes)
+    old_x = torch.cat([task_data(t, seed)[0][:300] for t in ("A", "C")])      # stored old inputs (without labels)
     if method == "vanilla":
         load(model, train_fast(model, modules, xb, yb, steps, seed=seed)); model.apply(CommitFastWeights(modules=modules))
-    elif method == "fast_weights":                            # consolidation ACTUELLE : commit sans contrôle
+    elif method == "fast_weights":                            # CURRENT consolidation: commit without check
         load(model, train_fast(model, modules, xb, yb, steps, lr=0.01, seed=seed)); model.apply(CommitFastWeights(modules=modules))
     elif method == "replay":
         xa, ya, _, _ = task_data("A", seed); xc, yc, _, _ = task_data("C", seed)
@@ -193,21 +193,21 @@ def run_method(method, seed=0, steps=600, base=None):
         load(model, train_fast(model, modules, xb, yb, steps, seed=seed, replay=(torch.cat([xa[ia], xc[ic]]), torch.cat([ya[ia], yc[ic]]))))
         model.apply(CommitFastWeights(modules=modules))
     elif method in ("invariant_constrained", "perturbation_guided"):
-        with torch.no_grad(): anchors = (old_x, model.forward(old_x))     # entrées anciennes NON étiquetées (sorties de référence)
+        with torch.no_grad(): anchors = (old_x, model.forward(old_x))     # UNLABELLED old inputs (reference outputs)
         mask = None
-        if method == "perturbation_guided":                   # ne modifier que les paramètres PEU sensibles pour l'ancien savoir
+        if method == "perturbation_guided":                   # modify only the parameters with LOW sensitivity for the old knowledge
             sens = parameter_sensitivity(model, old_x)
             flat = torch.cat([v.flatten() for d in sens.values() for v in d.values()])
             thr = torch.quantile(flat, 0.5)
             mask = {m: {k: (v <= thr).float() for k, v in d.items()} for m, d in sens.items()}
         cost = 0
-        for attempt, lam in enumerate((0.3, 1.0, 3.0)):     # candidat → contrôles → consolider, ou rollback puis contrainte plus forte
+        for attempt, lam in enumerate((0.3, 1.0, 3.0)):     # candidate → checks → consolidate, or rollback then stronger constraint
             deltas = train_fast(model, modules, xb, yb, steps, seed=seed + attempt, anchors=anchors, lam=lam, mask=mask)
             report = safe_consolidate(model, deltas, xbv, ybv, inv, base_new)
             cost += steps
             if report.decision == "consolidate": break
             rollbacks += 1
-            if any(r.startswith("gain") for r in report.reasons): break    # contrainte plus forte => gain encore plus faible
+            if any(r.startswith("gain") for r in report.reasons): break    # stronger constraint => even lower gain
     changed = sum(int((model.modules[m].slow[k] != before[m][k]).sum()) for m in modules for k in PARAM_NAMES)
     ret = inv.retention(model)
     return {"method": method, "new_task": round(model.accuracy(xbv, ybv), 4), "old_A": round(ret["A"], 4), "old_C": round(ret["C"], 4),

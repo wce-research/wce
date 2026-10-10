@@ -1,17 +1,17 @@
-"""Évaluation de la découverte de primitives — module d'ÉVALUATION (il voit la vérité ; rien n'en revient au système).
+"""Evaluation of primitive discovery — EVALUATION module (it sees the truth; nothing of it returns to the system).
 
-Métriques (jamais fusionnées) :
-  exact        : même type d'atome ET accord fonctionnel ≥ 0,95 sur la région observée
-  functional   : accord ≥ 0,95 (ou complément) avec une primitive découverte, quel que soit son type
-  equivalence  : toutes les COMPOSANTES de frontière de l'atome vrai (en base minimale : droites, cercles, demi-droites)
-                 sont retrouvées par des composantes de primitives découvertes — un anneau retrouvé comme deux cercles
-                 concentriques compte ici, pas en « exact »
-  component    : part des composantes de frontière vraies retrouvées
-  precision    : part des classes de primitives retenues dont toutes les composantes correspondent à une frontière vraie
-  parameter    : erreur absolue moyenne des paramètres, pour les correspondances exactes
+Metrics (never merged):
+  exact        : same atom type AND functional agreement ≥ 0.95 on the observed region
+  functional   : agreement ≥ 0.95 (or complement) with a discovered primitive, whatever its type
+  equivalence  : all the boundary COMPONENTS of the true atom (in the minimal basis: lines, circles, rays)
+                 are recovered by components of discovered primitives — a ring recovered as two concentric
+                 circles counts here, not in "exact"
+  component    : share of the true boundary components recovered
+  precision    : share of the retained primitive classes all of whose components match a true boundary
+  parameter    : mean absolute error of the parameters, for the exact matches
 
-Identifiabilité d'un atome vrai (avant de juger) : contraste z du VRAI atome sur les observations —
-identifiable (z ≥ 3), partiel (2 ≤ z < 3), non identifiable (z < 2).
+Identifiability of a true atom (before judging): contrast z of the TRUE atom on the observations —
+identifiable (z ≥ 3), partial (2 ≤ z < 3), not identifiable (z < 2).
 """
 from __future__ import annotations
 
@@ -31,7 +31,7 @@ def _wrap(a): return math.atan2(math.sin(a), math.cos(a))
 
 
 def components(atom: BNode) -> List[tuple]:
-    """Composantes de frontière en base minimale : ('line', angle, offset) | ('circle', cx, cy, r) | ('ray', px, py, direction)."""
+    """Boundary components in the minimal basis: ('line', angle, offset) | ('circle', cx, cy, r) | ('ray', px, py, direction)."""
     l = _leaf(atom); c = atom.params if atom.kind == "translate" else (0.0, 0.0); p = l.params
     if l.feat == "dot":
         if l.op in ("le", "ge"): return [("line", p[0], p[1])]
@@ -44,7 +44,7 @@ def components(atom: BNode) -> List[tuple]:
 
 
 def _ray_as_line(r):
-    """Droite support d'une demi-droite : (angle de la normale, décalage)."""
+    """Supporting line of a ray: (angle of the normal, offset)."""
     a = r[3] + math.pi / 2; return ("line", a, math.cos(a) * r[1] + math.sin(a) * r[2])
 
 
@@ -63,7 +63,7 @@ def identifiability_of(atom: BNode, X, y) -> str:
 
 
 def primitive_metrics(true_atoms: Sequence[BNode], found: Sequence[BNode], X, y, probe) -> dict:
-    """Métriques de découverte pour une scène. `found` : programmes des primitives retenues (tous membres de classes)."""
+    """Discovery metrics for one scene. `found`: programs of the retained primitives (all class members)."""
     fc = [(p, components(p)) for p in found]; allc = [c for _, cs in fc for c in cs]; rows = []
     for a in true_atoms:
         ta = predict(a, probe); ag = [(float((predict(p, probe) == ta).float().mean()), p) for p in found]

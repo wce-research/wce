@@ -1,10 +1,10 @@
-"""Langage conscient de la mesure (langage contrôlé) : la phrase modifie le CONTEXTE DE MESURE.
+"""Measurement-aware language (controlled language): the sentence modifies the MEASUREMENT CONTEXT.
 
-« le capteur voit X qui tombe vers Y »        -> événement observé par un capteur (fiabilité du capteur)
-« selon Alice, X est sur Y » / « Alice dit que »-> observation par l'observateur Alice (fiabilité d'Alice)
-« la mesure indique environ 1.2 m pour X »     -> mesure continue, bruit σ (« environ »)
-« on ne sait qu'à 20 cm près »                 -> RÉSOLUTION de lecture 0,2 m (≠ incertitude)
-« le cube sur la table », « la balle qui était dans la boîte » -> descriptions relationnelles (présent / passé)
+"le capteur voit X qui tombe vers Y"          -> event observed by a sensor (reliability of the sensor)
+"selon Alice, X est sur Y" / "Alice dit que"  -> observation by the observer Alice (reliability of Alice)
+"la mesure indique environ 1.2 m pour X"       -> continuous measurement, noise σ ("environ")
+"on ne sait qu'à 20 cm près"                   -> reading RESOLUTION 0.2 m (≠ uncertainty)
+"le cube sur la table", "la balle qui était dans la boîte" -> relational descriptions (present / past)
 """
 from __future__ import annotations
 
@@ -25,8 +25,8 @@ ENVIRON_SIGMA = 0.15
 class Description:
     type: Optional[str] = None
     color: Optional[str] = None
-    support: Optional[str] = None             # relation spatiale décrite
-    past: bool = False                         # « qui était … »
+    support: Optional[str] = None             # described spatial relation
+    past: bool = False                         # "qui était …"
 
 
 @dataclass

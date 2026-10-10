@@ -35,12 +35,12 @@ def simulate(
 ):
     if duration < 0:
         raise ValueError(
-            "La durée ne peut pas être négative"
+            "The duration cannot be negative"
         )
 
     if dt <= 0:
         raise ValueError(
-            "dt doit être strictement positif"
+            "dt must be strictly positive"
         )
 
     remaining = duration

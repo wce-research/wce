@@ -1,29 +1,29 @@
-"""Boundary Ownership & Fragment Attribution — pour chaque morceau de frontière observée, à quelle primitive latente
-appartient-il ?
+"""Boundary Ownership & Fragment Attribution — for each piece of observed boundary, which latent primitive does it
+belong to?
 
-L'attribution est un problème GLOBAL : tous les milieux observés sont attribués ensemble à un petit nombre de courbes
-latentes (cercles, droites), en minimisant une énergie explicite dont chaque terme est rapporté séparément :
+Attribution is a GLOBAL problem: all observed midpoints are attributed together to a small number of latent
+curves (circles, lines), by minimising an explicit energy whose every term is reported separately:
 
-    fit          écart des milieux à la courbe qui les possède (tronqué)
-    noise        milieux laissés sans propriétaire
-    smooth       voisins de même tangente attribués à des propriétaires différents
-    complexity   coût par paramètre de chaque courbe utilisée
-    absent       frontière ATTENDUE et VISIBLE d'une courbe, sans milieu observé (preuve négative légitime)
-    chance       milieux qu'une courbe capterait par hasard : une courbe n'est créditée que de l'excédent (calibration nulle)
+    fit          deviation of the midpoints from the curve that owns them (truncated)
+    noise        midpoints left without an owner
+    smooth       neighbours with the same tangent attributed to different owners
+    complexity   cost per parameter of each curve used
+    absent       EXPECTED and VISIBLE boundary of a curve, with no observed midpoint (legitimate negative evidence)
+    chance       midpoints a curve would capture by chance: a curve is credited only with the excess (null calibration)
 
-Le masque est un objet explicite (`Occlusion`) : une courbe dont la frontière disparaît d'un seul côté d'une autre
-courbe est déclarée masquée par elle de ce côté, et cette portion n'est pas comptée comme absente.
+The occluder is an explicit object (`Occlusion`): a curve whose boundary disappears on only one side of another
+curve is declared occluded by it on that side, and that portion is not counted as absent.
 
-Objets :
-  Owner                        courbe latente candidate ou retenue, avec les milieux qu'elle possède
-  Occlusion                    (masque, masquée, côté, part cachée)
-  BoundaryOwnershipHypothesis  pour un fragment : propriétaires possibles pondérés (courbe A, courbe B, masque, limite
-                               du domaine, bruit, inconnu) — aucun propriétaire unique n'est forcé
-  OwnershipSolution            attribution, postérieure par milieu, masques, énergie, journal
+Objects:
+  Owner                        candidate or retained latent curve, with the midpoints it owns
+  Occlusion                    (occluder, occluded, side, hidden fraction)
+  BoundaryOwnershipHypothesis  for a fragment: weighted possible owners (curve A, curve B, occluder, domain
+                               limit, noise, unknown) — no single owner is forced
+  OwnershipSolution            attribution, posterior per midpoint, occluders, energy, log
 
-Solveur compact : ajout glouton de courbes (meilleur d'abord), puis au plus trois reprises
-« attribution → ré-estimation des paramètres → ré-attribution lissée », chacune gardée seulement si l'énergie baisse.
-Aucun modèle appris. Aucune vérité de monde.
+Compact solver: greedy addition of curves (best first), then at most three passes of
+"attribution → re-estimation of the parameters → smoothed re-attribution", each kept only if the energy decreases.
+No learned model. No world truth.
 """
 from __future__ import annotations
 
@@ -47,7 +47,7 @@ CONFIG_FILE = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__fil
 
 
 def load_config() -> dict:
-    """Réglages (coûts de l'énergie, température de la postérieure) choisis sur les scènes de MISE AU POINT ; défauts sinon."""
+    """Settings (energy costs, posterior temperature) chosen on the TUNING scenes; defaults otherwise."""
     try: return {**DEFAULTS, **json.load(open(CONFIG_FILE))["config"]}
     except (OSError, ValueError, KeyError): return dict(DEFAULTS)
 
@@ -55,7 +55,7 @@ def load_config() -> dict:
 @dataclass
 class Owner:
     kind: str                       # "circle" | "line"
-    params: tuple                   # (cx, cy, r) | (angle, décalage)
+    params: tuple                   # (cx, cy, r) | (angle, offset)
     ids: torch.Tensor = field(default_factory=lambda: torch.zeros(0, dtype=torch.long))
 
     @property
@@ -69,7 +69,7 @@ class Owner:
 
 @dataclass
 class Occlusion:
-    """Le masque `occluder` cache la courbe `occluded` là où le prédicat du masque vaut `side`."""
+    """The occluder `occluder` hides the curve `occluded` where the occluder's predicate equals `side`."""
     occluder: int
     occluded: int
     side: bool
@@ -78,7 +78,7 @@ class Occlusion:
 
 @dataclass
 class BoundaryOwnershipHypothesis:
-    """Propriétaires possibles d'un fragment observé. `options` : (rôle, indice de courbe ou None, probabilité), triées."""
+    """Possible owners of an observed fragment. `options`: (role, curve index or None, probability), sorted."""
     fragment: int
     ids: torch.Tensor
     options: List[Tuple[str, Optional[int], float]]
@@ -94,28 +94,28 @@ class BoundaryOwnershipHypothesis:
 @dataclass
 class OwnershipSolution:
     owners: List[Owner]
-    labels: torch.Tensor            # [m] indice de courbe, −1 = sans propriétaire
-    posterior: torch.Tensor         # [m, K + 1] ; dernière colonne = bruit
+    labels: torch.Tensor            # [m] curve index, −1 = no owner
+    posterior: torch.Tensor         # [m, K + 1]; last column = noise
     occlusions: List[Occlusion]
-    terms: Dict[str, float]         # termes d'énergie séparés + total
+    terms: Dict[str, float]         # separate energy terms + total
     log: List[dict]
     stats: Dict[str, float]
 
     def top_k(self, k=3) -> torch.Tensor:
-        """[m, k] indices de courbe par probabilité décroissante (K = bruit)."""
+        """[m, k] curve indices by decreasing probability (K = noise)."""
         return self.posterior.argsort(dim=1, descending=True)[:, : min(k, self.posterior.shape[1])]
     def is_occluder(self, i): return any(o.occluder == i for o in self.occlusions)
 
 
-# ================================================================ candidats
+# ================================================================ candidates
 
 def candidates(ob: ObservedBoundary, seed=0) -> List[Owner]:
-    """Courbes latentes candidates : composantes par consensus (cercles et droites), ré-estimées sur leurs milieux."""
+    """Candidate latent curves: consensus components (circles and lines), re-estimated on their midpoints."""
     return [Owner(c.kind, c.params) for c in circle_components(ob, seed=seed) + line_components(ob, seed=seed)]
 
 
 def refit(o: Owner, S: torch.Tensor) -> Optional[tuple]:
-    """Paramètres ré-estimés sur les milieux possédés ; None si l'estimation sort du domaine raisonnable."""
+    """Parameters re-estimated on the owned midpoints; None if the estimate leaves the reasonable domain."""
     if len(S) < 4: return None
     if o.kind == "line":
         n, b, _ = line_tls(S); n0 = torch.tensor([math.cos(o.params[0]), math.sin(o.params[0])], dtype=DT); n, b = (n, b) if float(n @ n0) >= 0 else (-n, -b)
@@ -123,7 +123,7 @@ def refit(o: Owner, S: torch.Tensor) -> Optional[tuple]:
     c, r, _ = circle_geometric(S, o.params[:2], o.params[2], iters=8); return (float(c[0]), float(c[1]), r) if 0.15 <= r <= 4.0 and float((c - torch.tensor(o.params[:2], dtype=DT)).norm()) < 1.0 else None
 
 
-# ================================================================ masque explicite et visibilité contrefactuelle
+# ================================================================ explicit occluder and counterfactual visibility
 
 def _domain(ob: ObservedBoundary): X = ob.X; return float(X[:, 0].min()), float(X[:, 0].max()), float(X[:, 1].min()), float(X[:, 1].max())
 
@@ -132,9 +132,9 @@ def _inside(P, box): return (P[:, 0] >= box[0]) & (P[:, 0] <= box[1]) & (P[:, 1]
 
 
 def find_occlusions(owners: Sequence[Owner], ob: ObservedBoundary, tol=0.3, lo=0.2, hi=0.6, share=0.1) -> List[Occlusion]:
-    """Pour chaque couple (courbe o, courbe q) : la frontière de o, dans le domaine, est coupée en deux par le prédicat
-    de q (seuls comptent comme soutien de o les milieux plus proches de o que de q). Si un côté est soutenu par des milieux (part ≥ hi) et l'autre presque pas (part ≤ lo), q MASQUE o de ce
-    côté. Chaque côté doit porter au moins `share` de la frontière : sinon rien ne peut être conclu."""
+    """For each pair (curve o, curve q): the boundary of o, inside the domain, is cut in two by the predicate
+    of q (only the midpoints closer to o than to q count as support for o). If one side is supported by midpoints (fraction ≥ hi) and the other almost not (fraction ≤ lo), q OCCLUDES o on that
+    side. Each side must carry at least `share` of the boundary: otherwise nothing can be concluded."""
     box = _domain(ob); out = []; M = ob.points
     for i, o in enumerate(owners):
         P = o.boundary(); P = P[_inside(P, box)]
@@ -142,7 +142,7 @@ def find_occlusions(owners: Sequence[Owner], ob: ObservedBoundary, tol=0.3, lo=0
         best = None; do = o.distance(M)
         for j, q in enumerate(owners):
             if j == i: continue
-            Mo = M[do <= q.distance(M)]                                               # les milieux mieux expliqués par q sont les siens : ils ne soutiennent pas o
+            Mo = M[do <= q.distance(M)]                                               # the midpoints better explained by q are its own: they do not support o
             if not len(Mo): continue
             seen = torch.cdist(P, Mo).min(1).values < tol; side = predict(q.program(), P.float()).bool()
             for val in (True, False):
@@ -157,8 +157,8 @@ def find_occlusions(owners: Sequence[Owner], ob: ObservedBoundary, tol=0.3, lo=0
 def expected_visibility(p: BNode, ob: ObservedBoundary, occluders: Sequence[Tuple[BNode, bool]] = (), tol=0.3, n=96) -> Dict[str, torch.Tensor]:
     """primitive → render expected boundary → apply hypothesized occlusion → compare only visible expected portion.
 
-    Renvoie des masques sur les points rendus : `domain` (dans la boîte des observations), `hidden` (cachée par un
-    masque supposé), `expected` (dans le domaine et non cachée), `seen` (un milieu observé à moins de `tol`)."""
+    Returns masks over the rendered points: `domain` (inside the box of the observations), `hidden` (hidden by a
+    hypothesised occluder), `expected` (inside the domain and not hidden), `seen` (an observed midpoint within `tol`)."""
     P = render(p, n=n, box=(-9.0, 9.0, -9.0, 9.0), reach=6.0); dom = _inside(P, _domain(ob)); hidden = torch.zeros(len(P), dtype=torch.bool)
     for q, val in occluders: hidden |= predict(q, P.float()).bool() == val
     seen = (torch.cdist(P, ob.points).min(1).values < tol) if len(P) and len(ob.points) else torch.zeros(len(P), dtype=torch.bool)
@@ -166,31 +166,31 @@ def expected_visibility(p: BNode, ob: ObservedBoundary, occluders: Sequence[Tupl
 
 
 def visible_support(p: BNode, ob: ObservedBoundary, occluders: Sequence[Tuple[BNode, bool]] = (), tol=0.15) -> Dict[str, float]:
-    """Score de VISIBILITÉ CONTREFACTUELLE d'une hypothèse de primitive : milieux expliqués de près, multipliés par la part
-    de la frontière attendue visible qui est effectivement observée. La portion cachée par un masque supposé n'entre
-    ni au numérateur ni au dénominateur."""
+    """COUNTERFACTUAL VISIBILITY score of a primitive hypothesis: closely explained midpoints, multiplied by the fraction
+    of the visible expected boundary that is actually observed. The portion hidden by a hypothesised occluder enters
+    neither the numerator nor the denominator."""
     v = expected_visibility(p, ob, occluders); P = v["points"]; n_exp = int(v["expected"].sum()); cov = float(v["seen"][v["expected"]].float().mean()) if n_exp else 0.0
     sup = float((torch.cdist(ob.points, P[v["expected"]]).min(1).values < tol).sum()) if n_exp and len(ob.points) else 0.0
     return {"support": sup, "coverage": cov, "expected": n_exp / max(1, len(P)), "hidden": float(v["hidden"].float().mean()) if len(P) else 0.0, "score": sup * cov}
 
 
-# ================================================================ énergie globale
+# ================================================================ global energy
 
 def _neighbors(ob: ObservedBoundary, link=0.35, turn=0.6) -> torch.Tensor:
     M, N = ob.points, ob.normals; A = (torch.cdist(M, M) < link) & ((N @ N.T).abs() > math.cos(turn)); A.fill_diagonal_(False); return A
 
 
 def absent_fraction(i: int, owners: Sequence[Owner], occ: Sequence[Occlusion], ob: ObservedBoundary, use_occlusion=True) -> float:
-    """Part de la frontière attendue visible de la courbe i qui n'a aucun milieu observé."""
+    """Fraction of the visible expected boundary of curve i that has no observed midpoint."""
     oc = [(owners[o.occluder].program(), o.side) for o in occ if o.occluded == i] if use_occlusion else []; v = expected_visibility(owners[i].program(), ob, oc); e = v["expected"]
     return float((~v["seen"][e]).float().mean()) if int(e.sum()) else 1.0
 
 
 def chance_support(o: Owner, ob: ObservedBoundary, cfg: dict, ids: Optional[torch.Tensor] = None, tol=0.3) -> float:
-    """CALIBRATION PAR LE HASARD : nombre de milieux qu'une courbe capterait si les milieux étaient répandus uniformément
-    dans le domaine : densité × aire de la bande de capture, le long de la portion de courbe où elle a des milieux
-    (`ids`), ou de toute sa portion dans le domaine si `ids` est omis. Une courbe n'est créditée que de ce qu'elle
-    explique AU-DELÀ de ce nombre : sur des étiquettes aléatoires, une courbe ne se paie pas."""
+    """CALIBRATION BY CHANCE: number of midpoints a curve would capture if the midpoints were spread uniformly
+    over the domain: density × area of the capture band, along the portion of the curve where it has midpoints
+    (`ids`), or along its whole portion inside the domain if `ids` is omitted. A curve is credited only with what it
+    explains BEYOND that number: on random labels, a curve does not pay for itself."""
     box = _domain(ob); P = o.boundary(192); inside = _inside(P, box); area = max(1e-9, (box[1] - box[0]) * (box[3] - box[2]))
     if len(P) < 2 or not int(inside.sum()): return 0.0
     if ids is not None: inside = inside & (torch.cdist(P, ob.points[ids]).min(1).values < tol) if len(ids) else torch.zeros_like(inside)
@@ -198,7 +198,7 @@ def chance_support(o: Owner, ob: ObservedBoundary, cfg: dict, ids: Optional[torc
 
 
 def energy(labels: torch.Tensor, owners: Sequence[Owner], ob: ObservedBoundary, cfg: dict, A: Optional[torch.Tensor] = None, occ: Optional[Sequence[Occlusion]] = None) -> Dict[str, float]:
-    """Score de cohérence globale d'une attribution, termes SÉPARÉS (plus bas = meilleur)."""
+    """Global coherence score of an attribution, SEPARATE terms (lower = better)."""
     M = ob.points; tau = cfg["tau"]; fit = 0.0; ab = 0.0; ch = 0.0; used = [i for i in range(len(owners)) if int((labels == i).sum())]; occ = find_occlusions(owners, ob) if occ is None and cfg["occlusion"] else (occ or [])
     for i in used:
         m = labels == i; fit += float(((owners[i].distance(M[m]) / SIGMA) ** 2).clamp(max=tau).sum()); ab += cfg["gamma"] * tau * absent_fraction(i, owners, occ, ob, cfg["occlusion"]) * int(m.sum()) if cfg["gamma"] > 0 else 0.0
@@ -208,12 +208,12 @@ def energy(labels: torch.Tensor, owners: Sequence[Owner], ob: ObservedBoundary, 
 
 
 def _unary(owners: Sequence[Owner], M: torch.Tensor, tau: float) -> torch.Tensor:
-    """[m, K + 1] coûts unaires ; dernière colonne = bruit."""
+    """[m, K + 1] unary costs; last column = noise."""
     cols = [((o.distance(M) / SIGMA) ** 2).clamp(max=2 * tau) for o in owners] + [torch.full((len(M),), tau, dtype=DT)]; return torch.stack(cols, 1)
 
 
 def _assign(owners, ob, cfg, A, sweeps=2) -> torch.Tensor:
-    """Ré-attribution : meilleur propriétaire par milieu, puis lissage (les voisins de même tangente se renforcent)."""
+    """Re-attribution: best owner per midpoint, then smoothing (neighbours with the same tangent reinforce each other)."""
     U = _unary(owners, ob.points, cfg["tau"]); K = len(owners); lab = U.argmin(1)
     for _ in range(sweeps if cfg["beta"] > 0 else 0):
         onehot = torch.nn.functional.one_hot(lab, K + 1).to(DT); agree = A.to(DT) @ onehot; lab = (U + cfg["beta"] * (A.sum(1, keepdim=True).to(DT) - agree)).argmin(1)
@@ -221,7 +221,7 @@ def _assign(owners, ob, cfg, A, sweeps=2) -> torch.Tensor:
 
 
 def _local_only(labels: torch.Tensor, ob: ObservedBoundary, link=0.6) -> torch.Tensor:
-    """Sans association LONGUE DISTANCE : chaque courbe ne garde que son plus grand amas spatialement connexe."""
+    """Without LONG-RANGE association: each curve keeps only its largest spatially connected cluster."""
     out = labels.clone()
     for i in torch.unique(labels[labels >= 0]).tolist():
         ids = torch.nonzero(labels == i)[:, 0]; f = link_fragments(ob.points[ids], link); keep = f == torch.bincount(f).argmax(); out[ids[~keep]] = -1
@@ -229,14 +229,14 @@ def _local_only(labels: torch.Tensor, ob: ObservedBoundary, link=0.6) -> torch.T
 
 
 def solve(ob: ObservedBoundary, cfg: Optional[dict] = None, seed=0) -> OwnershipSolution:
-    """Attribution globale. 1) candidats ; 2) ajout glouton, meilleur d'abord, de la courbe qui fait le plus baisser
-    l'énergie ; 3) au plus `max_iters` reprises : ré-estimation des paramètres sur les milieux possédés →
-    ré-attribution lissée → retrait des courbes devenues inutiles ; une reprise n'est gardée que si l'énergie baisse."""
+    """Global attribution. 1) candidates; 2) greedy addition, best first, of the curve that lowers the energy
+    the most; 3) at most `max_iters` passes: re-estimation of the parameters on the owned midpoints →
+    smoothed re-attribution → removal of the curves that have become useless; a pass is kept only if the energy decreases."""
     t0 = time.time(); cfg = {**load_config(), **(cfg or {})}; M = ob.points; m = len(M); cands = candidates(ob, seed); A = _neighbors(ob) if m else torch.zeros(0, 0, dtype=torch.bool); tested = 0; log = []
     if m == 0 or not cands: return OwnershipSolution([], torch.full((m,), -1, dtype=torch.long), torch.ones(m, 1, dtype=DT), [], {"fit": 0.0, "noise": cfg["tau"] * m, "smooth": 0.0, "complexity": 0.0, "absent": 0.0, "chance": 0.0, "total": cfg["tau"] * m, "owners": 0}, log, {"assignments_tested": 0, "candidates": len(cands), "seconds": 0.0})
     post = lambda lab: _local_only(lab, ob) if not cfg["long_range"] else lab
     chosen: List[int] = []; labels = torch.full((m,), -1, dtype=torch.long); E = energy(labels, [], ob, cfg, A)
-    while True:                                                                    # ajout glouton
+    while True:                                                                    # greedy addition
         best = None
         for c in range(len(cands)):
             if c in chosen: continue
@@ -245,7 +245,7 @@ def solve(ob: ObservedBoundary, cfg: Optional[dict] = None, seed=0) -> Ownership
         if best is None: break
         chosen.append(best[0]); E, labels = best[1], best[2]; log.append({"step": "add", "owner": cands[best[0]].kind, **{k: round(v, 2) for k, v in E.items()}})
     owners = [Owner(cands[i].kind, cands[i].params) for i in chosen]
-    for it in range(cfg["max_iters"]):                                             # attribution ↔ paramètres
+    for it in range(cfg["max_iters"]):                                             # attribution ↔ parameters
         new = []
         for i, o in enumerate(owners):
             ids = torch.nonzero(labels == i)[:, 0]
@@ -263,8 +263,8 @@ def solve(ob: ObservedBoundary, cfg: Optional[dict] = None, seed=0) -> Ownership
 
 
 def null_assigned(cfg: Optional[dict] = None, n=300, trials=12, seed=0, box=((-3.0, 1.2), (-3.0, 3.0)), rates=(0.5, 0.2)) -> List[float]:
-    """CALIBRATION SANS VÉRITÉ : part des milieux que le solveur attribue à une courbe sur des étiquettes ALÉATOIRES
-    (aucune frontière n'existe). Le coût `chance` est réglé pour que cette part reste faible."""
+    """CALIBRATION WITHOUT TRUTH: fraction of the midpoints that the solver attributes to a curve on RANDOM labels
+    (no boundary exists). The `chance` cost is set so that this fraction stays low."""
     from core.deep_partial import observe
     out = []
     for t in range(trials):
@@ -273,13 +273,13 @@ def null_assigned(cfg: Optional[dict] = None, n=300, trials=12, seed=0, box=((-3
     return out
 
 
-# ================================================================ hypothèses d'appartenance par fragment
+# ================================================================ ownership hypotheses per fragment
 
 def ownership_hypotheses(sol: OwnershipSolution, ob: ObservedBoundary, link=0.45, turn=0.6, edge=0.2) -> List[BoundaryOwnershipHypothesis]:
-    """Micro-fragments (proximité + continuité tangentielle) et, pour chacun, la distribution de ses propriétaires :
-    moyenne de la postérieure de ses milieux. Une courbe qui en masque une autre apparaît avec le rôle `occluder` ;
-    un fragment collé au bord de la boîte des observations reçoit une part `domain` ; la masse qui manque à une
-    décision nette (probabilité maximale sous 0,5) est rapportée comme `unknown`."""
+    """Micro-fragments (proximity + tangential continuity) and, for each, the distribution of its owners:
+    mean of the posterior of its midpoints. A curve that occludes another appears with the role `occluder`;
+    a fragment stuck to the edge of the box of the observations receives a `domain` share; the mass missing from a
+    clear-cut decision (maximum probability below 0.5) is reported as `unknown`."""
     from core.deep_fragments import _components_of
     M, N = ob.points, ob.normals; out = []
     if not len(M): return out
@@ -294,12 +294,12 @@ def ownership_hypotheses(sol: OwnershipSolution, ob: ObservedBoundary, link=0.45
     return out
 
 
-# ================================================================ appui de la composition
+# ================================================================ support from the composition
 
 def ownership_from_program(prog: BNode, ob: ObservedBoundary, tol=0.25) -> Tuple[torch.Tensor, List[BNode]]:
-    """primitive hypotheses → composition hypothesis → constraints → ownership refinement : chaque milieu va à la FEUILLE
-    du composite dont la frontière est la plus proche PARMI celles qui sont visibles en ce point (une feuille masquée
-    à cet endroit ne peut pas posséder le milieu). Renvoie (indice de feuille par milieu, feuilles)."""
+    """primitive hypotheses → composition hypothesis → constraints → ownership refinement: each midpoint goes to the LEAF
+    of the composite whose boundary is the closest AMONG those that are visible at that point (a leaf occluded
+    at that place cannot own the midpoint). Returns (leaf index per midpoint, leaves)."""
     from core.deep_partial import leaf_paths
     M = ob.points; lp = leaf_paths(prog); lab = torch.full((len(M),), -1, dtype=torch.long)
     if not len(M) or not lp: return lab, [l for _, l in lp]
@@ -309,7 +309,7 @@ def ownership_from_program(prog: BNode, ob: ObservedBoundary, tol=0.25) -> Tuple
     D = torch.stack(D, 1); d, i = D.min(1); lab[d < tol] = i[d < tol]; return lab, [l for _, l in lp]
 
 
-# ================================================================ des courbes possédées aux primitives
+# ================================================================ from owned curves to primitives
 
 def _curves(p: BNode) -> List[Tuple[str, tuple]]:
     g = geometry(p)
@@ -327,18 +327,18 @@ def _same(kind, a, o: Owner, tol_c=0.35, tol_r=0.3, tol_a=0.22, tol_b=0.3) -> bo
 
 
 def owned(p: BNode, sol: OwnershipSolution) -> float:
-    """Part des courbes de frontière d'une hypothèse de primitive qui coïncident avec une courbe retenue par l'attribution."""
+    """Fraction of the boundary curves of a primitive hypothesis that coincide with a curve retained by the attribution."""
     cs = _curves(p); return sum(any(_same(k, a, o) for o in sol.owners) for k, a in cs) / max(1, len(cs))
 
 
 def filter_by_ownership(programs: Sequence[BNode], sol: OwnershipSolution, min_owned=1.0) -> List[BNode]:
-    """Garde les hypothèses de primitives dont TOUTES les frontières (par défaut) sont des courbes possédées : l'attribution
-    globale sert de validation aux hypothèses produites sans attribution."""
+    """Keeps the primitive hypotheses whose boundaries are ALL (by default) owned curves: the global
+    attribution serves as validation for the hypotheses produced without attribution."""
     return [p for p in programs if owned(p, sol) >= min_owned]
 
 
 def primitives_from(sol: OwnershipSolution, ob: ObservedBoundary, k=3):
-    """Courbes possédées → fragments (un par courbe, modèle imposé) → relations → hypothèses de type, top-k par groupe."""
+    """Owned curves → fragments (one per curve, imposed model) → relations → type hypotheses, top-k per group."""
     from core.deep_fragments import build_graph, make_fragment, rank_by_group, type_hypotheses
     fr = [make_fragment(i, o.ids, ob, (o.kind, o.params)) for i, o in enumerate(sol.owners) if len(o.ids) >= 4]
     for i, f in enumerate(fr): f.index = i

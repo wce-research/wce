@@ -1,4 +1,4 @@
-"""Banc de la plasticité compositionnelle : multi-graines (16) et lot scellé (évalué une fois)."""
+"""Compositional plasticity benchmark: multi-seed (16) and sealed set (evaluated once)."""
 from __future__ import annotations
 
 import hashlib
@@ -17,7 +17,7 @@ def sealed_hash():
     return hashlib.sha256(json.dumps([[(t.name, t.kind, repr(t.spec), t.cue.tolist()) for t in s] for s in sealed_streams()], sort_keys=True).encode()).hexdigest()
 
 
-SEALED_SHA256 = "a4b07759504a4857c2f643318fdeb235deab3780ecc094d88b6f141dc9410182"   # figée AVANT toute évaluation
+SEALED_SHA256 = "a4b07759504a4857c2f643318fdeb235deab3780ecc094d88b6f141dc9410182"   # frozen BEFORE any evaluation
 
 
 def multi_seed(seeds=range(16), n_tasks=14, log=print):

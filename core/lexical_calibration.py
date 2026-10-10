@@ -1,9 +1,9 @@
-"""Posterior lexical calibré, entropie, cycle de vie, polysémie, similarité par comportement, classes, composition.
+"""Calibrated lexical posterior, entropy, lifecycle, polysemy, similarity by behaviour, classes, composition.
 
-P(c | w, preuves) = softmax_c( θ · φ(w, c) ) sur les concepts candidats + une option « aucun de ceux-ci » (NULL).
-φ : soutien net, nombre de situations compatibles, diversité des sources, contradictions, marge sur le concurrent,
-    accord morphologique (probabilité de la règle), plausibilité grammaticale du contexte, cooccurrence avec des
-    transformations observées. θ est ajusté sur des graines de CALIBRATION (jamais les graines de test).
+P(c | w, evidence) = softmax_c( θ · φ(w, c) ) over the candidate concepts + a "none of these" option (NULL).
+φ : net support, number of compatible situations, diversity of sources, contradictions, margin over the competitor,
+    morphological agreement (probability of the rule), grammatical plausibility of the context, co-occurrence with
+    observed transformations. θ is fitted on CALIBRATION seeds (never the test seeds).
 """
 from __future__ import annotations
 
@@ -22,11 +22,11 @@ FEATURES = ("net_support", "log_situations", "sources", "refute", "margin", "mor
 NULL = "NULL"
 
 
-# ================================================================ incertitude morphologique
+# ================================================================ morphological uncertainty
 
 def morphology_probability(agent, word, concept):
-    """Probabilité d'une règle de suffixe : Beta(radicaux qui la soutiennent, contre-exemples), + ancrage.
-    Contre-exemple : une forme qui applique la règle mais dont le sens ancré diffère de celui de la référence."""
+    """Probability of a suffix rule: Beta(stems that support it, counter-examples), + grounding.
+    Counter-example: a form that applies the rule but whose grounded meaning differs from that of the reference."""
     known = agent.lex.lexicon()
     best = 0.0
     for ref, meaning, rule, support in agent.morph.candidates(word, known):
@@ -41,7 +41,7 @@ def morphology_probability(agent, word, concept):
     return best
 
 
-# ================================================================ traits et posterior
+# ================================================================ features and posterior
 
 def _contexts(h):
     out = []
@@ -76,7 +76,7 @@ class LexicalExample:
     word: str
     concepts: List[str]
     feats: torch.Tensor          # [C, F]
-    gold: Optional[str]          # concept correct (évaluation) ou None
+    gold: Optional[str]          # correct concept (evaluation) or None
 
 
 class LexicalPosterior(torch.nn.Module):
@@ -89,7 +89,7 @@ class LexicalPosterior(torch.nn.Module):
     @property
     def parameter_count(self): return sum(p.numel() for p in self.parameters())
 
-    def forward(self, feats, mask):                 # [B, C, F], [B, C] -> P [B, C + 1] (dernier = NULL)
+    def forward(self, feats, mask):                 # [B, C, F], [B, C] -> P [B, C + 1] (last = NULL)
         s = (feats * self.theta).sum(-1).masked_fill(~mask, -1e9)
         s = torch.cat([s, self.null_bias.expand(s.shape[0], 1)], 1)
         return torch.softmax(s, 1)
@@ -135,11 +135,11 @@ def examples_from_agent(agent, gold: Dict[str, str] = None, words=None):
     return out
 
 
-# ================================================================ entropie et cycle de vie calibré
+# ================================================================ entropy and calibrated lifecycle
 
 def entropy(dist, n_concepts=None):
-    """Entropie H(C | w). Avec n_concepts : entropie « ouverte » — la masse NULL est répartie sur les concepts non
-    encore envisagés (aucun candidat = ignorance maximale log K, et non certitude)."""
+    """Entropy H(C | w). With n_concepts: "open" entropy — the NULL mass is spread over the concepts not
+    yet considered (no candidate = maximal ignorance log K, and not certainty)."""
     h = -sum(p * math.log(p) for c, p in dist.items() if p > 0 and c != NULL)
     pn = dist.get(NULL, 0.0)
     if pn > 0:
@@ -150,12 +150,12 @@ def entropy(dist, n_concepts=None):
 
 @dataclass
 class LexicalLifecycle:
-    """Transitions pilotées par le posterior calibré (seuils = risque attendu : coût d'une erreur 20, abstention 1)."""
+    """Transitions driven by the calibrated posterior (thresholds = expected risk: cost of an error 20, abstention 1)."""
     hypothesis: float = 0.5
     belief: float = 0.95
     stable: float = 0.99
     max_entropy: float = 0.5
-    min_situations: int = 2          # une observation isolée ne se distingue pas d'une coïncidence
+    min_situations: int = 2          # an isolated observation cannot be told apart from a coincidence
 
     def status(self, dist, n_sources=0, n_situations=0):
         best = max((c for c in dist if c != NULL), key=lambda c: dist[c], default=None)
@@ -168,7 +168,7 @@ class LexicalLifecycle:
 
 
 class CalibratedLexicon:
-    """S'attache à un agent : sens d'un mot appris depuis les observations selon le posterior calibré."""
+    """Attaches to an agent: meaning of a word learned from the observations according to the calibrated posterior."""
 
     def __init__(self, posterior: LexicalPosterior, lifecycle: LexicalLifecycle = None, min_status=LEX_BELIEF):
         self.post, self.life, self.min_status = posterior, lifecycle or LexicalLifecycle(), min_status
@@ -186,7 +186,7 @@ class CalibratedLexicon:
         best = max((c for c in d if c != NULL), key=lambda c: d[c], default=None)
         st, c = self.life.status(d, len(h.sources[best]) if h and best else 0, len(h.experiences[best]) if h and best else 0)
         hist = self.history[word]
-        if not hist or hist[-1] != st: hist.append(st)            # régression visible si une contradiction fait baisser P
+        if not hist or hist[-1] != st: hist.append(st)            # regression visible if a contradiction lowers P
         return st, c, d.get(c, 0.0) if c else 0.0
 
     def meaning(self, agent, word):
@@ -196,7 +196,7 @@ class CalibratedLexicon:
 
 
 def attach(agent, calibrated: CalibratedLexicon):
-    """Remplace la décision lexicale (seuils fixes de LexicalMemory) par le posterior calibré."""
+    """Replaces the lexical decision (fixed thresholds of LexicalMemory) with the calibrated posterior."""
     original = agent.word_meaning
 
     def word_meaning(tok):
@@ -211,10 +211,10 @@ def attach(agent, calibrated: CalibratedLexicon):
     return agent
 
 
-# ================================================================ polysémie : P(sens | mot, syntaxe, domaine, type d'entité)
+# ================================================================ polysemy: P(sense | word, syntax, domain, entity type)
 
 class PolysemyPosterior:
-    """Bayes naïf lissé appris des légendes : sens | (type du patient, type de la cible, préposition, domaine)."""
+    """Smoothed naive Bayes learned from the captions: sense | (patient type, target type, preposition, domain)."""
 
     def __init__(self, alpha=1.0): self.alpha = alpha; self.counts = defaultdict(Counter); self.prior = Counter()
 
@@ -246,10 +246,10 @@ class PolysemyPosterior:
         return {s: math.exp(v - m) / z for s, v in logp.items()}
 
 
-# ================================================================ similarité par comportement, classes, analogie
+# ================================================================ similarity by behaviour, classes, analogy
 
 def behavior_matrix(captions):
-    """Mot -> profil de comportement (type de structure, action, relation, rôle), sans plongements externes."""
+    """Word -> behaviour profile (structure type, action, relation, role), without external embeddings."""
     rows = defaultdict(Counter)
     for c in captions:
         s = c["structure"]; toks = tokenize(c["text"])
@@ -281,10 +281,10 @@ class SimilarityByBehavior:
         self.M = M / M.norm(dim=1, keepdim=True).clamp_min(1e-9)
         self.index = {w: i for i, w in enumerate(self.words)}
 
-    def similarity(self): return self.M @ self.M.T                       # cosinus vectorisé
+    def similarity(self): return self.M @ self.M.T                       # vectorised cosine
 
     def classes(self, threshold=0.9):
-        """Classes fonctionnelles émergentes : composantes connexes du graphe de similarité (sans noms codés)."""
+        """Emergent functional classes: connected components of the similarity graph (no hard-coded names)."""
         S = self.similarity() >= threshold
         n = len(self.words); parent = list(range(n))
         def find(x):
@@ -297,8 +297,8 @@ class SimilarityByBehavior:
         return [sorted(g) for g in groups.values() if len(g) > 1]
 
     def analogy(self, contexts: List[List[str]], known: Dict[str, str], k=1):
-        """Mot inconnu : profil de cadres (classes voisines) -> mot connu le plus proche -> CANDIDAT par analogie
-        (provenance 'analogy' : jamais promu en fait)."""
+        """Unknown word: frame profile (neighbouring classes) -> closest known word -> CANDIDATE by analogy
+        (provenance 'analogy': never promoted to a fact)."""
         v = torch.zeros(len(self.vocab)); vidx = {f: i for i, f in enumerate(self.vocab)}
         for toks, i in contexts:
             for f in (f"prev_class={_cls(toks[i - 1] if i else '<s>')}", f"next_class={_cls(toks[i + 1] if i + 1 < len(toks) else '</s>')}"):
@@ -312,7 +312,7 @@ class SimilarityByBehavior:
 
 
 def class_purity(classes, meaning_of):
-    """Évaluation seulement : fraction des mots dont le sens partage la famille majoritaire de leur classe."""
+    """Evaluation only: fraction of the words whose meaning shares the majority family of their class."""
     tot = ok = 0
     for g in classes:
         fams = Counter((meaning_of.get(w) or "none").split(":")[0] for w in g)
@@ -320,18 +320,18 @@ def class_purity(classes, meaning_of):
     return ok / tot if tot else 0.0
 
 
-# ================================================================ composition lexicale
+# ================================================================ lexical composition
 
 def stem_lookup(word, lexicon, prefix=4):
-    """Candidat par radical partagé (≥ 4 lettres) avec une forme connue d'action ; unique sinon None (incertain)."""
+    """Candidate by shared stem (≥ 4 letters) with a known action form; unique, otherwise None (uncertain)."""
     if len(word) < prefix: return None
     hits = {m for f, m in lexicon.items() if m and m.startswith("act:") and f[:prefix] == word[:prefix]}
     return hits.pop() if len(hits) == 1 else None
 
 
 def compose(expr, word_meaning, lexicon=None):
-    """« remet / repose » (re- + verbe), « fait tomber » (causatif), « met dedans » (verbe + particule de lieu).
-    Renvoie (sens, trace) ou (None, trace) : aucune entrée indépendante par forme de surface."""
+    """"remet / repose" (re- + verb), "fait tomber" (causative), "met dedans" (verb + place particle).
+    Returns (meaning, trace) or (None, trace): no independent entry per surface form."""
     toks = expr.split()
     trace = []
     if lexicon is not None:
@@ -352,10 +352,10 @@ def compose(expr, word_meaning, lexicon=None):
     return None, trace
 
 
-# ================================================================ mesures de calibration lexicale
+# ================================================================ lexical calibration measures
 
 def calibration_points(examples, model: Optional[LexicalPosterior] = None, agent_conf=None):
-    """(confiance, exact) : posterior calibré si modèle, sinon confiance native (LexicalHypothesis.confidence)."""
+    """(confidence, exact): calibrated posterior if a model is given, otherwise native confidence (LexicalHypothesis.confidence)."""
     pts = []
     for ex in examples:
         if ex.gold is None: continue

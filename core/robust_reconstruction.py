@@ -1,18 +1,18 @@
-"""RECONSTRUCTION STRUCTURELLE ROBUSTE & INFÉRENCE CONSCIENTE DE LA MESURE.
+"""ROBUST STRUCTURAL RECONSTRUCTION & MEASUREMENT-AWARE INFERENCE.
 
-ÉTAT DU MONDE → OPÉRATEUR DE MESURE → OBSERVATION BRUITÉE → VRAISEMBLANCE STRUCTURELLE → STRUCTURES COMPATIBLES →
-POSTÉRIEURE → MESURE ACTIVE → RECONSTRUCTION → VALIDATION → PROMOTION.
+WORLD STATE → MEASUREMENT OPERATOR → NOISY OBSERVATION → STRUCTURAL LIKELIHOOD → COMPATIBLE STRUCTURES →
+POSTERIOR → ACTIVE MEASUREMENT → RECONSTRUCTION → VALIDATION → PROMOTION.
 
-Séparation explicite : structure (squelette) | paramètres θ | processus de mesure (capteur, résolution, temps) |
-bruit (retournements) | observations aberrantes (contamination) | incertitude résiduelle | erreur réelle de modèle.
-Une mauvaise observation ne complexifie PAS automatiquement la structure : l'approfondissement exige un facteur
-de Bayes (évidence approchée) en faveur du modèle plus riche APRÈS prise en compte du bruit.
+Explicit separation: structure (skeleton) | parameters θ | measurement process (sensor, resolution, time) |
+noise (flips) | outlier observations (contamination) | residual uncertainty | real model error.
+A bad observation does NOT automatically make the structure more complex: deepening requires a Bayes
+factor (approximate evidence) in favour of the richer model AFTER the noise is accounted for.
 
-Les quantités « évidence » sont des APPROXIMATIONS (BIC / Laplace grossière + a priori structurel documenté) ;
-elles ne sont pas présentées comme une vérité bayésienne exacte. Aucune famille n'est nommée ici.
-Inspirations (Dirac : état ≠ observable ≠ opérateur ≠ issue ; Shannon : IG ; Boltzmann : ensemble compatible ;
-Einstein : repères ; Fourier : bases ; Heisenberg : compromis de capteurs GÉNÉRIQUES) — inspirations seulement,
-aucune mécanique quantique.
+The "evidence" quantities are APPROXIMATIONS (BIC / coarse Laplace + documented structural prior);
+they are not presented as an exact Bayesian truth. No family is named here.
+Inspirations (Dirac: state ≠ observable ≠ operator ≠ outcome; Shannon: IG; Boltzmann: compatible ensemble;
+Einstein: frames; Fourier: bases; Heisenberg: GENERIC sensor trade-offs) — inspirations only,
+no quantum mechanics.
 """
 from __future__ import annotations
 
@@ -30,19 +30,19 @@ COMBINATORS = ("and", "or", "xor")
 N_PRIMITIVE_TYPES = 10
 
 
-# ================================================================ A — modèle de mesure
+# ================================================================ A — measurement model
 
 @dataclass(frozen=True)
 class MeasurementModel:
-    """Décrit COMMENT une observation est produite (jamais l'état latent lui-même)."""
+    """Describes HOW an observation is produced (never the latent state itself)."""
     observable: str = "membership"
     source: str = "standard"
     frame: str = "world"
     observation_time: float = 0.0
     ingestion_time: float = 0.0
-    resolution: float = 0.05             # flou de frontière (échelle du lissage de la vraisemblance)
-    flip: float = 0.05                   # bruit connu ou estimé (retournement)
-    contamination: float = 0.02          # probabilité d'observation aberrante (y ~ Bernoulli(½))
+    resolution: float = 0.05             # boundary blur (scale of the likelihood smoothing)
+    flip: float = 0.05                   # known or estimated noise (flip)
+    contamination: float = 0.02          # probability of an outlier observation (y ~ Bernoulli(½))
     missingness: float = 0.0
     cost: float = 1.0
     repeatable: bool = True
@@ -57,10 +57,10 @@ SENSOR_MODELS = {"precise": MeasurementModel(source="precise", flip=0.01, resolu
 @dataclass
 class Observations:
     X: torch.Tensor
-    y: torch.Tensor                       # −1 = manquant
-    flip: torch.Tensor                    # bruit par observation (capteur ⊕ monde)
+    y: torch.Tensor                       # −1 = missing
+    flip: torch.Tensor                    # noise per observation (sensor ⊕ world)
     resolution: torch.Tensor
-    weight: torch.Tensor                  # 1 ; réduit pour sources corrélées / observations anciennes
+    weight: torch.Tensor                  # 1; reduced for correlated sources / old observations
     source: List[str] = field(default_factory=list)
 
     @staticmethod
@@ -79,19 +79,19 @@ class Observations:
 
 
 def temporal_weights(obs_time, query_time, half_life=None):
-    """AD — une observation ANCIENNE n'est pas une mesure du présent : poids exp(−Δt / demi-vie) (∞ ⇒ 1)."""
+    """AD — an OLD observation is not a measurement of the present: weight exp(−Δt / half-life) (∞ ⇒ 1)."""
     if half_life is None: return torch.ones_like(obs_time)
     return torch.exp(-(query_time - obs_time).clamp_min(0) * math.log(2) / half_life)
 
 
 def correlated_weights(groups: Sequence[Optional[str]]):
-    """AC — observations d'une même source CORRÉLÉE : poids total d'un groupe = 1 + log(taille) (pas de cumul naïf)."""
+    """AC — observations from one CORRELATED source: total weight of a group = 1 + log(size) (no naive accumulation)."""
     c = Counter(g for g in groups if g is not None); w = []
     for g in groups: w.append(1.0 if g is None else (1 + math.log(c[g])) / c[g])
     return torch.tensor(w)
 
 
-# ================================================================ B/C — vraisemblances
+# ================================================================ B/C — likelihoods
 
 LIKELIHOODS = ("naive", "flip", "contamination", "soft_margin")
 
@@ -101,9 +101,9 @@ def membership_prob(prog: BNode, X, theta=None, k=12.0):
 
 
 def obs_loglik(prog: BNode, obs: Observations, kind="contamination", theta=None, gamma=0.02, per_point=False):
-    """log P(D | structure, θ, modèle de mesure). naive : bruit quasi nul (1e-3), sortie dure ;
-    flip : Bernoulli avec bruit du capteur ; contamination : mélange (1−γ)·flip + γ·½ ; soft_margin : flip + γ +
-    lissage de frontière à la résolution du capteur (tolérance près de la frontière)."""
+    """log P(D | structure, θ, measurement model). naive: near-zero noise (1e-3), hard output;
+    flip: Bernoulli with sensor noise; contamination: mixture (1−γ)·flip + γ·½; soft_margin: flip + γ +
+    boundary smoothing at the sensor resolution (tolerance near the boundary)."""
     v = obs.valid(); X, y, f, r, w = obs.X[v], obs.y[v].double(), obs.flip[v].double(), obs.resolution[v], obs.weight[v].double()
     if kind == "naive":
         p = (evaluate(prog if theta is None else prog.skeleton(), torch.nan_to_num(X), theta, None if theta is None else 30.0)).double()
@@ -118,14 +118,14 @@ def obs_loglik(prog: BNode, obs: Observations, kind="contamination", theta=None,
 
 
 def outlier_posterior(prog: BNode, obs: Observations, gamma=0.02):
-    """L — P(observation aberrante | données, modèle) pour chaque observation (mélange de contamination)."""
+    """L — P(outlier observation | data, model) for each observation (contamination mixture)."""
     v = obs.valid(); p = membership_prob(prog, obs.X[v], k=30.0).double(); f = obs.flip[v].double(); y = obs.y[v].double()
     p1 = f + (1 - 2 * f) * p; l_in = torch.where(y.bool(), p1, 1 - p1) * (1 - gamma); l_out = torch.full_like(l_in, 0.5 * gamma)
     return l_out / (l_in + l_out)
 
 
 def fit_robust(skel: BNode, obs: Observations, kind="contamination", gamma=0.02, steps=120, n_init=2, init=None, seed=0):
-    """Ajustement des paramètres θ par MAXIMUM de vraisemblance robuste (structure fixée). Renvoie (programme, logL)."""
+    """Fit of the parameters θ by robust MAXIMUM likelihood (structure fixed). Returns (program, logL)."""
     v = obs.valid(); X, y = obs.X[v], obs.y[v]; g = torch.Generator().manual_seed(seed); best = None
     inits = [torch.tensor(init)] if init is not None else []
     if skel.n_params() == 0: p = skel.with_params([]); return p, float(obs_loglik(p, obs, kind, gamma=gamma))
@@ -144,12 +144,12 @@ def fit_robust(skel: BNode, obs: Observations, kind="contamination", gamma=0.02,
     return best
 
 
-# ================================================================ E/F — évidence approchée et MDL
+# ================================================================ E/F — approximate evidence and MDL
 
 def log_evidence(prog: BNode, obs: Observations, ll: float):
-    """Évidence APPROCHÉE (BIC/Laplace grossière + a priori structurel) :
-    log p(D|S) ≈ logL(θ̂) − ½·k·log n − bits_structure·log 2. Ce n'est PAS une vraie marginale ; c'est un critère
-    qui pénalise explicitement la flexibilité (paramètres) ET la taille de l'AST."""
+    """APPROXIMATE evidence (BIC/coarse Laplace + structural prior):
+    log p(D|S) ≈ logL(θ̂) − ½·k·log n − bits_structure·log 2. It is NOT a true marginal; it is a criterion
+    that explicitly penalizes flexibility (parameters) AND the size of the AST."""
     n = max(1, len(obs)); k = prog.n_params()
     return ll - 0.5 * k * math.log(n) - structure_bits(prog) * math.log(2)
 
@@ -158,8 +158,8 @@ def structure_bits(prog: BNode): return prog.size() * math.log2(N_PRIMITIVE_TYPE
 
 
 def mdl(prog: BNode, obs: Observations, kind="contamination", gamma=0.02):
-    """Longueur de description (bits) = structure + paramètres + résidus/erreurs de MESURE (−log₂ P(D|θ, mesure)).
-    kind="naive" : erreurs codées comme EXCEPTIONS (log₂ C(n, e)) — sans modèle de mesure explicite."""
+    """Description length (bits) = structure + parameters + residuals/MEASUREMENT errors (−log₂ P(D|θ, measurement)).
+    kind="naive": errors coded as EXCEPTIONS (log₂ C(n, e)) — without an explicit measurement model."""
     n = max(1, len(obs)); k = prog.n_params(); pb = 0.5 * k * math.log2(n)
     if kind == "naive":
         v = obs.valid(); e = int((predict(prog, obs.X[v]) != obs.y[v]).sum())
@@ -173,7 +173,7 @@ def bic(prog, obs, ll): return -2 * ll + prog.n_params() * math.log(max(1, len(o
 def aic(prog, obs, ll): return -2 * ll + 2 * prog.n_params()
 
 
-# ================================================================ G — ensemble de structures compatibles
+# ================================================================ G — set of compatible structures
 
 @dataclass
 class StructureEntry:
@@ -182,14 +182,14 @@ class StructureEntry:
     evidence: float
     mass: float = 0.0
     stability: str = "UNTESTED"
-    variant: int = 0                      # >0 : échantillon de la postérieure PARAMÉTRIQUE de la même structure
+    variant: int = 0                      # >0: sample from the PARAMETRIC posterior of the same structure
 
     @property
     def complexity(self): return complexity(self.program)
 
 
 class CompatibleStructureSet:
-    """Plusieurs structures restent compatibles ; UNKNOWN est une sortie valide."""
+    """Several structures remain compatible; UNKNOWN is a valid output."""
 
     def __init__(self, entries: Sequence[StructureEntry] = (), unknown_threshold=0.6):
         self.entries: List[StructureEntry] = []; self.unknown_threshold = unknown_threshold
@@ -233,7 +233,7 @@ class CompatibleStructureSet:
         p = self.predictive(probes).clamp(1e-9, 1 - 1e-9); return float((-(p * p.log() + (1 - p) * (1 - p).log())).mean())
 
     def expected_accuracy(self, probes):
-        """Exactitude ATTENDUE du prédicteur de Bayes sous la postérieure (sondes fonctionnelles)."""
+        """EXPECTED accuracy of the Bayes predictor under the posterior (functional probes)."""
         p = self.predictive(probes); return float(torch.maximum(p, 1 - p).mean())
 
     def rescore(self, obs: Observations, kind="contamination", gamma=0.02):
@@ -245,7 +245,7 @@ class CompatibleStructureSet:
         self.entries = sorted([e for e in self.entries if e.mass >= min_mass], key=lambda e: -e.mass)[:max_entries]; self._norm()
 
     def add_parameter_samples(self, obs, kind, gamma, top=2, n=3, g=None):
-        """D — incertitude paramétrique : échantillons de Laplace des meilleures structures (même structure, variants)."""
+        """D — parametric uncertainty: Laplace samples of the best structures (same structure, variants)."""
         self.entries = [e for e in self.entries if e.variant == 0]; g = g or torch.Generator().manual_seed(0)
         for e in sorted(self.entries, key=lambda e: -e.mass)[:top]:
             if e.program.n_params() == 0: continue
@@ -255,10 +255,10 @@ class CompatibleStructureSet:
         self._norm()
 
 
-# ================================================================ D — postérieure paramétrique (Laplace diagonale), postérieure de mesure
+# ================================================================ D — parametric posterior (diagonal Laplace), measurement posterior
 
 class ParameterPosterior:
-    """P(θ | structure, D) ≈ N(θ̂, diag(1 / courbure)) — courbure par différences finies du log-vraisemblance."""
+    """P(θ | structure, D) ≈ N(θ̂, diag(1 / curvature)) — curvature by finite differences of the log-likelihood."""
 
     def __init__(self, prog: BNode, obs: Observations, kind="contamination", h=1e-2):
         self.prog = prog; th = torch.tensor(prog.param_vector(), dtype=torch.float64); sd = []
@@ -273,7 +273,7 @@ class ParameterPosterior:
 
 
 def estimate_noise(prog: BNode, obs: Observations, grid=(0.0, 0.02, 0.05, 0.08, 0.12, 0.15, 0.2, 0.25)):
-    """MeasurementPosterior : bruit additionnel du MONDE estimé par maximum de vraisemblance sur une grille."""
+    """MeasurementPosterior: additional WORLD noise estimated by maximum likelihood on a grid."""
     best = None
     for w in grid:
         o = Observations(obs.X, obs.y, (obs.flip + w).clamp(max=0.45), obs.resolution, obs.weight, obs.source)
@@ -282,15 +282,15 @@ def estimate_noise(prog: BNode, obs: Observations, grid=(0.0, 0.02, 0.05, 0.08, 
     return best[0]
 
 
-# ================================================================ L — attribution de l'écart
+# ================================================================ L — attribution of the discrepancy
 
 DISCREPANCY = ("MODEL_MISMATCH", "PARAMETER_UNCERTAINTY", "MEASUREMENT_NOISE", "OUTLIER", "NON_IDENTIFIABLE")
 
 
 def attribute_discrepancy(prog: BNode, obs: Observations, gamma=0.02, cluster_radius=0.35):
-    """Classe les erreurs d'ajustement : isolées et P(outlier) élevé → OUTLIER ; taux compatible avec le bruit connu
-    (binomial) → MEASUREMENT_NOISE ; concentrées près de la frontière → PARAMETER_UNCERTAINTY ; groupées loin de la
-    frontière en excès du bruit → MODEL_MISMATCH."""
+    """Classifies the fit errors: isolated with high P(outlier) → OUTLIER; rate compatible with the known noise
+    (binomial) → MEASUREMENT_NOISE; concentrated near the boundary → PARAMETER_UNCERTAINTY; clustered far from the
+    boundary in excess of the noise → MODEL_MISMATCH."""
     v = obs.valid(); X, y = obs.X[v], obs.y[v]; err = predict(prog, X) != y; n = len(X); e = int(err.sum())
     if e == 0: return {"label": "MEASUREMENT_NOISE", "errors": 0}
     exp_rate = float(obs.flip[v].mean()) + gamma; sd = math.sqrt(exp_rate * (1 - exp_rate) * n)
@@ -305,10 +305,10 @@ def attribute_discrepancy(prog: BNode, obs: Observations, gamma=0.02, cluster_ra
     return {"label": lab, "errors": e, "expected": round(exp_rate * n, 2), "near_boundary": round(near, 3), "clustered": round(clustered, 3)}
 
 
-# ================================================================ H/I — gains attendus
+# ================================================================ H/I — expected gains
 
 def _reweight(masses, Pq, flip):
-    """Pour chaque point candidat q et issue y ∈ {0, 1} : masses a posteriori (vectorisé) [Q, 2, K]."""
+    """For each candidate point q and outcome y ∈ {0, 1}: posterior masses (vectorized) [Q, 2, K]."""
     l1 = flip + (1 - 2 * flip) * Pq                                       # [K, Q]  P(y=1 | structure k, q)
     L = torch.stack([1 - l1, l1], 0).permute(2, 0, 1)                    # [Q, 2, K]
     joint = L * masses[None, None, :]; py = joint.sum(2)                 # [Q, 2]
@@ -316,7 +316,7 @@ def _reweight(masses, Pq, flip):
 
 
 def expected_functional_accuracy_gain(css: CompatibleStructureSet, cands, probes, flip=0.05):
-    """EFA(q) = E_y[ExactitudeAttendue(postérieure | q, y)] − ExactitudeAttendue(postérieure)."""
+    """EFA(q) = E_y[ExpectedAccuracy(posterior | q, y)] − ExpectedAccuracy(posterior)."""
     m = css.masses(); Pq = css.preds(cands); Pp = css.preds(probes)        # [K, Q], [K, P]
     post, py = _reweight(m, Pq, flip)
     pred = post @ Pp                                                      # [Q, 2, P]
@@ -341,11 +341,11 @@ def uncertainty(css, cands): p = css.predictive(cands).clamp(1e-9, 1 - 1e-9); re
 
 
 def expected_decision_loss_utility(efa, cost, compute=0.0, noise_risk=0.0, disturbance=0.0, value=1.0, lam=0.01):
-    """I — utilité = valeur·réduction d'erreur fonctionnelle − λ·(coût de mesure + calcul + risque de bruit + perturbation)."""
+    """I — utility = value·reduction of functional error − λ·(measurement cost + compute + noise risk + disturbance)."""
     return value * efa - lam * (cost + compute + noise_risk + disturbance)
 
 
-# ================================================================ J/K — planificateur de mesures
+# ================================================================ J/K — measurement planner
 
 ACTIONS = ("new_point", "repeat", "near_boundary", "far_from_boundary", "discriminate", "parameter", "validate", "deepen", "stop")
 
@@ -360,8 +360,8 @@ class MeasurementChoice:
 
 
 class RobustMeasurementPlanner:
-    """Planificateur DISTINCT du SearchPolicy : choisit (point, capteur) ou répétition, approfondissement, arrêt,
-    selon la postérieure. criterion ∈ {efa, structural_ig, functional_ig, disagreement, uncertainty, random}."""
+    """Planner DISTINCT from the SearchPolicy: chooses (point, sensor) or repetition, deepening, stop,
+    according to the posterior. criterion ∈ {efa, structural_ig, functional_ig, disagreement, uncertainty, random}."""
 
     def __init__(self, criterion="efa", sensors=("standard",), lam=0.01, allow_repeat=True, world_noise=0.0, seed=0):
         self.criterion, self.sensors, self.lam, self.allow_repeat, self.world_noise = criterion, sensors, lam, allow_repeat, world_noise
@@ -391,7 +391,7 @@ class RobustMeasurementPlanner:
         return best
 
 
-# ================================================================ M/N — recherche structurelle robuste
+# ================================================================ M/N — robust structural search
 
 def expand(parent: BNode, A, combs=COMBINATORS):
     return [(c, a) for c in combs for a in A]
@@ -412,10 +412,10 @@ class ReconstructionResult:
 
 
 class RobustStructuralReconstruction:
-    """Maintient plusieurs structures plausibles, ajuste θ robustement, estime le bruit, choisit mesure / répétition /
-    approfondissement / arrêt, ne complexifie que si le facteur de Bayes l'exige APRÈS prise en compte du bruit,
-    simplifie, et ne promeut qu'après contrôle prédictif a posteriori.
-    likelihood ∈ LIKELIHOODS ; depth_rule ∈ {bayes_factor, threshold} ; planner : RobustMeasurementPlanner | None."""
+    """Maintains several plausible structures, fits θ robustly, estimates the noise, chooses measurement / repetition /
+    deepening / stop, adds complexity only if the Bayes factor requires it AFTER the noise is accounted for,
+    simplifies, and promotes only after a posterior predictive check.
+    likelihood ∈ LIKELIHOODS; depth_rule ∈ {bayes_factor, threshold}; planner: RobustMeasurementPlanner | None."""
 
     def __init__(self, likelihood="contamination", depth_rule="bayes_factor", planner: Optional[RobustMeasurementPlanner] = None,
                  budget=16.0, max_depth=4, beam=3, gamma=0.02, bf_threshold=3.0, policy=None, seed=0, estimate_world_noise=True):
@@ -428,14 +428,14 @@ class RobustStructuralReconstruction:
     def _entry(self, prog, ll, obs): return StructureEntry(prog, ll, log_evidence(prog, obs, ll))
 
     def run(self, obs: Observations, oracle: Optional[Callable] = None, pool_sampler: Optional[Callable] = None, probes=None, g=None, monitor=None):
-        """monitor(css) -> exactitude RÉELLE (évaluation seulement, jamais utilisée pour décider) : sert à mesurer le
-        gain fonctionnel réalisé de chaque requête (H10)."""
+        """monitor(css) -> REAL accuracy (evaluation only, never used to decide): serves to measure the
+        realized functional gain of each query (H10)."""
         t0 = time.time(); evals = 0; trace = []; A = atoms(); css = CompatibleStructureSet()
         for a in A:
             p, ll = self._fit(a, obs); evals += 1; css.add(self._entry(p, ll, obs))
         depth = 1; queries = 0; spent = 0.0
         pool = pool_sampler(400, g) if pool_sampler else None; hist: List[torch.Tensor] = []
-        forced = self.planner is not None                                          # alternatives plausibles (profondeur 2) pour départager activement
+        forced = self.planner is not None                                          # plausible alternatives (depth 2) to discriminate actively
         while True:
             best = css.best()
             deepen = depth < self.max_depth and (forced or self._should_deepen(css, obs)); forced = False
@@ -464,7 +464,7 @@ class RobustStructuralReconstruction:
             rec = {"action": ch.action, "sensor": ch.sensor, "predicted_gain": ch.predicted_gain, "acc_before": acc_before}
             if monitor is not None: rec["true_acc_after"] = monitor(css)
             trace.append(rec)
-        # simplification et noise estimation
+        # simplification and noise estimation
         css.entries = [e for e in css.entries if e.variant == 0]; css._norm()
         best = css.best(); simp = simplify_robust(best.program, obs, self.kind, self.gamma); evals += 1
         if simp is not best.program:
@@ -474,11 +474,11 @@ class RobustStructuralReconstruction:
         return ReconstructionResult(ans, css, queries, spent, evals, round(time.time() - t0, 2), depth, trace, disc, status)
 
     def _should_deepen(self, css, obs):
-        """N — critère : seuil d'erreur (ancien) OU comparaison modèle simple + bruit vs complexe (facteur de Bayes)."""
+        """N — criterion: error threshold (old) OR comparison simple model + noise vs complex (Bayes factor)."""
         best = css.best(); v = obs.valid(); err = float((predict(best.program, obs.X[v]) != obs.y[v]).float().mean())
         noise = float(obs.flip[v].mean())
         if self.depth_rule == "threshold": return err > noise + 0.03
-        # le meilleur modèle courant est-il INCOMPATIBLE avec son bruit (test binomial) ? sinon, ne pas approfondir
+        # is the current best model INCOMPATIBLE with its noise (binomial test)? otherwise, do not deepen
         n = int(v.sum()); e = err * n; exp = (noise + self.gamma) * n; sd = math.sqrt(max(exp * (1 - (noise + self.gamma)), 1e-9))
         return e > exp + 2.0 * sd
 
@@ -488,8 +488,8 @@ def _acc_vs(css, probes):
 
 
 def simplify_robust(prog: BNode, obs: Observations, kind="contamination", gamma=0.02, bf=1.0):
-    """Remplace un combinateur par l'un de ses enfants si l'évidence approchée ne baisse pas (structure simple + bruit
-    plausible préférée à structure complexe + ajustement parfait)."""
+    """Replaces a combinator with one of its children if the approximate evidence does not drop (simple structure + plausible
+    noise preferred to complex structure + perfect fit)."""
     from core.active_structure import _subtrees_replacements
     cur = prog; ev = log_evidence(cur, obs, float(obs_loglik(cur, obs, kind, gamma=gamma)))
     while True:
@@ -501,7 +501,7 @@ def simplify_robust(prog: BNode, obs: Observations, kind="contamination", gamma=
         cur, ev = best
 
 
-# ================================================================ O — calibration de P(règle fausse)
+# ================================================================ O — calibration of P(rule wrong)
 
 def platt(scores, labels, steps=300):
     a = torch.zeros(2, requires_grad=True); s = torch.tensor(scores, dtype=torch.float32); y = torch.tensor(labels, dtype=torch.float32)
@@ -511,7 +511,7 @@ def platt(scores, labels, steps=300):
 
 
 def beta_calibration(scores, labels, steps=400):
-    """Calibration bêta : logit(p) = a·ln s − b·ln(1−s) + c."""
+    """Beta calibration: logit(p) = a·ln s − b·ln(1−s) + c."""
     s = torch.tensor(scores, dtype=torch.float32).clamp(1e-4, 1 - 1e-4); y = torch.tensor(labels, dtype=torch.float32)
     w = torch.tensor([1.0, 1.0, 0.0], requires_grad=True); opt = torch.optim.Adam([w], lr=0.05)
     f = lambda s: w[0] * torch.log(s) - w[1] * torch.log(1 - s) + w[2]
@@ -538,11 +538,11 @@ def calibration_metrics(p, y, bins=10):
     return {"ece": round(ece, 4), "brier": round(brier, 4), "reliability": curve, "at_0.5": pr(0.5), "at_0.9": pr(0.9)}
 
 
-# ================================================================ P — contrôle prédictif a posteriori
+# ================================================================ P — posterior predictive check
 
 def posterior_predictive_check(prog: BNode, obs_new: Observations, n_sim=400, g=None, gamma=0.02):
-    """Statistiques réelles sur de NOUVELLES observations vs distribution prédictive simulée (bruit compris) :
-    nombre d'erreurs et nombre de paires d'erreurs voisines (structure spatiale). p-valeurs unilatérales."""
+    """Real statistics on NEW observations vs simulated predictive distribution (noise included):
+    number of errors and number of pairs of neighbouring errors (spatial structure). One-sided p-values."""
     g = g or torch.Generator().manual_seed(0); v = obs_new.valid(); X, y = obs_new.X[v], obs_new.y[v]
     p = membership_prob(prog, X, k=30.0).double(); f = obs_new.flip[v].double(); p1 = (1 - gamma) * (f + (1 - 2 * f) * p) + gamma * 0.5
     pred = predict(prog, X)
@@ -555,11 +555,11 @@ def posterior_predictive_check(prog: BNode, obs_new: Observations, n_sim=400, g=
     return {"errors": obs_e, "pairs": obs_pairs, "p_errors": p_err, "p_pairs": p_pairs, "reject": min(p_err, p_pairs) < 0.01}
 
 
-# ================================================================ T/U/V/W/X — couches de mesure inspirées
+# ================================================================ T/U/V/W/X — inspired measurement layers
 
 def fourier_reconstruction(signal, k=None, energy=0.99):
-    """T — représentation : signal compliqué en espace direct → peu de raies en fréquence ; reconstruction inverse.
-    Changement de BASE (représentation), jamais du monde."""
+    """T — representation: complicated signal in direct space → few spectral lines in frequency; inverse reconstruction.
+    Change of BASIS (representation), never of the world."""
     from core.measurement import BasisTransform
     bt = BasisTransform(len(signal)); F = bt.forward(signal); mag = F.abs()
     order = mag.argsort(descending=True); cum = torch.cumsum(mag[order] ** 2, 0) / (mag ** 2).sum()
@@ -572,19 +572,19 @@ def microstate_entropy(css: CompatibleStructureSet): return css.entropy()
 
 
 def frame_transform(X, angle=0.0, shift=(0.0, 0.0)):
-    """V — repère : une mesure spatiale porte son repère ; X_monde = R(angle)·X_repère + décalage."""
+    """V — frame: a spatial measurement carries its frame; X_world = R(angle)·X_frame + shift."""
     c, s = math.cos(angle), math.sin(angle); R = torch.tensor([[c, -s], [s, c]], dtype=X.dtype)
     return X @ R.T + torch.tensor(shift, dtype=X.dtype)
 
 
 def sensor_tradeoff_choice(css, pool, probes, budget_left, world_noise=0.0):
-    """W — compromis GÉNÉRIQUES (résolution ↔ coût / bruit) : le planificateur choisit le capteur dont l'utilité
-    (gain fonctionnel attendu − coût) est maximale. Aucune relation d'incertitude quantique."""
+    """W — GENERIC trade-offs (resolution ↔ cost / noise): the planner chooses the sensor whose utility
+    (expected functional gain − cost) is maximal. No quantum uncertainty relation."""
     return RobustMeasurementPlanner("efa", sensors=tuple(SENSOR_MODELS), world_noise=world_noise).choose(css, pool, None, probes, budget_left)
 
 
 @dataclass(frozen=True)
 class MeasurementOutcome:
-    """X — séparation stricte : l'issue observée n'est JAMAIS l'état latent."""
+    """X — strict separation: the observed outcome is NEVER the latent state."""
     value: int
     model: MeasurementModel

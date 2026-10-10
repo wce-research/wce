@@ -1,14 +1,14 @@
-"""Diagnostic AVAL (sous-jalon Downstream Selection Loss) — module d'ÉVALUATION, dev uniquement.
+"""DOWNSTREAM diagnostic (Downstream Selection Loss sub-milestone) — EVALUATION module, dev only.
 
-Question : avec les VRAIS atomes fournis, une structure de bonne forme est souvent générée, mais la récupération
-finale au seuil 0,99 s'effondre. Où, et pourquoi, une bonne candidate devient-elle une mauvaise solution finale ?
+Question: with the TRUE atoms provided, a structure of the right form is often generated, but the final
+recovery at the 0.99 threshold collapses. Where, and why, does a good candidate become a bad final solution?
 
-Principe : le pipeline n'est PAS modifié. `TracedSearch` est une sous-classe de `DeepSearch` qui ENREGISTRE chaque
-ajustement (programme avant, programme après, origine) et la simplification, sans changer aucun calcul (testé : même
-sortie que `DeepSearch`). Tout ce qui utilise la vérité (accords fonctionnels, classement oracle, cause de la perte) est
-calculé APRÈS coup, ici.
+Principle: the pipeline is NOT modified. `TracedSearch` is a subclass of `DeepSearch` that RECORDS each
+fit (program before, program after, origin) and the simplification, without changing any computation (tested: same
+output as `DeepSearch`). Everything that uses the truth (functional agreements, oracle ranking, cause of the loss) is
+computed AFTER the fact, here.
 
-Étapes suivies :
+Stages followed:
   true atoms → candidate generation → initial fit → refit / polish → simplification → canonicalization → scoring →
   ranking → final selection
 """
@@ -36,8 +36,8 @@ GOOD = 0.99
 
 
 class TracedSearch(DeepSearch):
-    """DeepSearch + enregistrement. Aucun calcul n'est modifié : les méthodes appellent `super()` et notent ce qui
-    entre et ce qui sort."""
+    """DeepSearch + recording. No computation is modified: the methods call `super()` and note what
+    goes in and what comes out."""
 
     def _setup(self, data, noise): super()._setup(data, noise); self.fits: List[dict] = []; self.simplification: dict = {}; self._pending = None
 
@@ -57,8 +57,8 @@ class TracedSearch(DeepSearch):
 
 @dataclass
 class BestCandidateTrajectory:
-    """Meilleur accord fonctionnel rencontré à chaque étape, candidat correspondant, étape où le meilleur global
-    apparaît et étape où il disparaît ou se dégrade."""
+    """Best functional agreement encountered at each stage, corresponding candidate, stage where the global best
+    appears and stage where it disappears or degrades."""
     stages: Dict[str, dict] = field(default_factory=dict)
 
     def add(self, stage, accord, program): self.stages[stage] = {"accord": accord, "program": render(program) if program is not None else None, "form": algebraic_form(program) if program is not None else None}
@@ -83,8 +83,8 @@ def _spearman(a, b):
 
 
 def score_components(prog: BNode, data: FitData, gamma=0.02) -> dict:
-    """Composantes du score, séparées : vraisemblance profilée (prédictions dures, bruit par hypothèse), vraisemblance
-    robuste adoucie (contamination), pénalité de paramètres, pénalité de structure, MDL en bits, score a posteriori."""
+    """Components of the score, separated: profiled likelihood (hard predictions, noise per hypothesis), softened
+    robust likelihood (contamination), parameter penalty, structural penalty, MDL in bits, posterior score."""
     pred = predict_batch(prog.skeleton(), torch.tensor([prog.param_vector()], dtype=DT), data.X)[0].to(DT); n = len(data); k = prog.n_params(); d = n_atoms(prog)
     ll = profiled_loglik(pred, data); robust = float(loglik_batch(prog.skeleton(), torch.tensor([prog.param_vector()], dtype=DT), data, gamma)[0])
     pen_k = 0.5 * k * math.log(max(1, n)); pen_s = (2 * d - 1) * 3.0 * math.log(2)
@@ -99,8 +99,8 @@ def _state(prog: BNode, data: FitData, accord_fn, truth: BNode, rank=None) -> di
 
 
 def fitter_comparison(cands: List[BNode], task, accord_fn, steps=100):
-    """Ancien ajusteur (`fit_robust`, jalon précédent) contre nouvel ajusteur par lots, mêmes candidats, même
-    initialisation. Un écart numérique faible ne garantit pas le même classement : on compare les deux."""
+    """Old fitter (`fit_robust`, previous milestone) against new batch fitter, same candidates, same
+    initialisation. A small numerical gap does not guarantee the same ranking: we compare both."""
     from core.robust_reconstruction import SENSOR_MODELS, Observations, fit_robust
     obs = Observations.build(task.X, task.y, SENSOR_MODELS["standard"], 0.05); data = FitData.build(task.X, task.y, float(obs.flip[0])); rows = []
     for p in cands:
@@ -114,21 +114,21 @@ def fitter_comparison(cands: List[BNode], task, accord_fn, steps=100):
 
 
 def trace_task(task, seed=0, fitter_audit=True) -> dict:
-    """Trace complète d'une tâche avec les VRAIS atomes fournis comme littéraux (aucune découverte de primitives)."""
+    """Complete trace of a task with the TRUE atoms provided as literals (no primitive discovery)."""
     from core.deep_reachability import leaves
     from core.deep_world import full_region, obs_region
     t0 = time.time(); tr = task.world.truth; tl = leaves(tr); d = n_atoms(tr); data = FitData.build(task.X, task.y, 0.10)
     F = full_region(4000, torch.Generator().manual_seed(11)); I = obs_region(2000, torch.Generator().manual_seed(11)); labF, labI = task.world.label(F, 1.0), task.world.label(I, 1.0)
     accord = lambda p: (float((predict(p, F) == labF).float().mean()), float((predict(p, I) == labI).float().mean())); A = lambda p: accord(p)[0]
     traj = BestCandidateTrajectory(); traj.add("true_atoms", 1.0, tr)
-    # --- candidate generation (même appel que le pipeline au tour 0)
+    # --- candidate generation (same call as the pipeline at round 0)
     max_depth = min(6, d + 1); gen = generate_candidates(task.X.float(), data.y, max_depth=max_depth, top=4, seed=seed, extra_literals=tl, geometry=False, time_budget=30.0)
     order = sorted(range(len(gen.programs)), key=lambda i: -gen.info[i]["score"]); cands = [gen.programs[i] for i in order]; cand_states = [_state(p, data, accord, tr, rank=r) for r, p in enumerate(cands)]
     bi = max(range(len(cands)), key=lambda i: cand_states[i]["accord"]) if cands else None; traj.add("candidate_generation", cand_states[bi]["accord"] if cands else 0.0, cands[bi] if cands else None)
-    # --- pipeline tracé (inchangé)
+    # --- traced pipeline (unchanged)
     S = TracedSearch("factorized", budget=150.0, seed=seed, max_depth=max_depth, fact_literals=tl, fact_residual=False); out = S.run(data)
     r0 = [f for f in S.fits if f["origin"] == "factorized_r0"]; later = [f for f in S.fits if f["origin"].startswith("factorized_r") and f["origin"] != "factorized_r0"]
-    polish = []                                                               # audit du polissage : avant / après, pour chaque ajustement d'un candidat
+    polish = []                                                               # audit of the polish: before / after, for each fit of a candidate
     for f in r0 + later:
         if not f["inits"]: continue
         b, a = f["inits"][0], f["fitted"]; sb, sa = score_components(b, data), score_components(a, data)
@@ -143,18 +143,18 @@ def trace_task(task, seed=0, fitter_audit=True) -> dict:
     by_ev = sorted(allh, key=lambda h: -h.evidence); traj.add("scoring", A(by_ev[0].program), by_ev[0].program)
     dedup_ranked = sorted(ranked, key=lambda h: -h.evidence); traj.add("ranking", A(dedup_ranked[0].program), dedup_ranked[0].program)
     final = out.best().program; traj.add("final_selection", A(final), final)
-    # --- classement oracle contre scores internes
+    # --- oracle ranking against internal scores
     st = [_state(h.program, data, accord, tr) for h in allh]; acc = [s["accord"] for s in st]; oracle = {}
     for name, key, sign in (("posterior_score", "posterior_score", 1), ("likelihood", "likelihood", 1), ("robust_likelihood", "robust_likelihood", 1), ("mdl", "mdl_bits", -1), ("complexity_penalty", "complexity_penalty", -1), ("structural_penalty", "structural_penalty", -1)):
         v = [sign * s[key] for s in st]; o = sorted(range(len(st)), key=lambda i: -v[i]); ob = max(range(len(st)), key=lambda i: acc[i])
         oracle[name] = {"spearman": _spearman(v, acc), "top1_agreement": acc[o[0]] >= acc[ob] - 0.005, "top3_recall": any(acc[i] >= acc[ob] - 0.005 for i in o[:3]), "top5_recall": any(acc[i] >= acc[ob] - 0.005 for i in o[:5]), "top1_accord": acc[o[0]]}
     sel_state = _state(final, data, accord, tr); best_state = _state(pool_best.program, data, accord, tr)
     comp = {k: best_state[k] - sel_state[k] for k in ("likelihood", "robust_likelihood", "complexity_penalty", "structural_penalty", "posterior_score", "errors")}
-    # --- borne d'estimation : la VRAIE structure, ajustée depuis les VRAIS paramètres, sur ces données
+    # --- estimation bound: the TRUE structure, fitted from the TRUE parameters, on these data
     th, _ = fit_batch(tr.skeleton(), data, torch.tensor([normalize(tr).param_vector()], dtype=DT), steps=100); tfit = normalize(tr).skeleton().with_params(th[0].tolist()); st_true = score_components(normalize(tr), data); st_tfit = score_components(tfit, data)
     truth_fit = {"accord": A(tfit), "likelihood_true_params": st_true["likelihood"], "likelihood_fitted": st_tfit["likelihood"], "errors_true_params": st_true["errors"], "errors_fitted": st_tfit["errors"], "fit_improved_likelihood": st_tfit["likelihood"] >= st_true["likelihood"]}
-    # --- garde-fous exploratoires (contrefactuels calculés sur les états enregistrés ; le pipeline n'est pas modifié)
-    pool = {}                                                                 # meilleure version SUR LES DONNÉES de chaque structure, version initiale comprise
+    # --- exploratory safeguards (counterfactuals computed on the recorded states; the pipeline is not modified)
+    pool = {}                                                                 # best version ON THE DATA of each structure, initial version included
     for f in S.fits:
         for p in f["inits"][:1] + [f["fitted"]]:
             k = skel_key(p); s = score_components(p, data)
@@ -162,24 +162,24 @@ def trace_task(task, seed=0, fitter_audit=True) -> dict:
     hb = max(pool.values(), key=lambda v: v[1]["posterior_score"])[0] if pool else final
     counterfactual = {"hold_best": A(hb), "no_simplification": A(simp["before"]), "no_dedup": A(by_ev[0].program), "pre_fit_top_score": cand_states[0]["accord"] if cands else 0.0,
                       "best_available": A(pool_best.program), "hold_best_no_simplification_note": "hold_best = argmax du score sur les meilleures versions (sur les données) de chaque structure, sans simplification"}
-    # --- cause de la perte
+    # --- cause of the loss
     num_bad = any(not math.isfinite(v) for h in allh for v in h.program.param_vector()) or any(not math.isfinite(h.evidence) for h in allh)
     a_final = A(final); pre_good = [i for i, s in enumerate(cand_states) if s["accord"] >= GOOD]; polished_keys = {skel_key(f["fitted"]) for f in r0}
     good_polished = [f for f in r0 if f["inits"] and A(f["inits"][0]) >= GOOD]
     if a_final >= GOOD: cause = RECOVERED
     elif num_bad: cause = "NUMERICAL_INSTABILITY"
-    elif not pre_good: cause = "OTHER"                                        # aucun candidat ≥ 0,99 avant ajustement : hors du périmètre aval
-    elif not good_polished: cause = "SCORING_MISALIGNED"                      # le crible avant ajustement n'a pas retenu le bon candidat pour le polissage
-    elif A(pool_best.program) < GOOD:                                         # plus aucun candidat ≥ 0,99 après les ajustements
+    elif not pre_good: cause = "OTHER"                                        # no candidate ≥ 0.99 before fit: outside the downstream scope
+    elif not good_polished: cause = "SCORING_MISALIGNED"                      # the pre-fit screen did not keep the good candidate for the polish
+    elif A(pool_best.program) < GOOD:                                         # no candidate ≥ 0.99 left after the fits
         if all(A(f["fitted"]) < GOOD for f in good_polished) and not any(A(f["fitted"]) >= GOOD for f in S.fits):
             improved = all(score_components(f["fitted"], data)["likelihood"] >= score_components(f["inits"][0], data)["likelihood"] - 1e-9 for f in good_polished)
             cause = "THRESHOLD_TOO_STRICT" if improved and a_final >= 0.97 else "INITIAL_FIT_BAD"
         else: cause = "POLISH_DEGRADED"
-    elif A(ranked_best.program) < GOOD: cause = "CANONICALIZATION_CHANGED_BEHAVIOR"       # présent parmi les structures ajustées, absent après dédoublonnage
+    elif A(ranked_best.program) < GOOD: cause = "CANONICALIZATION_CHANGED_BEHAVIOR"       # present among the fitted structures, absent after deduplication
     elif A(simp["before"]) >= GOOD and a_final < GOOD: cause = "SIMPLIFICATION_DEGRADED"
     elif A(dedup_ranked[0].program) < GOOD:
         gb = _state(ranked_best.program, data, accord, tr); tp = _state(dedup_ranked[0].program, data, accord, tr)
-        cause = "SCORING_MISALIGNED" if gb["likelihood"] < tp["likelihood"] else "RANKING_FAILURE"      # les données préfèrent la mauvaise / les pénalités font perdre la bonne
+        cause = "SCORING_MISALIGNED" if gb["likelihood"] < tp["likelihood"] else "RANKING_FAILURE"      # the data prefer the bad one / the penalties make the good one lose
     else: cause = "FINAL_SELECTION_FAILURE"
     miscounted = a_final >= GOOD and not sel_state["equivalent"]
     return {"cause": cause, "final_accord": a_final, "final_in_region": accord(final)[1], "final_exact": sel_state["exact"], "final_equivalent": sel_state["equivalent"], "functional_not_equivalent": miscounted,

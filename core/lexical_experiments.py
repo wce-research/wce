@@ -1,5 +1,5 @@
-"""Expériences lexicales : polysémie calibrée, désambiguïsation active, politique des mots inconnus (provenance),
-incertitude morphologique, similarité par comportement, classes émergentes, composition."""
+"""Lexical experiments: calibrated polysemy, active disambiguation, unknown-word policy (provenance),
+morphological uncertainty, similarity by behaviour, emergent classes, composition."""
 from __future__ import annotations
 
 import math
@@ -17,10 +17,10 @@ from core.lexical_calibration import (
 from core.unified import calibration_report
 
 
-# ================================================================ polysémie
+# ================================================================ polysemy
 
 def polysemy_eval(seeds=range(8)):
-    """« range » : P(sens | type du patient, type de la cible, relation, domaine) sur les items de polysémie."""
+    """"range": P(sense | patient type, target type, relation, domain) on the polysemy items."""
     from core.grounded_benchmark import SYSTEMS, seed_data
     pts, base_ok, n = [], 0, 0
     for seed in seeds:
@@ -50,10 +50,10 @@ def polysemy_eval(seeds=range(8)):
             "calibration": calibration_report([c for c, _ in pts], [y for _, y in pts])}
 
 
-# ================================================================ désambiguïsation lexicale active (posterior calibré)
+# ================================================================ active lexical disambiguation (calibrated posterior)
 
 def active_lexical(posterior, seed=0, budget=12, pool=None):
-    """Exposition choisie par gain d'information attendu sur le posterior calibré ; promotion = statut BELIEF calibré."""
+    """Exposure chosen by expected information gain on the calibrated posterior; promotion = calibrated BELIEF status."""
     from core.discourse_benchmark import observation_pool
     pool, agent = pool or observation_pool(seed)
     cal = CalibratedLexicon(posterior)
@@ -74,8 +74,8 @@ def active_lexical(posterior, seed=0, budget=12, pool=None):
                         before = entropy(d0, K)
                         gains = []
                         for it in remaining:
-                            # issue PRÉDITE sans regarder l'observation : seuls les types présents dans le monde visé
-                            # (inventaire public) restent compatibles ; les autres hypothèses de type seraient réfutées
+                            # outcome PREDICTED without looking at the observation: only the types present in the targeted world
+                            # (public inventory) remain compatible; the other type hypotheses would be refuted
                             pred = {c: ("neutral" if c in it["types"] else "refute") for c in d0 if c != NULL and c.startswith("type:")}
                             m2 = LexicalMemory(); m2.hyps = {k: _copy(h) for k, h in mem.hyps.items()}
                             m2.observe(w, pred, it["source"], it["weight"], "sim")
@@ -106,13 +106,13 @@ def _copy(h):
 def _mean(xs): return round(sum(xs) / len(xs), 2) if xs else None
 
 
-# ================================================================ politique des mots inconnus (provenance)
+# ================================================================ unknown-word policy (provenance)
 
 STRUCTURAL, MORPHOLOGICAL, ANALOGY, UNKNOWN = "structural_inference", "morphological", "analogy", "unknown"
 
 
 def unknown_word_candidates(agent, word, calibrated=None, similarity=None, contexts=()):
-    """Quatre voies, chacune avec sa provenance ; l'analogie n'est jamais promue en fait (au plus HYPOTHESIS)."""
+    """Four routes, each with its provenance; analogy is never promoted to a fact (at most HYPOTHESIS)."""
     out = []
     if calibrated is not None and agent.lexmem.get(word) is not None:
         st, c, p = calibrated.status(agent, word)
@@ -152,18 +152,18 @@ def unknown_word_policy_eval(posterior, seeds=range(4)):
         {"analogy_promoted_to_fact": promoted_analogy}
 
 
-# ================================================================ incertitude morphologique
+# ================================================================ morphological uncertainty
 
 def morphology_eval(seeds=range(4)):
-    """Règles de suffixe : probabilité (soutien vs contre-exemples) sur des formes réelles et des PIÈGES."""
+    """Suffix rules: probability (support vs counter-examples) on real forms and on TRAPS."""
     from core.grounded_benchmark import SYSTEMS, seed_data
-    traps = ["cuber", "boulet", "tablette", "rougeur", "bleuet", "caissier"]         # ressemblent à des formes connues
+    traps = ["cuber", "boulet", "tablette", "rougeur", "bleuet", "caissier"]         # they resemble known forms
     out = Counter(); probs = []
     for seed in seeds:
         data, splits, caps = seed_data(seed)
         a = SYSTEMS["no_elimination"](); a.learn_captions(caps)
         known = a.lex.lexicon()
-        for form, meaning in known.items():                       # formes réelles : fléchies connues (auto-cohérence)
+        for form, meaning in known.items():                       # real forms: known inflected forms (self-consistency)
             for ref, m, rule, sup in a.morph.candidates(form, known):
                 if ref == form: continue
                 p = morphology_probability(a, form, m); probs.append((p, m == meaning)); break
@@ -175,7 +175,7 @@ def morphology_eval(seeds=range(4)):
     return {**dict(out), "calibration": calibration_report([p for p, _ in probs], [y for _, y in probs])}
 
 
-# ================================================================ similarité par comportement / classes / composition
+# ================================================================ similarity by behaviour / classes / composition
 
 def semantic_classes(seed=0, threshold=0.9):
     from core.grounded_benchmark import seed_data

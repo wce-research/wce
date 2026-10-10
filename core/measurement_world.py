@@ -1,13 +1,13 @@
-"""Monde TEMPOREL de mesure (bibliothèque standard seulement ; aucun composant de WCE).
+"""TEMPORAL measurement world (standard library only; no WCE component).
 
-T pas (20–50) ; objets typés (deux du même type au moins : ambiguïté d'identité), couleurs, positions sur des supports
-(table, étagère, sol, boîte, sous l'étagère) avec un rang gauche→droite, hauteur (support + empilement), propriétaire rare.
-Événements : déplacements, chutes, mises en boîte, empilements, transferts de propriétaire — partiellement observés.
-Capteurs à fréquences différentes, mesures manquantes et bruitées, témoignages en langage (descriptions
-relationnelles, « selon Alice… », « le capteur voit… », « la mesure indique environ… », « à 10 cm près »).
-Mesures ACTIVES disponibles à la question (avec coût, bruit, perturbation) : simulées sur l'état latent final.
-Questions datées : où est X maintenant / à t, couleur de « le cube sur la table », quel objet était sur la table
-avant la chute, hauteur. Attendu : la VÉRITÉ (une abstention n'est ni juste ni fausse confiante).
+T steps (20–50); typed objects (at least two of the same type: identity ambiguity), colours, positions on supports
+(table, shelf, floor, box, under the shelf) with a left→right rank, height (support + stacking), rare owner.
+Events: moves, falls, boxings, stackings, owner transfers — partially observed.
+Sensors at different frequencies, missing and noisy measurements, testimonies in language (relational
+descriptions, "selon Alice…", "le capteur voit…", "la mesure indique environ…", "à 10 cm près").
+ACTIVE measurements available at question time (with cost, noise, disturbance): simulated on the final latent state.
+Dated questions: where is X now / at t, colour of "le cube sur la table", which object was on the table
+before the fall, height. Expected: the TRUTH (an abstention is neither correct nor false confident).
 """
 from __future__ import annotations
 
@@ -72,20 +72,20 @@ def episode(seed, T=30, n_objects=4):
             traj[o]["loc"].append(loc[o]); traj[o]["height"].append(HEIGHT[loc[o]] + stack[o]); traj[o]["owner"].append(owner[o])
             traj[o]["rank"].append([p for p in order if loc[p] == loc[o]].index(o))
     obs = []
-    for o, d in objs.items():                                                           # capteur de couleur, à t = 0, parfois absent
+    for o, d in objs.items():                                                           # colour sensor, at t = 0, sometimes absent
         if rng.random() < 0.6:
             v = d["color"] if rng.random() < 0.95 else rng.choice([c for c in COLORS if c != d["color"]])
             obs.append({"t": 0, "kind": "sensor", "source": "color_cam", "entity": o, "attribute": "color", "value": v})
     for t in range(T + 1):
         for o, d in objs.items():
-            if t % 3 == 0 and rng.random() < 0.8:                                       # caméra : positions, toutes les 3 étapes
+            if t % 3 == 0 and rng.random() < 0.8:                                       # camera: positions, every 3 steps
                 v = traj[o]["loc"][t] if rng.random() < 0.9 else rng.choice([s for s in SUPPORTS if s != traj[o]["loc"][t]])
                 obs.append({"t": t, "kind": "sensor", "source": "camera", "entity": o, "attribute": "loc", "value": v})
-            if t % 5 == 0 and rng.random() < 0.7:                                       # balance : hauteur continue, résolution 0,1
+            if t % 5 == 0 and rng.random() < 0.7:                                       # scale: continuous height, resolution 0.1
                 h = traj[o]["height"][t] + rng.gauss(0, 0.08)
                 obs.append({"t": t, "kind": "sensor", "source": "scale", "entity": o, "attribute": "height", "value": round(h, 1),
                             "resolution": 0.1})
-            if rng.random() < 0.08:                                                     # témoignage en langage
+            if rng.random() < 0.08:                                                     # testimony in language
                 sp = rng.choice(list(SPEAKERS)); r = SPEAKERS[sp]
                 v = traj[o]["loc"][t] if rng.random() < r else rng.choice([s for s in SUPPORTS if s != traj[o]["loc"][t]])
                 same = [p for p in objs if objs[p]["type"] == d["type"]]
@@ -98,7 +98,7 @@ def episode(seed, T=30, n_objects=4):
                             "text": f"la mesure indique environ {h:.1f} m pour {np_text(d['type'], d['color'])}, on ne sait qu'à 20 cm près",
                             "entity_truth": o})
         for e in events:
-            if e["t"] == t and e["kind"] in ("fall", "move") and rng.random() < 0.5:   # événements partiellement observés
+            if e["t"] == t and e["kind"] in ("fall", "move") and rng.random() < 0.5:   # partially observed events
                 d = objs[e["o"]]
                 verb = "tombe" if e["kind"] == "fall" else "est déplacé"
                 obs.append({"t": t, "kind": "text", "source": "camera_event",
@@ -113,7 +113,7 @@ def episode(seed, T=30, n_objects=4):
         questions.append({"type": "where_at", "text": f"où était {desc} à t={tp} ?", "entity": o, "t": tp, "truth": traj[o]["loc"][tp]})
         questions.append({"type": "height_now", "text": f"quelle est la hauteur {of_np(desc)} ?", "entity": o, "t": T,
                           "truth": traj[o]["height"][T]})
-    for typ in sorted({d["type"] for d in objs.values()}):        # ordre déterministe (indépendant de PYTHONHASHSEED)
+    for typ in sorted({d["type"] for d in objs.values()}):        # deterministic order (independent of PYTHONHASHSEED)
         same = [p for p in objs if objs[p]["type"] == typ]
         if len(same) < 2: continue
         for sup in ("table", "shelf", "floor", "box"):
@@ -133,12 +133,12 @@ def episode(seed, T=30, n_objects=4):
 
 
 ACTIVE_MENU = {
-    # mesure : (attribut, coût, fiabilité / bruit, perturbation)
+    # measurement: (attribute, cost, reliability / noise, disturbance)
     "color": ("color", 0.15, 0.97, "PASSIVE"),
     "loc_precise": ("loc", 0.5, 0.97, "PASSIVE"),
     "loc_coarse": ("loc_region", 0.1, 0.95, "PASSIVE"),
     "owner": ("owner", 0.3, 0.9, "PASSIVE"),
-    "weigh": ("height", 0.2, 0.9, "DESTRUCTIVE"),        # pesée : déplace l'objet au sol (perturbe la position)
+    "weigh": ("height", 0.2, 0.9, "DESTRUCTIVE"),        # weighing: moves the object to the floor (disturbs the position)
 }
 REGION = {"table": "high", "shelf": "high", "floor": "low", "box": "low", "under_shelf": "low"}
 
@@ -156,4 +156,4 @@ def sealed_hash():
     return hashlib.sha256(json.dumps(sealed_episodes(), sort_keys=True, default=str).encode()).hexdigest()
 
 
-SEALED_SHA256 = "9d372b0762feedf18b3e10c4e877cebb215f0d9149538842d87eed536d85137c"   # empreinte du lot scellé (figée avant toute évaluation)
+SEALED_SHA256 = "9d372b0762feedf18b3e10c4e877cebb215f0d9149538842d87eed536d85137c"   # fingerprint of the sealed set (frozen before any evaluation)

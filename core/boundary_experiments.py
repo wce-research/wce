@@ -1,4 +1,4 @@
-"""Expériences du jalon « Boundary Program Induction » (une graine = un appel ; parallélisées par graine)."""
+"""Experiments of the "Boundary Program Induction" milestone (one seed = one call; parallelised per seed)."""
 from __future__ import annotations
 
 import copy
@@ -22,19 +22,19 @@ from core.truth_anchor import BoundaryGenerativeCertificate, collect_counterexam
 def task(inst, g, n=200): return sample_task(inst, n, g)
 
 
-# ================================================================ familles : anti-unification et cycle de vie (H3, AT, AU)
+# ================================================================ families: anti-unification and life cycle (H3, AT, AU)
 
 def induce_family_library(seed, per_family=3):
-    """Programmes réussis (récupération fonctionnelle) sur familles d'ENTRAÎNEMENT + VALIDATION → anti-unification
-    par structure → familles (macros) → validation sur NOUVELLES instances → cycle de vie."""
+    """Successful programs (functional recovery) on TRAINING + VALIDATION families → anti-unification
+    by structure → families (macros) → validation on NEW instances → life cycle."""
     g = torch.Generator().manual_seed(seed); progs = []
     for inst in instances(TRAIN + VALIDATION, seed, per_family):
         X, y = task(inst, g); s = stable_search(X, y, seed=seed)
-        F = full_region(2000, g)                                          # MÊMES points pour prédiction et vérité
+        F = full_region(2000, g)                                          # SAME points for prediction and truth
         if s.best is not None and s.adequate and float((predict(s.best, F) == inst.label(F)).float().mean()) >= 0.95:
             progs.append(s.best)
     fams = induce_families(progs, min_support=2)
-    for f in fams:                                                     # validation sur nouvelles instances (familles train/val)
+    for f in fams:                                                     # validation on new instances (train/val families)
         for inst in instances(TRAIN + VALIDATION, seed + 77, 1):
             X, y = task(inst, g); Xt, yt, Xv, yv = split(X, y)
             prog, _ = fit(f.macro.skeleton, Xt, yt); acc = float((predict(prog, Xv) == yv).float().mean())
@@ -44,7 +44,7 @@ def induce_family_library(seed, per_family=3):
 
 
 def family_reuse_experiment(seed, fams):
-    """H3 : nouvelles instances → (a) macros de familles d'abord, (b) recherche complète. Exactitude et coût."""
+    """H3: new instances → (a) family macros first, (b) full search. Accuracy and cost."""
     g = torch.Generator().manual_seed(seed + 5); macros = [f.macro.skeleton for f in fams if f.status in ("STABLE", "SUPPORTED")]
     rows = []
     for inst in instances(TRAIN + VALIDATION, seed + 900, 1):
@@ -57,9 +57,9 @@ def family_reuse_experiment(seed, fams):
 
 
 def discovery_recall(seed, per_family=3):
-    """AT/AU : sur familles HELD-OUT (jamais vues), programmes réussis → familles promues (anti-unification) ;
-    rappel = familles held-out dont une famille promue récupère une NOUVELLE instance ; fausses promotions =
-    familles promues qui échouent sur de nouvelles instances de la famille d'origine."""
+    """AT/AU: on HELD-OUT families (never seen), successful programs → promoted families (anti-unification);
+    recall = held-out families for which a promoted family recovers a NEW instance; false promotions =
+    promoted families that fail on new instances of the original family."""
     g = torch.Generator().manual_seed(seed + 11); progs_by_family = defaultdict(list); all_progs = []
     for inst in instances(HELD_OUT + UNREPRESENTABLE, seed + 300, per_family):
         X, y = task(inst, g); s = stable_search(X, y, seed=seed)
@@ -80,10 +80,10 @@ def discovery_recall(seed, per_family=3):
             "false_promotions": false, "from_unrepresentable": sum(1 for fam, _ in all_progs if fam in UNREPRESENTABLE)}
 
 
-# ================================================================ H4 : expériences actives
+# ================================================================ H4: active experiments
 
 def active_identification(seed, budget=30):
-    """Nb de requêtes avant identification (MAP fonctionnellement correct ET P ≥ 0,95) ; politiques IG / désaccord / aléatoire."""
+    """Number of queries before identification (MAP functionally correct AND P ≥ 0.95); policies IG / disagreement / random."""
     g0 = torch.Generator().manual_seed(seed + 21); rows = []
     for inst in instances(VALIDATION + HELD_OUT, seed + 400, 1):
         X, y = task(inst, g0, n=80); s = stable_search(X, y, seed=seed)
@@ -107,17 +107,17 @@ def active_identification(seed, budget=30):
     return rows
 
 
-# ================================================================ H5 : ancres de vérité
+# ================================================================ H5: truth anchors
 
 def truth_anchor_experiment(seed, budget=10):
-    """Références FAUSSES mais auto-cohérentes (ajustées sur une sous-région, ou sur un petit échantillon, ou sur
-    étiquettes biaisées) vs références CORRECTES ; ancres actives vs aléatoires (même budget)."""
+    """WRONG but self-consistent references (fitted on a sub-region, or on a small sample, or on
+    biased labels) vs CORRECT references; active vs random anchors (same budget)."""
     g = torch.Generator().manual_seed(seed + 31); rows = []
     for inst in instances(VALIDATION + HELD_OUT[:2], seed + 600, 1):
         X, y = task(inst, g, n=240); F = full_region(3000, g)
         good = stable_search(X, y, seed=seed); refs = []
         if good.best is not None and float((predict(good.best, F) == inst.label(F)).float().mean()) >= 0.95: refs.append(("correct", good.best, good, X))
-        sub = X[:, 0] < -1.2                                                  # sous-région : référence fausse ailleurs
+        sub = X[:, 0] < -1.2                                                  # sub-region: reference wrong elsewhere
         if int(sub.sum()) > 30:
             s2 = stable_search(X[sub], y[sub], seed=seed); refs.append(("restricted_region", s2.best, s2, X[sub]))
         s3 = stable_search(X[:16], y[:16], seed=seed); refs.append(("tiny_sample", s3.best, s3, X[:16]))
@@ -135,14 +135,14 @@ def truth_anchor_experiment(seed, budget=10):
     return rows
 
 
-# ================================================================ H6 / H7 : cristallisation, résidu ; base partagée ; budget strict
+# ================================================================ H6 / H7: crystallisation, residual; shared base; strict budget
 
 def train_expert(X, y, h=16, steps=800, seed=0): return train_mlp(X, y, h=h, steps=steps, seed=seed)
 
 
 def crystallization_experiment(seed):
-    """Expert neuronal → comportement sur échantillons GÉNÉRÉS → induction → vérification (accord avec l'expert ET
-    ancres = observations) → remplacement si sûr ; sinon programme + résidu si partiel ; sinon expert conservé."""
+    """Neural expert → behaviour on GENERATED samples → induction → verification (agreement with the expert AND
+    anchors = observations) → replacement if safe; otherwise program + residual if partial; otherwise expert kept."""
     g = torch.Generator().manual_seed(seed + 41); rows = []
     for inst in instances(VALIDATION + HELD_OUT + PARTIAL + UNREPRESENTABLE[:2], seed + 700, 1):
         X, y = task(inst, g); e = train_expert(X, y, seed=seed); ep = lambda Q: mlp_logits(e, Q).argmax(1)
@@ -167,7 +167,7 @@ def crystallization_experiment(seed):
 
 
 def residual_experiment(seed, n=3):
-    """H7 : fonctions PARTIELLEMENT symbolisables : expert seul vs programme seul vs programme + résidu."""
+    """H7: PARTIALLY symbolisable functions: expert alone vs program alone vs program + residual."""
     g = torch.Generator().manual_seed(seed + 51); rows = []
     for inst in instances(PARTIAL, seed + 800, n):
         X, y = task(inst, g); Fi, Fo = in_region(2000, g), out_region(2000, g)
@@ -180,9 +180,9 @@ def residual_experiment(seed, n=3):
 
 
 def shared_basis_experiment(seed, n_tasks=6, h=24):
-    """Compétences neuronales restantes (non représentables) : experts séparés (h=16) vs base PARTAGÉE (h=24, apprise
-    sur les premières tâches puis gelée) + têtes linéaires ; compression, interférence (base réajustée), régénération
-    d'une tête depuis son générateur + étiquettes de référence."""
+    """Remaining neural skills (not representable): separate experts (h=16) vs SHARED base (h=24, learned
+    on the first tasks then frozen) + linear heads; compression, interference (base refitted), regeneration
+    of a head from its generator + reference labels."""
     g = torch.Generator().manual_seed(seed + 61); insts = instances(UNREPRESENTABLE + PARTIAL, seed + 850, 2)[:n_tasks]
     data = [task(i, g) for i in insts]; Fi = in_region(2000, g)
     sep = [train_expert(X, y, seed=seed + j) for j, (X, y) in enumerate(data)]
@@ -195,17 +195,17 @@ def shared_basis_experiment(seed, n_tasks=6, h=24):
     for _ in range(800):
         opt.zero_grad(); loss = sum(torch.nn.functional.cross_entropy(feat(W, X) @ hd["w"].T + hd["b"], y) for (X, y), hd in zip(data[:k0], heads[:k0])); loss.backward(); opt.step()
     Wf = {k: v.detach() for k, v in W.items()}
-    for j in range(k0, n_tasks):                                        # nouvelles tâches : tête seule (base gelée)
+    for j in range(k0, n_tasks):                                        # new tasks: head only (frozen base)
         X, y = data[j]; hd = heads[j]; o = torch.optim.Adam(hd.values(), lr=0.05)
         for _ in range(600): o.zero_grad(); torch.nn.functional.cross_entropy(feat(Wf, X) @ hd["w"].T + hd["b"], y).backward(); o.step()
     H = [{k: v.detach() for k, v in hd.items()} for hd in heads]
     sh_acc = [float(((feat(Wf, Fi) @ hd["w"].T + hd["b"]).argmax(1) == i.label(Fi)).float().mean()) for hd, i in zip(H, insts)]
-    # interférence : réajuster la base pour la dernière tâche dégrade-t-il les anciennes ?
+    # interference: does refitting the base for the last task degrade the old ones?
     W2 = {k: v.clone().requires_grad_(True) for k, v in Wf.items()}; o = torch.optim.Adam(W2.values(), lr=0.03); X, y = data[-1]
     for _ in range(300): o.zero_grad(); torch.nn.functional.cross_entropy(feat(W2, X) @ H[-1]["w"].T + H[-1]["b"], y).backward(); o.step()
     W2 = {k: v.detach() for k, v in W2.items()}
     inter = [float(((feat(W2, Fi) @ hd["w"].T + hd["b"]).argmax(1) == i.label(Fi)).float().mean()) for hd, i in zip(H[:k0], insts[:k0])]
-    # régénération d'une tête depuis générateur + référence (substitut = sortie certifiée de la tête)
+    # regeneration of a head from generator + reference (surrogate = certified output of the head)
     j = 0; X, y = data[j]; gen = ContinuousGenerator(k=2).fit(X); Z = gen.sample(1500, g); ref = (feat(Wf, Z) @ H[j]["w"].T + H[j]["b"]).argmax(1)
     hd = {"w": torch.zeros(2, h, requires_grad=True), "b": torch.zeros(2, requires_grad=True)}; o = torch.optim.Adam(hd.values(), lr=0.05)
     for _ in range(600): o.zero_grad(); torch.nn.functional.cross_entropy(feat(Wf, Z) @ hd["w"].T + hd["b"], ref).backward(); o.step()
@@ -217,11 +217,11 @@ def shared_basis_experiment(seed, n_tasks=6, h=24):
 
 
 def hard_budget_stream(seed, budget=260, mode="hard", n=18):
-    """Flux mixte sous budget (paramètres + flottants symboliques). Politique : programme > programme+résidu >
-    tête sur base partagée > expert ; si dépassement : cristalliser, puis élaguer la compétence de plus FAIBLE
-    VALEUR (usage, dépendances, récence, coût de régénération) seulement si sa valeur < celle de la nouvelle ;
-    sinon S'ABSTENIR (mode hard). Jamais de violation silencieuse : chaque compétence gardée doit passer son
-    certificat ancré."""
+    """Mixed stream under budget (parameters + symbolic floats). Policy: program > program+residual >
+    head on a shared base > expert; if exceeded: crystallise, then prune the skill of LOWEST
+    VALUE (usage, dependencies, recency, regeneration cost) only if its value < that of the new one;
+    otherwise ABSTAIN (hard mode). Never a silent violation: each kept skill must pass its
+    anchored certificate."""
     rng = random.Random(seed); g = torch.Generator().manual_seed(seed + 71)
     fams = list(VALIDATION + HELD_OUT + PARTIAL + UNREPRESENTABLE); insts = instances(fams, seed + 950, 1); rng.shuffle(insts); insts = insts[:n]
     skills = []; log = Counter(); used = 0; violations = 0; t = 0
@@ -251,10 +251,10 @@ def hard_budget_stream(seed, budget=260, mode="hard", n=18):
             "operations": dict(log), "invariant_violations": violations}
 
 
-# ================================================================ nouveauté, sur-ajustement, stabilité, confiance
+# ================================================================ novelty, overfitting, stability, confidence
 
 def novelty_detection(seed, fams_lib):
-    """Connu (macro dans la plage) / nouvelle paramétrisation (macro hors plage) / nouvelle composition / non supporté."""
+    """Known (macro within range) / new parameterisation (macro out of range) / new composition / unsupported."""
     g = torch.Generator().manual_seed(seed + 81); macros = [f.macro for f in fams_lib if f.status in ("STABLE", "SUPPORTED")]; rows = []
     cases = [(i, "known") for i in instances(TRAIN + VALIDATION, seed + 1000, 1)] + [(i, "new_composition") for i in instances(HELD_OUT, seed + 1001, 1)] + \
             [(i, "unsupported") for i in instances(UNREPRESENTABLE, seed + 1002, 1)]
@@ -272,7 +272,7 @@ def novelty_detection(seed, fams_lib):
 
 
 def symbolic_overfitting(seed, n_small=12):
-    """Petit échantillon → programme simple qui s'ajuste mais extrapole faux ; détecté par ancres actives ?"""
+    """Small sample → simple program that fits but extrapolates wrongly; detected by active anchors?"""
     g = torch.Generator().manual_seed(seed + 91); rows = []
     for inst in instances(VALIDATION + HELD_OUT, seed + 1100, 1):
         X, y = task(inst, g, n=n_small); s = BoundaryProgramSearch(seed=seed).run(X, y, X, y)
@@ -284,7 +284,7 @@ def symbolic_overfitting(seed, n_small=12):
 
 
 def program_stability(seed):
-    """Observations légèrement perturbées (bruit de position + 5 % d'étiquettes) : même structure ? même fonction ?"""
+    """Slightly perturbed observations (position noise + 5 % of the labels): same structure? same function?"""
     g = torch.Generator().manual_seed(seed + 101); rows = []
     for inst in instances(VALIDATION + HELD_OUT, seed + 1200, 1):
         X, y = task(inst, g); a = stable_search(X, y, seed=seed)
@@ -298,8 +298,8 @@ def program_stability(seed):
 
 
 def confidence_calibration(seed):
-    """Confiance SÉPARÉE : famille (masse postérieure de la structure MAP), paramètres (écart-type bootstrap),
-    prédictions (probabilité prédictive) → ECE des prédictions et corrélation confiance-famille / justesse-structure."""
+    """SEPARATE confidence: family (posterior mass of the MAP structure), parameters (bootstrap standard deviation),
+    predictions (predictive probability) → ECE of the predictions and correlation family-confidence / structure-correctness."""
     g = torch.Generator().manual_seed(seed + 111); rows = []; conf_all, ok_all = [], []
     for inst in instances(VALIDATION + HELD_OUT, seed + 1300, 1):
         X, y = task(inst, g); s = stable_search(X, y, seed=seed)
@@ -321,7 +321,7 @@ def confidence_calibration(seed):
     return {"rows": rows, "prediction_ece": round(e, 4)}
 
 
-# ================================================================ primitives : ablation, économie, profondeur
+# ================================================================ primitives: ablation, economy, depth
 
 def primitive_ablation(seed, per_family=1):
     g = torch.Generator().manual_seed(seed + 121); insts = instances(TRAIN + VALIDATION + HELD_OUT, seed + 1400, per_family); data = [(i, task(i, g)) for i in insts]

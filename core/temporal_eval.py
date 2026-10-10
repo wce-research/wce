@@ -1,4 +1,4 @@
-"""Évaluation de la dynamique temporelle sur le banc temporel (adaptateur ; le banc ignore le système)."""
+"""Evaluation of the temporal dynamics on the temporal bench (adapter; the bench is unaware of the system)."""
 from __future__ import annotations
 
 import time
@@ -16,8 +16,8 @@ SYSTEMS_T = ("last_observation", "static_votes", "no_hazard", "temporal")
 
 
 def fit_training(episodes, mode="mean"):
-    """Taux de changement par type de clé + fiabilités des sources (observations et événements) + probabilité de
-    surélévation (hauteur ≠ hauteur du support), sur l'ENTRAÎNEMENT."""
+    """Rate of change per key type + reliabilities of the sources (observations and events) + probability of
+    elevation (height ≠ height of the support), on the TRAINING."""
     hz = HazardModel().fit([tr for ep in episodes for tr in ep["train_trajectories"]])
     bump = n = 0
     for ep in episodes:
@@ -29,10 +29,10 @@ def fit_training(episodes, mode="mean"):
         for e, tr in ep["truth"].items():
             off = [h != HEIGHTS[l] for l, h in zip(tr["loc"], tr["height"])]
             toggles += sum(a != b for a, b in zip(off, off[1:])); exp += len(off) - 1
-    hz.toggle = (toggles + 1) / (exp + 50)                           # taux de bascule de la surélévation (appris)
+    hz.toggle = (toggles + 1) / (exp + 50)                           # toggle rate of the elevation (learned)
     starts = sum(tr["height"][0] != HEIGHTS[tr["loc"][0]] for ep in episodes for tr in ep["truth"].values())
     n0 = sum(len(ep["truth"]) for ep in episodes)
-    hz.mod_prior = [1 - (starts + 1) / (n0 + 2), (starts + 1) / (n0 + 2)]       # surélévation initiale (apprise)
+    hz.mod_prior = [1 - (starts + 1) / (n0 + 2), (starts + 1) / (n0 + 2)]       # initial elevation (learned)
     rel = SourceReliabilityModel(mode=mode, global_prior=(2.0, 1.0))
     for ep in episodes:
         for r in ep["reports"]:
@@ -55,7 +55,7 @@ def build_memory(ep, hz, rel, system):
 
 
 def _baseline_answer(ep, q, rel, system):
-    """Références naïves : dernière observation, ou votes sans le temps (une source = un vote)."""
+    """Naive references: last observation, or votes without time (one source = one vote)."""
     reps = [r for r in ep["reports"] if r["entity"] == q["entity"] and r["key"] == q["key"] and r["kind"] == "observation"
             and (r["t"] <= q["t"] if q["type"] != "present" else True)]
     if q["type"] in ("present", "still_on_table"): reps = [r for r in reps]
@@ -75,7 +75,7 @@ def _baseline_answer(ep, q, rel, system):
 
 
 def derived_height(d_height, d_loc, bump):
-    """Produit d'experts : hauteur déduite du support (avec surélévation possible) × modèle propre de la hauteur."""
+    """Product of experts: height deduced from the support (with possible elevation) × own model of the height."""
     derived = {h: 0.0 for h in d_height}
     for l, pl in d_loc.items():
         base = HEIGHTS[l]; up = min(base + 0.5, 2.5)
@@ -93,10 +93,10 @@ def answer(ep, q, mem, rel, system):
         st = mem.state(q["entity"], q["key"])
         if q["type"] in ("present", "still_on_table"):
             d = st.current(ep["T"])
-            conflict = st.conflict_at(ep["T"]) and sorted(d.values(), reverse=True)[1] >= 0.2     # conflit AU PRÉSENT seulement
+            conflict = st.conflict_at(ep["T"]) and sorted(d.values(), reverse=True)[1] >= 0.2     # conflict AT THE PRESENT only
         else:
             d = st.historical(q["t"], ep["T"]); conflict = st.conflict_at(q["t"]) and sorted(d.values(), reverse=True)[1] >= 0.2
-        if q["key"] == "height" and system == "temporal":                       # hauteur = f(support, surélévation) : état joint
+        if q["key"] == "height" and system == "temporal":                       # height = f(support, elevation): joint state
             js = JointDerivedState(mem.state(q["entity"], "loc"), (0, 1), lambda l, b: min(HEIGHTS[l] + 0.5 * b, 2.5),
                                    getattr(mem.hz, "toggle", 0.03), DOMAINS["height"], getattr(mem.hz, "mod_prior", None))
             for r in mem.state(q["entity"], "height").reports:
@@ -173,8 +173,8 @@ def compare(episodes=None, train=None):
 
 
 def source_interval_coverage(episodes=None, train=None, level=0.9):
-    """Intervalle CRÉDIBLE Beta vs intervalle PRÉDICTIF bêta-binomial : contient-il la proportion de rapports justes
-    d'une source dans un épisode de test ?"""
+    """Beta CREDIBLE interval vs beta-binomial PREDICTIVE interval: does it contain the proportion of correct reports
+    of a source in a test episode?"""
     _, rel = fit_training(train or train_episodes(60))
     cov = Counter(); widths = defaultdict(list)
     for ep in episodes or dev_episodes():
@@ -193,7 +193,7 @@ def source_interval_coverage(episodes=None, train=None, level=0.9):
 
 
 def long_stream(T, seed=1):
-    """Flux long : temps, mémoire (rapports vs segments), précision et calibration des questions historiques."""
+    """Long stream: time, memory (reports vs segments), accuracy and calibration of the historical questions."""
     ep = episode(seed, T=T)
     hz, rel = fit_training(train_episodes(8))
     t0 = time.perf_counter(); mem = build_memory(ep, hz, rel, "temporal")
@@ -207,7 +207,7 @@ def long_stream(T, seed=1):
 
 
 def multi_bench(n_seeds=8, n_train=60, n_eval=30, log=print):
-    """Graines de BANC : chaque graine a ses propres épisodes d'entraînement (taux, fiabilités) et d'évaluation."""
+    """BENCH seeds: each seed has its own training episodes (rates, reliabilities) and evaluation episodes."""
     from core.grounded_benchmark import paired, summarize_values
     per = []
     for k in range(n_seeds):

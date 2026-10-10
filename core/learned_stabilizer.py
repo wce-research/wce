@@ -1,10 +1,10 @@
-"""Stabilisateurs APPRIS : P(invariant préservé | famille de transformation, contexte, amplitude).
+"""LEARNED stabilizers: P(invariant preserved | transformation family, context, magnitude).
 
-Données : états SkillNet réels (après une séquence de tâches) × transformations d'adaptation tirées au hasard
-(15 familles) × compétences certifiées ; étiquette = le certificat de la compétence (et le comportement de son
-contexte) tient-il après la transformation ? Modèle : régression logistique (petite, interprétable).
-Comparé à un stabilisateur ÉCRIT À LA MAIN (règles par famille) et à un HYBRIDE (règle quand elle est certaine
-par construction, modèle appris sinon). Généralisation : amplitudes, modules, paramètres et compositions inédits.
+Data: real SkillNet states (after a sequence of tasks) × adaptation transformations drawn at random
+(15 families) × certified skills; label = does the certificate of the skill (and the behaviour of its
+context) hold after the transformation? Model: logistic regression (small, interpretable).
+Compared with a HAND-WRITTEN stabilizer (per-family rules) and with a HYBRID (rule when it is certain
+by construction, learned model otherwise). Generalisation: unseen magnitudes, modules, parameters and compositions.
 """
 from __future__ import annotations
 
@@ -41,7 +41,7 @@ def _rel_delta(p, mag, g):
 
 
 def sample_transformation(net, rng: random.Random, mag_range=(0.01, 0.2), modules=None):
-    """Tire une transformation applicable ; renvoie (famille, cible, amplitude, spec)."""
+    """Draws an applicable transformation; returns (family, target, magnitude, spec)."""
     fam = rng.choice(FAMILIES); g = torch.Generator().manual_seed(rng.randrange(10 ** 9))
     mods = [m for m in (modules or list(net.modules)) if "w1" in net.modules[m]] or [m for m in net.modules if "w1" in net.modules[m]]
     m = rng.choice(mods); mag = math.exp(rng.uniform(math.log(mag_range[0]), math.log(mag_range[1])))
@@ -104,7 +104,7 @@ def label(net, certs, skill, ctx_before):
 
 
 def hand_rule(net, certs, fam, target, skill):
-    """Stabilisateur écrit à la main : préservation par construction, sinon « touche la compétence ⇒ cassé »."""
+    """Hand-written stabilizer: preservation by construction, otherwise "touches the skill ⇒ broken"."""
     if fam in BY_CONSTRUCTION: return 1.0
     mods = skill_modules(net, skill)
     if fam in ("ParameterUpdate", "FastWeightUpdate"): return 0.0 if target in mods else 1.0
@@ -160,7 +160,7 @@ def scores(pred, rows):
     y = [r["label"] for r in rows]; n = max(1, len(y))
     acc = sum((p >= 0.5) == (t >= 0.5) for p, t in zip(pred, y)) / n
     brier = sum((p - t) ** 2 for p, t in zip(pred, y)) / n
-    fs = sum(1 for p, t in zip(pred, y) if p >= 0.5 and t < 0.5) / n                    # « préservé » prédit à tort (dangereux)
+    fs = sum(1 for p, t in zip(pred, y) if p >= 0.5 and t < 0.5) / n                    # "preserved" wrongly predicted (dangerous)
     return {"accuracy": round(acc, 4), "brier": round(brier, 4), "false_safe": round(fs, 4), "n": len(y)}
 
 
@@ -171,14 +171,14 @@ def compare(model, rows):
 
 
 def hybrid_value(hand, learned, family):
-    """Hybride : la règle quand elle garantit la préservation (par construction / composant non touché) ;
-    le modèle appris quand la règle conclut « touché » (il estime si l'amplitude reste dans la zone stable)."""
+    """Hybrid: the rule when it guarantees preservation (by construction / component not touched);
+    the learned model when the rule concludes "touched" (it estimates whether the magnitude stays in the stable zone)."""
     if family in BY_CONSTRUCTION or hand >= 1.0: return min(hand, 1.0) if family not in BY_CONSTRUCTION else 1.0
     return learned
 
 
 def composition_test(model, net, certs, n=150, seed=7):
-    """Paires de transformations : survie prédite = produit des survies (indépendance) vs survie réelle."""
+    """Pairs of transformations: predicted survival = product of the survivals (independence) vs actual survival."""
     rng = random.Random(seed); rows = []
     for _ in range(n):
         a = sample_transformation(net, rng); b = sample_transformation(net, rng)
@@ -201,8 +201,8 @@ def composition_test(model, net, certs, n=150, seed=7):
 
 
 def generalization_experiment(train_seeds=(0, 1, 2), test_seeds=(3, 4), n=250):
-    """Entraînement : amplitudes 0,01–0,2 sur les états des graines d'entraînement. Tests : (a) amplitudes inédites
-    0,3–1,5 ; (b) modules / paramètres inédits (états de graines jamais vues) ; (c) compositions inédites."""
+    """Training: magnitudes 0.01–0.2 on the states of the training seeds. Tests: (a) unseen magnitudes
+    0.3–1.5; (b) unseen modules / parameters (states of seeds never seen); (c) unseen compositions."""
     train, states = [], {}
     for s in train_seeds:
         net, certs = built_state(s); states[s] = (net, certs); train += simulate(net, certs, n, seed=s)

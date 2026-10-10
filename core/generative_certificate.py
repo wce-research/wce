@@ -1,10 +1,10 @@
-"""Certificats d'invariants GÉNÉRATIFS : une compétence est protégée par un MODÈLE COMPACT de sa région de validité
-(générateur appris), ses invariants (programme de référence : règle découverte ou petit substitut), sa géométrie
-locale de sensibilité et ses dépendances — JAMAIS par son jeu de données d'origine.
+"""GENERATIVE invariant certificates: a skill is protected by a COMPACT MODEL of its validity region
+(learned generator), its invariants (reference program: discovered rule or small surrogate), its local
+sensitivity geometry and its dependencies — NEVER by its original dataset.
 
-Interface commune `CertificateGenerator` : sample, sample_boundary, sample_high_sensitivity, sample_rare,
-sample_counterfactual (+ sample_adversarial). Générateurs : continu (gaussien robuste faible rang appris) et
-symbolique (gabarits obtenus par ANTI-UNIFICATION des exemples observés + distributions de remplissage apprises).
+Common interface `CertificateGenerator`: sample, sample_boundary, sample_high_sensitivity, sample_rare,
+sample_counterfactual (+ sample_adversarial). Generators: continuous (learned robust low-rank Gaussian) and
+symbolic (templates obtained by ANTI-UNIFICATION of the observed examples + learned filler distributions).
 """
 from __future__ import annotations
 
@@ -35,11 +35,11 @@ def clean_inputs(X, clip=6.0):
     return torch.nan_to_num(X, nan=0.0).clamp(-clip, clip)
 
 
-# ================================================================ générateur continu appris
+# ================================================================ learned continuous generator
 
 class ContinuousGenerator(CertificateGenerator):
-    """Appris depuis l'expérience : centre et échelle ROBUSTES (médiane / MAD, NaN ignorés, outliers écrêtés),
-    covariance faible rang (ACP, k composantes) + diagonale, plages de validité (quantiles 1 %–99 %)."""
+    """Learned from experience: ROBUST centre and scale (median / MAD, NaN ignored, outliers clipped),
+    low-rank covariance (PCA, k components) + diagonal, validity ranges (1 %–99 % quantiles)."""
     domain = "continuous"
 
     def __init__(self, k=3):
@@ -60,7 +60,7 @@ class ContinuousGenerator(CertificateGenerator):
 
     def _z(self, n, g, radius=None):
         z = torch.randn(n, self.k, generator=g); e = torch.randn(n, len(self.mean), generator=g)
-        if radius is not None:                                        # coquille de Mahalanobis (cas rares)
+        if radius is not None:                                        # Mahalanobis shell (rare cases)
             full = torch.cat([z, e], 1); full = full / full.norm(dim=1, keepdim=True) * radius[:, None]
             z, e = full[:, : self.k], full[:, self.k:] / math.sqrt(max(1.0, (len(self.mean)) / self.k))
         return z, e
@@ -76,7 +76,7 @@ class ContinuousGenerator(CertificateGenerator):
         return self.mean + (z * self.s) @ self.U.T + e * self.diag.sqrt()
 
     def sample_boundary(self, n, g, label_fn, steps=14, jitter=0.03):
-        """Recherche STRUCTURELLE : bissection le long de segments entre points d'étiquettes opposées."""
+        """STRUCTURAL search: bisection along segments between points with opposite labels."""
         out = []
         for _ in range(8):
             A, B = self.sample(4 * n, g), self.sample(4 * n, g); la, lb = label_fn(A), label_fn(B)
@@ -90,20 +90,20 @@ class ContinuousGenerator(CertificateGenerator):
         return P + jitter * torch.randn(P.shape, generator=g) * self.diag.sqrt()
 
     def sample_counterfactual(self, n, g, label_fn):
-        """Paires contrefactuelles : x et son image de l'autre côté de la frontière la plus proche (même direction)."""
+        """Counterfactual pairs: x and its image on the other side of the nearest boundary (same direction)."""
         X = self.sample(n, g); B = self.sample_boundary(n, g, label_fn, jitter=0.0)
         k = min(len(X), len(B)); return torch.cat([X[:k], B[:k] + 0.15 * (B[:k] - X[:k]) / (B[:k] - X[:k]).norm(dim=1, keepdim=True).clamp_min(1e-6)])
 
     def sample_high_sensitivity(self, n, g, model_fn, pool=8):
-        """Points de plus forte sensibilité d'entrée (norme du gradient de la marge, si différentiable)."""
+        """Points of highest input sensitivity (norm of the margin gradient, if differentiable)."""
         X = self.sample(pool * n, g).requires_grad_(True)
         o = model_fn(X); m = (o[:, 1] - o[:, 0]).sum()
         gr = torch.autograd.grad(m, X)[0].norm(dim=1)
         return X.detach()[gr.argsort(descending=True)[:n]]
 
     def sample_adversarial(self, n, g, model_fn, ref_fn, steps=25, lr=0.1, start=None):
-        """Recherche de désaccord maximal entre le modèle et la référence (invariant), à l'intérieur de la région
-        de validité (Mahalanobis ≤ 3,5 dans la base apprise)."""
+        """Search for maximal disagreement between the model and the reference (invariant), inside the validity
+        region (Mahalanobis ≤ 3.5 in the learned basis)."""
         X = (start if start is not None else self.sample(n, g)).clone().requires_grad_(True)
         y = ref_fn(X.detach()); s = (2 * y - 1).float()
         opt = torch.optim.Adam([X], lr=lr)
@@ -116,11 +116,11 @@ class ContinuousGenerator(CertificateGenerator):
     def memory_bytes(self): return FLOAT_BYTES * self.floats()
 
 
-# ================================================================ générateur symbolique appris (anti-unification)
+# ================================================================ learned symbolic generator (anti-unification)
 
 class SymbolicGenerator(CertificateGenerator):
-    """Gabarits par ANTI-UNIFICATION positionnelle des exemples (jetons) de même forme ; les positions variables
-    deviennent des emplacements à distribution apprise (catégorielle, ou entière bornée si numérique)."""
+    """Templates by positional ANTI-UNIFICATION of examples (tokens) of the same shape; the variable positions
+    become slots with a learned distribution (categorical, or bounded integer if numeric)."""
     domain = "symbolic"
 
     def __init__(self, tokenize=lambda s: str(s).split(), detok=lambda t: " ".join(t), rebuild=None):
@@ -173,11 +173,11 @@ def _isnum(c):
     except ValueError: return False
 
 
-# ================================================================ substitut de référence (invariant de sortie)
+# ================================================================ reference surrogate (output invariant)
 
 class TinySurrogate:
-    """Substitut neuronal COMPACT (16→6→2) distillé sur des échantillons GÉNÉRÉS étiquetés par la compétence au
-    moment de la certification — utilisé quand aucune règle symbolique fidèle n'a été découverte."""
+    """COMPACT neural surrogate (16→6→2) distilled on GENERATED samples labelled by the skill at
+    certification time — used when no faithful symbolic rule has been discovered."""
     def __init__(self, gen, label_fn, d, h=24, n=4000, steps=1200, seed=0):
         g = torch.Generator().manual_seed(seed)
         X = torch.cat([gen.sample(n, g), gen.sample_boundary(n // 3, g, label_fn), gen.sample_rare(n // 5, g)]); y = label_fn(X)
@@ -194,7 +194,7 @@ class TinySurrogate:
     def floats(self): return sum(v.numel() for v in self.p.values())
 
 
-# ================================================================ certificat génératif
+# ================================================================ generative certificate
 
 TOLERANCE = {"central": 0.04, "boundary": 0.30, "rare": 0.15, "counterfactual": 0.25, "high_sensitivity": 0.2}
 
@@ -204,16 +204,16 @@ class GenerativeInvariantCertificate:
     skill: str
     domain: str
     generator: CertificateGenerator
-    reference: Callable                       # programme de référence (règle découverte ou substitut compact)
+    reference: Callable                       # reference program (discovered rule or compact surrogate)
     reference_kind: str                       # "rule" | "surrogate" | "program"
     reference_floats: int
     invariants: Tuple[str, ...] = ("output_equivalence",)
     tolerance: Dict[str, float] = field(default_factory=lambda: dict(TOLERANCE))
-    counterexamples: Optional[torch.Tensor] = None     # quelques contre-exemples connus (≤ 4)
+    counterexamples: Optional[torch.Tensor] = None     # a few known counterexamples (≤ 4)
     provenance: str = ""
     stability_radius: float = 0.0
     dependencies: Tuple[str, ...] = ()
-    curvature: Any = None                     # StabilityEllipsoid éventuel (module partagé)
+    curvature: Any = None                     # optional StabilityEllipsoid (shared module)
     created_at: int = 0
 
     def probes(self, n, g, model_fn=None, categories=("central", "boundary", "rare", "counterfactual")):
@@ -227,7 +227,7 @@ class GenerativeInvariantCertificate:
         return out
 
     def check(self, predict_fn, n=48, seed=0, model_fn=None, categories=("central", "boundary", "rare", "counterfactual")):
-        """predict_fn(X) -> étiquettes de la compétence ; erreur par catégorie vs référence ; OK si ≤ tolérance."""
+        """predict_fn(X) -> labels of the skill; per-category error vs reference; OK if ≤ tolerance."""
         g = torch.Generator().manual_seed(seed); errs = {}
         for c, X in self.probes(n, g, model_fn, categories).items():
             if len(X) == 0: continue
@@ -238,8 +238,8 @@ class GenerativeInvariantCertificate:
         return ok, errs
 
     def calibrate(self, predict_fn, n=96, repeats=3, slack=0.05):
-        """Tolérance par catégorie = désaccord MESURÉ à la certification (moyenne sur plusieurs tirages) + marge
-        d'échantillonnage + slack : le certificat détecte une DÉGRADATION par rapport au niveau certifié."""
+        """Per-category tolerance = disagreement MEASURED at certification (mean over several draws) + sampling
+        margin + slack: the certificate detects a DEGRADATION relative to the certified level."""
         acc = defaultdict(list)
         for r in range(repeats):
             _, errs = self.check(predict_fn, n=n, seed=10_000 + r)
@@ -254,7 +254,7 @@ class GenerativeInvariantCertificate:
         return self.generator.memory_bytes() + FLOAT_BYTES * (self.reference_floats + ce + curv + 8) + 32
 
 
-# ================================================================ certificat à sondes STOCKÉES (base de comparaison)
+# ================================================================ STORED-probe certificate (comparison baseline)
 
 @dataclass
 class StoredProbeCertificate:
@@ -271,12 +271,12 @@ class StoredProbeCertificate:
     def memory_bytes(self): return FLOAT_BYTES * self.probes.numel() + self.labels.numel() // 8 + 16
 
 
-# ================================================================ couverture : capacité de DÉTECTION de dommages
+# ================================================================ coverage: damage DETECTION capability
 
 def damaged(predict_fn, kind, regime, g):
-    """Dommages définis sur la VRAIE distribution du régime (et non sur le générateur, pour ne pas le favoriser) :
-    boundary_shift (frontière décalée de 0,15), rare_region (erreurs au-delà du quantile 0,98 de la vraie
-    distribution), local_bump (boule couvrant ≈ 3 % de la masse autour d'un point typique), global (5 % d'erreurs)."""
+    """Damage defined on the TRUE distribution of the regime (and not on the generator, so as not to favour it):
+    boundary_shift (boundary shifted by 0.15), rare_region (errors beyond the 0.98 quantile of the true
+    distribution), local_bump (ball covering ≈ 3 % of the mass around a typical point), global (5 % errors)."""
     from core.continuous_world import drift_rule
     mu, sc = regime.mu, regime.scale
     T = mu + sc * torch.randn(4000, len(mu), generator=g)
@@ -297,10 +297,10 @@ def damaged(predict_fn, kind, regime, g):
 
 
 def coverage_experiment(regimes, seed=0, n_support=256, n_probe=48):
-    """Pour chaque régime : la compétence = la VRAIE règle (référence parfaite), on l'endommage localement et on
-    mesure si un jeu de sondes le DÉTECTE. Jeux comparés (même budget de sondes) : aléatoire global N(0, I·σ),
-    sondes stockées (tirées du support), sondes du certificat génératif (central + frontière + rares +
-    contrefactuelles). Plus : taux de fausses alarmes sur la compétence intacte."""
+    """For each regime: the skill = the TRUE rule (perfect reference), it is damaged locally and we
+    measure whether a probe set DETECTS it. Sets compared (same probe budget): global random N(0, I·σ),
+    stored probes (drawn from the support), probes of the generative certificate (central + boundary + rare +
+    counterfactual). Plus: false-alarm rate on the intact skill."""
     from core.continuous_world import D
     g = torch.Generator().manual_seed(seed); res = defaultdict(Counter)
     for r in regimes:

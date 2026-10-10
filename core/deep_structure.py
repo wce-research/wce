@@ -1,14 +1,14 @@
-"""Représentation compositionnelle HIÉRARCHIQUE (jalon Deep Compositional Structure Discovery).
+"""HIERARCHICAL compositional representation (Deep Compositional Structure Discovery milestone).
 
     Primitive → Substructure → CompositeStructure → StructureFamily → WorldHypothesis
 
-Un programme n'est plus un candidat plat : c'est un nœud d'un graphe de sous-structures PARTAGÉES (internées par
-squelette canonique). `A∘B∘C` référence le nœud `A∘B` déjà découvert, avec ses ajustements en cache.
+A program is no longer a flat candidate: it is a node of a graph of SHARED substructures (interned by
+canonical skeleton). `A∘B∘C` references the already discovered `A∘B` node, with its cached fits.
 
-Chaque structure expose : enfants, invariants, paramètres, profondeur, coût descriptif, support observationnel,
-alternatives équivalentes, dépendances.
+Each structure exposes: children, invariants, parameters, depth, description cost, observational support,
+equivalent alternatives, dependencies.
 
-Ce module ne contient AUCUNE vérité de monde et n'importe aucun module de monde.
+This module contains NO world truth and imports no world module.
 """
 from __future__ import annotations
 
@@ -23,10 +23,10 @@ import torch
 from core.boundary_program import BNode, atoms, canonical, predict
 
 COMBINATORS = ("and", "or", "xor")
-COMPACT_PARAMS = 64                       # budget compact (paramètres) — inchangé depuis le jalon précédent
-MAX_FRAGMENTS = 32                        # budget de la bibliothèque de fragments
+COMPACT_PARAMS = 64                       # compact budget (parameters) — unchanged since the previous milestone
+MAX_FRAGMENTS = 32                        # budget of the fragment library
 
-# Invariants d'un atome : transformations de l'espace qui laissent sa fonction inchangée (déclaratifs, testés).
+# Invariants of an atom: transformations of the space that leave its function unchanged (declarative, tested).
 _ATOM_INVARIANTS = {("dot", "le"): ("translation_along_boundary",), ("dot", "ge"): ("translation_along_boundary",), ("dot", "in"): ("translation_along_boundary", "reflection_across_axis"),
                     ("norm", "le"): ("rotation_about_center",), ("norm", "ge"): ("rotation_about_center",), ("norm", "in"): ("rotation_about_center",),
                     ("angle", "in"): ("scaling_about_center", "reflection_across_bisector")}
@@ -42,11 +42,11 @@ def n_atoms(n: BNode): return sum(n_atoms(c) for c in n.children) if is_composit
 def skel_key(n: BNode): return json.dumps(canonical(n.skeleton()).to_dict(), sort_keys=True)
 
 
-# ================================================================ équivalence algébrique (structure)
+# ================================================================ algebraic equivalence (structure)
 
 def algebraic_form(n: BNode):
-    """Forme normale à réécritures près : associativité et commutativité de and / or / xor (aplatissement + tri).
-    Les lois de De Morgan et l'absorption ne sont PAS appliquées (limite assumée)."""
+    """Normal form up to rewritings: associativity and commutativity of and / or / xor (flattening + sorting).
+    De Morgan's laws and absorption are NOT applied (acknowledged limitation)."""
     n = canonical(n.skeleton())
     def norm(x):
         if is_composite(x):
@@ -63,34 +63,34 @@ def algebraic_form(n: BNode):
 def structurally_equivalent(a: BNode, b: BNode): return algebraic_form(a) == algebraic_form(b)
 
 
-# ================================================================ graphe de sous-structures
+# ================================================================ substructure graph
 
 @dataclass
 class Substructure:
-    """Nœud du graphe hiérarchique. `key` = squelette canonique (identité structurelle, sans paramètres)."""
+    """Node of the hierarchical graph. `key` = canonical skeleton (structural identity, without parameters)."""
     key: str
     skeleton: BNode
     children: Tuple[str, ...] = ()
-    combinator: str = ""                                   # "" pour une primitive
-    alternatives: set = field(default_factory=set)         # clés de structures observationnellement équivalentes
-    fits: Dict[str, tuple] = field(default_factory=dict)   # cache : jeu de données → (paramètres, logL)
-    uses: int = 0                                          # nombre de compositions qui la réutilisent
+    combinator: str = ""                                   # "" for a primitive
+    alternatives: set = field(default_factory=set)         # keys of observationally equivalent structures
+    fits: Dict[str, tuple] = field(default_factory=dict)   # cache: dataset → (parameters, logL)
+    uses: int = 0                                          # number of compositions that reuse it
 
     @property
-    def depth(self): return n_atoms(self.skeleton)                       # profondeur compositionnelle (nb d'atomes)
+    def depth(self): return n_atoms(self.skeleton)                       # compositional depth (number of atoms)
     @property
     def n_params(self): return self.skeleton.n_params()
     @property
     def is_primitive(self): return not self.combinator
 
     def description_bits(self, n_atom_types=8, library: Optional["FragmentLibrary"] = None):
-        """Coût descriptif (bits) : choix du combinateur / du type d'atome à chaque nœud ; un fragment de la
-        bibliothèque se référence par son indice au lieu d'être épelé."""
+        """Description cost (bits): choice of the combinator / of the atom type at each node; a fragment of the
+        library is referenced by its index instead of being spelled out."""
         return description_bits(self.skeleton, n_atom_types, library)
 
     def invariants(self):
-        """Invariants garantis par construction : ceux d'une primitive ; pour un composite, ceux communs aux enfants
-        de même centre ne sont pas décidables sans paramètres → seuls les invariants logiques sont déclarés."""
+        """Invariants guaranteed by construction: those of a primitive; for a composite, those common to children
+        with the same center are not decidable without parameters → only the logical invariants are declared."""
         if self.is_primitive: l = _leaf(self.skeleton); return set(_ATOM_INVARIANTS.get((l.feat, l.op), ()))
         return {f"commutative_{self.combinator}", f"associative_{self.combinator}"} | ({"self_inverse_xor"} if self.combinator == "xor" else set())
 
@@ -106,15 +106,15 @@ class CompositeStructure(Substructure):
 def description_bits(skel: BNode, n_atom_types=8, library: Optional["FragmentLibrary"] = None):
     if library is not None and is_composite(skel):
         i = library.index_of(skel)
-        if i is not None: return 1.0 + math.log2(max(2, len(library)))            # 1 bit « fragment » + indice
+        if i is not None: return 1.0 + math.log2(max(2, len(library)))            # 1 "fragment" bit + index
     if is_composite(skel):
         return 1.0 + math.log2(len(COMBINATORS)) + sum(description_bits(c, n_atom_types, library) for c in skel.children)
     return 1.0 + math.log2(n_atom_types)
 
 
 class StructureStore:
-    """Internement : une sous-structure (squelette canonique) n'existe qu'UNE fois ; toute composition référence ses
-    enfants. C'est ce qui rend `A∘B∘C` dépendant de `A∘B` déjà découvert."""
+    """Interning: a substructure (canonical skeleton) exists only ONCE; every composition references its
+    children. This is what makes `A∘B∘C` depend on the already discovered `A∘B`."""
 
     def __init__(self, allowed=None):
         self.nodes: Dict[str, Substructure] = {}; self.primitives: List[str] = []
@@ -134,7 +134,7 @@ class StructureStore:
         return self.intern(BNode(comb, children=(a.skeleton, b.skeleton)))
 
     def dependencies(self, key: str):
-        """Toutes les sous-structures dont dépend `key` (fermeture transitive)."""
+        """All the substructures `key` depends on (transitive closure)."""
         out = []; stack = list(self.nodes[key].children)
         while stack:
             k = stack.pop()
@@ -151,7 +151,7 @@ class StructureStore:
 
 
 def subtrees(skel: BNode, min_atoms=1):
-    """Tous les sous-arbres (squelettes) d'une structure, composites et atomes."""
+    """All the subtrees (skeletons) of a structure, composites and atoms."""
     out = []
     def walk(n):
         if n_atoms(n) >= min_atoms: out.append(n)
@@ -161,8 +161,8 @@ def subtrees(skel: BNode, min_atoms=1):
 
 
 def normalize(prog: BNode) -> BNode:
-    """Ordonne les enfants des combinateurs commutatifs par clé de squelette (les paramètres suivent leur nœud), sans
-    aucune réécriture dépendant des paramètres : normalize(p).skeleton() est le squelette canonique interné."""
+    """Orders the children of commutative combinators by skeleton key (parameters follow their node), without
+    any parameter-dependent rewriting: normalize(p).skeleton() is the interned canonical skeleton."""
     if not prog.children: return prog
     ch = tuple(normalize(c) for c in prog.children)
     if is_composite(prog): ch = tuple(sorted(ch, key=skel_key))
@@ -170,7 +170,7 @@ def normalize(prog: BNode) -> BNode:
 
 
 def _eval_override(prog: BNode, X, path, value):
-    """Prédictions dures du programme quand la sous-structure au chemin `path` est remplacée par la constante `value`."""
+    """Hard predictions of the program when the substructure at path `path` is replaced by the constant `value`."""
     if path == (): return torch.full((len(X),), int(value), dtype=torch.long)
     if not is_composite(prog): return predict(prog, X)
     a = _eval_override(prog.children[0], X, path[1:] if path and path[0] == 0 else None, value)
@@ -179,15 +179,15 @@ def _eval_override(prog: BNode, X, path, value):
 
 
 def observational_support(prog: BNode, sub_path: Tuple[int, ...], X):
-    """Support observationnel d'une sous-structure DANS un programme ajusté : points où la prédiction change quand la
-    sous-structure est remplacée par la constante qui la remplace LE MIEUX. Support vide ⇒ la sous-structure n'est pas
-    contrainte par ces observations (elle pourrait être retirée sans rien changer)."""
+    """Observational support of a substructure INSIDE a fitted program: points where the prediction changes when the
+    substructure is replaced by the constant that replaces it BEST. Empty support ⇒ the substructure is not
+    constrained by these observations (it could be removed without changing anything)."""
     base = predict(prog, X); c0 = _eval_override(prog, X, tuple(sub_path), 0) != base; c1 = _eval_override(prog, X, tuple(sub_path), 1) != base
     return c0 if int(c0.sum()) <= int(c1.sum()) else c1
 
 
 def composite_paths(prog: BNode):
-    """Chemins (indices d'enfants) vers chaque opérande de combinateur."""
+    """Paths (child indices) to each combinator operand."""
     out = []
     def walk(n, path):
         if is_composite(n):
@@ -195,16 +195,16 @@ def composite_paths(prog: BNode):
     walk(prog, ()); return out
 
 
-# ================================================================ familles : anti-unification réelle
+# ================================================================ families: actual anti-unification
 
 @dataclass(frozen=True)
 class Var:
-    """Variable de structure (trou) d'un schéma généralisé."""
+    """Structure variable (hole) of a generalized schema."""
     name: str
 
 
 def _term(n: BNode):
-    """Terme : ('and'|'or'|'xor', t1, t2) | ('atom', clé de squelette)."""
+    """Term: ('and'|'or'|'xor', t1, t2) | ('atom', skeleton key)."""
     if is_composite(n): return (n.kind, _term(n.children[0]), _term(n.children[1]))
     return ("atom", skel_key(n))
 
@@ -215,9 +215,9 @@ def _var_names(t): return {t.name} if isinstance(t, Var) else set() if t[0] == "
 
 
 def _lgg(a, b, table):
-    """Plus petit généralisé de deux termes. Une même paire de sous-termes distincts reçoit la MÊME variable
-    (c'est ce qui distingue l'anti-unification d'un simple masquage par position). Les combinateurs commutatifs
-    sont alignés dans l'ordre qui donne le schéma le plus spécifique."""
+    """Least general generalization of two terms. A given pair of distinct subterms receives the SAME variable
+    (this is what distinguishes anti-unification from mere masking by position). Commutative combinators
+    are aligned in the order that yields the most specific schema."""
     if a == b: return a
     if not isinstance(a, Var) and not isinstance(b, Var) and a[0] == b[0] and a[0] != "atom":
         cands = []
@@ -231,8 +231,8 @@ def _lgg(a, b, table):
 
 @dataclass
 class StructureFamily:
-    """Schéma généralisé `generalized_structure(parameters)` : un terme avec variables de structure. Les paramètres
-    numériques restent libres (ajustés par instance) : la famille n'est jamais une instance mémorisée."""
+    """Generalized schema `generalized_structure(parameters)`: a term with structure variables. The numerical
+    parameters stay free (fitted per instance): the family is never a memorized instance."""
     pattern: object
     support: int = 0
     provenance: List[str] = field(default_factory=list)
@@ -245,7 +245,7 @@ class StructureFamily:
     def is_trivial(self): return isinstance(self.pattern, Var)
 
     def matches(self, skel: BNode):
-        """Liaisons {variable: terme} si le squelette est une instance du schéma (à commutativité près), sinon None."""
+        """Bindings {variable: term} if the skeleton is an instance of the schema (up to commutativity), otherwise None."""
         return _match(self.pattern, _term(canonical(skel.skeleton())), {})
 
     def instantiate(self, bindings: Dict[str, BNode]) -> BNode:
@@ -282,7 +282,7 @@ def _match(p, t, b):
 
 
 def anti_unify(skeletons: Sequence[BNode]) -> StructureFamily:
-    """Anti-unification de plusieurs structures → schéma commun le plus spécifique (variables partagées)."""
+    """Anti-unification of several structures → most specific common schema (shared variables)."""
     terms = [_term(canonical(s.skeleton())) for s in skeletons]; pat = terms[0]
     for t in terms[1:]: pat = _lgg(pat, t, {})
     return StructureFamily(_rename(pat), len(skeletons))
@@ -297,8 +297,8 @@ def _rename(t):
 
 
 def generalization_quality(family: StructureFamily, positives: Sequence[BNode], negatives: Sequence[BNode]):
-    """Généralisation correcte : le schéma couvre les positifs ; surgénéralisation : il couvre des négatifs.
-    Compression : bits économisés en décrivant les positifs par (schéma + liaisons) plutôt qu'un par un."""
+    """Correct generalization: the schema covers the positives; overgeneralization: it covers negatives.
+    Compression: bits saved by describing the positives by (schema + bindings) rather than one by one."""
     cov = sum(family.matches(p) is not None for p in positives) / max(1, len(positives))
     over = sum(family.matches(n) is not None for n in negatives) / max(1, len(negatives))
     raw = sum(description_bits(p.skeleton()) for p in positives)
@@ -319,15 +319,15 @@ def description_bits_term(t, n_atom_types=8):
     return 1.0 + math.log2(len(COMBINATORS)) + description_bits_term(t[1]) + description_bits_term(t[2])
 
 
-# ================================================================ bibliothèque de fragments
+# ================================================================ fragment library
 
 @dataclass
 class Fragment:
-    """Composition GÉNÉRIQUE réutilisable : un squelette (paramètres libres), jamais une instance du monde."""
+    """Reusable GENERIC composition: a skeleton (free parameters), never an instance of the world."""
     skeleton: BNode
     key: str
-    frequency: int = 0                                     # nombre de solutions DISTINCTES qui le contiennent
-    parameterizations: int = 0                             # nombre de jeux de paramètres distincts observés
+    frequency: int = 0                                     # number of DISTINCT solutions that contain it
+    parameterizations: int = 0                             # number of distinct parameter sets observed
     sources: List[str] = field(default_factory=list)
 
     @property
@@ -335,8 +335,8 @@ class Fragment:
 
 
 class FragmentLibrary:
-    """Fragments promus s'ils apparaissent dans plusieurs solutions compatibles ET sous plusieurs paramétrages
-    (sinon ce serait de la mémorisation d'instance). Taille bornée (MAX_FRAGMENTS)."""
+    """Fragments promoted if they appear in several compatible solutions AND under several parameterizations
+    (otherwise it would be instance memorization). Bounded size (MAX_FRAGMENTS)."""
 
     def __init__(self, min_support=2, min_parameterizations=2, max_fragments=MAX_FRAGMENTS):
         self.min_support, self.min_param, self.max_fragments = min_support, min_parameterizations, max_fragments; self.family_support, self.max_families = 3, 8
@@ -344,7 +344,7 @@ class FragmentLibrary:
         self.families: List[StructureFamily] = []
 
     def observe(self, program: BNode, source: str):
-        """Enregistre les sous-structures composites d'une solution (programme AJUSTÉ) d'une tâche `source`."""
+        """Records the composite substructures of a solution (FITTED program) of a task `source`."""
         seen = set()
         def walk(n):
             if is_composite(n):
@@ -354,20 +354,20 @@ class FragmentLibrary:
                     if source not in f.sources: f.sources.append(source); f.frequency += 1
                     self._params[k].add(tuple(round(v, 1) for v in n.param_vector()))
                 for c in n.children: walk(c)
-        walk(normalize(program))                                       # pas de réécriture dépendant des paramètres
+        walk(normalize(program))                                       # no parameter-dependent rewriting
 
     def promote(self):
-        """Promotion : support ≥ min_support, ≥ min_parameterizations paramétrages ; les plus fréquents puis les plus
-        compressifs d'abord ; bornée. Les schémas généralisés (anti-unification) des fragments de même taille sont
-        ajoutés comme familles."""
+        """Promotion: support ≥ min_support, ≥ min_parameterizations parameterizations; the most frequent then the most
+        compressive first; bounded. The generalized schemas (anti-unification) of fragments of the same size are
+        added as families."""
         ok = []
         for k, f in self._cand.items():
             f.parameterizations = len(self._params[k])
             if f.frequency >= self.min_support and f.parameterizations >= self.min_param: ok.append(f)
         ok.sort(key=lambda f: (-f.frequency * (f.n_atoms - 1), f.key)); self.fragments = ok[: self.max_fragments]
-        # Familles : anti-unification PAR PAIRES de fragments de même taille (anti-unifier tout un groupe hétérogène ne
-        # donne que le schéma trivial). On garde les schémas à UNE variable soutenus par au moins `family_support`
-        # fragments, les plus soutenus d'abord.
+        # Families: PAIRWISE anti-unification of fragments of the same size (anti-unifying a whole heterogeneous group
+        # yields only the trivial schema). We keep the schemas with ONE variable supported by at least `family_support`
+        # fragments, the most supported first.
         pats: Dict[str, StructureFamily] = {}
         for i, f in enumerate(self.fragments):
             for g2 in self.fragments[i + 1:]:
@@ -389,11 +389,11 @@ class FragmentLibrary:
     def contains(self, skel: BNode): return self.index_of(skel) is not None
 
     def proposals(self, max_atoms=None):
-        """Squelettes à essayer comme blocs de construction (fréquence décroissante)."""
+        """Skeletons to try as building blocks (decreasing frequency)."""
         return [f.skeleton for f in self.fragments if max_atoms is None or f.n_atoms <= max_atoms]
 
     def compression_gain(self, skeletons: Sequence[BNode]):
-        """Bits économisés sur un ensemble de structures en référençant les fragments, coût de la bibliothèque déduit."""
+        """Bits saved on a set of structures by referencing the fragments, with the library cost deducted."""
         raw = sum(description_bits(s) for s in skeletons); withlib = sum(description_bits(s, library=self) for s in skeletons)
         cost = sum(description_bits(f.skeleton) for f in self.fragments)
         return {"raw_bits": raw, "with_library_bits": withlib, "library_bits": cost, "net_gain_bits": raw - withlib - cost}
@@ -409,23 +409,23 @@ class FragmentLibrary:
         return lib
 
 
-# ================================================================ hypothèses de monde
+# ================================================================ world hypotheses
 
-NONE_OF_THE_ABOVE = "NONE_OF_THE_ABOVE"       # observations INCOMPATIBLES avec les hypothèses disponibles
-UNKNOWN = "UNKNOWN"                           # information INSUFFISANTE pour trancher
+NONE_OF_THE_ABOVE = "NONE_OF_THE_ABOVE"       # observations INCOMPATIBLE with the available hypotheses
+UNKNOWN = "UNKNOWN"                           # INSUFFICIENT information to decide
 KNOWN = "KNOWN"
 
 
 @dataclass
 class WorldHypothesis:
-    """Hypothèse sur le monde : une structure ajustée (ou l'hypothèse spéciale « aucune des structures connues »)."""
-    key: str                                   # clé de la sous-structure, ou NONE_OF_THE_ABOVE
+    """Hypothesis about the world: a fitted structure (or the special hypothesis "none of the known structures")."""
+    key: str                                   # key of the substructure, or NONE_OF_THE_ABOVE
     program: Optional[BNode] = None
     loglik: float = float("-inf")
     evidence: float = float("-inf")
     mass: float = 0.0
-    family: str = ""                           # famille (forme algébrique) à laquelle elle appartient
-    origin: str = ""                           # étape de la recherche qui l'a produite (trace)
+    family: str = ""                           # family (algebraic form) it belongs to
+    origin: str = ""                           # search step that produced it (trace)
     fit_cost: int = 0
 
     @property
@@ -439,7 +439,7 @@ class WorldHypothesis:
 
 
 def family_of(prog: BNode):
-    """Famille d'une structure = multiensemble des types d'atomes + nombre de combinateurs (granularité grossière,
-    rejetable en bloc)."""
+    """Family of a structure = multiset of atom types + number of combinators (coarse granularity,
+    rejectable as a whole)."""
     c = Counter(_atom_name(skel_key(s)) for s in subtrees(prog) if not is_composite(s))
     return json.dumps(sorted(c.items()))

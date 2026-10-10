@@ -1,16 +1,16 @@
-"""Expériences du sous-jalon High-Precision Primitive Estimation — module d'ÉVALUATION (dev uniquement ; il voit la vérité
-pour MESURER ; jamais le lot scellé).
+"""Experiments of the High-Precision Primitive Estimation sub-milestone — EVALUATION module (dev only; it sees the truth
+to MEASURE; never the sealed set).
 
-  single : banc par primitive ISOLÉE ou masquée — type × densité × bruit × masquage ; gradient générique, inférence à type
-           connu existante, estimateurs spécialisés (courbes), recherche directe, raffinement, consensus, oracles partiels,
-           identifiabilité de la vraie primitive
-  sens   : carte de sensibilité — UN paramètre d'UN vrai atome perturbé → dégradation fonctionnelle → récupération finale
-  birth  : un vrai atome retiré → naissance par gain de plancher (nouvelle) contre recherche sur le résidu (ancienne) ;
-           fausses naissances sur ensembles complets ; diagnostic de polarité (anti-disque)
-  chain  : A atomes du pipeline gelé, B flat_scene_k3, C haute précision — MÊME aval fort ; régimes standard, rich, dense
-  ood    : régime `hard` (160 observations, 10 % de bruit), jamais utilisé en mise au point
+  single : bench per ISOLATED or occluded primitive — type × density × noise × occlusion; generic gradient, existing
+           known-type inference, specialized estimators (curves), direct search, refinement, consensus, partial oracles,
+           identifiability of the true primitive
+  sens   : sensitivity map — ONE parameter of ONE true atom perturbed → functional degradation → final recovery
+  birth  : one true atom removed → birth by floor gain (new) versus search on the residual (old);
+           false births on complete sets; polarity diagnostic (anti-disc)
+  chain  : A atoms of the frozen pipeline, B flat_scene_k3, C high precision — SAME strong downstream; regimes standard, rich, dense
+  ood    : `hard` regime (160 observations, 10% noise), never used in tuning
 
-Tâches : clés 1100–1131 (jamais utilisées ; mise au point : clés 1090–1099 uniquement).
+Tasks: keys 1100–1131 (never used; tuning: keys 1090–1099 only).
 """
 from __future__ import annotations
 
@@ -29,7 +29,7 @@ from core.deep_lpr_exp import _acc, _name, _regions, _row, atom_visibility, froz
 
 DEPTHS = (1, 2, 3, 4, 5, 6)
 REGIMES = ("standard", "rich", "dense")
-DENSE = (2400, 0.02)                 # régime dense pré-enregistré : (observations, bruit)
+DENSE = (2400, 0.02)                 # preregistered dense regime: (observations, noise)
 OOD_REGIME = "hard"
 PRIMARY = ("A", "B", "C")
 PREREGISTERED_SECONDARY = ("B5",)
@@ -38,15 +38,15 @@ HISTORICAL = ("A_full", "B_full", "C_prev")
 KINDS = ("half", "band", "disc", "antidisc", "ring", "sector")
 DENSITIES = (150, 300, 600, 2400)
 NOISES = (0.0, 0.05)
-MASKS = (0.0, 0.3, 0.6)             # visibilité forte, moyenne, faible
+MASKS = (0.0, 0.3, 0.6)             # strong, medium, weak visibility
 DELTAS = (0.02, 0.05, 0.10, 0.20)
 PERTURB = ("center", "radius", "width", "orientation", "offset", "direction", "half_width")
-REL_GOOD, REL_FINE = 0.10, 0.05     # erreur fonctionnelle RELATIVE (désaccord / aire de la primitive), indépendante de la polarité
+REL_GOOD, REL_FINE = 0.10, 0.05     # RELATIVE functional error (disagreement / area of the primitive), independent of polarity
 GOOD = 0.99
 
 
 def task_at(key, d, regime):
-    """Même MONDE que `down_task(key, d, ·)` quel que soit le régime : les régimes sont appariés sur la vraie structure."""
+    """Same WORLD as `down_task(key, d, ·)` whatever the regime: the regimes are paired on the true structure."""
     from core.deep_experiments import down_task
     if regime != "dense": return down_task(key, d, regime)
     from core.deep_world import NOISE_KINDS, SPLIT_BASE, DeepTask, NoiseSpec, corrupt, make_world, obs_region
@@ -61,8 +61,8 @@ def _probe():
 
 
 def rel_error(true: BNode, hyp: BNode, P: torch.Tensor) -> float:
-    """Erreur fonctionnelle relative : part de désaccord rapportée à l'aire (minoritaire) de la vraie primitive, la
-    polarité étant libre (la composition dispose du complément). 0 = identique ; ≥ 1 = aucune ressemblance."""
+    """Relative functional error: share of disagreement relative to the (minority) area of the true primitive,
+    polarity being free (composition has the complement available). 0 = identical; ≥ 1 = no resemblance."""
     a = predict(true, P); d = float((a != predict(hyp, P)).float().mean()); d = min(d, 1 - d); m = float(a.float().mean()); return d / max(1e-6, min(m, 1 - m))
 
 
@@ -70,7 +70,7 @@ def _same_family(a: BNode, p: BNode) -> bool: return _name(a).replace("not_", ""
 
 
 def family_errors(true: BNode, hyp: BNode) -> dict:
-    """Erreur absolue par famille de paramètres ; vide si les deux primitives ne sont pas de même géométrie."""
+    """Absolute error per parameter family; empty if the two primitives do not have the same geometry."""
     from core.deep_partial_exp import param_errors
     if not _same_family(true, hyp): return {}
     e = param_errors(strip(true), strip(hyp)); out = {}
@@ -80,8 +80,8 @@ def family_errors(true: BNode, hyp: BNode) -> dict:
 
 
 def atom_precision(programs: Sequence[BNode], task, P=None) -> List[dict]:
-    """Par vrai atome : meilleure erreur relative parmi `programs`, et erreurs de paramètres du meilleur candidat de même
-    géométrie."""
+    """Per true atom: best relative error among `programs`, and parameter errors of the best candidate with the same
+    geometry."""
     from core.deep_reachability import leaves
     P = _probe() if P is None else P; progs = [strip(p) for p in programs]; out = []
     for a in leaves(task.world.truth):
@@ -96,14 +96,14 @@ def _precision_extra(pool: Sequence[BNode], kept: Sequence[BNode], task, P=None)
             "atoms_hp": [{"type": x["type"], "visible": v, "rel_pool": x["rel"], "rel_kept": z["rel"], "errors": x["errors"]} for x, z, v in zip(a, b, vis)], "rss_mb": resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024.0}
 
 
-# ================================================================ chaînes complètes
+# ================================================================ complete chains
 
 def _chain_row(task, name, rec, regions, t0, extra=None) -> dict:
     H = rec.hypotheses; pool = [h.program for h in H] + [a for h in H for a in h.alternatives]; kept = rec.chosen.programs if rec.chosen else []; return _row(task, name, rec, regions, t0, {**_precision_extra(pool, kept, task), **(extra or {})})
 
 
 def chain_rows(task, seed=0, arms: Optional[Sequence[str]] = None, historical=True) -> List[dict]:
-    """Chaînes primaires (même aval fort), bras secondaire pré-enregistré, variantes de C, chaînes historiques."""
+    """Primary chains (same strong downstream), preregistered secondary arm, variants of C, historical chains."""
     from core.deep_e2e import discover
     from core.deep_lpr import recover as lpr_recover, strong_downstream
     regions = _regions(task); X, y = task.X, task.y; rows = []; want = lambda a: arms is None or a in arms
@@ -127,10 +127,10 @@ def chain_rows(task, seed=0, arms: Optional[Sequence[str]] = None, historical=Tr
     return rows
 
 
-# ================================================================ banc par primitive
+# ================================================================ bench per primitive
 
 def _direct(sk_type: str, X, y, seed, k=5) -> List[BNode]:
-    """Recherche DIRECTE de la primitive entière dans son espace de paramètres (aucune décomposition en courbes)."""
+    """DIRECT search for the whole primitive in its parameter space (no decomposition into curves)."""
     from core.deep_fragments import SKELETONS
     from core.deep_hp import _climb, evaluate_batch, floor_batch, sample_params
     from core.deep_partial import observe
@@ -140,7 +140,7 @@ def _direct(sk_type: str, X, y, seed, k=5) -> List[BNode]:
 
 
 def _methods(sc, seed) -> dict:
-    """Méthode → (hypothèses classées, équivalents d'évaluation). Type CONNU pour toutes."""
+    """Method → (ranked hypotheses, evaluation equivalents). KNOWN type for all."""
     from core.deep_hp import load_config
     from core.deep_partial import infer, observe
     from core.deep_partial_exp import estimate
@@ -180,11 +180,11 @@ def single_rows(key, kind: str, seed=0) -> List[dict]:
     return rows
 
 
-# ================================================================ carte de sensibilité
+# ================================================================ sensitivity map
 
 def perturb(a: BNode, family: str, delta: float, rng: random.Random) -> Optional[BNode]:
-    """UN vrai atome, UNE famille de paramètres, amplitude `delta` (signe tiré). `orientation` tourne la droite autour de
-    son point le plus proche du centre de la zone observée (pas autour de l'origine) ; `width` écarte les deux bords."""
+    """ONE true atom, ONE parameter family, amplitude `delta` (sign drawn). `orientation` rotates the line about
+    its point closest to the center of the observed zone (not about the origin); `width` moves the two edges apart."""
     a = strip(a); fam = families(a); th = list(a.param_vector()); sgn = rng.choice((-1.0, 1.0)); idx = [i for i, f in enumerate(fam) if f == family]
     if family == "width":
         idx = [i for i, f in enumerate(fam) if f in ("offset", "radius")]
@@ -201,8 +201,8 @@ def perturb(a: BNode, family: str, delta: float, rng: random.Random) -> Optional
 
 
 def sens_rows(task, seed=0, max_atoms=3) -> List[dict]:
-    """parameter perturbation → functional degradation → structural recovery degradation. Les AUTRES atomes restent exacts ;
-    aucune finalisation (on mesure la composition, pas l'ajustement)."""
+    """parameter perturbation → functional degradation → structural recovery degradation. The OTHER atoms stay exact;
+    no finalization (the composition is measured, not the fit)."""
     from core.deep_lpr import strong_downstream
     from core.deep_reachability import leaves
     A = leaves(task.world.truth); regions = _regions(task); P = _probe(); rng = random.Random(seed * 7919 + len(A)); base = _acc(strong_downstream([(a, 1.0, "true") for a in A], task.X, task.y, {"fit": "none"}).program, regions); rows = []
@@ -216,7 +216,7 @@ def sens_rows(task, seed=0, max_atoms=3) -> List[dict]:
     return rows
 
 
-# ================================================================ naissance d'une primitive manquante
+# ================================================================ birth of a missing primitive
 
 def birth_rows(task, seed=0) -> List[dict]:
     from core.deep_lpr import recover as lpr_recover, strong_downstream
@@ -241,7 +241,7 @@ def birth_rows(task, seed=0) -> List[dict]:
     return rows
 
 
-# ================================================================ sous-unités AWS
+# ================================================================ AWS sub-units
 
 def subunits(key):
     from core.deep_experiments import _row as wrap

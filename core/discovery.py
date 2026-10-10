@@ -1,8 +1,8 @@
-"""Découverte : transformations (composition de primitives), invariants (ce qui reste stable), cycle de vie des
-hypothèses, et LOI CACHÉE dans un monde ouvert précurseur choisie par EXPÉRIMENTATION ACTIVE (MeasurementPlanner).
+"""Discovery: transformations (composition of primitives), invariants (what stays stable), life cycle of
+hypotheses, and HIDDEN LAW in a precursor open world, selected by ACTIVE EXPERIMENTATION (MeasurementPlanner).
 
-Boucle fermée : NOUVEAUTÉ → HYPOTHÈSES → MESURER / AGIR → DÉCOUVRIR LA TRANSFORMATION → TESTER LES INVARIANTS
-→ FORMER LA COMPÉTENCE → CONSTRUIRE LE CERTIFICAT GÉNÉRATIF → CONSOLIDER → RÉUTILISER.
+Closed loop: NOVELTY → HYPOTHESES → MEASURE / ACT → DISCOVER THE TRANSFORMATION → TEST THE INVARIANTS
+→ FORM THE SKILL → BUILD THE GENERATIVE CERTIFICATE → CONSOLIDATE → REUSE.
 """
 from __future__ import annotations
 
@@ -17,7 +17,7 @@ import torch
 from core.measurement import CompatibleStateSet, MeasurementContext, MeasurementOperator, MeasurementOutcome, NoiseModel, Observable, information_gain
 
 
-# ================================================================ primitives géométriques 2D
+# ================================================================ 2D geometric primitives
 
 def rot(th): c, s = math.cos(th), math.sin(th); return torch.tensor([[c, -s], [s, c]])
 
@@ -31,7 +31,7 @@ PRIMS = {
 
 
 def fit_primitive(name, P, Q):
-    """Paramètre optimal (moindres carrés / Procrustes) d'une primitive pour P -> Q."""
+    """Optimal parameter (least squares / Procrustes) of a primitive for P -> Q."""
     if name == "rotate":
         Pc, Qc = P - P.mean(0), Q - Q.mean(0); M = Pc.T @ Qc
         return math.atan2(float(M[0, 1] - M[1, 0]), float(M[0, 0] + M[1, 1]))
@@ -46,17 +46,17 @@ def apply_chain(chain, P):
 
 
 def discover_transformation(P, Q, max_len=2, tol=1e-3):
-    """Recherche bornée sur les compositions de primitives (longueur ≤ 2) avec ajustement des paramètres étape par
-    étape (le dernier maillon est ajusté sur le résidu). Renvoie (chaîne, erreur, nb de candidats)."""
+    """Bounded search over the compositions of primitives (length ≤ 2) with step-by-step fitting of the parameters
+    (the last link is fitted on the residual). Returns (chain, error, number of candidates)."""
     best, n = None, 0
     names = list(PRIMS)
     for L in range(1, max_len + 1):
         for combo in itertools.product(names, repeat=L):
             n += 1; chain = []; cur = P
             for i, name in enumerate(combo):
-                if i < L - 1:                                     # paramètres intermédiaires : ajustés conjointement par grille
+                if i < L - 1:                                     # intermediate parameters: fitted jointly by grid
                     pass
-            # ajustement : premier maillon par grille / Procrustes, second par moindres carrés sur le résidu
+            # fitting: first link by grid / Procrustes, second by least squares on the residual
             if L == 1:
                 a = fit_primitive(combo[0], P, Q); chain = [(combo[0], a)]
             else:
@@ -78,7 +78,7 @@ def _grid(name, P, Q):
 
 
 def memorization_baseline(P, Q, Pnew):
-    """Mémorisation : plus proche voisin dans la table (P -> Q) + décalage local."""
+    """Memorization: nearest neighbor in the table (P -> Q) + local offset."""
     d = torch.cdist(Pnew, P); i = d.argmin(1); return Q[i] + (Pnew - P[i])
 
 
@@ -92,7 +92,7 @@ def transformation_discovery_experiment(seed=0, n_tasks=20, n_points=6):
             chain.append((name, a))
         g = torch.Generator().manual_seed(rng.randrange(10 ** 6)); P = torch.randn(n_points, 2, generator=g); Q = apply_chain(chain, P) + 0.01 * torch.randn(n_points, 2, generator=g)
         found, err, n = discover_transformation(P, Q); out["candidates"] += n
-        Pnew = torch.randn(50, 2, generator=g) * 3                                          # hors de la région vue
+        Pnew = torch.randn(50, 2, generator=g) * 3                                          # outside the seen region
         truth = apply_chain(chain, Pnew)
         e_rule = float((apply_chain(found, Pnew) - truth).norm(dim=1).mean()); e_mem = float((memorization_baseline(P, Q, Pnew) - truth).norm(dim=1).mean())
         out["discovered_exact"] += e_rule < 0.1; out["rule_error"] += e_rule; out["memo_error"] += e_mem
@@ -100,7 +100,7 @@ def transformation_discovery_experiment(seed=0, n_tasks=20, n_points=6):
     out["discovered_exact"] = round(out["discovered_exact"] / n_tasks, 3); return out
 
 
-# ================================================================ invariants et cycle de vie
+# ================================================================ invariants and life cycle
 
 INVARIANT_CANDIDATES = {
     "pairwise_distance": lambda P: torch.pdist(P),
@@ -115,7 +115,7 @@ INVARIANT_CANDIDATES = {
 
 @dataclass
 class Hypothesis:
-    """HYPOTHESIS → SUPPORTED → STABLE | REFUTED, avec preuves pour / contre."""
+    """HYPOTHESIS → SUPPORTED → STABLE | REFUTED, with evidence for / against."""
     name: str
     status: str = "HYPOTHESIS"
     support: int = 0
@@ -133,8 +133,8 @@ class Hypothesis:
 
 
 def discover_invariants(transform_sampler: Callable, n_traj=8, n_perturb=12, seed=0, tol=1e-4):
-    """Trajectoires sous une famille de transformations inconnue ; candidats invariants testés : constance le long
-    des trajectoires, puis PERTURBATION (nouvelles instances de la famille) ; sinon réfutés."""
+    """Trajectories under an unknown family of transformations; candidate invariants tested: constancy along
+    the trajectories, then PERTURBATION (new instances of the family); otherwise refuted."""
     g = torch.Generator().manual_seed(seed); hyps = {k: Hypothesis(k) for k in INVARIANT_CANDIDATES}
     for t in range(n_traj + n_perturb):
         P = torch.randn(4, 2, generator=g); Q = transform_sampler(P, g)
@@ -145,7 +145,7 @@ def discover_invariants(transform_sampler: Callable, n_traj=8, n_perturb=12, see
     return hyps
 
 
-# ================================================================ monde ouvert précurseur avec LOI CACHÉE
+# ================================================================ precursor open world with HIDDEN LAW
 
 PHI_GRID = [k * math.pi / 16 for k in range(-16, 16)]        # 32 rotations
 GAIN_GRID = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.5]
@@ -154,9 +154,9 @@ MIRROR = [False, True]
 
 @dataclass
 class LawWorld:
-    """Monde continu 2D : objets typés (balle, bloc, « mystère »), positions, frottement ; action pousser(objet,
-    direction, intensité) ; capteur de position bruité ; langage limité (« pousse le mystère vers l'est »).
-    LOI CACHÉE : le type « mystère » répond à une poussée par d = gain · R(φ) · M · u (M miroir éventuel), au lieu de d = u."""
+    """Continuous 2D world: typed objects (ball, block, « mystère »), positions, friction; action push(object,
+    direction, intensity); noisy position sensor; limited language (« pousse le mystère vers l'est »).
+    HIDDEN LAW: the « mystère » type responds to a push with d = gain · R(φ) · M · u (M optional mirror), instead of d = u."""
     phi: float
     gain: float
     mirror: bool
@@ -176,20 +176,20 @@ class LawWorld:
         return d + self.noise * torch.randn(2, generator=self.g)
 
     def say(self, text):
-        """Langage limité : « pousse le mystère vers le nord|sud|est|ouest »."""
+        """Limited language: « pousse le mystère vers le nord|sud|est|ouest »."""
         dirs = {"est": 0.0, "nord": math.pi / 2, "ouest": math.pi, "sud": -math.pi / 2}
         obj = "mystere" if "mystère" in text else "balle"; d = next(v for k, v in dirs.items() if k in text)
         return self.push(obj, d)
 
 
 def hypothesis_space():
-    """Lois candidates = compositions de primitives (miroir ∘ rotation ∘ gain) sur une grille — 512 hypothèses."""
+    """Candidate laws = compositions of primitives (mirror ∘ rotation ∘ gain) on a grid — 512 hypotheses."""
     return CompatibleStateSet.product({("law", "phi"): list(range(len(PHI_GRID))), ("law", "gain"): list(range(len(GAIN_GRID))),
                                        ("law", "mirror"): [0, 1]})
 
 
 class PushOperator(MeasurementOperator):
-    """Opérateur de mesure d'une expérience « pousser dans la direction θ » : issue = déplacement discrétisé (grille)."""
+    """Measurement operator of a "push in direction θ" experiment: outcome = discretized displacement (grid)."""
 
     def __init__(self, theta, noise, magnitude=1.0, obj="mystere"):
         super().__init__(Observable("push", "law", "phi", tuple(range(len(PHI_GRID)))), MeasurementContext(sensor=f"push@{theta:.2f}", noise=NoiseModel("gaussian", sigma=noise), cost=0.1))
@@ -198,7 +198,7 @@ class PushOperator(MeasurementOperator):
 
     def predicted(self, S):
         th = self.theta; u = self.magnitude * torch.tensor([math.cos(th), math.sin(th)])
-        if self.obj != "mystere": return u.expand(len(S), 2).clone()           # loi connue : aucune information
+        if self.obj != "mystere": return u.expand(len(S), 2).clone()           # known law: no information
         phi = torch.tensor(PHI_GRID)[S.column(("law", "phi"))]; gain = torch.tensor(GAIN_GRID)[S.column(("law", "gain"))]
         mir = S.column(("law", "mirror")).float(); v = torch.stack([u[0].expand_as(mir), u[1] * (1 - 2 * mir)], 1)
         c, s = torch.cos(phi), torch.sin(phi)
@@ -221,8 +221,8 @@ def expected_entropy(S, op):
 
 
 def identify_law(world: LawWorld, policy="active", max_exp=30, confidence=0.99, seed=0, directions=8):
-    """Actions possibles : pousser (balle | bloc | mystère) dans 8 directions avec 3 intensités. Choix par gain
-    d'information attendu (MeasurementPlanner, active) ou au hasard ; croyance mise à jour ; arrêt à P(MAP) ≥ confiance."""
+    """Possible actions: push (ball | block | mystère) in 8 directions with 3 intensities. Choice by expected
+    information gain (MeasurementPlanner, active) or at random; belief updated; stop at P(MAP) ≥ confidence."""
     rng = random.Random(seed); S = hypothesis_space(); thetas = [k * 2 * math.pi / directions for k in range(directions)]
     actions = [(o, th, m) for o in ("balle", "bloc", "mystere") for th in thetas for m in (0.2, 0.5, 1.0)]
     for n in range(1, max_exp + 1):
@@ -245,8 +245,8 @@ def law_correct(world, found):
 
 
 def form_skill(world, found):
-    """Loi soutenue → TransformationSpec (DomainTransformation), invariants testés, compétence prédictive et
-    CERTIFICAT GÉNÉRATIF (générateur de poussées + référence = la loi découverte)."""
+    """Supported law → TransformationSpec (DomainTransformation), tested invariants, predictive skill and
+    GENERATIVE CERTIFICATE (push generator + reference = the discovered law)."""
     from core.invariant_algebra import DomainTransformation
     from core.generative_certificate import ContinuousGenerator, GenerativeInvariantCertificate
     phi, gain, mirror = found["phi"], found["gain"], found["mirror"]

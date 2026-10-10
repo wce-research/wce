@@ -1,13 +1,13 @@
-"""Sous-jalon Objective Alignment & Conditional Optimization — module d'ÉVALUATION, dev uniquement.
+"""Sub-milestone Objective Alignment & Conditional Optimization — EVALUATION module, dev only.
 
-Trois régimes d'entrée, séparés :
-  A  vrais atomes + vrais paramètres            (contrôle : optimiser devrait être inutile)
-  B  vrais atomes + paramètres perturbés        (faible / moyen / fort)
-  C  atomes découverts + paramètres approximatifs (le cas réellement intéressant)
+Three input regimes, separated:
+  A  true atoms + true parameters               (control: optimising should be useless)
+  B  true atoms + perturbed parameters          (low / medium / high)
+  C  discovered atoms + approximate parameters  (the genuinely interesting case)
 
-Pour chaque candidat : signaux internes AVANT ajustement, puis, pour chaque objectif observable, l'état initial, le
-meilleur état rencontré et l'état final, avec l'accord fonctionnel réel de chacun (vérité : MESURE seulement).
-Les politiques (toujours / jamais / garde-fou / porte conditionnelle) sont ensuite évaluées sur ces états enregistrés.
+For each candidate: internal signals BEFORE fitting, then, for each observable objective, the initial state, the
+best state encountered and the final state, with the real functional agreement of each (truth: MEASUREMENT only).
+The policies (always / never / guardrail / conditional gate) are then evaluated on these recorded states.
 """
 from __future__ import annotations
 
@@ -46,7 +46,7 @@ def _spearman(a, b):
 
 
 def candidates_for(task, seed=0):
-    """Candidats des trois régimes pour une tâche : [(régime, niveau, programme, erreur de paramètres initiale)]."""
+    """Candidates of the three regimes for a task: [(regime, level, program, initial parameter error)]."""
     from core.deep_reachability import leaves
     tr = normalize(task.world.truth); out = [("A", "true", tr, 0.0)]; g = torch.Generator().manual_seed(seed + 17); p0 = torch.tensor(tr.param_vector(), dtype=DT)
     for name, s in PERTURBATIONS.items():
@@ -58,7 +58,7 @@ def candidates_for(task, seed=0):
 
 
 def candidate_study(task, seed=0) -> List[dict]:
-    """Étude par candidat : signaux, puis chaque objectif (état initial / meilleur / final) avec accord réel."""
+    """Study per candidate: signals, then each objective (initial / best / final state) with real agreement."""
     A = _accord(task); data = FitData.build(task.X, task.y, 0.10); rows = []; tr = task.world.truth
     for regime, level, prog, perr in candidates_for(task, seed):
         sk = prog.skeleton(); init = torch.tensor(prog.param_vector(), dtype=DT); st = lambda th: sk.with_params(th.tolist()); sig = signals(sk, data, init)
@@ -74,8 +74,8 @@ def candidate_study(task, seed=0) -> List[dict]:
 
 
 def e2e_run(task, policy: str, literals: str, seed=0) -> dict:
-    """Chaîne complète : découverte de primitives (ou vrais atomes, contrôle) → composition → politique d'optimisation
-    → sélection. Seul le paramètre `validated` de l'étape d'ajustement change entre les politiques."""
+    """Full chain: discovery of primitives (or true atoms, control) → composition → optimisation policy
+    → selection. Only the `validated` parameter of the fitting step changes between the policies."""
     from core.deep_reachability import leaves
     t0 = time.time(); tr = task.world.truth; A = _accord(task); data = FitData.build(task.X, task.y, 0.10); kw = {"fact_literals": leaves(tr), "fact_residual": False} if literals == "true" else {}
     out = DeepSearch("factorized", budget=150.0, seed=seed, max_depth=min(6, n_atoms(tr) + 1), validated=E2E_POLICIES[policy], **kw).run(data); best = out.best().program; a = A(best)
@@ -84,14 +84,14 @@ def e2e_run(task, policy: str, literals: str, seed=0) -> dict:
             "preserved": out.stats["preserved"], "gate_rollbacks": out.stats["gate_rollbacks"], "seconds": round(time.time() - t0, 2)}
 
 
-# Les 9 tâches dégradées par le garde-fou dans l'expérience à deux bras : 6 nouvelles (4,7 %) et 3 du diagnostic (2,3 %).
+# The 9 tasks degraded by the guardrail in the two-arm experiment: 6 new (4.7%) and 3 from the diagnostic (2.3%).
 RESIDUAL_TASKS = (("104", 4, "standard"), ("106", 4, "standard"), ("110", 5, "standard"), ("107", 4, "standard"), ("101", 4, "rich"), ("107", 5, "standard"), ("9", 4, "standard"), ("0", 5, "rich"), ("1", 5, "standard"))
 
 
 def residual_case(task, seed=0) -> dict:
-    """Analyse d'une tâche DÉGRADÉE par le garde-fou : pour chaque ajustement accepté, l'accord réel a-t-il baissé
-    alors que la vraisemblance profilée montait (exploitation du bruit) ? Les deux bras finissent-ils sur la même
-    structure ? Laquelle les DONNÉES préfèrent-elles ?"""
+    """Analysis of a task DEGRADED by the guardrail: for each accepted fit, did the real agreement go down
+    while the profiled likelihood went up (exploitation of the noise)? Do the two arms end on the same
+    structure? Which one do the DATA prefer?"""
     from core.deep_downstream import TracedSearch
     from core.deep_reachability import leaves
     tr = task.world.truth; A = _accord(task); data = FitData.build(task.X, task.y, 0.10); res = {}
@@ -114,8 +114,8 @@ def residual_case(task, seed=0) -> dict:
     res["rollback_lost_gain"] = sum(h["accord_proposal"] > h["accord_before"] + 0.002 for h in rb); res["rollbacks"] = len(rb); res["same_final_structure"] = res["A"]["form"] == res["B"]["form"]
     res["data_prefer_B"] = res["B"]["profiled"] > res["A"]["profiled"] + 1e-9; res["evidence_prefer_B"] = res["B"]["evidence"] > res["A"]["evidence"] + 1e-9
     if res["B"]["accord"] >= res["A"]["accord"] - 1e-9: res["explanation"] = "NOT_DEGRADED"
-    elif res["accepted_harmful"] > 0 and res["data_prefer_B"]: res["explanation"] = "NOISE_EXPLOITED_ACCEPTED"          # un ajustement accepté (mieux sur les données) est fonctionnellement moins bon
-    elif res["data_prefer_B"] or res["evidence_prefer_B"]: res["explanation"] = "DATA_PREFER_WORSE_FUNCTION"          # la solution B explique mieux les observations et est moins bonne : critère insuffisant
-    elif not res["same_final_structure"]: res["explanation"] = "PATH_CHANGED_STRUCTURE"                              # conserver d'autres états a changé la structure finalement retenue
+    elif res["accepted_harmful"] > 0 and res["data_prefer_B"]: res["explanation"] = "NOISE_EXPLOITED_ACCEPTED"          # an accepted fit (better on the data) is functionally worse
+    elif res["data_prefer_B"] or res["evidence_prefer_B"]: res["explanation"] = "DATA_PREFER_WORSE_FUNCTION"          # solution B explains the observations better and is worse: insufficient criterion
+    elif not res["same_final_structure"]: res["explanation"] = "PATH_CHANGED_STRUCTURE"                              # keeping other states changed the structure finally retained
     else: res["explanation"] = "OTHER"
     return {"experiment": "residual", **res}

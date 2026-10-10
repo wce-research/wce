@@ -1,4 +1,4 @@
-"""Graphe causal léger des transformations du World."""
+"""Lightweight causal graph of the transformations of the World."""
 
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
@@ -116,7 +116,7 @@ class TransformGraph:
 
     def explain_last(self):
         record = self.current.record
-        if record is None: return "Aucune transformation appliquée."
+        if record is None: return "No transformation applied."
         lines = []
         for change in getattr(record.executable, "changes", ()):
             lines.append(f"{change.entity}.{change.property}: {change.before} -> {change.after}")

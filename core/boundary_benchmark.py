@@ -1,4 +1,4 @@
-"""Banc multi-graines + lot scellé + hypothèses pré-enregistrées (docs/hypotheses_boundary_induction.md)."""
+"""Multi-seed benchmark + sealed set + preregistered hypotheses (docs/hypotheses_boundary_induction.md)."""
 from __future__ import annotations
 
 import json
@@ -57,7 +57,7 @@ def run_job(args):
     raise KeyError(job)
 
 
-# ================================================================ agrégation
+# ================================================================ aggregation
 
 def _ci(xs):
     xs = [float(x) for x in xs if x is not None]; n = len(xs)
@@ -73,7 +73,7 @@ def aggregate(results):
     for seed, job, r in results: by[job][seed] = r
     seeds = sorted(by["main"]); S = {}
     def per_seed(job, f): return [f(by[job][s]) for s in sorted(by[job]) if by[job][s] is not None]
-    # --- principal : par méthode × catégorie
+    # --- main: per method × category
     cats = ("validation", "held_out", "partial", "unrepresentable", "held_out_composition", "double_held_out")
     S["main"] = {}
     for m in METHODS:
@@ -158,20 +158,20 @@ def hypotheses(S, by, seeds):
     H["H8"] = {"abstention": round(abst, 3), "false_reject": round(frej, 3), "verdict": "SOUTENUE" if abst >= 0.8 and frej <= 0.2 else "RÉFUTÉE" if abst < 0.5 else "NON CONCLUANTE"}
     from core.boundary_program import PRIMITIVES
     needed = [k[len("without_"):] for k, v in S.get("ablation", {}).items() if k.startswith("without_") and v and v["mean"] < S["ablation"]["all"]["mean"] - 0.02]
-    covered = 4 + 3 + 3                                                          # familles représentables du banc dév. (train + val + held-out récupérables)
+    covered = 4 + 3 + 3                                                          # representable families of the dev. benchmark (train + val + recoverable held-out)
     H["H9"] = {"primitive_types": len(PRIMITIVES), "necessary_primitives": needed, "families_covered_estimate": covered, "coverage_all": S.get("ablation", {}).get("all"),
                "verdict": "SOUTENUE" if len(PRIMITIVES) <= 0.5 * covered or len(needed) <= 0.5 * covered else "RÉFUTÉE" if len(PRIMITIVES) >= covered else "NON CONCLUANTE"}
     return H
 
 
-# ================================================================ lot scellé
+# ================================================================ sealed set
 
 def sealed_eval(seed=990777):
     spec = sealed_spec(); g = torch.Generator().manual_seed(seed); rows = []
     from core.boundary_experiments import induce_family_library
     lib, _ = induce_family_library(seed); macros = [f.macro.skeleton for f in lib if f.status in ("STABLE", "SUPPORTED")]
     for inst in instances(spec["families"], spec["seed"], spec["per_family"]):
-        X, y = sample_task(inst, 200, g, label_noise=0.08)                       # étiquettes plus bruitées que le dév.
+        X, y = sample_task(inst, 200, g, label_noise=0.08)                       # labels noisier than in dev.
         R = evaluate_all(inst, X, y, g, macros)
         for m, r in R.items():
             if r is not None: rows.append({"family": inst.family, "representable": inst.representable, "method": m, **{k: v for k, v in r.items()}})

@@ -1,6 +1,6 @@
-"""Expériences ciblées de la plasticité compositionnelle : synthèse de sondes (I), sous-espaces orthogonaux /
-espace nul (J, K), régénération sans instantané (AJ), économie de transformations (AK), compression de
-l'historique d'apprentissage (AL), décision de croissance et réutilisation future (N, P), macros (S, T)."""
+"""Targeted experiments on compositional plasticity: probe synthesis (I), orthogonal subspaces /
+null space (J, K), regeneration without snapshot (AJ), transformation economy (AK), compression of
+the learning history (AL), growth decision and future reuse (N, P), macros (S, T)."""
 from __future__ import annotations
 
 import copy
@@ -14,11 +14,11 @@ from core.multitask_benchmark import D_CUE, mono_acc, mono_forward, mono_init, m
 from core.skillnet import ALL_DATA, SkillNet, skill_modules, task_stream
 
 
-# ================================================================ I — synthèse de sondes vs replay complet
+# ================================================================ I — probe synthesis vs full replay
 
 def probe_synthesis_experiment(seed=0, ks=(0, 4, 8, 16, 32, 64), steps=250):
-    """Ancienne tâche A puis nouvelle B (réseau monolithique) ; protection de A par k sondes SYNTHÉTISÉES
-    (sorties de référence, aucune donnée brute) vs k sondes ALÉATOIRES vs replay de TOUTES les données de A."""
+    """Old task A then new B (monolithic network); protection of A by k SYNTHESIZED probes
+    (reference outputs, no raw data) vs k RANDOM probes vs replay of ALL the data of A."""
     tasks = task_stream(seed + 50, 2); rng = random.Random(seed); A, B = tasks
     Xa, Ca, ya = A.sample(128, rng); Xb, Cb, yb = B.sample(128, rng); ta, tb = A.test_set(1), B.test_set(2)
     p = mono_train(mono_init(seed), torch.cat([Xa, Ca], 1), ya, steps, seed=seed); proto = Ca.mean(0).round()
@@ -40,7 +40,7 @@ def probe_synthesis_experiment(seed=0, ks=(0, 4, 8, 16, 32, 64), steps=250):
     return out
 
 
-# ================================================================ J/K — gradient vanilla vs projeté vs contraint vs croissance
+# ================================================================ J/K — vanilla gradient vs projected vs constrained vs growth
 
 def subspace_experiment(seed=0, steps=250, k=32):
     tasks = task_stream(seed + 60, 2); rng = random.Random(seed); A, B = tasks
@@ -60,7 +60,7 @@ def subspace_experiment(seed=0, steps=250, k=32):
     return out
 
 
-# ================================================================ AJ — régénération sans instantané
+# ================================================================ AJ — regeneration without snapshot
 
 def regeneration_experiment(seed=0, n_tasks=10):
     net = SkillNet(seed=seed); certs = {}; pl = PlasticityPlanner(seed=seed); rng = random.Random(seed); tasks = task_stream(seed, n_tasks)
@@ -81,7 +81,7 @@ def regeneration_experiment(seed=0, n_tasks=10):
             "accuracy_before": mean("before"), "accuracy_corrupted": mean("corrupted"), "accuracy_regenerated": mean("regenerated"), "per_module": per}
 
 
-# ================================================================ AK/AL/S/T — économie, compression, macros, bibliothèque
+# ================================================================ AK/AL/S/T — economy, compression, macros, library
 
 def economy_and_compression(seed=0, n_tasks=16):
     tasks = task_stream(seed, n_tasks); rng = random.Random(seed)
@@ -102,7 +102,7 @@ def economy_and_compression(seed=0, n_tasks=16):
 
 
 def library_ablation(seed=0, n_tasks=16):
-    """Bibliothèque de stratégies : nombre d'évaluations de candidats et calcul, avec / sans."""
+    """Strategy library: number of candidate evaluations and compute, with / without."""
     out = {}
     for use in (False, True):
         tasks = task_stream(seed, n_tasks); rng = random.Random(seed); net = SkillNet(seed=seed); certs = {}

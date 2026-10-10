@@ -1,13 +1,13 @@
-"""Banc d'apprentissage continu SANS identifiant de tâche (10 à 20 tâches successives) : 7 méthodes.
+"""Continual-learning benchmark WITHOUT task identifier (10 to 20 successive tasks): 7 methods.
 
-1 vanilla (réseau monolithique, entrée = données + indice)   2 replay (tampon de données BRUTES)
-3 EWC-like (Fisher diagonale)                                  4 gradient projeté (espace nul du Jacobien sur sondes synthétisées)
-5 contraintes d'invariants (ancrage des sorties sur sondes)   6 croissance structurelle seule (un expert par contexte)
-7 plasticité compositionnelle complète (réutilisation > composition > adaptateur > croissance, certificats, bibliothèque)
+1 vanilla (monolithic network, input = data + cue)            2 replay (buffer of RAW data)
+3 EWC-like (diagonal Fisher)                                   4 projected gradient (null space of the Jacobian on synthesised probes)
+5 invariant constraints (anchoring of the outputs on probes) 6 structural growth alone (one expert per context)
+7 full compositional plasticity (reuse > composition > adapter > growth, certificates, library)
 
-Métriques : exactitude moyenne finale, transfert arrière (BWT), transfert avant (FWT = exactitude à l'apprentissage −
-réseau neuf entraîné seul), oubli, croissance des paramètres, mémoire stockée (octets), calcul (pas d'entraînement),
-récurrences (latence de réactivation, réutilisation).
+Metrics: final mean accuracy, backward transfer (BWT), forward transfer (FWT = accuracy at learning time −
+fresh network trained alone), forgetting, parameter growth, stored memory (bytes), compute (training steps),
+recurrences (reactivation latency, reuse).
 """
 from __future__ import annotations
 
@@ -24,7 +24,7 @@ METHODS = ("vanilla", "replay", "ewc", "projected", "invariant_constraints", "st
 H, STEPS, N_SUPPORT = 64, 250, 128
 
 
-# ================================================================ réseau monolithique (bases)
+# ================================================================ monolithic network (baselines)
 
 def mono_init(seed):
     g = torch.Generator().manual_seed(seed); d = D_DATA + D_CUE
@@ -46,7 +46,7 @@ def mono_unflat(v, like):
 
 def mono_train(p, Z, y, steps=STEPS, lr=0.02, seed=0, replay=None, ewc=None, anchors=None, basis=None, lam=1.0):
     torch.manual_seed(seed); q = {k: v.clone().requires_grad_(True) for k, v in p.items()}
-    # Adam sortirait du sous-espace projeté (normalisation par coordonnée) : SGD à moment quand une base est imposée
+    # Adam would leave the projected subspace (per-coordinate normalisation): SGD with momentum when a basis is imposed
     opt = (torch.optim.Adam(q.values(), lr=lr) if basis is None else torch.optim.SGD(q.values(), lr=0.1, momentum=0.9)); f = torch.nn.functional
     for _ in range(steps):
         opt.zero_grad(); loss = f.cross_entropy(mono_forward(q, Z), y)
@@ -54,7 +54,7 @@ def mono_train(p, Z, y, steps=STEPS, lr=0.02, seed=0, replay=None, ewc=None, anc
         if ewc is not None: loss = loss + sum((F[k] * (q[k] - th[k]) ** 2).sum() for F, th in ewc for k in q) * 50.0
         if anchors is not None and len(anchors[0]): loss = loss + lam * ((mono_forward(q, anchors[0]) - anchors[1]) ** 2).mean()
         loss.backward()
-        if basis is not None:                                 # projection : Δθ ⟂ directions sensibles des tâches anciennes
+        if basis is not None:                                 # projection: Δθ ⟂ sensitive directions of the old tasks
             g = torch.cat([q[k].grad.flatten() for k in q]); g = g - basis @ (basis.T @ g)
             for k, v in mono_unflat(g, q).items(): q[k].grad = v
         opt.step()
@@ -66,8 +66,8 @@ def mono_acc(p, X, C, y):
 
 
 def probes_for(p, cue_proto, k=16):
-    """Sondes synthétisées pour une tâche passée : données choisies (faible marge + couverture) × prototype d'indice
-    (résumé canonique de tâche) — aucune entrée ancienne stockée."""
+    """Probes synthesised for a past task: chosen data (low margin + coverage) × cue prototype
+    (canonical task summary) — no old input stored."""
     fn = lambda X: mono_forward(p, torch.cat([X, cue_proto.expand(len(X), D_CUE)], 1))
     X, _ = synthesize_probes(fn, None, k)
     return torch.cat([X, cue_proto.expand(len(X), D_CUE)], 1)
@@ -85,7 +85,7 @@ def jac_basis(p, Z, old_basis=None, energy=0.99):
     return B if old_basis is None else torch.linalg.qr(torch.cat([old_basis, B], 1))[0]
 
 
-# ================================================================ exécution d'une méthode
+# ================================================================ execution of a method
 
 def run(method, tasks, seed=0, steps=STEPS, n_support=N_SUPPORT, capacity=3000):
     rng = random.Random(seed); T = len(tasks); R = [[0.0] * T for _ in range(T)]
@@ -121,7 +121,7 @@ def run(method, tasks, seed=0, steps=STEPS, n_support=N_SUPPORT, capacity=3000):
             if method == "invariant_constraints" and anchors: kw["anchors"] = (torch.cat([a for a, _ in anchors]), torch.cat([o for _, o in anchors]))
             p = mono_train(p, Z, y, steps, seed=seed + i, **kw); compute += steps
             if method == "replay":
-                buf[0].append(Z[:32]); buf[1].append(y[:32]); mem_bytes += 32 * (Z.shape[1] + 1)                     # données BRUTES
+                buf[0].append(Z[:32]); buf[1].append(y[:32]); mem_bytes += 32 * (Z.shape[1] + 1)                     # RAW data
             if method == "ewc":
                 q = {k: v.clone().requires_grad_(True) for k, v in p.items()}
                 g = torch.autograd.grad(torch.nn.functional.cross_entropy(mono_forward(q, Z), y), list(q.values()))
@@ -144,7 +144,7 @@ _REFS = {}
 
 
 def refs(tasks, seed, steps, n_support):
-    """Référence pour le transfert avant : réseau monolithique NEUF entraîné seul sur la tâche (mêmes données)."""
+    """Reference for the forward transfer: FRESH monolithic network trained alone on the task (same data)."""
     key = (tuple(t.name for t in tasks), seed)
     if key not in _REFS:
         rng = random.Random(seed); out = []

@@ -1,9 +1,9 @@
-"""Pont vers la langue : micro-corpus français -> mêmes primitives WCE, même mécanisme.
+"""Bridge to language: French micro-corpus -> same WCE primitives, same mechanism.
 
-Le mécanisme est celui des commandes symboliques (REV, ROT...) :
-une expérience (phrase, avant, après) est EXPLIQUÉE par une recherche sur les primitives
-connues ; le mot est alors lié à la primitive qui explique l'observation (lexique = routage).
-Un mot jamais observé reste inconnu : le système ne devine pas.
+The mechanism is that of the symbolic commands (REV, ROT...):
+an experience (sentence, before, after) is EXPLAINED by a search over the known
+primitives; the word is then bound to the primitive that explains the observation (lexicon = routing).
+A word never observed remains unknown: the system does not guess.
 """
 from __future__ import annotations
 
@@ -26,7 +26,7 @@ DETERMINERS = {"la", "le", "l", "les", "un", "une"}
 KNOWN_NOUNS = {"balle", "bloc", "table", "sol"}
 
 
-# ================================================================ primitives physiques (specs WCE)
+# ================================================================ physical primitives (WCE specs)
 
 def fall_spec(entity):
     from core.action import LiftAction
@@ -59,7 +59,7 @@ def apply_spec(world, spec):
     return world
 
 
-# ================================================================ analyse
+# ================================================================ parsing
 
 @dataclass
 class Parsed:
@@ -77,7 +77,7 @@ def parse(sentence, entities=()):
     return Parsed(verb=rest[0] if rest else "", entity=entity, sequence=sequence)
 
 
-# ================================================================ pont
+# ================================================================ bridge
 
 @dataclass
 class Interpretation:
@@ -95,7 +95,7 @@ class LanguageBridge:
         self.library = StrategyLibrary()
         self.log: List[str] = []
 
-    # ---- apprentissage par l'expérience ---------------------------------
+    # ---- learning from experience ---------------------------------
     def observe_physics(self, sentence, before: World, after: World):
         p = parse(sentence, before.entities)
         if p.entity is None: return None
@@ -118,7 +118,7 @@ class LanguageBridge:
 
     def _bind(self, verb, explaining, sentence):
         if len(explaining) != 1:
-            self.log.append(f"'{sentence}': {len(explaining)} explication(s) -> pas de liaison")
+            self.log.append(f"'{sentence}': {len(explaining)} explanation(s) -> no binding")
             return None
         skill = explaining[0]
         self.lexicon.setdefault(verb, Counter())[skill] += 1
@@ -126,14 +126,14 @@ class LanguageBridge:
         self.log.append(f"'{sentence}': '{verb}' -> {skill}")
         return skill
 
-    # ---- interprétation / exécution -------------------------------------
+    # ---- interpretation / execution -------------------------------------
     def interpret(self, sentence, entities=()):
         p = parse(sentence, entities)
         if p.verb in self.lexicon:
             skill = self.lexicon[p.verb].most_common(1)[0][0]
             return Interpretation(sentence, p.verb, skill, True, Goal(skill, p.entity or p.sequence),
-                                  f"'{p.verb}' appris sur {sum(self.lexicon[p.verb].values())} expérience(s)")
-        return Interpretation(sentence, p.verb, None, False, None, f"verbe inconnu '{p.verb}' : aucune expérience")
+                                  f"'{p.verb}' learned from {sum(self.lexicon[p.verb].values())} experience(s)")
+        return Interpretation(sentence, p.verb, None, False, None, f"unknown verb '{p.verb}': no experience")
 
     def execute(self, sentence, world: World = None):
         interp = self.interpret(sentence, world.entities if world is not None else ())
@@ -146,7 +146,7 @@ class LanguageBridge:
 
 
 def default_corpus():
-    """Expériences d'apprentissage (phrase, monde avant, monde après)."""
+    """Learning experiences (sentence, world before, world after)."""
     return [("la balle tombe", {"balle": 2.0, "bloc": 1.0}, "balle", "FALL"),
             ("la balle monte", {"balle": 0.0, "bloc": 1.0}, "balle", "RISE"),
             ("le bloc tombe", {"balle": 0.0, "bloc": 3.0}, "bloc", "FALL"),

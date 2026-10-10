@@ -1,10 +1,10 @@
-"""Droit d'affirmer (ClaimEntitlement), séparé de la probabilité de vérité.
+"""Entitlement to assert (ClaimEntitlement), separate from the probability of truth.
 
-Chaque réponse produit une provenance épistémique : affirmation, niveau d'inférence, observations, règles, fiabilités,
-hypothèses d'identité, hypothèses lexicales, alternatives restantes. Deux incertitudes distinctes :
-  - épistémique : le monde est-il établi ? (postérieure de croyance, conflits, identité) ;
-  - linguistique : la phrase a-t-elle été comprise ? (sens des mots, marge grammaticale).
-Décision : ASSERTED (L0/L1, ou L2 très sûr et diversifié) | QUALIFIED | ASKED | WITHHELD.
+Each answer produces an epistemic provenance: claim, inference level, observations, rules, reliabilities,
+identity assumptions, lexical assumptions, remaining alternatives. Two distinct uncertainties:
+  - epistemic: is the world established? (belief posterior, conflicts, identity);
+  - linguistic: was the sentence understood? (word meanings, grammatical margin).
+Decision: ASSERTED (L0/L1, or L2 very confident and diversified) | QUALIFIED | ASKED | WITHHELD.
 """
 from __future__ import annotations
 
@@ -33,7 +33,7 @@ class EpistemicProvenance:
     linguistic_uncertainty: float = 0.0
     epistemic_uncertainty: float = 0.0
     source_diversity: int = 0
-    source_lower: float = 1.0          # borne basse crédible de la source la plus fiable qui soutient la croyance
+    source_lower: float = 1.0          # credible lower bound of the most reliable source that supports the belief
     single_source: bool = False
 
     def summary(self):
@@ -47,7 +47,7 @@ class EpistemicProvenance:
 
 
 def evidence_level(agent, key):
-    """Niveau des preuves qui établissent une croyance : L0 direct, L1 élimination explicite, L2 identité probabiliste."""
+    """Level of the evidence that establishes a belief: L0 direct, L1 explicit elimination, L2 probabilistic identity."""
     b = agent.belief.graph.belief(key)
     if b.value is None: return L0, "inconnue"
     lvl, why = L0, "directe"
@@ -62,7 +62,7 @@ def evidence_level(agent, key):
 
 
 def provenance(agent, ans, lexical_posterior=None) -> EpistemicProvenance:
-    """Provenance d'une réponse de l'agent ancré / unifié (lue dans son état de croyances courant)."""
+    """Provenance of an answer of the grounded / unified agent (read from its current belief state)."""
     g = agent.belief.graph
     level = L0
     obs, rules, rel, ids, alts, supporters = [], [], {}, [], {}, set()
@@ -87,7 +87,7 @@ def provenance(agent, ans, lexical_posterior=None) -> EpistemicProvenance:
                     rules.append(f"identité jointe probabiliste ({s})"); level = max(level, L2)
                     ids.append(f"{e.key[1]} via {s} (P={getattr(ev, 'weight', 1.0):.3f})")
     if not ans.entries and ans.intent != "command": p_belief = 0.0
-    # prémisses de l'identification du référent : couleurs établies des objets du même type (si la question décrit une couleur)
+    # premises of the referent identification: established colors of the objects of the same type (if the question describes a color)
     if any(str(m).startswith("color:") for m in ans.word_meanings.values()):
         for e in ans.entries:
             o = e.key[1] if len(e.key) > 1 else None
@@ -99,20 +99,20 @@ def provenance(agent, ans, lexical_posterior=None) -> EpistemicProvenance:
     idp = ans.features.get("identity_p")
     if idp is not None:
         qrule = ans.features.get("identity_rule")
-        if qrule is not None:                                    # identité de la question établie par élimination explicite
+        if qrule is not None:                                    # identity of the question established by explicit elimination
             ids.append(f"référence de la question par élimination ({qrule.descriptor} -> {qrule.remaining})")
             rules.append(f"EliminateCandidates({qrule.descriptor}->{qrule.remaining}, L{qrule.level})"); level = max(level, qrule.level)
             weights.append(qrule.confidence)
         else:
             ids.append(f"référence de la question (P={idp:.3f}, jointe probabiliste)"); weights.append(idp); level = max(level, L2)
             rules.append("coréférence probabiliste à la question")
-    if ans.entries and len(ans.entries) > 1 and ans.intent != "command": level = max(level, L1)   # composition de croyances
-    # hypothèses lexicales
+    if ans.entries and len(ans.entries) > 1 and ans.intent != "command": level = max(level, L1)   # composition of beliefs
+    # lexical assumptions
     lex = {}
     for t in agent._ctx if hasattr(agent, "_ctx") else []:
         m, src, conf = agent.word_meaning(t)
         if src in SAFE_WORD_SOURCES or m is None: continue
-        if src in ("neural", "analogy"): level = L3          # une analogie n'est jamais un fait
+        if src in ("neural", "analogy"): level = L3          # an analogy is never a fact
         p = conf
         if lexical_posterior is not None and src == "grounded_obs": p = lexical_posterior(t, m)
         lex[t] = p
@@ -140,11 +140,11 @@ def provenance(agent, ans, lexical_posterior=None) -> EpistemicProvenance:
 @dataclass
 class EntitlementPolicy:
     assert_threshold: float = 0.9          # L0 / L1
-    l2_threshold: float = 0.97             # L2 : affirmé seulement si allow_l2 (sinon « probable » au mieux)
+    l2_threshold: float = 0.97             # L2: asserted only if allow_l2 (otherwise "likely" at best)
     allow_l2: bool = False
     qualify_threshold: float = 0.67
     max_linguistic_uncertainty: float = 0.1
-    min_single_source_lower: float = 0.75   # une croyance qui repose sur UNE source incertaine n'est pas affirmée
+    min_single_source_lower: float = 0.75   # a belief that rests on ONE uncertain source is not asserted
 
 
 class ClaimEntitlement:
@@ -164,7 +164,7 @@ class ClaimEntitlement:
             return QUALIFIED if q >= self.p.qualify_threshold else WITHHELD
         if prov.single_source and prov.source_lower < self.p.min_single_source_lower and prov.level > L0 - 1 \
                 and ans.intent != "command":
-            return QUALIFIED if q >= self.p.qualify_threshold else WITHHELD          # risque de source
+            return QUALIFIED if q >= self.p.qualify_threshold else WITHHELD          # source risk
         if prov.level <= L1 and q >= self.p.assert_threshold: return ASSERTED
         if self.p.allow_l2 and prov.level == L2 and q >= self.p.l2_threshold and prov.source_diversity >= 2: return ASSERTED
         if q >= self.p.qualify_threshold: return QUALIFIED
@@ -172,8 +172,8 @@ class ClaimEntitlement:
 
     @staticmethod
     def output(ans, decision):
-        """Forme évaluable : seule une affirmation ASSERTED garde la valeur ; QUALIFIED reste non engagée (LIKELY).
-        Une abstention brute est rendue telle quelle (aucun gain par simple changement d'étiquette)."""
+        """Evaluable form: only an ASSERTED claim keeps the value; QUALIFIED stays uncommitted (LIKELY).
+        A raw abstention is rendered as is (no gain from a mere change of label)."""
         if decision == ASSERTED or ans.output in ABSTAIN: return ans.output
         if decision == ASKED: return "ASK"
         return "UNKNOWN"

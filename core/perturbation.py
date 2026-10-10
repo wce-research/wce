@@ -1,12 +1,12 @@
-"""Perturbations comme TransformationSpec traçables ; réponse ; sensibilité locale ; Jacobiens (autograd, LOCAL) ;
-sensibilité structurelle (discrète) ; attribution de crédit généralisée (observationnelle vs interventionnelle).
+"""Perturbations as traceable TransformationSpec; response; local sensitivity; Jacobians (autograd, LOCAL);
+structural sensitivity (discrete); generalized credit assignment (observational vs interventional).
 
-Principe : STATE → PERTURB → MEASURE RESPONSE → ESTIMATE SENSITIVITY → (invariants, stabilité : core/stability.py).
+Principle: STATE → PERTURB → MEASURE RESPONSE → ESTIMATE SENSITIVITY → (invariants, stability: core/stability.py).
 
-La rétropropagation n'est PAS le moteur de raisonnement : `DifferentiableSensitivity` ne fournit que des gradients /
-Jacobiens LOCAUX pour les sous-systèmes PyTorch ; tout le reste passe par des perturbations discrètes
-(`StructuralSensitivity`) et des INTERVENTIONS réelles (`interventional_credit`). Une sensibilité observationnelle
-(gradient, corrélation) n'est jamais présentée comme une cause.
+Backpropagation is NOT the reasoning engine: `DifferentiableSensitivity` only provides LOCAL gradients /
+Jacobians for the PyTorch subsystems; everything else goes through discrete perturbations
+(`StructuralSensitivity`) and real INTERVENTIONS (`interventional_credit`). An observational sensitivity
+(gradient, correlation) is never presented as a cause.
 """
 from __future__ import annotations
 
@@ -28,8 +28,8 @@ KINDS = ("input", "measurement", "belief", "parameter", "connection", "routing",
 # ================================================================ perturbation (TransformationSpec)
 
 class Perturbation(TransformationSpec):
-    """Perturbation traçable : kind, target, magnitude, norm, locality, direction, domain.
-    `apply(obj)` renvoie un NOUVEL objet perturbé (l'original n'est jamais modifié) ; `inverse()` si réversible."""
+    """Traceable perturbation: kind, target, magnitude, norm, locality, direction, domain.
+    `apply(obj)` returns a NEW perturbed object (the original is never modified); `inverse()` if invertible."""
 
     def __init__(self, kind, target, magnitude=1.0, direction=None, norm="l2", locality="local", domain="model",
                  fn: Optional[Callable] = None, inverse_fn: Optional[Callable] = None, name=None):
@@ -57,7 +57,7 @@ class Perturbation(TransformationSpec):
         return DEFAULT_APPLY[self.kind](obj, self)
 
     def inverse(self):
-        if not self.invertible: raise ValueError(f"{self.name} n'est pas réversible")
+        if not self.invertible: raise ValueError(f"{self.name} is not invertible")
         if self.inverse_fn is not None:
             return Perturbation(self.kind, self.target, self.magnitude, self.direction, self.norm, self.locality, self.pdomain,
                                 self.inverse_fn, self.fn, name=f"Inverse[{self.name}]")
@@ -77,7 +77,7 @@ def unit_direction(shape, seed, dtype=torch.float32):
     return d / d.norm().clamp_min(1e-12)
 
 
-# ---- applications par défaut (pures : copient l'objet) ----------------------------------------------
+# ---- default applications (pure: they copy the object) ----------------------------------------------
 
 def _apply_input(x, p):
     d = p.direction if p.direction is not None else unit_direction(x.shape, 0, x.dtype)
@@ -85,13 +85,13 @@ def _apply_input(x, p):
 
 
 def _apply_parameter(model: ModelState, p):
-    """target = (module, clé) ; direction = tenseur de même forme (norme 1) ; magnitude relative à ||W||."""
+    """target = (module, key); direction = tensor of the same shape (norm 1); magnitude relative to ||W||."""
     m = copy.deepcopy(model); mod, key = p.target
     W = m.modules[mod].slow[key]
     d = p.direction if p.direction is not None else unit_direction(W.shape, sum(map(ord, f"{mod}.{key}")))
     scale = getattr(p, "_scale", None)
-    if scale is None and hasattr(p, "_parent"): scale = getattr(p._parent, "_scale", None)   # inverse : échelle de l'original
-    if scale is None: scale = float(W.norm().clamp_min(1e-6)); object.__setattr__(p, "_scale", scale)   # amplitude relative à ||W|| d'ORIGINE
+    if scale is None and hasattr(p, "_parent"): scale = getattr(p._parent, "_scale", None)   # inverse: scale of the original
+    if scale is None: scale = float(W.norm().clamp_min(1e-6)); object.__setattr__(p, "_scale", scale)   # amplitude relative to the ORIGINAL ||W||
     m.modules[mod].slow[key] = W + p.magnitude * scale * d
     return m
 
@@ -101,7 +101,7 @@ def _apply_connection(model, p):
 
 
 def _apply_routing(model, p):
-    """Routage : branche (avec force = magnitude) un module source sur une cible ; magnitude 0 = aucun changement."""
+    """Routing: connects (with strength = magnitude) a source module to a target; magnitude 0 = no change."""
     from core.model_state import Connection
     m = copy.deepcopy(model); src, tgt = p.target
     if p.magnitude == 0: return m
@@ -113,13 +113,13 @@ def _apply_routing(model, p):
 
 
 def _apply_belief(S, p):
-    """Bruit sur les log-poids d'un CompatibleStateSet (croyance) ; l'ensemble d'origine est intact."""
+    """Noise on the log-weights of a CompatibleStateSet (belief); the original set is intact."""
     d = p.direction if p.direction is not None else unit_direction(S.logw.shape, 0, torch.float64)
     return S._fork(S.logw + p.magnitude * d, f"perturbation de croyance ({p.magnitude:g})")
 
 
 def _apply_measurement(op, p):
-    """Perturbe le contexte de mesure : fiabilité r -> r − magnitude (bornée), opérateur copié."""
+    """Perturbs the measurement context: reliability r -> r − magnitude (bounded), operator copied."""
     from core.measurement import NoiseModel
     import dataclasses
     o = copy.copy(op); n = op.context.noise
@@ -128,7 +128,7 @@ def _apply_measurement(op, p):
 
 
 def _apply_transformation(chain, p):
-    """Chaîne de transformations : target = index ; direction = transformation de remplacement."""
+    """Chain of transformations: target = index; direction = replacement transformation."""
     c = list(chain); c[p.target] = p.direction; return c
 
 
@@ -138,7 +138,7 @@ DEFAULT_APPLY = {"input": _apply_input, "parameter": _apply_parameter, "connecti
 
 
 def traced(graph: Optional[TransformGraph], p: Perturbation, config=None):
-    """Ajoute la perturbation au TransformGraph (branche hypothétique)."""
+    """Adds the perturbation to the TransformGraph (hypothetical branch)."""
     if graph is None: return None
     node = graph.current.add_child(p, config or {"perturbation": p.name}, name=f"P{len(graph.nodes)}")
     graph.nodes[node.name] = node
@@ -148,7 +148,7 @@ def traced(graph: Optional[TransformGraph], p: Perturbation, config=None):
 def new_graph(name="perturbation"): return TransformGraph(TransformNode(name, configuration={}))
 
 
-# ================================================================ réponse
+# ================================================================ response
 
 @dataclass
 class PerturbationResponse:
@@ -168,7 +168,7 @@ class PerturbationResponse:
 
 
 def model_response(model, perturbed, x, y=None, p=None, invariants=None, x_old=None, y_old=None):
-    """Réponse d'un ModelState à une perturbation (sortie, décision, perte, chemin de calcul, invariants)."""
+    """Response of a ModelState to a perturbation (output, decision, loss, computation path, invariants)."""
     with torch.no_grad():
         o0, o1 = model.forward(x), perturbed.forward(x)
     r = PerturbationResponse(p.name if p else "?", p.magnitude if p else 0.0)
@@ -183,13 +183,13 @@ def model_response(model, perturbed, x, y=None, p=None, invariants=None, x_old=N
 
 
 def local_sensitivity(F: Callable, x, delta) -> float:
-    """S ≈ ||F(x + δ) − F(x)|| / ||δ|| (générique : tenseurs)."""
+    """S ≈ ||F(x + δ) − F(x)|| / ||δ|| (generic: tensors)."""
     fx, fy = F(x), F(x + delta)
     return float((fy - fx).norm() / delta.norm().clamp_min(1e-12))
 
 
 def sensitivity_curve(fn_response: Callable[[float], float], eps=1e-3, n=6, factor=2.0):
-    """Réponse pour ε, 2ε, 4ε… ; renvoie (magnitudes, réponses, sensibilités, exposant log-log ≈ ordre local)."""
+    """Response for ε, 2ε, 4ε…; returns (magnitudes, responses, sensitivities, log-log exponent ≈ local order)."""
     ms = magnitudes(eps, n, factor); rs = [fn_response(m) for m in ms]
     sens = [r / m for r, m in zip(rs, ms)]
     pts = [(math.log(m), math.log(r)) for m, r in zip(ms, rs) if r > 0]
@@ -201,7 +201,7 @@ def sensitivity_curve(fn_response: Callable[[float], float], eps=1e-3, n=6, fact
 
 
 def belief_sensitivity(S, magnitude, var=None, seed=0):
-    """Variation totale de la marginale (ou des poids) sous une perturbation des log-poids."""
+    """Total variation of the marginal (or of the weights) under a perturbation of the log-weights."""
     p = Perturbation("belief", "logw", magnitude, unit_direction(S.logw.shape, seed, torch.float64) * math.sqrt(len(S.logw)))
     T = p.apply(S)
     if var is None: change = 0.5 * float((T.weights - S.weights).abs().sum())
@@ -210,12 +210,12 @@ def belief_sensitivity(S, magnitude, var=None, seed=0):
     return change / magnitude if magnitude else 0.0, T
 
 
-# ================================================================ sensibilité différentiable (autograd, LOCAL)
+# ================================================================ differentiable sensitivity (autograd, LOCAL)
 
 class DifferentiableSensitivity:
-    """Gradients / Jacobiens LOCAUX d'un ModelState (sous-système différentiable) pour le moteur général.
-    Fournit : ∂sortie/∂entrée, ∂perte/∂poids, ∂routage/∂représentation (via les forces de connexion = portes),
-    et la comparaison autograd vs différences finies."""
+    """LOCAL gradients / Jacobians of a ModelState (differentiable subsystem) for the general engine.
+    Provides: ∂output/∂input, ∂loss/∂weights, ∂routing/∂representation (via the connection strengths = gates),
+    and the autograd vs finite-difference comparison."""
 
     def __init__(self, model: ModelState):
         self.model = model
@@ -225,17 +225,17 @@ class DifferentiableSensitivity:
         if strengths is None: return m.forward(x, overrides)
         saved = {k: c.strength for k, c in m.connectivity.items()}
         try:
-            for k, s in strengths.items(): m.connectivity[k].strength = s           # tenseurs (requires_grad)
+            for k, s in strengths.items(): m.connectivity[k].strength = s           # tensors (requires_grad)
             return m.forward(x, overrides)
         finally:
             for k, s in saved.items(): m.connectivity[k].strength = s
 
     def input_jacobian(self, x):
-        """∂sortie/∂entrée pour un exemple x (vecteur) : [out_dim, in_dim]."""
+        """∂output/∂input for one example x (vector): [out_dim, in_dim]."""
         return torch.autograd.functional.jacobian(lambda v: self._forward(v.unsqueeze(0))[0], x)
 
     def weight_gradients(self, x, y):
-        """∂perte/∂poids lents, par module et clé."""
+        """∂loss/∂slow weights, per module and key."""
         params = {m: {k: v.clone().requires_grad_(True) for k, v in self.model.modules[m].slow.items()}
                   for m in self.model.topological_order()}
         over = {m: {k: d[k] + self.model.fast_parameters.get(m, {}).get(k, 0) for k in PARAM_NAMES} for m, d in params.items()}
@@ -248,7 +248,7 @@ class DifferentiableSensitivity:
         return out
 
     def routing_gradients(self, x, y):
-        """∂perte/∂force de chaque connexion active (le routage comme porte continue)."""
+        """∂loss/∂strength of each active connection (routing as a continuous gate)."""
         s = {k: torch.tensor(float(c.strength), requires_grad=True) for k, c in self.model.connectivity.items()}
         loss = torch.nn.functional.cross_entropy(self._forward(x, strengths=s), y)
         used = [k for k in s if s[k].requires_grad]
@@ -256,13 +256,13 @@ class DifferentiableSensitivity:
         return {k: (0.0 if gi is None else float(gi)) for k, gi in zip(used, g)}
 
     def routing_representation_jacobian(self, x, source="expert_a", target="head"):
-        """∂(entrée pondérée du module cible)/∂(représentation source) = force × I — exposé pour contrôle."""
+        """∂(weighted input of the target module)/∂(source representation) = strength × I — exposed as a check."""
         c = self.model.connectivity[(source, target)]
         dim = self.model.modules[source].output_dim
         return c.strength * torch.eye(dim)
 
     def finite_difference_input(self, x, h=1e-3):
-        """Jacobien d'entrée par différences finies centrées (contrôle d'autograd)."""
+        """Input Jacobian by centred finite differences (check of autograd)."""
         cols = []
         with torch.no_grad():
             for j in range(x.numel()):
@@ -279,7 +279,7 @@ class DifferentiableSensitivity:
         w0 = float(W.view(-1)[idx]); return (loss_at(w0 + h) - loss_at(w0 - h)) / (2 * h)
 
     def compare(self, x, y, n_weights=8, seed=0, h=1e-3):
-        """Écart relatif autograd vs différences finies (entrée et poids)."""
+        """Relative gap autograd vs finite differences (input and weights)."""
         x64 = x.double()
         model64 = copy.deepcopy(self.model)
         for mod in model64.modules.values(): mod.slow = {k: v.double() for k, v in mod.slow.items()}
@@ -294,11 +294,11 @@ class DifferentiableSensitivity:
         return {"input_rel_error": rel_in, "weight_rel_error_max": max(errs), "weight_rel_error_mean": sum(errs) / len(errs)}
 
 
-# ================================================================ sensibilité structurelle (discrète)
+# ================================================================ structural sensitivity (discrete)
 
 @dataclass
 class StructuralEdit:
-    """Perturbation DISCRÈTE d'un composant non différentiable (relation, Skill, règle, preuve, source, routage)."""
+    """DISCRETE perturbation of a non-differentiable component (relation, Skill, rule, proof, source, routing)."""
     name: str
     component: str
     kind: str
@@ -306,7 +306,7 @@ class StructuralEdit:
 
 
 class StructuralSensitivity:
-    """Sensibilité = |score(edit(système)) − score(système)| pour chaque édition discrète (par intervention)."""
+    """Sensitivity = |score(edit(system)) − score(system)| for each discrete edit (by intervention)."""
 
     def __init__(self, score: Callable[[Any], float]):
         self.score = score
@@ -321,7 +321,7 @@ class StructuralSensitivity:
         return base, sorted(out, key=lambda r: -r["sensitivity"])
 
 
-# ================================================================ attribution de crédit généralisée
+# ================================================================ generalized credit assignment
 
 COMPONENT_KINDS = ("weights", "routing", "expert", "measurement", "source", "belief", "lexical", "transformation", "planner")
 
@@ -330,13 +330,13 @@ COMPONENT_KINDS = ("weights", "routing", "expert", "measurement", "source", "bel
 class Credit:
     component: str
     kind: str
-    observational: float = 0.0       # sensibilité locale (gradient / corrélation) : PAS une cause
-    interventional: float = 0.0      # amélioration RÉELLE du score après intervention (restauration / remplacement)
+    observational: float = 0.0       # local sensitivity (gradient / correlation): NOT a cause
+    interventional: float = 0.0      # REAL improvement of the score after intervention (restoration / replacement)
 
 
 def interventional_credit(system, components: Dict[str, Tuple[str, Callable[[Any], Any]]], score: Callable[[Any], float]):
-    """Pour chaque composant : intervenir réellement (le remplacer par sa version de référence / neutre), réévaluer.
-    Crédit = score(intervention) − score(système). Le système d'origine n'est pas modifié."""
+    """For each component: actually intervene (replace it with its reference / neutral version), re-evaluate.
+    Credit = score(intervention) − score(system). The original system is not modified."""
     base = score(system); out = []
     for name, (kind, intervene) in components.items():
         out.append(Credit(name, kind, interventional=score(intervene(copy.deepcopy(system))) - base))
@@ -344,8 +344,8 @@ def interventional_credit(system, components: Dict[str, Tuple[str, Callable[[Any
 
 
 def gradient_credit(model: ModelState, x, y):
-    """Crédit OBSERVATIONNEL d'un modèle : ||∂perte/∂W|| · ||W|| par module, et |∂perte/∂force| par connexion.
-    Ne voit que les paramètres différentiables."""
+    """OBSERVATIONAL credit of a model: ||∂loss/∂W|| · ||W|| per module, and |∂loss/∂strength| per connection.
+    Only sees the differentiable parameters."""
     ds = DifferentiableSensitivity(model); g = ds.weight_gradients(x, y); out = {}
     for m, d in g.items():
         out[f"weights:{m}"] = sum(float(d[k].norm() * model.modules[m].slow[k].norm()) for k in d)

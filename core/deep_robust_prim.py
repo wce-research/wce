@@ -1,15 +1,15 @@
-"""Expériences du sous-jalon Robust Primitive Discovery — module d'ÉVALUATION (dev uniquement ; il voit la vérité, rien
-n'en revient au système ; jamais le lot scellé).
+"""Experiments of the Robust Primitive Discovery sub-milestone — EVALUATION module (dev only; it sees the truth, nothing
+of it comes back to the system; never the sealed set).
 
-  audit      : décomposition des erreurs d'une méthode, par composante de frontière vraie et par type d'atome
-  arms       : comparaison des chaînes proposition × validation × assemblage sur le banc atomique
-  validator  : vraies acceptations / fausses acceptations / vrais rejets / faux rejets, sur un même vivier de candidats
-  diversity  : recouvrement et complémentarité des proposeurs
-  active     : mesures dirigées vers les primitives indécises contre mesures aléatoires
-  chain      : primitives → structure candidate → récupération finale, avec plafonds oracle
+  audit      : breakdown of the errors of a method, by true boundary component and by atom type
+  arms       : comparison of the proposal × validation × assembly chains on the atomic bench
+  validator  : true acceptances / false acceptances / true rejections / false rejections, on a same pool of candidates
+  diversity  : overlap and complementarity of the proposers
+  active     : measurements directed at the undecided primitives versus random measurements
+  chain      : primitives → candidate structure → final recovery, with oracle ceilings
 
-Scènes : indices ≥ 2000 du banc atomique (jamais utilisés auparavant) ; indices ≥ 5000 pour la mise au point.
-Tâches de composition : clés 400+ de `down_task` (jamais utilisées auparavant).
+Scenes: indices ≥ 2000 of the atomic bench (never used before); indices ≥ 5000 for tuning.
+Composition tasks: keys 400+ of `down_task` (never used before).
 """
 from __future__ import annotations
 
@@ -64,7 +64,7 @@ def validator(name, cfg=None):
     raise KeyError(name)
 
 
-# bras : (proposeur, validateur | "old" = validateur du sous-jalon précédent, assemblage conjoint)
+# arms: (proposer, validator | "old" = validator of the previous sub-milestone, joint assembly)
 ARMS = {"gradient": ("gradient", "old", False), "gradient_min": ("gradient_min", "old", False), "union_old": ("union", "old", False),
         "gradient_rv": ("gradient", "full", False), "gradmin_rv": ("gradient_min", "full", False), "hough_rv": ("hough", "full", False), "grid_rv": ("grid", "full", False),
         "ransac_rv": ("ransac", "full", False), "ransac_local_rv": ("ransac_local", "full", False), "union_all_joint": ("union_all", "full", True),
@@ -79,8 +79,8 @@ def scene_at(index, category, tune=False):
 
 
 def discover_logged(X, y, prop, rounds=4, keep_per_round=3, seed=0, max_classes=12):
-    """Reproduit EXACTEMENT `core.deep_primitives.discover` (validateur du sous-jalon précédent) en journalisant chaque
-    candidat : nécessaire à l'audit. Renvoie (CompatiblePrimitives, journal, propositions, équivalents-ajustement)."""
+    """Reproduces EXACTLY `core.deep_primitives.discover` (validator of the previous sub-milestone) while logging each
+    candidate: required for the audit. Returns (CompatiblePrimitives, log, proposals, fit-equivalents)."""
     v = PrimitiveValidation(); pairs = close_pairs(X, y); cp = CompatiblePrimitives(X); counter = FitCounter(); log = []; n = 0
     for r in range(rounds):
         cands = prop.propose(X, y, pairs, seed + r, counter); n += len(cands); base = v.z_min; v.z_min = max(base, math.sqrt(2 * math.log(max(2, len(cands)))) + 1.0)
@@ -97,7 +97,7 @@ def discover_logged(X, y, prop, rounds=4, keep_per_round=3, seed=0, max_classes=
 
 
 def run_arm(X, y, arm, seed=0, cfg=None):
-    """Renvoie (programmes retenus [tous membres + atomes assemblés], représentants, journal, coût) ou None si indisponible."""
+    """Returns (retained programs [all members + assembled atoms], representatives, log, cost) or None if unavailable."""
     pn, vn, joint = ARMS[arm]; p = proposer(pn); t0 = time.time()
     if p is None: return None
     if vn == "old": cp, log, n, fe = discover_logged(X, y, p, seed=seed); jt = []
@@ -121,9 +121,9 @@ def arm_row(scene, arm, seed=0, cfg=None):
 # ================================================================ audit
 
 def audit(scene, arm=REFERENCE, seed=0) -> List[dict]:
-    """Une ligne par COMPOSANTE de frontière vraie (droite, cercle, demi-droite), étiquetée du type de son atome, classée :
+    """One row per true boundary COMPONENT (line, circle, half-line), labelled with the type of its atom, classified:
     found | unrecognized_equivalent | dominated | rejected | far_parameters | wrong_type | never_proposed.
-    Plus une ligne `false_positive` par primitive retenue sans frontière vraie correspondante."""
+    Plus one `false_positive` row per retained primitive with no matching true boundary."""
     t = scene.task; r = run_arm(t.X, t.y, arm, seed)
     if r is None: return []
     P = _probe(); pairs = close_pairs(t.X, t.y); log = r["log"]; lc = [components(l["program"]) for l in log]; kept_c = [c for p in r["found"] for c in components(p)]; out = []
@@ -147,21 +147,21 @@ def audit(scene, arm=REFERENCE, seed=0) -> List[dict]:
     return out
 
 
-# ================================================================ validateur : TA / FA / TR / FR sur un même vivier
+# ================================================================ validator: TA / FA / TR / FR on a same pool
 
 VALIDATORS = ("old", "holdout_z3", "holdout_cal", "insample_z3", "insample_cal", "full", "stab")
 
 
 def validator_study(scene, seed=0) -> List[dict]:
-    """Vivier commun : premier tour du proposeur `union` sur une moitié des POINTS. Un candidat est VRAI si toutes ses
-    composantes correspondent à une frontière vraie. Variantes :
-      old          validateur précédent (toutes les paires, z ≥ max(3, multiplicité))
-      holdout_z3   contraste sur l'AUTRE moitié des points, seuil nominal 3 (non calibré)
-      holdout_cal  idem, seuil calibré sur étiquettes aléatoires
-      insample_z3  contraste sur toutes les paires nettoyées, seuil nominal 3
-      insample_cal idem, seuil calibré sur étiquettes aléatoires
-      full         configuration retenue (seuil calibré + support + pureté + cohérence multi-région)
-      stab         full + stabilité au sous-échantillonnage"""
+    """Common pool: first round of the `union` proposer on one half of the POINTS. A candidate is TRUE if all its
+    components match a true boundary. Variants:
+      old          previous validator (all the pairs, z ≥ max(3, multiplicity))
+      holdout_z3   contrast on the OTHER half of the points, nominal threshold 3 (not calibrated)
+      holdout_cal  same, threshold calibrated on random labels
+      insample_z3  contrast on all the cleaned pairs, nominal threshold 3
+      insample_cal same, threshold calibrated on random labels
+      full         retained configuration (calibrated threshold + support + purity + multi-region consistency)
+      stab         full + stability under subsampling"""
     t = scene.task; X, y = t.X, t.y; allp = close_pairs(X, y); ia, ib = split_points(X, y, seed); A, B = clean_pairs(X[ia], y[ia]), clean_pairs(X[ib], y[ib]); C = clean_pairs(X, y); cands = proposer("union").propose(X[ia], y[ia], A, seed, FitCounter())
     tc = [c for a in scene.atoms for c in components(a)]; truth = [all(any(component_match(c, d) for d in tc) for c in components(p.program)) for p in cands]; out = []; cfg = load_config(); bare = dict(min_support=0, min_purity=0.0, min_segments=0)
     for vn in VALIDATORS:
@@ -176,13 +176,13 @@ def validator_study(scene, seed=0) -> List[dict]:
     return out
 
 
-# ================================================================ diversité des proposeurs
+# ================================================================ diversity of the proposers
 
 PROPOSERS = ("gradient", "gradient_min", "geometric", "contrast", "hough", "grid", "ransac", "ransac_local", "neural")
 
 
 def diversity(scene, seed=0) -> List[dict]:
-    """Par proposeur (premier tour, toutes les paires) : indices des composantes vraies atteintes, propositions, coût."""
+    """Per proposer (first round, all the pairs): indices of the true components reached, proposals, cost."""
     t = scene.task; X, y = t.X, t.y; tc = [c for a in scene.atoms for c in components(a)]; out = []
     for pn in PROPOSERS:
         p = proposer(pn)
@@ -192,7 +192,7 @@ def diversity(scene, seed=0) -> List[dict]:
     return out
 
 
-# ================================================================ mesures actives spécifiques aux primitives
+# ================================================================ active measurements specific to primitives
 
 def active(scene, policy, seed=0, budget=24):
     t = scene.task; g = torch.Generator().manual_seed(seed + 77); X, y = t.X, t.y
@@ -205,14 +205,14 @@ def active(scene, policy, seed=0, budget=24):
     r = run_arm(X, y, BEST, seed); m = primitive_metrics(scene.atoms, r["found"], X, y, _probe()); return {"method": f"active_{policy}", "queries": 0 if policy == "none" else budget, **{k: m[k] for k in ("exact", "equivalence", "component_recall", "precision")}}
 
 
-# ================================================================ chaîne aval et plafonds oracle
+# ================================================================ downstream chain and oracle ceilings
 
 SOURCES = ("reference", "true", "true_types", "partial", "gradient_disc", "robust_min", "robust_joint", "robust_joint_resid")
 CHAIN_ARMS = tuple((s, "always") for s in SOURCES) + (("reference", "validated"), ("true", "validated"), ("robust_joint", "validated"))
 
 
 def _estimate(skels: Sequence[BNode], inits_of, X, y, seed):
-    """Paramètres ESTIMÉS par contraste pour des squelettes donnés ; la meilleure initialisation (contraste) est gardée."""
+    """Parameters ESTIMATED by contrast for given skeletons; the best initialisation (contrast) is kept."""
     pairs = close_pairs(X, y); out = []
     for i, sk in enumerate(skels):
         th, obj = contrast_fit(sk, pairs, inits_of(i, sk), steps=60); out.append(sk.with_params(th[int(obj.argmax())].tolist()))
@@ -220,8 +220,8 @@ def _estimate(skels: Sequence[BNode], inits_of, X, y, seed):
 
 
 def oracle_literals(task, source, seed=0):
-    """Plafonds : `true` vrais atomes ; `true_types` vrais TYPES, paramètres à estimer depuis des initialisations
-    génériques ; `partial` vrais centres et orientations, rayons / décalages / largeurs à estimer."""
+    """Ceilings: `true` true atoms; `true_types` true TYPES, parameters to be estimated from generic
+    initialisations; `partial` true centres and orientations, radii / offsets / widths to be estimated."""
     from core.deep_reachability import leaves
     tl = leaves(task.world.truth); X, y = task.X, task.y
     if source == "true": return tl
@@ -240,8 +240,8 @@ def oracle_literals(task, source, seed=0):
 
 
 def chain(task, source, policy="always", seed=0):
-    """primitives découvertes → rappel des primitives → structure candidate → récupération fonctionnelle finale. La
-    composition, le score, la simplification et la sélection sont ceux du pipeline existant, inchangés."""
+    """discovered primitives → recall of the primitives → candidate structure → final functional recovery. The
+    composition, the score, the simplification and the selection are those of the existing pipeline, unchanged."""
     from core.deep_objective import E2E_POLICIES
     from core.deep_reachability import leaves
     from core.deep_search import DeepSearch
@@ -252,7 +252,7 @@ def chain(task, source, policy="always", seed=0):
     elif source == "gradient_disc": d = discover(X, y, GradientProposer(), seed=seed); lits = d.primitives.literals(alternatives=2); cost = d.fit_equivalents
     elif source.startswith("robust"): c = load_config(); d = discover_robust(X, y, proposer("union"), validator("full", c), seed=seed, joint=source != "robust_min", prune_z=c["prune_z"], split=c["split"]); lits = literals_of(d, alternatives=2, with_joint=source != "robust_min"); cost = d.fit_equivalents
     if lits is not None: kw = {"fact_literals": lits, "fact_residual": source.endswith("_resid")}
-    depth = min(6, sum(len(components(a)) for a in tl) + 1)                      # même profondeur pour toutes les sources : la base minimale a besoin d'un nœud par frontière
+    depth = min(6, sum(len(components(a)) for a in tl) + 1)                      # same depth for all the sources: the minimal basis needs one node per boundary
     if lits is not None and not lits: acc, best_acc, n = [], 0.0, 0; fe = cost
     else:
         out = DeepSearch("factorized", budget=150.0, seed=seed, max_depth=depth, validated=E2E_POLICIES[policy], **kw).run(data); best = out.best(); acc = [float((predict(h.program, F) == lab).float().mean()) for h in out.all.values()]
@@ -263,13 +263,13 @@ def chain(task, source, policy="always", seed=0):
             "candidate_functional": max(acc, default=0.0) >= 0.97, "candidate_best": max(acc, default=0.0), "final_full": best_acc, "final_functional": best_acc >= 0.99, "final_095": best_acc >= 0.95, "atoms": n, "fit_equivalents": fe, "seconds": round(time.time() - t0, 2)}
 
 
-# ================================================================ sous-unités AWS
+# ================================================================ AWS sub-units
 
 def subunits(key):
     from core.deep_experiments import DOWN_DEPTHS, GEN_REGIMES, _row, down_task
     from core.deep_primitive_world import CATEGORIES
     k = int(key); out = []
-    if k >= 400:                                                                   # clés 400+ : chaîne aval (tâches de composition jamais utilisées)
+    if k >= 400:                                                                   # keys 400+: downstream chain (composition tasks never used)
         for d in DOWN_DEPTHS:
             for reg in GEN_REGIMES:
                 for s, pol in CHAIN_ARMS: out.append((f"chain_d{d}_{reg}_{s}_{pol}", (lambda d=d, reg=reg, s=s, pol=pol: [_row(down_task(key, d, reg), {"task_id": f"{key}_{d}_{reg}", **chain(down_task(key, d, reg), s, pol, k)})])))

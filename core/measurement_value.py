@@ -1,17 +1,17 @@
-"""Apprentissage de la VALEUR RÉALISÉE des mesures (MeasurementValueLearner) et méta-planificateur.
+"""Learning of the REALISED VALUE of measurements (MeasurementValueLearner) and meta-planner.
 
-Données : épisodes d'ENTRAÎNEMENT. À chaque décision de mesure, chaque mesure candidate est SIMULÉE sur une copie
-du monde latent ; étiquette = perte décisionnelle réalisée avant − après (vérité connue à l'entraînement seulement).
-Caractéristiques : IG analytique, coût, perturbation, but (type de question), incertitude courante (entropie,
-confiance max), type de capteur. Modèle : régression ridge (forme close, petit) + correction rapide en ligne
-(« poids rapides » linéaires, décroissance) — pas de gros réseau.
+Data: TRAINING episodes. At each measurement decision, each candidate measurement is SIMULATED on a copy
+of the latent world; label = realised decision loss before − after (truth known in training only).
+Features: analytic IG, cost, disturbance, goal (question type), current uncertainty (entropy,
+max confidence), sensor type. Model: ridge regression (closed form, small) + fast online correction
+(linear "fast weights", decay) — no large network.
 
-Politiques comparées : max_ig, max_utility (valeur décisionnelle analytique, coûts manuels), learned
-(valeur prédite seule), hybrid (valeur analytique + résidu appris). Toute décision reste vérifiable : la
-prédiction, ses caractéristiques et la valeur analytique sont tracées (SelectMeasurement).
+Policies compared: max_ig, max_utility (analytic decision value, manual costs), learned
+(predicted value alone), hybrid (analytic value + learned residual). Every decision remains verifiable: the
+prediction, its features and the analytic value are traced (SelectMeasurement).
 
-Mesure contrefactuelle : `counterfactual_measurement` répond à « si je mesurais X, quelle réduction d'incertitude
-attendrais-je ? » SANS mesurer : ni le monde ni la croyance ne changent, et le résultat est marqué HYPOTHETICAL.
+Counterfactual measurement: `counterfactual_measurement` answers "if I measured X, what reduction of uncertainty
+would I expect?" WITHOUT measuring: neither the world nor the belief changes, and the result is marked HYPOTHETICAL.
 """
 from __future__ import annotations
 
@@ -39,11 +39,11 @@ def features(S, op, target, ig, dv, context):
     return f
 
 
-ANALYTIC_INDEX = None      # la valeur analytique n'est PAS une caractéristique du modèle "learned"
+ANALYTIC_INDEX = None      # the analytic value is NOT a feature of the "learned" model
 
 
 class MeasurementValueLearner:
-    """RealizedValue ≈ f(IG, coût, perturbation, but, incertitude) ; mode hybride : analytique + résidu appris."""
+    """RealizedValue ≈ f(IG, cost, disturbance, goal, uncertainty); hybrid mode: analytic + learned residual."""
 
     def __init__(self, ridge=1.0, fast_lr=0.05, fast_decay=0.9):
         self.ridge, self.fast_lr, self.fast_decay = ridge, fast_lr, fast_decay
@@ -54,7 +54,7 @@ class MeasurementValueLearner:
     features = staticmethod(features)
 
     def _fit(self, X, y):
-        A = X.T @ X + self.ridge * torch.eye(X.shape[1], dtype=X.dtype); A[0, 0] -= self.ridge     # biais non régularisé
+        A = X.T @ X + self.ridge * torch.eye(X.shape[1], dtype=X.dtype); A[0, 0] -= self.ridge     # bias not regularised
         return torch.linalg.solve(A, X.T @ y)
 
     def fit(self, rows: List[Dict]):
@@ -76,7 +76,7 @@ class MeasurementValueLearner:
         return float(x @ (self.w + self.fast))
 
     def adapt(self, f, observed, hybrid=False, analytic=0.0):
-        """Adaptation LOCALE en ligne (poids rapides linéaires, décroissance vers 0) à partir d'une valeur observée."""
+        """LOCAL online adaptation (linear fast weights, decay towards 0) from an observed value."""
         x = torch.tensor(f, dtype=torch.float64); err = observed - self.predict(f, hybrid, analytic)
         step = self.fast_lr * err * x / (1.0 + float(x @ x))
         if hybrid: self.fast_res = self.fast_decay * self.fast_res + step
@@ -93,7 +93,7 @@ def _corr(a, b):
     return round(float(torch.corrcoef(t)[0, 1]), 3)
 
 
-# ================================================================ collecte (ENTRAÎNEMENT) et évaluation
+# ================================================================ collection (TRAINING) and evaluation
 
 def collect(train, hz, rel, cal, seed=0):
     from core.measurement_agent import MeasurementAgent
@@ -131,11 +131,11 @@ def evaluate_policies(episodes, hz, rel, cal, learner, policies=("max_ig", "max_
     return out
 
 
-# ================================================================ mesure contrefactuelle
+# ================================================================ counterfactual measurement
 
 @dataclass(frozen=True)
 class CounterfactualMeasurement:
-    """Résultat HYPOTHÉTIQUE : rien n'a été mesuré ; aucun enregistrement n'est produit."""
+    """HYPOTHETICAL result: nothing was measured; no record is produced."""
     operator: str
     expected_entropy_after: float
     expected_reduction: float
@@ -144,7 +144,7 @@ class CounterfactualMeasurement:
 
 
 def counterfactual_measurement(S, op, target=None):
-    """« Si je mesurais X, quelle réduction d'incertitude attendrais-je ? » — sans observer (ni monde, ni croyance)."""
+    """"If I measured X, what reduction of uncertainty would I expect?" — without observing (neither world nor belief)."""
     h_after, po = expected_posterior_entropy(S, op, target)
     h0 = S.entropy(target)
     outs = op.outcomes()
@@ -152,12 +152,12 @@ def counterfactual_measurement(S, op, target=None):
                                      {o: round(float(p), 6) for o, p in zip(outs, po.tolist())})
 
 
-# ================================================================ adaptation en ligne (dérive de la valeur réelle)
+# ================================================================ online adaptation (drift of the real value)
 
 def online_adaptation_experiment(rows, seed=0, drift_sensor="loc_precise", drift=-3.0):
-    """Le modèle est ajusté sur la 1re moitié ; dans la 2de moitié la valeur réalisée d'un capteur DÉRIVE
-    (ex. capteur dégradé). Erreur quadratique : modèle figé vs modèle + poids rapides adaptés en ligne
-    (prédire, puis observer la valeur réalisée, puis adapter)."""
+    """The model is fitted on the 1st half; in the 2nd half the realised value of a sensor DRIFTS
+    (e.g. degraded sensor). Squared error: frozen model vs model + fast weights adapted online
+    (predict, then observe the realised value, then adapt)."""
     rng = random.Random(seed); rows = list(rows); rng.shuffle(rows)
     half = len(rows) // 2; L = MeasurementValueLearner(fast_lr=0.3, fast_decay=0.995).fit(rows[:half])
     frozen = MeasurementValueLearner().fit(rows[:half])
@@ -166,7 +166,7 @@ def online_adaptation_experiment(rows, seed=0, drift_sensor="loc_precise", drift
     for r in rows[half:]:
         y = r["realized"] + (drift if r["features"][idx] == 1.0 else 0.0)
         static.append((frozen.predict(r["features"]) - y) ** 2)
-        online.append(L.adapt(r["features"], y) ** 2)          # erreur AVANT adaptation sur cet exemple
+        online.append(L.adapt(r["features"], y) ** 2)          # error BEFORE adaptation on this example
     return {"mse_static": round(sum(static) / len(static), 4), "mse_online": round(sum(online) / len(online), 4), "n": len(static)}
 
 

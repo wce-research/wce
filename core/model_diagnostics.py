@@ -1,11 +1,11 @@
-"""Diagnostic du ModelState par la MÊME algèbre de mesure, puis réparation minimale.
+"""Diagnosis of the ModelState by the SAME measurement algebra, then minimal repair.
 
-panne → hypothèses de cause (ensemble compatible) → mesure diagnostique choisie (gain d'information / coût)
-→ postérieure sur les causes → TransformationSpec de réparation MINIMALE ; comparée à des réparations directes.
+failure → cause hypotheses (compatible set) → diagnostic measurement chosen (information gain / cost)
+→ posterior over the causes → MINIMAL repair TransformationSpec; compared with direct repairs.
 
-Observables du modèle : dérive des poids d'un module (vs instantané), routage (connectivité), capacité (unités),
-magnitude des poids rapides, effet de l'ablation d'un module, exactitude globale. Les tables P(issue | cause) sont
-APPRISES par simulation de pannes sur des graines d'entraînement (le test ne sert qu'à mesurer).
+Observables of the model: weight drift of a module (vs snapshot), routing (connectivity), capacity (units),
+magnitude of the fast weights, effect of ablating a module, global accuracy. The tables P(outcome | cause) are
+LEARNED by simulating failures on training seeds (the test is used only to measure).
 """
 from __future__ import annotations
 
@@ -28,14 +28,14 @@ CAUSES = ("corrupt:enc", "corrupt:expert_a", "corrupt:head", "bad_routing", "ins
 MODULES = ("enc", "expert_a", "head")
 
 
-# ================================================================ pannes (cause cachée)
+# ================================================================ failures (hidden cause)
 
 def inject(model, cause, rng: random.Random):
     if cause.startswith("corrupt:"):
         m = cause.split(":")[1]
         for k, v in model.modules[m].slow.items():
             model.modules[m].slow[k] = v + rng.uniform(0.8, 1.6) * v.std() * torch.randn(v.shape, generator=torch.Generator().manual_seed(rng.randrange(10 ** 6)))
-    elif cause == "bad_routing":                             # un expert dormant est branché à tort sur la tête
+    elif cause == "bad_routing":                             # a dormant expert is wrongly wired to the head
         model.apply(ActivateModule(module="expert_b"))
         if (INPUT, "expert_b") not in model.connectivity: model.apply(CreateConnection(source=INPUT, target="expert_b"))
         model.apply(CreateConnection(source="expert_b", target="head", strength=rng.uniform(1.0, 2.0)))
@@ -46,10 +46,10 @@ def inject(model, cause, rng: random.Random):
         for k, v in model.modules[m].slow.items(): d[k] = rng.uniform(1.0, 2.0) * v.std() * torch.randn(v.shape)
 
 
-# ================================================================ observables du modèle
+# ================================================================ observables of the model
 
 def observe(model, name, x, y, base_acc):
-    """Issue discrète d'une mesure diagnostique (lit le MODÈLE, jamais la cause cachée)."""
+    """Discrete outcome of a diagnostic measurement (reads the MODEL, never the hidden cause)."""
     snap = model.snapshots["good"]
     if name.startswith("drift:"):
         m = name.split(":")[1]
@@ -78,7 +78,7 @@ def observe(model, name, x, y, base_acc):
     raise KeyError(name)
 
 
-DIAGNOSTICS = {  # nom : (issues possibles, coût)
+DIAGNOSTICS = {  # name: (possible outcomes, cost)
     **{f"drift:{m}": (("none", "small", "large", "shape"), 0.05) for m in MODULES},
     "routing": (("ok", "changed"), 0.02), "capacity": (("ok", "reduced"), 0.02), "fast": (("ok", "large"), 0.02),
     **{f"ablation:{m}": (("recovers", "no", "error"), 0.3) for m in MODULES},
@@ -87,7 +87,7 @@ DIAGNOSTICS = {  # nom : (issues possibles, coût)
 
 
 class TableOperator(MeasurementOperator):
-    """Opérateur diagnostique : P(issue | cause) = table APPRISE (fréquences lissées)."""
+    """Diagnostic operator: P(outcome | cause) = LEARNED table (smoothed frequencies)."""
 
     def __init__(self, name, table, cost):
         outs = DIAGNOSTICS[name][0]
@@ -110,7 +110,7 @@ def setup(seed=0):
 
 
 def learn_tables(n_per_cause=6, seed=0):
-    """Simulations de pannes sur des graines d'ENTRAÎNEMENT -> P(issue | cause) (lissage de Laplace)."""
+    """Failure simulations on TRAINING seeds -> P(outcome | cause) (Laplace smoothing)."""
     rng = random.Random(seed)
     counts = {c: {d: Counter() for d in DIAGNOSTICS} for c in CAUSES}
     base, xv, yv, acc = setup(seed)
@@ -135,7 +135,7 @@ REPAIR = {
 
 
 def diagnose_and_repair(model, tables, xv, yv, base_acc, policy="max_utility", seed=0, max_steps=6):
-    """Boucle : hypothèses -> diagnostic -> postérieure -> réparation minimale (TransformationSpec)."""
+    """Loop: hypotheses -> diagnosis -> posterior -> minimal repair (TransformationSpec)."""
     graph = new_graph("diagnostic")
     S = CompatibleStateSet.product({("model", "cause"): CAUSES}, graph=graph)
     planner = MeasurementPlanner(policy=policy, confidence=0.9, budget=1.5, seed=seed, graph=graph, value_of_information=1.0, min_ig=0.01)
@@ -159,7 +159,7 @@ def diagnose_and_repair(model, tables, xv, yv, base_acc, policy="max_utility", s
 
 
 def direct_repair(model, policy, xv, yv):
-    """Politiques DIRECTES (sans diagnostic) : restaurer tout l'instantané, ou toujours restaurer le module expert."""
+    """DIRECT policies (without diagnosis): restore the whole snapshot, or always restore the expert module."""
     if policy == "restore_all": model.apply(RestoreSnapshot(snapshot="good"))
     elif policy == "restore_expert": model.apply(RestoreModule(module="expert_a", snapshot="good"))
     return model.accuracy(xv, yv)

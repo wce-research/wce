@@ -1,7 +1,7 @@
-"""Expérience multi-graines : modèle de fiabilité des sources -> preuves -> croyances -> droit d'affirmer -> identité L1.
+"""Multi-seed experiment: source reliability model -> evidence -> beliefs -> entitlement to assert -> L1 identity.
 
-Découpage : graines d'ENTRAÎNEMENT = partition train de chaque graine (historique étiqueté des sources) ;
-graines de CALIBRATION 200–205 (a priori hiérarchiques, lexique : 100–111) ; aucune mesure sur le test ne règle rien.
+Split: TRAINING seeds = train partition of each seed (labelled history of the sources);
+CALIBRATION seeds 200–205 (hierarchical priors, lexicon: 100–111); no measurement on the test tunes anything.
 """
 from __future__ import annotations
 
@@ -53,7 +53,7 @@ def build(name, caps, splits, posterior, priors, train_emits):
         model = fit_supervised(train_emits, mode, priors, selection=False)
         install(agent, model)
     if name in ("temporal_mean", "l1_temporal"):
-        install_temporal(agent, learn_change_rate(splits["train"]))       # croyances spatiales temporelles
+        install_temporal(agent, learn_change_rate(splits["train"]))       # temporal spatial beliefs
     return agent, cal, model
 
 
@@ -84,7 +84,7 @@ def run_seed(seed, systems=SYSTEMS_S, posterior=None, priors=None, n_worlds=20):
         m["reliability_brier"] = {t: v["brier"] for t, v in reliability_points(rel, test_emits)[0].items()}
         m["seconds"] = time.perf_counter() - t0
         out[name] = m; rows_by[name] = rows
-    # croyances : une seule ingestion par monde (agents neufs, lecture seule de l'état)
+    # beliefs: a single ingestion per world (fresh agents, read-only access to the state)
     bel = {}
     for name in ("em", "beta_mean", "beta_lower", "temporal_mean"):
         if name not in systems: continue
@@ -145,8 +145,8 @@ def multi_seed(seeds=range(16), systems=SYSTEMS_S, log=print):
 
 
 def reliability_only(seeds=range(32), priors=None):
-    """Métriques de FIABILITÉ seules (peu coûteuses) sur beaucoup de graines : ECE / Brier par type, erreur par source,
-    couverture des intervalles ; EM vs Beta hiérarchique (moyenne)."""
+    """RELIABILITY metrics alone (cheap) over many seeds: ECE / Brier per type, error per source,
+    interval coverage; EM vs hierarchical Beta (mean)."""
     priors = priors or type_priors()
     per = {"em": defaultdict(list), "beta_mean": defaultdict(list)}
     err = defaultdict(lambda: defaultdict(list))

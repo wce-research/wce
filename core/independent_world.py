@@ -1,13 +1,13 @@
-"""Environnement linguistique INDÉPENDANT de WCE.
+"""Linguistic environment INDEPENDENT of WCE.
 
-Ce module n'importe AUCUN composant WCE (ni planner, ni parser, ni lexique agent).
-Il produit :
-- WorldTruth : la vérité cachée (objets, relations, hauteurs, propriétaires, événements) ;
-- des observations partielles et bruitées, émises par des sources de fiabilité différente ;
-- des phrases françaises via ses PROPRES gabarits (paraphrases, synonymes, variations, ordres) ;
-- des légendes (phrase, structure perçue) pour l'apprentissage de l'agent ;
-- un benchmark de requêtes avec réponses de référence calculées ici, sans WCE ;
-- IndependentWorldVerifier : oracle SUPPORTED / REFUTED / UNKNOWN sur WorldTruth.
+This module imports NO WCE component (neither planner, nor parser, nor agent lexicon).
+It produces:
+- WorldTruth: the hidden truth (objects, relations, heights, owners, events);
+- partial and noisy observations, emitted by sources of differing reliability;
+- French sentences via its OWN templates (paraphrases, synonyms, variations, orders);
+- captions (sentence, perceived structure) for the agent's learning;
+- a benchmark of queries with reference answers computed here, without WCE;
+- IndependentWorldVerifier: SUPPORTED / REFUTED / UNKNOWN oracle on WorldTruth.
 """
 from __future__ import annotations
 
@@ -25,7 +25,7 @@ PERSONS = ("paul", "marie")
 NUMBERS = {1: "un", 2: "deux", 3: "trois", 4: "quatre", 5: "cinq", 0: "zéro"}
 
 
-# ================================================================ vérité cachée
+# ================================================================ hidden truth
 
 @dataclass
 class Obj:
@@ -39,7 +39,7 @@ class Obj:
 class Event:
     time: int
     action: str                  # place | fall | push
-    agent: Optional[str]         # personne ou objet
+    agent: Optional[str]         # person or object
     patient: str
     rel: str
     target: str
@@ -117,7 +117,7 @@ def generate_world(seed) -> WorldTruth:
     return world
 
 
-# ================================================================ sources et observations
+# ================================================================ sources and observations
 
 @dataclass(frozen=True)
 class Source:
@@ -140,7 +140,7 @@ class Observation:
     value: Any
     time: int
     text: Optional[str] = None
-    implied: bool = False        # couleur impliquée par une description (« la balle rouge »)
+    implied: bool = False        # colour implied by a description ("la balle rouge")
 
 
 def domain_size(kind):
@@ -163,7 +163,7 @@ def _corrupt(world, key, value, rng):
 def emit_observations(world: WorldTruth, seed=0, sources=SOURCES) -> List[Observation]:
     rng = random.Random(seed * 7919 + world.seed)
     gen = LanguageGenerator(seed=seed * 31 + world.seed)
-    obs = [Observation("sensor_A", ("type", o), world.objects[o].kind, 0) for o in world.movables]   # inventaire complet
+    obs = [Observation("sensor_A", ("type", o), world.objects[o].kind, 0) for o in world.movables]   # full inventory
     facts = world.facts()
     for key, value in facts.items():
         kind = key[0]
@@ -178,18 +178,18 @@ def emit_observations(world: WorldTruth, seed=0, sources=SOURCES) -> List[Observ
             text = gen.describe(world, key, v) if src.modality == "text" else None
             obs.append(Observation(src.name, key, v, time if time != "now" else 1, text))
             if text is not None:
-                # une couleur n'est impliquée par une description que si la référence est non ambiguë (type unique)
+                # a colour is implied by a description only if the reference is unambiguous (unique type)
                 for o in gen.last_mentioned:
                     if sum(1 for m in world.movables if world.objects[m].kind == world.objects[o].kind) == 1:
                         obs.append(Observation(src.name, ("color", o), world.objects[o].color, 0, None, implied=True))
     return obs
 
 
-# ================================================================ connaissabilité idéale (référence)
+# ================================================================ ideal knowability (reference)
 
 def ideal_value(observations, key, threshold=0.9):
-    """Agent idéal connaissant les VRAIES fiabilités : valeur si la postérieure >= seuil, sinon None.
-    Une source ne vote qu'une fois par proposition (la répétition ne crée pas la vérité)."""
+    """Ideal agent knowing the TRUE reliabilities: value if the posterior >= threshold, otherwise None.
+    A source votes only once per proposition (repetition does not create truth)."""
     votes = {}
     for ob in observations:
         if ob.key == key: votes[ob.source] = ob.value
@@ -205,7 +205,7 @@ def ideal_value(observations, key, threshold=0.9):
 
 
 def knowable(world, observations, key):
-    """Valeur connaissable ET vraie ; None si inconnaissable ou si les preuves induisent en erreur."""
+    """Value knowable AND true; None if unknowable or if the evidence is misleading."""
     truth = world.facts().get(key)
     v = ideal_value(observations, key)
     if key[0] == "loc" and key[2] == "now":
@@ -219,10 +219,10 @@ def knowable(world, observations, key):
     return v if v == truth else None
 
 
-# ================================================================ oracle indépendant
+# ================================================================ independent oracle
 
 class IndependentWorldVerifier:
-    """Connaît WorldTruth. Répond sur des propositions structurées, sans planner."""
+    """Knows WorldTruth. Answers on structured propositions, without planner."""
 
     def __init__(self, world: WorldTruth):
         self.world = world
@@ -248,7 +248,7 @@ class IndependentWorldVerifier:
         return "UNKNOWN"
 
 
-# ================================================================ générateur de langue (gabarits propres)
+# ================================================================ language generator (own templates)
 
 LEX = {"ball": [("balle", "f"), ("boule", "f"), ("ballon", "m")], "cube": [("cube", "m")],
        "block": [("bloc", "m"), ("brique", "f")], "cone": [("cône", "m")], "box": [("boîte", "f"), ("caisse", "f")],
@@ -257,7 +257,7 @@ COLOR_FORMS = {"red": ("rouge", "rouge"), "blue": ("bleu", "bleue"), "green": ("
 REL_FORMS = {"on": ["sur"], "under": ["sous", "en dessous de"], "in": ["dans", "à l'intérieur de"], "next_to": ["à côté de", "près de"]}
 VERB_FORMS = {"place": {"imp": ["pose", "place", "mets"], "pc": ["a posé", "a placé", "a mis"], "pp": ["posé", "placé", "mis"]},
               "fall": {"pc": ["est tombé", "a chuté"]}, "push": {"pc": ["a poussé"], "pp": ["poussé"]}}
-HELD_OUT_FORMS = {"boule", "brique", "caisse", "rayon", "plancher", "mets"}     # jamais dans les légendes d'entraînement
+HELD_OUT_FORMS = {"boule", "brique", "caisse", "rayon", "plancher", "mets"}     # never in the training captions
 NONSENSE = ["flurpe", "zorvax", "blimpeux", "trakul", "vornite", "glissonne"]
 
 
@@ -270,7 +270,7 @@ class LanguageGenerator:
         self.rng = random.Random(seed)
         self.allow_held_out = allow_held_out
         self.last_mentioned: List[str] = []
-        self.meanings: Dict[str, str] = {}          # pour l'évaluation uniquement
+        self.meanings: Dict[str, str] = {}          # for evaluation only
 
     def _word(self, kind):
         forms = [f for f in LEX[kind] if self.allow_held_out or f[0] not in HELD_OUT_FORMS]
@@ -305,7 +305,7 @@ class LanguageGenerator:
         return f"{prep} {np}"
 
     def describe(self, world, key, value):
-        """Phrase décrivant une proposition (éventuellement fausse)."""
+        """Sentence describing a proposition (possibly false)."""
         self.last_mentioned = []
         kind = key[0]
         o = key[1] if len(key) > 1 else None
@@ -357,7 +357,7 @@ class LanguageGenerator:
                                 f"{patient} a été {pp}{'e' if g == 'f' and not pp.endswith('s') else ''} {self._join(prep, target)} par {agent}"])
 
 
-# ================================================================ légendes d'apprentissage (phrase + structure perçue)
+# ================================================================ learning captions (sentence + perceived structure)
 
 def _desc(world, oid, with_color=True):
     if oid in SUPPORT_HEIGHT: return {"type": oid}
@@ -368,8 +368,8 @@ def _desc(world, oid, with_color=True):
 
 
 def captions(n, seed=0, allow_held_out=False):
-    """Paires (phrase, structure perçue) issues de mondes d'entraînement (vraies, non bruitées).
-    La structure est ce qu'un capteur voit (types, couleurs, relations, actions) — jamais des mots."""
+    """(sentence, perceived structure) pairs from training worlds (true, not noisy).
+    The structure is what a sensor sees (types, colours, relations, actions) — never words."""
     out = []
     rng = random.Random(seed)
     i = 0
@@ -407,7 +407,7 @@ def captions(n, seed=0, allow_held_out=False):
             text = f"{s1} puis {s2}" if conn == "puis" else f"{s2} après que {s1}"
             s = {"kind": "sequence", "events": [_event_struct(world, e1), _event_struct(world, e2)]}
         elif choice == "command":
-            # démonstration : consigne impérative + effet observé (« mets » reste hors apprentissage)
+            # demonstration: imperative instruction + observed effect ("mets" stays out of learning)
             rel, tgt = rng.choice([("on", "table"), ("on", "floor"), ("on", "shelf")] + [("in", b) for b in world.movables if world.objects[b].kind == "box" and b != o])
             verb = rng.choice([v for v in VERB_FORMS["place"]["imp"] if allow_held_out or v not in HELD_OUT_FORMS])
             gen.meanings[verb] = "act:place"
@@ -430,7 +430,7 @@ def _event_struct(world, e):
             "target": _desc(world, e.target)}
 
 
-# ================================================================ benchmark (références calculées ici)
+# ================================================================ benchmark (references computed here)
 
 ABSTAIN_ANSWERS = {"UNKNOWN", "UNKNOWN_WORD", "ASK"}
 
@@ -453,7 +453,7 @@ def _answer_loc(v): return f"{v[0]}:{v[1]}"
 
 
 def ref_status(world, observations, oid, with_color=True):
-    """Une description (type [+ couleur]) est-elle résoluble par un agent idéal ? ok / ASK / UNKNOWN."""
+    """Is a description (type [+ colour]) resolvable by an ideal agent? ok / ASK / UNKNOWN."""
     if oid in SUPPORT_HEIGHT: return "ok"
     kind = world.objects[oid].kind
     same = [m for m in world.movables if world.objects[m].kind == kind]
@@ -488,7 +488,7 @@ def benchmark_items(world: WorldTruth, observations, seed=0) -> List[Item]:
     for o in world.movables:
         kind = world.objects[o].kind
         unique = _unique_kind(world, kind)
-        # où / quand
+        # where / when
         for t in ("now", 0):
             key = ("loc", o, t)
             v = knowable(world, observations, key)
@@ -497,19 +497,19 @@ def benchmark_items(world: WorldTruth, observations, seed=0) -> List[Item]:
             text = rng.choice([f"où est {subj} ?", f"où se trouve {subj} ?"]) if t == "now" else \
                    rng.choice([f"où était {subj} au début ?", f"au début, où était {subj} ?"])
             add(text, gated(gold, o), "where", "temporal" if t == 0 else cat(key, gold), subject=o, time=t, key=key)
-        # couleur (référence par le type seul : ambiguë si plusieurs objets du même type)
+        # colour (reference by type alone: ambiguous if several objects of the same type)
         subj, _ = gen.np(world, o, with_color=False)
         key = ("color", o)
         v = knowable(world, observations, key)
         gold = ("ASK" if not unique else (v if v else "UNKNOWN"))
         add(f"de quelle couleur est {subj} ?", gold, "color", "ambiguous" if not unique else cat(key, gold), subject=o, key=key)
-        # hauteur
+        # height
         key = ("height", o, "now")
         v = knowable(world, observations, key)
         subj, _ = gen.np(world, o)
         add(rng.choice([f"à quelle hauteur est {subj} ?", f"quelle est la hauteur {gen._join('de', subj)} ?"]),
             gated(f"{v:g}" if v is not None else "UNKNOWN", o), "height", cat(key, "UNKNOWN" if v is None else "x"), subject=o, key=key)
-        # affirmations couleur vraies / fausses (type seul si unique)
+        # true / false colour claims (type alone if unique)
         if unique:
             vc = knowable(world, observations, ("color", o))
             claimed = rng.choice(COLORS)
@@ -517,7 +517,7 @@ def benchmark_items(world: WorldTruth, observations, seed=0) -> List[Item]:
             gold = "UNKNOWN" if vc is None else ("SUPPORTED" if claimed == vc else "REFUTED")
             add(f"{subj} est {COLOR_FORMS[claimed][1 if g == 'f' else 0]}", gold, "claim",
                 "false" if gold == "REFUTED" else cat(("color", o), gold), subject=o, key=("color", o), claimed=claimed)
-        # affirmation de position (vraie ou fausse), avec unités parfois
+        # position claim (true or false), sometimes with units
         rel, tgt = world.loc(o)
         if rng.random() < 0.5:
             rel, tgt = rng.choice([("on", "table"), ("on", "shelf"), ("on", "floor"), ("under", "table")])
@@ -532,7 +532,7 @@ def benchmark_items(world: WorldTruth, observations, seed=0) -> List[Item]:
             gold = "UNKNOWN" if vh is None else ("SUPPORTED" if abs(h - vh) < 1e-6 else "REFUTED")
             add(f"{gen.np(world, o)[0]} est à {gen.number(h)}", gated(gold, o), "claim", "false" if gold == "REFUTED" else "correct" if gold == "SUPPORTED" else "unknown",
                 subject=o, key=("height", o, "now"), claimed=h)
-        # propriété non soutenue
+        # unsupported ownership
         person = rng.choice(PERSONS)
         vo = knowable(world, observations, ("owner", o))
         gold = "UNKNOWN" if vo is None else ("SUPPORTED" if vo == person else "REFUTED")
@@ -565,7 +565,7 @@ def benchmark_items(world: WorldTruth, observations, seed=0) -> List[Item]:
     other = rng.choice([c for c in COLORS if c != obj.color])
     subj, g = gen.np(world, o)
     add(f"{subj} est {COLOR_FORMS[other][1 if g == 'f' else 0]}", "REJECT", "claim", "adversarial", kind="internal_contradiction", subject=o)
-    # ---- commandes compositionnelles
+    # ---- compositional commands
     items += command_items(world, observations, gen, rng)
     return items
 
@@ -601,7 +601,7 @@ def command_items(world, observations, gen, rng):
     verb = rng.choice(VERB_FORMS["place"]["imp"] + (["mets"] if gen.allow_held_out else []))
     ok = _valid_placement(world, a, rel, tgt)
     add(f"{verb} {na} {gen._join(gen.rel(rel), nt)}", _effect([(a, rel, tgt)]) if ok else "REJECT", "command", refs=(a, tgt))
-    # séquence
+    # sequence
     b = rng.choice([m for m in movables if m != a] or [a])
     rel2, tgt2 = rng.choice(dests)
     nb, _ = gen.np(world, b); nt2, _ = gen.np(world, tgt2)
@@ -610,7 +610,7 @@ def command_items(world, observations, gen, rng):
     eff = {(a, rel, tgt)} if a != b else set()
     eff = [(a, rel, tgt)] + [(b, rel2, tgt2)] if a != b else [(a, rel2, tgt2)]
     add(text, _effect(eff) if ok2 else "REJECT", "command", refs=(a, tgt, b, tgt2), kind="sequence")
-    # référence discursive (pronom)
+    # discourse reference (pronoun)
     subj, g = gen.np(world, a)
     pron = "-la" if g == "f" else "-le"
     add(f"regarde {subj}. pose{pron} {gen._join(gen.rel(rel), nt)}", _effect([(a, rel, tgt)]) if ok else "REJECT", "command",
@@ -630,7 +630,7 @@ def command_items(world, observations, gen, rng):
     else: gold = "NONE"
     add(f"si {gen.np(world, cond_obj)[0]} est {gen._join(gen.rel(crel), gen.np(world, ctgt)[0])}, pose {na} {gen._join(gen.rel(rel), nt)}",
         gold, "command", refs=(cond_obj, a, tgt), kind="condition", **cond_meta)
-    # relative : « l'objet qui est sous l'étagère »
+    # relative clause: "l'objet qui est sous l'étagère"
     rrel, rtgt = rng.choice([("under", "shelf"), ("under", "table"), ("on", "shelf"), ("on", "table")])
     matches = [m for m in movables if knowable(world, observations, ("loc", m, "now")) == (rrel, rtgt)]
     unknown = [m for m in movables if knowable(world, observations, ("loc", m, "now")) is None]
@@ -641,14 +641,14 @@ def command_items(world, observations, gen, rng):
     gold = gold_rel if gold_rel in ("ASK", "UNKNOWN") else (_effect([(gold_rel, trel, target)]) if _valid_placement(world, gold_rel, trel, target) else "REJECT")
     add(f"pose {gen._join(gen.rel(trel), gen.np(world, target)[0])} l'objet qui est {gen._join(gen.rel(rrel), gen.np(world, rtgt)[0])}",
         gold, "command", kind="relative", relative=((rrel, rtgt), trel, target))
-    # attachement ambigu : « pose la balle dans la boîte sur la table »
+    # ambiguous attachment: "pose la balle dans la boîte sur la table"
     if box:
         p = rng.choice([m for m in movables if m != box])
         np_p, _ = gen.np(world, p); np_box, _ = gen.np(world, box)
         in_box = knowable(world, observations, ("loc", p, "now"))
         box_on = knowable(world, observations, ("loc", box, "now"))
-        r1 = in_box == ("in", box)                      # « la balle (qui est) dans la boîte » -> sur la table
-        r2 = box_on == ("on", "table")                  # « dans la boîte (qui est) sur la table »
+        r1 = in_box == ("in", box)                      # "la balle (qui est) dans la boîte" -> on the table
+        r2 = box_on == ("on", "table")                  # "dans la boîte (qui est) sur la table"
         if r1 and r2: gold = "ASK"
         elif r1: gold = _effect([(p, "on", "table")])
         elif r2: gold = _effect([(p, "in", box)])
@@ -659,7 +659,7 @@ def command_items(world, observations, gen, rng):
 
 
 def build_dataset(n_worlds=25, seed=0):
-    """Mondes -> observations -> items. Aucune dépendance à WCE."""
+    """Worlds -> observations -> items. No dependency on WCE."""
     data = []
     for i in range(n_worlds):
         world = generate_world(seed * 100000 + i)
@@ -669,6 +669,6 @@ def build_dataset(n_worlds=25, seed=0):
 
 
 def split_of(index, n):
-    """Partition fixe par monde : 40 % train, 15 % calibration, 15 % validation, 30 % test tenu à l'écart."""
+    """Fixed split per world: 40 % train, 15 % calibration, 15 % validation, 30 % held-out test."""
     f = index / n
     return "train" if f < 0.4 else "calibration" if f < 0.55 else "validation" if f < 0.7 else "test"

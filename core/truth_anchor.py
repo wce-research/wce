@@ -1,10 +1,10 @@
-"""Certificats ANCRÉS dans la vérité observée (ObservedTruthAnchor) + collecte ACTIVE de contre-exemples.
+"""Certificates ANCHORED in the observed truth (ObservedTruthAnchor) + ACTIVE collection of counterexamples.
 
-Limite corrigée : un certificat qui ne teste que l'accord avec sa propre référence peut être auto-cohérent et faux.
-Le BoundaryGenerativeCertificate vérifie (1) la cohérence avec la référence (programme) sur des sondes générées,
-ET (2) l'accord avec des observations INDÉPENDANTES et fiables (ancres) : observations directes, contre-exemples
-actifs (là où la règle pourrait échouer : désaccord avec des programmes alternatifs, frontière, hors du support),
-expériences confirmatoires — chacune avec sa provenance.
+Limitation corrected: a certificate that only tests agreement with its own reference can be self-consistent and wrong.
+The BoundaryGenerativeCertificate checks (1) consistency with the reference (program) on generated probes,
+AND (2) agreement with INDEPENDENT and reliable observations (anchors): direct observations, active
+counterexamples (where the rule could fail: disagreement with alternative programs, boundary, outside the support),
+confirmatory experiments — each with its provenance.
 """
 from __future__ import annotations
 
@@ -37,7 +37,7 @@ class ObservedTruthAnchor:
         wrong = (predict_fn(X) != y).float(); return float(wrong.mean()), int(wrong.sum())
 
     def refutes(self, predict_fn, max_errors=None):
-        """Réfutation si le nombre d'erreurs dépasse ce qu'explique le bruit d'étiquette (binomiale, p ≤ 0,01)."""
+        """Refutation if the number of errors exceeds what label noise explains (binomial, p ≤ 0.01)."""
         n = len(self.anchors)
         if n == 0: return False
         e, k = self.error(predict_fn); eps = 1 - sum(a.reliability for a in self.anchors) / n
@@ -51,8 +51,8 @@ class ObservedTruthAnchor:
 
 @dataclass
 class BoundaryGenerativeCertificate:
-    """Certificat génératif de frontière : programme appris, postérieure, ancres de vérité, régions de désaccord,
-    sondes de frontière, contre-exemples."""
+    """Generative boundary certificate: learned program, posterior, truth anchors, disagreement regions,
+    boundary probes, counterexamples."""
     program: BNode
     generator: object
     posterior: Optional[ProgramPosterior] = None
@@ -72,9 +72,9 @@ class BoundaryGenerativeCertificate:
 
 def collect_counterexamples(program: BNode, oracle: Callable, g, budget=10, alternatives: Optional[List[BNode]] = None,
                             region_sampler=None, policy="active", support=None, noise=0.03):
-    """« Où cette règle pourrait-elle échouer ? » — points où la règle DIVERGE de programmes alternatifs
-    compatibles avec les données, puis points proches de sa frontière HORS du support observé ; on observe la
-    vérité (bruitée) et on l'ajoute comme ancre. policy="random" : points uniformes (contrôle)."""
+    """"Where could this rule fail?" — points where the rule DIVERGES from alternative programs
+    compatible with the data, then points close to its boundary OUTSIDE the observed support; the (noisy)
+    truth is observed and added as an anchor. policy="random": uniform points (control)."""
     pool = region_sampler(1500, g); anchor = ObservedTruthAnchor()
     if policy == "random":
         idx = torch.randperm(len(pool), generator=g)[:budget]
@@ -84,12 +84,12 @@ def collect_counterexamples(program: BNode, oracle: Callable, g, budget=10, alte
             P = predict(program, pool)
             for a in alternatives: score += (predict(a, pool) != P).double()
         from core.boundary_program import evaluate
-        margin = (evaluate(program, pool, k=4.0) - 0.5).abs().double()              # proximité de la frontière
+        margin = (evaluate(program, pool, k=4.0) - 0.5).abs().double()              # proximity to the boundary
         far = torch.zeros(len(pool), dtype=torch.float64)
         if support is not None: far = torch.cdist(pool, support).min(1).values.double()
         score = score + 0.5 * (1 - 2 * margin) + 0.3 * far / (far.max() + 1e-9)
         idx = []; chosen = torch.zeros(len(pool), dtype=torch.bool)
-        for _ in range(budget):                                                     # diversité : pas deux points trop proches
+        for _ in range(budget):                                                     # diversity: no two points too close
             s = score.clone(); s[chosen] = -1e9
             if idx: s -= 2.0 * (torch.cdist(pool, pool[idx]).min(1).values < 0.3).double()
             i = int(s.argmax()); idx.append(i); chosen[i] = True

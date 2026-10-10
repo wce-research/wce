@@ -1,5 +1,5 @@
-"""Calibration des sources dans l'environnement indépendant : historique étiqueté (graines / mondes d'entraînement),
-a priori hiérarchiques (graines de calibration), audit MNAR, mesures de calibration (sources, croyances par clé)."""
+"""Calibration of sources in the independent environment: labelled history (training seeds / worlds),
+hierarchical priors (calibration seeds), MNAR audit, calibration measurements (sources, beliefs per key)."""
 from __future__ import annotations
 
 from collections import Counter, defaultdict
@@ -17,12 +17,12 @@ def key_type(key):
 
 
 def _truth(world, key, value):
-    if key[0] == "event": return value                                       # un événement émis est toujours vrai ici
+    if key[0] == "event": return value                                       # an emitted event is always true here
     return world.facts().get(key)
 
 
 def emissions(agent, worlds):
-    """(source, type de clé, correcte|None, analysée) pour chaque observation émise (évaluation / entraînement)."""
+    """(source, key type, correct|None, parsed) for each emitted observation (evaluation / training)."""
     out = []
     for x in worlds:
         w = x["world"]
@@ -39,7 +39,7 @@ def emissions(agent, worlds):
 
 
 def fit_supervised(emits, mode="lower", type_priors=None, selection=True, discount=1.0, level=0.8):
-    """Beta-binomial sur l'historique ÉMIS étiqueté ; correction de sélection vers le canal analysé (texte)."""
+    """Beta-binomial on the labelled EMITTED history; selection correction towards the parsed channel (text)."""
     m = SourceReliabilityModel(type_priors=type_priors, mode=mode, discount=discount, level=level)
     for s, kt, ok, parsed, is_text in emits: m.observe(s, ok, kt)
     if selection:
@@ -48,7 +48,7 @@ def fit_supervised(emits, mode="lower", type_priors=None, selection=True, discou
 
 
 def fit_parsed_only(emits, mode="lower", type_priors=None, level=0.8):
-    """Variante : historique restreint aux affirmations ANALYSÉES (ce que l'agent a réellement ingéré), sans correction."""
+    """Variant: history restricted to the PARSED claims (what the agent actually ingested), without correction."""
     m = SourceReliabilityModel(type_priors=type_priors, mode=mode, level=level)
     for s, kt, ok, parsed, is_text in emits:
         if parsed: m.observe(s, ok, kt)
@@ -56,8 +56,8 @@ def fit_parsed_only(emits, mode="lower", type_priors=None, level=0.8):
 
 
 def hierarchical_priors(emits_by_seed):
-    """A priori de type par Bayes empirique sur les graines de CALIBRATION (jamais le test) : chaque (source, graine)
-    est une réalisation du type."""
+    """Type priors by empirical Bayes on the CALIBRATION seeds (never the test): each (source, seed)
+    is a realisation of the type."""
     m = SourceReliabilityModel(mode="mean")
     for seed, emits in emits_by_seed.items():
         for s, kt, ok, parsed, is_text in emits: m.observe(f"{s}@{seed}", ok, kt)
@@ -69,10 +69,10 @@ def install(agent, model):
     return agent
 
 
-# ================================================================ mesures
+# ================================================================ measurements
 
 def reliability_points(model, emits, parsed_only=True):
-    """(fiabilité effective annoncée, affirmation correcte) sur le canal analysé des mondes de TEST."""
+    """(announced effective reliability, correct claim) on the parsed channel of the TEST worlds."""
     pts = defaultdict(list)
     for s, kt, ok, parsed, is_text in emits:
         if ok is None or (parsed_only and not parsed): continue
@@ -82,7 +82,7 @@ def reliability_points(model, emits, parsed_only=True):
 
 
 def source_table(model, emits):
-    """Par source : moyenne a posteriori, exactitude réelle (analysée / émise), erreur, intervalle, couverture."""
+    """Per source: posterior mean, actual accuracy (parsed / emitted), error, interval, coverage."""
     acc = defaultdict(Counter)
     for s, kt, ok, parsed, is_text in emits:
         if ok is None: continue
@@ -102,8 +102,8 @@ def source_table(model, emits):
 
 
 def belief_points(agent, worlds, pts=None, conflicted=None, ingest=True):
-    """Croyances (valeur, postérieure) vs vérité, par type de clé ; statut CONFLICTED compté à part.
-    ingest=False : l'état courant de l'agent est lu (UNE seule ingestion par monde, sinon la mémoire lexicale gonfle)."""
+    """Beliefs (value, posterior) vs truth, per key type; CONFLICTED status counted separately.
+    ingest=False: the current state of the agent is read (ONE single ingestion per world, otherwise the lexical memory inflates)."""
     pts = pts if pts is not None else defaultdict(list); conflicted = conflicted if conflicted is not None else Counter()
     for x in worlds:
         w = x["world"]; facts = w.facts()
@@ -122,7 +122,7 @@ def belief_points(agent, worlds, pts=None, conflicted=None, ingest=True):
 
 
 def evaluate_answers(agent, worlds):
-    """Une seule ingestion par monde : réponses + croyances lues sur le même état."""
+    """A single ingestion per world: answers + beliefs read on the same state."""
     from core.independent_agent import ABSTAIN
     rows, pts, conf = [], defaultdict(list), Counter()
     for x in worlds:
@@ -135,8 +135,8 @@ def evaluate_answers(agent, worlds):
 
 
 def predictive_coverage(model, emits, level=0.9, parsed_only=True):
-    """Pour chaque source : la proportion de ses affirmations justes sur le TEST est-elle dans l'intervalle ?
-    Crédible Beta (incertitude du paramètre seule) vs PRÉDICTIF bêta-binomial (paramètre + bruit des n futures)."""
+    """For each source: is the proportion of its correct claims on the TEST within the interval?
+    Beta credible (parameter uncertainty alone) vs beta-binomial PREDICTIVE (parameter + noise of the n future ones)."""
     from core.temporal_belief import beta_binomial_interval
     per = defaultdict(lambda: [0, 0])
     for s, kt, ok, parsed, is_text in emits:

@@ -1,11 +1,11 @@
-"""DÉCOUVERTE STRUCTURELLE ACTIVE : la recherche et l'expérimentation sont ENTRELACÉES.
+"""ACTIVE STRUCTURAL DISCOVERY: search and experimentation are INTERLEAVED.
 
-PREUVES → POSTÉRIEURE SUR PROGRAMMES → CLASSES D'ÉQUIVALENCE FONCTIONNELLE → EXPÉRIENCE QUI DÉPARTAGE LES
-STRUCTURES → OBSERVATION → MISE À JOUR TENANT COMPTE DU BRUIT → SCISSION / FUSION → APPROFONDIR SEULEMENT SI
-NÉCESSAIRE → PROMOTION → COMPÉTENCE → CERTIFICAT.
+EVIDENCE → POSTERIOR OVER PROGRAMS → FUNCTIONAL EQUIVALENCE CLASSES → EXPERIMENT THAT DISCRIMINATES BETWEEN THE
+STRUCTURES → OBSERVATION → NOISE-AWARE UPDATE → SPLIT / MERGE → DEEPEN ONLY IF
+NECESSARY → PROMOTION → SKILL → CERTIFICATE.
 
-Aucune famille n'est nommée ici (le banc nommé vit dans les générateurs d'évaluation, jamais importés ici).
-Le niveau de bruit d'étiquette (fiabilité de la source) est une entrée CONNUE du modèle de bruit.
+No family is named here (the named benchmark lives in the evaluation generators, never imported here).
+The label noise level (reliability of the source) is a KNOWN input of the noise model.
 """
 from __future__ import annotations
 
@@ -26,14 +26,14 @@ def grid(n=30, lo=-3.0, hi=3.0):
     t = torch.linspace(lo, hi, n); return torch.stack(torch.meshgrid(t, t, indexing="ij"), -1).reshape(-1, 2)
 
 
-PROBES = grid(30)                         # sondes canoniques (région complète)
-CANON = grid(24, -2.5, 2.5)               # repère canonique
+PROBES = grid(30)                         # canonical probes (full region)
+CANON = grid(24, -2.5, 2.5)               # canonical frame
 
 
-# ================================================================ signatures, équivalence fonctionnelle, canonisation
+# ================================================================ signatures, functional equivalence, canonicalisation
 
 def components(mask_grid: torch.Tensor):
-    """Nombre de composantes connexes (4-voisinage) d'un masque de grille carré."""
+    """Number of connected components (4-neighbourhood) of a square grid mask."""
     n = int(math.isqrt(mask_grid.numel())); M = mask_grid.reshape(n, n).tolist(); seen = set(); comps = 0
     for i in range(n):
         for j in range(n):
@@ -48,8 +48,8 @@ def components(mask_grid: torch.Tensor):
 
 
 def canonical_frame(pred_fn: Callable, probes=PROBES):
-    """Repère canonique de la région positive : centre, axes principaux, échelle, orientation par moments d'ordre 3
-    (invariance aux translations, rotations, échelles, réflexions — empirique, pas une preuve)."""
+    """Canonical frame of the positive region: centre, principal axes, scale, orientation by order-3 moments
+    (invariance to translations, rotations, scalings, reflections — empirical, not a proof)."""
     P = probes[pred_fn(probes).bool()]
     if len(P) < 4 or len(P) > 0.97 * len(probes): return None
     c = P.mean(0); C = torch.cov((P - c).T) + 1e-6 * torch.eye(2); ev, V = torch.linalg.eigh(C)
@@ -67,11 +67,11 @@ def canonical_signature(pred_fn: Callable):
 
 @dataclass
 class EquivalenceSignature:
-    probes: torch.Tensor                  # prédictions sur sondes canoniques
-    canonical: torch.Tensor               # prédictions dans le repère canonique (invariant aux transformations)
-    components: int                       # topologie de la région positive
+    probes: torch.Tensor                  # predictions on canonical probes
+    canonical: torch.Tensor               # predictions in the canonical frame (invariant to the transformations)
+    components: int                       # topology of the positive region
     area: float
-    reflection_symmetry: float            # accord sous réflexion (axe principal) dans le repère canonique
+    reflection_symmetry: float            # agreement under reflection (principal axis) in the canonical frame
 
     @staticmethod
     def of(pred_fn: Callable):
@@ -89,8 +89,8 @@ def program_signature(prog: BNode): return EquivalenceSignature.of(lambda X: pre
 
 @dataclass
 class FunctionalEquivalenceClass:
-    """Programmes d'AST différents regroupés par comportement (équivalence EMPIRIQUE sur sondes, jamais une preuve).
-    Plusieurs représentations sont conservées (pas de syntaxe canonique imposée)."""
+    """Programs with different ASTs grouped by behaviour (EMPIRICAL equivalence on probes, never a proof).
+    Several representations are kept (no canonical syntax imposed)."""
     members: List[BNode]
     signature: EquivalenceSignature
 
@@ -98,7 +98,7 @@ class FunctionalEquivalenceClass:
 
 
 def functional_clusters(programs: Sequence[BNode], threshold=0.03, canonical=False, signatures=None):
-    """Regroupement glouton par distance de signature (et même topologie)."""
+    """Greedy clustering by signature distance (and same topology)."""
     sigs = signatures or [program_signature(p) for p in programs]; out: List[FunctionalEquivalenceClass] = []; idx = []
     for p, s in zip(programs, sigs):
         for k, cl in enumerate(out):
@@ -109,11 +109,11 @@ def functional_clusters(programs: Sequence[BNode], threshold=0.03, canonical=Fal
     return out, idx
 
 
-# ================================================================ postérieure structurelle
+# ================================================================ structural posterior
 
 class StructuralPosterior:
-    """P(programme), P(classe fonctionnelle), entropies paramétrique / structurelle / fonctionnelle.
-    Vraisemblance avec bruit d'étiquette ε CONNU (fiabilité de la source)."""
+    """P(program), P(functional class), parametric / structural / functional entropies.
+    Likelihood with KNOWN label noise ε (reliability of the source)."""
 
     def __init__(self, programs: Sequence[BNode], eps=0.03, threshold=0.03, use_functional=True):
         self.programs: List[BNode] = []; self.logw = torch.zeros(0, dtype=torch.float64); self.eps = max(eps, 0.01)
@@ -130,7 +130,7 @@ class StructuralPosterior:
 
     def _recluster(self):
         if self.use_functional: self.classes, self.cls = functional_clusters(self.programs, self.threshold, signatures=self.sigs)
-        else:                                                          # classes = structure AST (contrôle)
+        else:                                                          # classes = AST structure (control)
             keys = {}; self.cls = [keys.setdefault(structure_hash(p), len(keys)) for p in self.programs]
             self.classes = [FunctionalEquivalenceClass([p for p, c in zip(self.programs, self.cls) if c == k], None) for k in range(len(keys))]
 
@@ -157,14 +157,14 @@ class StructuralPosterior:
     def map_class(self): cp = self.class_probs(); k = int(cp.argmax()); return k, float(cp[k])
 
     def map_program(self, slack=2.0):
-        """Meilleur programme de la classe MAP ; parmi ceux à ≤ slack de log-vraisemblance, le plus SIMPLE."""
+        """Best program of the MAP class; among those within ≤ slack of log-likelihood, the SIMPLEST."""
         k, _ = self.map_class(); idx = [i for i, c in enumerate(self.cls) if c == k]; top = max(float(self.logw[i]) for i in idx)
         near = [i for i in idx if float(self.logw[i]) >= top - slack]; return self.programs[min(near, key=lambda i: complexity(self.programs[i]))]
 
     def predictive(self, X): return (self.weights[:, None] * self.preds(X)).sum(0)
 
     def _ig(self, X, groups, gw):
-        """IG(point ; variable de groupe) avec bruit ε : groups[i] = groupe du programme i."""
+        """IG(point; group variable) with noise ε: groups[i] = group of program i."""
         P = self.preds(X); G = int(max(groups)) + 1; w = self.weights
         pg = torch.zeros(G, dtype=torch.float64).index_add_(0, torch.tensor(groups), w).clamp_min(1e-12)
         p1g = torch.zeros(G, len(X), dtype=torch.float64).index_add_(0, torch.tensor(groups), w[:, None] * P) / pg[:, None]
@@ -181,7 +181,7 @@ class StructuralPosterior:
     def disagreement(self, X): p = self.predictive(X); return 1 - (2 * p - 1).abs()
 
     def disagreement_region(self, X, min_mass=0.05):
-        """DisagreementRegion : points où les CLASSES plausibles (masse ≥ min_mass) prédisent différemment."""
+        """DisagreementRegion: points where the plausible CLASSES (mass ≥ min_mass) predict differently."""
         cp = self.class_probs(); keep = [k for k in range(len(self.classes)) if float(cp[k]) >= min_mass]
         if len(keep) < 2: return X[:0]
         P = self.preds(X); w = self.weights; votes = []
@@ -190,7 +190,7 @@ class StructuralPosterior:
         V = torch.stack(votes); return X[(V != V[0]).any(0)]
 
 
-# ================================================================ classification des requêtes, identifiabilité, espace des versions
+# ================================================================ query classification, identifiability, version space
 
 def query_type(post: StructuralPosterior, x):
     s, p = float(post.ig_structure(x)[0]), float(post.ig_parameters(x)[0])
@@ -202,7 +202,7 @@ def query_type(post: StructuralPosterior, x):
 
 
 def identifiability(post: StructuralPosterior, pool, min_mass=0.05):
-    """Les classes plausibles sont-elles distinguables par une expérience du pool ? Sinon NON IDENTIFIABLE."""
+    """Are the plausible classes distinguishable by an experiment from the pool? Otherwise NON-IDENTIFIABLE."""
     cp = post.class_probs(); keep = [k for k in range(len(post.classes)) if float(cp[k]) >= min_mass]
     if len(keep) < 2: return {"identifiable": True, "plausible_classes": len(keep), "pairs": 0, "distinguishable_pairs": 0}
     P = post.preds(pool); reps = [P[[i for i, c in enumerate(post.cls) if c == k][0]] for k in keep]; pairs = dist = 0
@@ -212,7 +212,7 @@ def identifiability(post: StructuralPosterior, pool, min_mass=0.05):
 
 
 def minimal_distinguishing_set(post: StructuralPosterior, pool, min_mass=0.05):
-    """Couverture d'ensemble GLOUTONNE : plus petit ensemble de points séparant toutes les paires de classes plausibles."""
+    """GREEDY set cover: smallest set of points separating all the pairs of plausible classes."""
     cp = post.class_probs(); keep = [k for k in range(len(post.classes)) if float(cp[k]) >= min_mass]
     P = post.preds(pool); reps = {k: P[[i for i, c in enumerate(post.cls) if c == k][0]] for k in keep}
     pairs = {(a, b) for a in keep for b in keep if a < b and bool((reps[a] != reps[b]).any())}; chosen = []
@@ -223,13 +223,13 @@ def minimal_distinguishing_set(post: StructuralPosterior, pool, min_mass=0.05):
 
 
 def version_space(post: StructuralPosterior, X, y, slack=None):
-    """Programmes encore COMPATIBLES : erreurs ≤ attendu sous bruit (ε·n + 2,5·√(ε(1−ε)n) + 1)."""
+    """Programs still COMPATIBLE: errors ≤ expected under noise (ε·n + 2.5·√(ε(1−ε)n) + 1)."""
     n = len(y); slack = slack if slack is not None else post.eps * n + 2.5 * math.sqrt(post.eps * (1 - post.eps) * n) + 1
     err = (post.preds(X) != y.double()).sum(1); keep = (err <= slack)
     return [p for p, k in zip(post.programs, keep.tolist()) if k]
 
 
-# ================================================================ politique de recherche (proposeur appris)
+# ================================================================ search policy (learned proposer)
 
 def expansion_key(parent: BNode, atom: BNode, comb: str, depth: int):
     pk = parent.kind if parent.kind != "translate" else "T:" + parent.children[0].feat
@@ -240,9 +240,9 @@ def expansion_key(parent: BNode, atom: BNode, comb: str, depth: int):
 
 
 class SearchPolicy:
-    """Petit proposeur (comptages lissés ≈ modèle linéaire sur indicatrices) : contexte d'expansion → utilité.
-    Il PROPOSE seulement (top-k) ; la vérité vient des données et des expériences. Il décide aussi « chercher
-    vs demander » (règle explicite) et le filtrage contextuel des primitives (primitive gating)."""
+    """Small proposer (smoothed counts ≈ linear model on indicators): expansion context → utility.
+    It only PROPOSES (top-k); the truth comes from the data and the experiments. It also decides "search
+    vs ask" (explicit rule) and the contextual filtering of the primitives (primitive gating)."""
 
     def __init__(self, k=12, alpha=1.0): self.k, self.alpha = k, alpha; self.pos = Counter(); self.tot = Counter(); self.macros = Counter()
 
@@ -253,23 +253,23 @@ class SearchPolicy:
     def propose(self, parent, A, depth, guided=True):
         cands = [(c, a) for c in COMBINATORS for a in A]
         if not guided: return cands
-        per = max(1, self.k // len(COMBINATORS)); out = []                # diversité : top-k PAR combinateur
+        per = max(1, self.k // len(COMBINATORS)); out = []                # diversity: top-k PER combinator
         for c in COMBINATORS:
             out += sorted([t for t in cands if t[0] == c], key=lambda t: -self.score(expansion_key(parent, t[1], t[0], depth)))[:per]
         return out
 
     def should_search(self, fit_err, eps, max_ig, structural_entropy):
-        """Chercher plus profond si rien n'explique les données, ou si les requêtes ne départagent plus (IG≈0) alors
-        que l'ajustement reste insuffisant."""
+        """Search deeper if nothing explains the data, or if the queries no longer discriminate (IG≈0) while
+        the fit remains insufficient."""
         return fit_err > eps + 0.03 or (max_ig < 0.005 and fit_err > eps + 0.015)
 
     def record_trajectory(self, traj): self.macros[tuple(traj[:6])] += 1
 
 
-# ================================================================ ajustement à chaud (extension de programme)
+# ================================================================ warm-start fitting (program extension)
 
 def fit_extension(parent: BNode, atom: BNode, comb: str, X, y, steps=90, n_init=2, seed=0):
-    """Ajuste combinateur(parent, atome) en partant des paramètres DÉJÀ ajustés du parent (recherche à chaud)."""
+    """Fits combinator(parent, atom) starting from the ALREADY fitted parameters of the parent (warm-start search)."""
     skel = BNode(comb, children=(parent.skeleton(), atom)); base = parent.param_vector()
     g = torch.Generator().manual_seed(seed); best = None; yf = y.float()
     for th_a in _inits(atom, X, y, n_init, g):
@@ -282,7 +282,7 @@ def fit_extension(parent: BNode, atom: BNode, comb: str, X, y, steps=90, n_init=
     return best
 
 
-# ================================================================ boucle entrelacée
+# ================================================================ interleaved loop
 
 @dataclass
 class DiscoveryResult:
@@ -300,9 +300,9 @@ class DiscoveryResult:
 
 
 class ActiveStructuralDiscovery:
-    """query_policy ∈ {structure_ig, parameter_ig, predictive_entropy, disagreement, random} ;
-    guided : proposeur ; functional : classes fonctionnelles (sinon classes AST) ; noise_aware : stabilité
-    fonctionnelle avec tolérances dépendant du bruit."""
+    """query_policy ∈ {structure_ig, parameter_ig, predictive_entropy, disagreement, random};
+    guided: proposer; functional: functional classes (otherwise AST classes); noise_aware: functional
+    stability with noise-dependent tolerances."""
 
     def __init__(self, policy: Optional[SearchPolicy] = None, guided=True, functional=True, query_policy="structure_ig", budget=16,
                  max_depth=4, beam=3, eps=0.03, seed=0, allow_repeat=True, record=False, min_queries=8):
@@ -338,11 +338,11 @@ class ActiveStructuralDiscovery:
             if q >= self.budget: break
             k, pk = post.map_class()
             if q >= self.min_queries and pk >= 0.97 and max_ig < 0.01 and err <= self.eps + 0.03:
-                if noise_aware_stability(best, X, y, self.eps)["accept"] or depth >= self.max_depth: break      # plus rien à départager
+                if noise_aware_stability(best, X, y, self.eps)["accept"] or depth >= self.max_depth: break      # nothing left to discriminate
                 stalls += 1
                 if stalls <= 2: self._force = True; continue
                 break
-            # expérience : nouveau point ou répétition d'un point informatif bruité
+            # experiment: new point or repetition of a noisy informative point
             i = int(ig.argmax()); xq = pool[i:i + 1]
             if self.allow_repeat and repeats:
                 R = torch.stack(repeats); igr = self._query_scores(post, R)
@@ -352,19 +352,19 @@ class ActiveStructuralDiscovery:
             if float(torch.rand(1, generator=g)) < self.eps_world: yq = 1 - yq
             Xa, ya = torch.cat([Xa, xq]), torch.cat([ya, yq]); q += 1; repeats.append(xq[0]); traj.append(query_type(post, xq))
             post.update(xq, yq)
-            if q % 4 == 0:                                              # réajustement des survivants (paramètres)
+            if q % 4 == 0:                                              # refitting of the survivors (parameters)
                 top = sorted(range(len(post.programs)), key=lambda i: -float(post.logw[i]))[:4]
                 post.add([fit(post.programs[i].skeleton(), Xa, ya, steps=80, n_init=1, seed=q)[0] for i in top]); evals += len(top); post.rescore(Xa, ya)
             ent.append(post.entropy()); vs.append(len(version_space(post, Xa, ya)))
         best = simplify(post.map_program(), Xa, ya, self.eps); evals += 1
-        st = noise_aware_stability(best, X, y, self.eps)          # sur l'échantillon passif représentatif (comme la calibration)
+        st = noise_aware_stability(best, X, y, self.eps)          # on the representative passive sample (like the calibration)
         if self.record: self.policy.record_trajectory(traj)
         status = "identified" if st["accept"] and post.map_class()[1] >= 0.9 else ("unsupported" if not st["accept"] else "ambiguous")
         idf = identifiability(post, pool)
         if status == "ambiguous" and not idf["identifiable"]: status = "non_identifiable"
         return DiscoveryResult(best, post, q, evals, depth, round(time.time() - t0, 2), st["accept"], trace, ent, vs, status)
 
-    eps_world = 0.0                                                      # bruit RÉEL des requêtes (fixé par l'appelant)
+    eps_world = 0.0                                                      # ACTUAL noise of the queries (set by the caller)
 
     def _query_scores(self, post, pool):
         if self.qp == "structure_ig": return post.ig_structure(pool)
@@ -375,8 +375,8 @@ class ActiveStructuralDiscovery:
 
 
 def train_policy(tasks, eps=0.03, seed=0):
-    """Apprend le proposeur sur des tâches d'ENTRAÎNEMENT : recherche non guidée enregistrée ; une expansion est
-    « utile » si elle réduit l'erreur d'ajustement de ≥ 0,02 par rapport au parent."""
+    """Learns the proposer on TRAINING tasks: recorded unguided search; an expansion is
+    "useful" if it reduces the fitting error by ≥ 0.02 relative to the parent."""
     pol = SearchPolicy(); rec = ActiveStructuralDiscovery(pol, guided=False, budget=4, eps=eps, seed=seed, record=True)
     for X, y, oracle, sampler, g in tasks:
         r = rec.run(X, y, oracle, sampler, g)
@@ -385,7 +385,7 @@ def train_policy(tasks, eps=0.03, seed=0):
 
 
 def _subtrees_replacements(n: BNode):
-    """Variantes obtenues en remplaçant UN combinateur par l'un de ses enfants (élagage d'une branche)."""
+    """Variants obtained by replacing ONE combinator by one of its children (pruning of one branch)."""
     out = []
     if n.kind in COMBINATORS: out += list(n.children)
     for i, c in enumerate(n.children):
@@ -395,8 +395,8 @@ def _subtrees_replacements(n: BNode):
 
 
 def simplify(prog: BNode, X, y, eps):
-    """SIMPLIFIER : élagage glouton des branches tant que l'erreur n'augmente pas au-delà du bruit d'échantillonnage
-    (1 erreur + 0,5·√(ε n))."""
+    """SIMPLIFY: greedy pruning of the branches as long as the error does not increase beyond the sampling noise
+    (1 error + 0.5·√(ε n))."""
     tol = (1 + 0.5 * math.sqrt(max(eps, 0.01) * len(X))) / len(X); cur = prog; e0 = float((predict(cur, X) != y).float().mean())
     while True:
         best = None
@@ -408,20 +408,20 @@ def simplify(prog: BNode, X, y, eps):
 
 
 def fit_from(prog: BNode, X, y, steps=80, lr=0.03):
-    """Réajustement À CHAUD depuis les paramètres actuels (structure fixée)."""
+    """WARM-START refitting from the current parameters (fixed structure)."""
     skel = prog.skeleton(); th = torch.tensor(prog.param_vector()).requires_grad_(True); opt = torch.optim.Adam([th], lr=lr); yf = y.float()
     for t in range(steps):
         opt.zero_grad(); torch.nn.functional.binary_cross_entropy(evaluate(skel, X, th, 12.0).clamp(1e-5, 1 - 1e-5), yf).backward(); opt.step()
     return skel.with_params(th.detach().tolist())
 
 
-# ================================================================ stabilité et ancres tenant compte du bruit
+# ================================================================ noise-aware stability and anchors
 
-STABILITY_TABLE = {0.0: (0.04, 0.05), 0.02: (0.05, 0.08), 0.05: (0.07, 0.11), 0.08: (0.09, 0.15), 0.12: (0.11, 0.2)}   # (désaccord max, erreur en excès max) — recalibré par scripts/active_calibrate.py
+STABILITY_TABLE = {0.0: (0.04, 0.05), 0.02: (0.05, 0.08), 0.05: (0.07, 0.11), 0.08: (0.09, 0.15), 0.12: (0.11, 0.2)}   # (max disagreement, max excess error) — recalibrated by scripts/active_calibrate.py
 
 
 def _load_calibration():
-    """Table calibrée (TRAIN + VALIDATION) ; enveloppe monotone en ε (plus de bruit ⇒ tolérance ≥)."""
+    """Calibrated table (TRAIN + VALIDATION); monotone envelope in ε (more noise ⇒ tolerance ≥)."""
     import json, os
     path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "results", "active_stability_calibration.json")
     if not os.path.exists(path): return
@@ -442,9 +442,9 @@ def _interp(eps):
 
 
 def noise_aware_stability(prog: BNode, X, y, eps):
-    """Stabilité FONCTIONNELLE sous bruit : (1) erreur d'ajustement ≤ ε + tolérance(ε) ; (2) la même structure
-    réajustée sur deux moitiés disjointes donne des fonctions dont le désaccord sur la région observée reste dans
-    la variance attendue sous ce bruit. Modes séparés : prédiction / classe fonctionnelle / paramètres / AST."""
+    """FUNCTIONAL stability under noise: (1) fitting error ≤ ε + tolerance(ε); (2) the same structure
+    refitted on two disjoint halves gives functions whose disagreement on the observed region stays within
+    the variance expected under this noise. Separate modes: prediction / functional class / parameters / AST."""
     n = len(X) // 2; dmax, emax = _interp(eps)
     a, b = fit_from(prog, X[:n], y[:n]), fit_from(prog, X[n:], y[n:])
     pred_dis = float((predict(a, X) != predict(b, X)).float().mean()); err = float((predict(prog, X) != y).float().mean())
@@ -452,15 +452,15 @@ def noise_aware_stability(prog: BNode, X, y, eps):
     sa, sb = program_signature(a), program_signature(b)
     modes = {"prediction_stability": 1 - pred_dis, "functional_class_stability": float(sa.components == sb.components and sa.distance(sb) <= 0.06),
              "parameter_stability": float(1 / (1 + (pa - pb).norm())), "ast_stability": float(structure_hash(a) == structure_hash(b))}
-    emax = max(emax, 1.5 * math.sqrt(max(eps, 0.01) * (1 - eps) / len(X)))            # variance binomiale de l'erreur sous bruit
+    emax = max(emax, 1.5 * math.sqrt(max(eps, 0.01) * (1 - eps) / len(X)))            # binomial variance of the error under noise
     return {"accept": err <= eps + emax and pred_dis <= dmax, "error": err, "disagreement": pred_dis, **modes}
 
 
 @dataclass
 class NoiseAwareTruthAnchor:
-    """P(règle fausse | observations) avec P(y | règle, x, bruit) = ε + (1−2ε)·σ(k·marge) : près de la frontière la
-    règle prédit ≈ 0,5 (tolérance large) ; loin, elle est stricte. Hypothèses concurrentes : programmes alternatifs
-    + modèle nul (0,5). Test SÉQUENTIEL avec répétitions possibles ; seuils de décision fixés a priori (0,9 / 0,1)."""
+    """P(rule wrong | observations) with P(y | rule, x, noise) = ε + (1−2ε)·σ(k·margin): near the boundary the
+    rule predicts ≈ 0.5 (wide tolerance); far from it, it is strict. Competing hypotheses: alternative programs
+    + null model (0.5). SEQUENTIAL test with possible repetitions; decision thresholds fixed a priori (0.9 / 0.1)."""
     rule: BNode
     alternatives: List[BNode]
     eps: float
@@ -484,7 +484,7 @@ class NoiseAwareTruthAnchor:
         pw = self.p_wrong(); return "reject" if pw >= hi else "accept" if pw <= lo else "undecided"
 
     def choose(self, pool, history, cost_new=1.0, cost_repeat=0.6):
-        """Utilité = discrimination attendue (IG sur {règle, alternatives, nul}) − risque de bruit − coût."""
+        """Utility = expected discrimination (IG over {rule, alternatives, null}) − noise risk − cost."""
         cands = torch.cat([pool, torch.stack(history)]) if history else pool
         w = torch.softmax(self.logp, 0)
         P = torch.stack([(self.eps + (1 - 2 * self.eps) * evaluate(h, cands, k=self.k)).double() for h in [self.rule] + self.alternatives] + [torch.full((len(cands),), 0.5, dtype=torch.float64)])
@@ -506,11 +506,11 @@ def sequential_truth_test(rule, alternatives, oracle, pool_sampler, g, eps, budg
     return {"p_wrong": anc.p_wrong(), "decision": anc.decision(), "queries": anc.n, "repeats": repeats}
 
 
-# ================================================================ résidu à porte (contrôle OOD)
+# ================================================================ gated residual (OOD control)
 
 def gated_residual(prog: BNode, X, y, h=3, steps=400, radius=0.35, seed=0):
-    """program(x) + gate(x)·résidu(x) : la porte n'est ouverte QUE près des erreurs d'entraînement du programme
-    ET dans l'enveloppe des données observées (boîte englobante) ; hors région, la sortie = programme (OOD préservé)."""
+    """program(x) + gate(x)·residual(x): the gate is open ONLY near the training errors of the program
+    AND inside the envelope of the observed data (bounding box); outside the region, the output = program (OOD preserved)."""
     from core.boundary_methods import train_residual
     errs = X[predict(prog, X) != y]; lo, hi = X.min(0).values, X.max(0).values
     f, rp = train_residual(prog, X, y, h=h, steps=steps, seed=seed)
@@ -525,12 +525,12 @@ def gated_residual(prog: BNode, X, y, h=3, steps=400, radius=0.35, seed=0):
     return g_pred, rp + 2 * len(errs), gate
 
 
-# ================================================================ familles fonctionnelles (orbites)
+# ================================================================ functional families (orbits)
 
 @dataclass
 class OrbitFamily:
-    """Famille = fonction canonique (signature dans le repère canonique) + orbite sous les transformations
-    admissibles (translation, rotation, échelle, réflexion) + représentations (AST) connues."""
+    """Family = canonical function (signature in the canonical frame) + orbit under the admissible
+    transformations (translation, rotation, scaling, reflection) + known representations (ASTs)."""
     canonical: EquivalenceSignature
     representations: List[BNode]
     support: int = 1
@@ -548,7 +548,7 @@ class OrbitFamily:
 
 
 def induce_orbit_families(programs: Sequence[BNode], min_support=2, threshold=0.08, canonical=True):
-    """Regroupement fonctionnel (canonique ou brut) → familles ; plusieurs AST par famille autorisés."""
+    """Functional clustering (canonical or raw) → families; several ASTs per family allowed."""
     fams: List[OrbitFamily] = []
     for p in programs:
         s = program_signature(p)
@@ -566,8 +566,8 @@ def induce_ast_families(programs: Sequence[BNode], min_support=2):
 
 
 def reuse_family(fams: Sequence[OrbitFamily], X, y, canonical=True, eps=0.03):
-    """Nouvelle instance : choisir la famille par signature (canonique ou brute) d'un ajustement rapide, puis
-    ajuster les paramètres de ses représentations (a priori de famille)."""
+    """New instance: choose the family by the signature (canonical or raw) of a quick fit, then
+    fit the parameters of its representations (family prior)."""
     probe, _ = fit(atoms()[0], X, y, steps=60, n_init=1)
     knn = lambda Q: _knn(X, y, Q); s = EquivalenceSignature.of(knn); evals = 1
     order = sorted(fams, key=lambda f: f.canonical.distance(s, canonical=canonical))

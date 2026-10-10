@@ -1,7 +1,7 @@
-"""Compréhension ancrée : grammaire jointe, lexique ancré par les preuves, polysémie, abstentions expliquées.
+"""Grounded understanding: joint grammar, evidence-grounded lexicon, polysemy, explained abstentions.
 
-L'agent reste isolé de la vérité : il n'importe pas le générateur ; il n'apprend que de légendes,
-d'observations (capteurs, textes) et de la cohérence avec son propre graphe de preuves.
+The agent stays isolated from the truth: it does not import the generator; it learns only from captions,
+from observations (sensors, texts) and from consistency with its own evidence graph.
 """
 from __future__ import annotations
 
@@ -20,9 +20,9 @@ from core.independent_agent import (
 
 
 class GroundedLexicon(LexiconInducer):
-    """Lexique trans-situationnel + alignement EM (IBM Model 1) : chaque symbole perçu doit être « produit »
-    par un mot de la phrase ; les mots se disputent les symboles. Un mot toujours voisin d'un autre
-    (« contient » / « liste ») ne lui vole donc pas son sens."""
+    """Cross-situational lexicon + EM alignment (IBM Model 1): each perceived symbol must be "produced"
+    by a word of the sentence; the words compete for the symbols. A word that is always next to another
+    ("contient" / "liste") therefore does not steal its meaning."""
 
     def __init__(self, **kw):
         super().__init__(**kw)
@@ -35,7 +35,7 @@ class GroundedLexicon(LexiconInducer):
         self._pairs.append((list(set(tokens)), list(structure_symbols(structure))))
 
     def align(self, iterations=12):
-        """IBM Model 1 vectorisé : tableaux plats (phrase, symbole, mot) + index_add, aucune boucle sur les paires."""
+        """Vectorised IBM Model 1: flat arrays (sentence, symbol, word) + index_add, no loop over the pairs."""
         words = sorted({w for toks, _ in self._pairs for w in toks}); syms = sorted({x for _, ss in self._pairs for x in ss})
         wi = {w: i for i, w in enumerate(words)}; si = {x: i for i, x in enumerate(syms)}
         cap, sid, wid = [], [], []
@@ -76,7 +76,7 @@ REQUIRED = {"loc": ("subject", "target"), "event": ("patient",), "color": ("subj
             "owner": ("subject",), "count": ("target",)}
 
 
-# ================================================================ grammaire jointe (perceptron structuré)
+# ================================================================ joint grammar (structured perceptron)
 
 @dataclass
 class ParseHypothesis:
@@ -92,11 +92,11 @@ class ParseHypothesis:
 
 
 class JointGrammarInducer(GrammarInducer):
-    """Rôles décidés CONJOINTEMENT pour tous les syntagmes d'une phrase.
+    """Roles decided JOINTLY for all the phrases of a sentence.
 
-    Les contraintes (rôles distincts, rôle nul possible, rôles requis, ordre relatif, marqueurs comme « par »,
-    mot suivant, type de syntagme) sont des primitives ; leurs POIDS sont appris par perceptron moyenné
-    sur les légendes (observations alignées). Aucune règle de grammaire française n'est écrite à la main."""
+    The constraints (distinct roles, possible null role, required roles, relative order, markers such as "par",
+    next word, phrase type) are primitives; their WEIGHTS are learned by averaged perceptron
+    on the captions (aligned observations). No French grammar rule is written by hand."""
 
     def __init__(self, lex, joint=True):
         super().__init__(lex)
@@ -166,8 +166,8 @@ class JointGrammarInducer(GrammarInducer):
         return JointGrammarInducer._assign_cache[key]
 
     def decode(self, tokens, nps, kind, k=1, hard=True):
-        """Satisfaction de contraintes vectorisée : score(a) = Σ unaire[i, a_i] + Σ_{i<j} paire[a_i, a_j] + Σ manquants.
-        Les analyses violant une contrainte dure (rôle requis absent) ne passent qu'en dernier."""
+        """Vectorised constraint satisfaction: score(a) = Σ unary[i, a_i] + Σ_{i<j} pair[a_i, a_j] + Σ missing.
+        Parses violating a hard constraint (required role absent) only come last."""
         combos, idx, req, roles = self._assignment_table(len(nps), kind)
         R = len(roles); none = R - 1
         U = torch.zeros(len(nps), R)
@@ -209,12 +209,12 @@ class JointGrammarInducer(GrammarInducer):
                     for x in self.feats(tokens, nps, kind, g): self.w[x] += 1; self._u[x] += self._c
                     for x in self.feats(tokens, nps, kind, pred): self.w[x] -= 1; self._u[x] -= self._c
                 self._c += 1
-        for x in list(self.w): self.w[x] -= self._u[x] / self._c          # moyenne du perceptron
+        for x in list(self.w): self.w[x] -= self._u[x] / self._c          # perceptron averaging
         self.explored = 0
         return len(data)
 
     def satisfies(self, kind, assign):
-        """Contraintes dures vérifiées par WCE (rôles requis présents, rôles distincts)."""
+        """Hard constraints verified by WCE (required roles present, distinct roles)."""
         used = [r for r in assign if r != "none"]
         return len(used) == len(set(used)) and all(r in used for r in REQUIRED.get(kind, ()))
 
@@ -234,7 +234,7 @@ class JointGrammarInducer(GrammarInducer):
 
 
 class RoleStudent(torch.nn.Module):
-    """Élève compact distillé du perceptron joint : rôle par syntagme (mot précédent, suivant, rang, type)."""
+    """Compact student distilled from the joint perceptron: role per phrase (previous word, next word, rank, type)."""
 
     def __init__(self, vocab, roles, dim=16, hidden=32, seed=0):
         super().__init__()
@@ -267,7 +267,7 @@ class RoleStudent(torch.nn.Module):
         return self.net(x)
 
     def fit(self, examples, epochs=150):
-        """Un seul lot par époque (toutes les phrases concaténées)."""
+        """A single batch per epoch (all sentences concatenated)."""
         rows = [r for t, nps, k, a in examples for r in self._x(t, nps, k)]
         targets = torch.tensor([self.roles.index(r) for t, nps, k, a in examples for r in a])
         p = torch.tensor([r[0] for r in rows]); n = torch.tensor([r[1] for r in rows]); kk = torch.tensor([r[2] for r in rows])
@@ -280,7 +280,7 @@ class RoleStudent(torch.nn.Module):
         return self
 
     def predict(self, tokens, nps, kind):
-        """Assignation gloutonne (rôles distincts) ; None si le rôle d'un syntagme est hors du type de phrase."""
+        """Greedy assignment (distinct roles); None if the role of a phrase is outside the sentence type."""
         with torch.no_grad(): probs = torch.softmax(self.logits(tokens, nps, kind), 1)
         allowed = set(ROLES.get(kind, ())) | {"none"}
         order = sorted(range(len(nps)), key=lambda i: -float(probs[i].max()))
@@ -296,7 +296,7 @@ class RoleStudent(torch.nn.Module):
         return tuple(out)
 
 
-# ================================================================ lexique ancré par les preuves
+# ================================================================ evidence-grounded lexicon
 
 @dataclass
 class LexicalHypothesis:
@@ -327,7 +327,7 @@ class LexicalHypothesis:
 
     @property
     def status(self):
-        """UNKNOWN -> HYPOTHESIS -> BELIEF -> FACT_LIKE selon la quantité, la marge et la diversité ; régression possible."""
+        """UNKNOWN -> HYPOTHESIS -> BELIEF -> FACT_LIKE according to quantity, margin and diversity; regression possible."""
         b = self.best
         if b is None: return LEX_UNKNOWN
         s, r = self.support[b], self.refute[b]
@@ -369,7 +369,7 @@ class LearningNeed:
     hypothesis: Dict[str, float] = field(default_factory=dict)
 
 
-# ================================================================ agent ancré
+# ================================================================ grounded agent
 
 @dataclass
 class GroundedConfig(AgentConfig):
@@ -377,10 +377,10 @@ class GroundedConfig(AgentConfig):
     grounded_lexicon: bool = True
     polysemy: bool = True
     distilled_roles: bool = False
-    budget: int = 99                   # hypothèses (lexicales / d'analyse) vérifiables par requête
-    grammar_margin: float = 1.0        # sous cette marge, une analyse alternative est testée
-    ground_on_sensors: bool = False    # vérifier les sens candidats sur les seules preuves capteurs (anti-circularité)
-    elimination: bool = False          # désactivée par défaut (8 graines : légèrement nuisible) ; référence par élimination à l'ingestion (canal de preuve séparé)
+    budget: int = 99                   # hypotheses (lexical / parse) verifiable per query
+    grammar_margin: float = 1.0        # below this margin, an alternative parse is tested
+    ground_on_sensors: bool = False    # check candidate meanings on sensor evidence only (anti-circularity)
+    elimination: bool = False          # disabled by default (8 seeds: slightly harmful); reference by elimination at ingestion (separate evidence channel)
     neural: bool = False
     geometry: bool = False
     verification: str = "selective"
@@ -402,7 +402,7 @@ class GroundedAgent(IndependentAgent):
         self._forced: Dict[str, str] = {}
         self._eliminated = False
 
-    # ---- apprentissage ------------------------------------------------------------
+    # ---- learning ------------------------------------------------------------
     def learn_captions(self, caps):
         for c in caps: self.lex.observe(tokenize(c["text"]), c["structure"])
         self.lex.align()
@@ -422,7 +422,7 @@ class GroundedAgent(IndependentAgent):
         return self
 
     def distill_roles(self, caps):
-        """Élève compact entraîné sur les décisions du perceptron joint (enseignant WCE)."""
+        """Compact student trained on the decisions of the joint perceptron (WCE teacher)."""
         examples, vocab = [], set()
         for c in caps:
             toks = tokenize(c["text"]); s = c["structure"]
@@ -436,7 +436,7 @@ class GroundedAgent(IndependentAgent):
         self.grammar.explored = 0
         return len(examples)
 
-    # ---- sens des mots : lexique -> senses -> preuves -> composition -> morphologie ----
+    # ---- word meanings: lexicon -> senses -> evidence -> composition -> morphology ----
     def senses(self, tok):
         if self.lex.tok[tok] < 3: return []
         out = [(c / self.lex.tok[tok], s) for s, c in self.lex.co[tok].items()
@@ -444,7 +444,7 @@ class GroundedAgent(IndependentAgent):
         return [s for _, s in sorted(out, reverse=True)]
 
     def _choose_sense(self, tok, senses):
-        """Polysémie : le sens est choisi par le type du patient (appris des légendes), pas par le mot seul."""
+        """Polysemy: the sense is chosen by the type of the patient (learned from the captions), not by the word alone."""
         if tok in self._ctx:
             i = self._ctx.index(tok)
             for t in self._ctx[i + 1:]:
@@ -454,7 +454,7 @@ class GroundedAgent(IndependentAgent):
                     scored = [(self.sense_ctx[(tok, s)][ptype], s) for s in senses]
                     best = max(scored)
                     if best[0] > 0: return best[1]
-                    # repli : sens dont les patients observés sont les plus proches (même conteneur possible)
+                    # fallback: sense whose observed patients are the closest (same container possible)
                     break
         return senses[0]
 
@@ -470,7 +470,7 @@ class GroundedAgent(IndependentAgent):
         if self.cfg.grounded_lexicon:
             m = self.lexmem.meaning(tok)
             if m: return m, "grounded_obs", self.lexmem.get(tok).confidence
-        if tok.startswith("re") and len(tok) > 4:                       # composition : re- + verbe connu
+        if tok.startswith("re") and len(tok) > 4:                       # composition: re- + known verb
             inner = self.lex.meaning(tok[2:]) or (self.senses(tok[2:]) or [None])[0]
             if inner and inner.startswith("act:"): return inner, "composition", 0.9
         cands = self.morph.candidates(tok, self.lex.lexicon())
@@ -482,9 +482,9 @@ class GroundedAgent(IndependentAgent):
         return None, "unknown", 0.0
 
     def resolve(self, np, belief=None, discourse=None, strict=True):
-        """Élimination (ingestion seulement) : si aucun objet connu ne correspond et qu'un seul candidat a une
-        couleur inconnue, les autres étant établis et différents, la description affirmée le désigne.
-        Refusé pour les requêtes : une question peut porter une présupposition fausse."""
+        """Elimination (ingestion only): if no known object matches and a single candidate has an
+        unknown colour, the others being established and different, the asserted description designates it.
+        Refused for queries: a question may carry a false presupposition."""
         objs, unknown = super().resolve(np, belief, discourse, strict)
         if self.cfg.elimination and not strict and np.color and not objs and len(unknown) == 1 and not np.pronoun:
             self._eliminated = True
@@ -495,8 +495,8 @@ class GroundedAgent(IndependentAgent):
         return self.word_meaning(tok)[1] == "unknown" and tok.isalpha()
 
     def _affordance(self, kinds, patient, rel, target):
-        """Affordances de « dans » apprises des légendes : un conteneur non physique (appris) ne contient
-        que les types observés dedans, et ces types ne vont nulle part ailleurs."""
+        """Affordances of "dans" learned from the captions: a non-physical (learned) container contains
+        only the types observed in it, and these types go nowhere else."""
         pk, tk = kinds.get(patient), kinds.get(target, target)
         learned = {t for t in self.contains if t not in SUPPORTS and t != "box"}
         inventory_types = {p for t in learned for p in self.contains[t]}
@@ -505,10 +505,10 @@ class GroundedAgent(IndependentAgent):
         return affordance(kinds, patient, rel, target)
 
     def _resolve_oov(self, tokens, meanings, i, ans, mode):
-        if self.cfg.budget < 20: return None                  # inférence contextuelle exhaustive = coûteuse
+        if self.cfg.budget < 20: return None                  # exhaustive contextual inference = costly
         return super()._resolve_oov(tokens, meanings, i, ans, mode)
 
-    # ---- ingestion en plusieurs passes + ancrage lexical ------------------------------
+    # ---- multi-pass ingestion + lexical grounding ------------------------------
     def ingest(self, observations, update=True):
         belief = self.belief or self.new_world()
         self._world_id += 1
@@ -525,7 +525,7 @@ class GroundedAgent(IndependentAgent):
             else:
                 texts.append(ob)
         done = set()
-        for _ in range(2):                                  # passes : les nouvelles croyances débloquent des références
+        for _ in range(2):                                  # passes: new beliefs unlock references
             for j, ob in enumerate(texts):
                 if j in done: continue
                 toks = tokenize(ob.text)
@@ -556,7 +556,7 @@ class GroundedAgent(IndependentAgent):
         return belief
 
     def _ground(self, toks, ob):
-        """Ancrage trans-situationnel : quels sens rendent la phrase cohérente avec les preuves des AUTRES sources ?"""
+        """Cross-situational grounding: which meanings make the sentence consistent with the evidence from the OTHER sources?"""
         unknown = [i for i, t in enumerate(toks) if self._is_unknown(t)]
         if len(unknown) != 1: return None
         i = unknown[0]; word = toks[i]
@@ -585,14 +585,14 @@ class GroundedAgent(IndependentAgent):
         return "support" if verdicts else "neutral"
 
     def _morphology_from_grounding(self):
-        """Morphologie + ancrage : une famille n'est induite que si les formes sont ancrées au même concept."""
+        """Morphology + grounding: a family is induced only if the forms are grounded to the same concept."""
         for w, h in self.lexmem.hyps.items():
             if h.status in (LEX_BELIEF, LEX_FACT):
                 for form, m in self.lex.lexicon().items():
                     if m == h.best and form != w:
                         if len(w) > len(form): self.morph.learn_pair(w, form)
 
-    # ---- analyse contrefactuelle des observations ------------------------------------------
+    # ---- counterfactual parsing of observations ------------------------------------------
     def parse_statement(self, tokens):
         props = self._parse_statement(tokens)
         meanings = [self.word_meaning(t)[0] for t in tokens]
@@ -600,7 +600,7 @@ class GroundedAgent(IndependentAgent):
         nps = self.grammar.chunks(tokens, meanings)
         if self._kind(syms, tokens) == "color" and len(nps) == 1 and nps[0].color and nps[0].type:
             standalone = [m for i, m in enumerate(meanings) if m and m.startswith("color:") and not (nps[0].start <= i < nps[0].end)]
-            if not standalone:                                  # « c'est une clé bleue » : l'attribut est la valeur affirmée
+            if not standalone:                                  # "c'est une clé bleue": the attribute is the asserted value
                 objs, unknown = self.resolve(NP(0, 0, type=nps[0].type), strict=False)
                 if len(objs) == 1 and not unknown: return [(("color", objs[0]), nps[0].color)]
                 return None
@@ -619,7 +619,7 @@ class GroundedAgent(IndependentAgent):
         if not hyps: return None
         distinct = {tuple(sorted(map(str, p))) for _, p in hyps}
         if len(distinct) == 1: return hyps[0][1]
-        # analyses divergentes et proches : la cohérence avec les preuves départage, sinon on n'ingère pas
+        # diverging and close parses: consistency with the evidence breaks the tie, otherwise nothing is ingested
         scored = []
         for rank, props in hyps:
             s = 0
@@ -628,9 +628,9 @@ class GroundedAgent(IndependentAgent):
                 if b.status in (FACT, BELIEF): s += 1 if b.value == value else -1
             scored.append((s, -rank, props))
         scored.sort(reverse=True)
-        return scored[0][2]              # à égalité de preuves : la préférence grammaticale (rang 0) l'emporte
+        return scored[0][2]              # on an evidence tie: the grammatical preference (rank 0) wins
 
-    # ---- réponses ------------------------------------------------------------------------
+    # ---- answers ------------------------------------------------------------------------
     def answer(self, text, mode=None):
         import re as _re
         last = [s for s in _re.split(r"(?<=[.])\s+", text.strip()) if s][-1]
@@ -644,7 +644,7 @@ class GroundedAgent(IndependentAgent):
         return self._post(ans, text, mode)
 
     def _conjunction(self, text, last):
-        """« A et B » / « A, B et C » : chaque clause est vérifiée ; la conjonction combine les verdicts."""
+        """"A et B" / "A, B et C": each clause is verified; the conjunction combines the verdicts."""
         parts = [p.strip() for p in _split_clauses(last)]
         results = [self.answer(p) for p in parts]
         outs = [r.output for r in results]
@@ -662,7 +662,7 @@ class GroundedAgent(IndependentAgent):
 
     def _post(self, ans, text, mode):
         ans.initial_output = ans.output
-        # contre-analyse : si la meilleure analyse grammaticale n'est pas nettement meilleure, on teste la suivante
+        # counter-parse: if the best grammatical parse is not clearly better, the next one is tested
         if self.cfg.joint_grammar and ans.output not in ABSTAIN and self.grammar.last_margin < self.cfg.grammar_margin \
                 and self.cfg.budget >= 2:
             self.grammar.rank = 1
@@ -679,14 +679,14 @@ class GroundedAgent(IndependentAgent):
         return ans
 
     def _evidence_correction(self, ans, text, mode):
-        """Auto-correction par le graphe de preuves : un mot inconnu dont l'hypothèse lexicale est déjà soutenue
-        (sans réfutation) est essayé ; la réponse n'est gardée que si elle repose sur une croyance établie."""
+        """Self-correction through the evidence graph: an unknown word whose lexical hypothesis is already supported
+        (without refutation) is tried; the answer is kept only if it rests on an established belief."""
         words = [t for t in self._ctx if self._is_unknown(t)]
         if len(words) != 1: return
         h = self.lexmem.get(words[0])
         if not h or h.best is None or h.refute[h.best] > 0: return
         second = max((h.support[c] for c in h.support if c != h.best), default=0.0)
-        # exigence stricte : au moins deux expériences indépendantes, support net, aucune réfutation
+        # strict requirement: at least two independent experiences, clear support, no refutation
         if h.support[h.best] < 1.5 or len(h.experiences[h.best]) < 2 or h.support[h.best] - second < 1.0: return
         self._forced[words[0]] = h.best
         try: retry = IndependentAgent.answer(self, text, mode)
@@ -698,7 +698,7 @@ class GroundedAgent(IndependentAgent):
             ans.reasoning += [f"auto-correction : « {words[0]} » ≈ {h.best} (hypothèse ancrée, support {h.support[h.best]:.2f})"] + retry.reasoning
             ans.evidence += retry.evidence; ans.sources += retry.sources
 
-    # ---- abstentions expliquées et besoins d'apprentissage ----------------------------------
+    # ---- explained abstentions and learning needs ----------------------------------
     def abstention_reason(self, ans):
         if ans.output == "UNKNOWN_WORD": return "lexical_unknown"
         if ans.output == "ASK" or "grammar_ambiguity" in ans.flags: return "grammar_ambiguity"

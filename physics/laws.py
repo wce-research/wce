@@ -44,10 +44,10 @@ class Law:
 
 class ForceDynamicsLaw(Law):
     """
-    Dynamique newtonienne 2D.
+    2D Newtonian dynamics.
 
-        Fx_net = somme(Fx)
-        Fy_net = somme(Fy)
+        Fx_net = sum(Fx)
+        Fy_net = sum(Fy)
 
         ax = Fx_net / m
         ay = Fy_net / m
@@ -58,15 +58,15 @@ class ForceDynamicsLaw(Law):
         x(t+dt) = x(t) + vx(t+dt)*dt
         y(t+dt) = y(t) + vy(t+dt)*dt
 
-    Le support est traité comme une contrainte unilatérale verticale :
+    The support is treated as a vertical unilateral constraint:
 
-        - si les forces verticales poussent vers le bas,
-          le support fournit la réaction nécessaire ;
+        - if the vertical forces push downwards,
+          the support provides the necessary reaction;
 
-        - si les forces verticales résultantes poussent vers le haut,
-          le contact est rompu.
+        - if the resulting vertical forces push upwards,
+          the contact is broken.
 
-    En horizontal, pas de contrainte de support (pas de frottement).
+    Horizontally, no support constraint (no friction).
     """
 
     def __init__(
@@ -93,7 +93,7 @@ class ForceDynamicsLaw(Law):
             self.providers,
         )
 
-        # Regrouper les forces par entité
+        # Group the forces by entity
         force_by_entity = {}
 
         for force in forces:
@@ -110,7 +110,7 @@ class ForceDynamicsLaw(Law):
             if entity.properties.get("fixed"):
                 continue
 
-            # Vérifier qu'on a au moins une propriété de position
+            # Check that we have at least one position property
             if "y" not in entity.properties and "x" not in entity.properties:
                 continue
 
@@ -119,7 +119,7 @@ class ForceDynamicsLaw(Law):
             fx = force_by_entity.get(entity.name, {"fx": 0.0, "fy": 0.0})["fx"]
             fy = force_by_entity.get(entity.name, {"fx": 0.0, "fy": 0.0})["fy"]
 
-            # --- Traitement du support (vertical uniquement) ---
+            # --- Support handling (vertical only) ---
             support_relations = [
                 relation
                 for relation in world.relations
@@ -130,17 +130,17 @@ class ForceDynamicsLaw(Law):
             ]
 
             if support_relations:
-                # Le support peut pousser vers le haut,
-                # mais ne peut jamais tirer l'objet vers le bas.
+                # The support can push upwards,
+                # but can never pull the object downwards.
                 if fy <= 0.0:
-                    # Réaction normale :
-                    # elle compense exactement les forces
-                    # dirigées vers le bas.
+                    # Normal reaction:
+                    # it exactly compensates the forces
+                    # directed downwards.
                     fy = 0.0
 
                 else:
-                    # La résultante verticale est dirigée vers le haut :
-                    # l'objet quitte son support.
+                    # The vertical resultant is directed upwards:
+                    # the object leaves its support.
                     for relation in support_relations:
                         relation_changes.append(
                             RelationChange(
@@ -151,11 +151,11 @@ class ForceDynamicsLaw(Law):
                             )
                         )
 
-            # --- Calcul des accélérations ---
+            # --- Computation of the accelerations ---
             ax = fx / mass
             ay = fy / mass
 
-            # --- Intégration pour x (si propriété existe) ---
+            # --- Integration for x (if the property exists) ---
             if "x" in entity.properties:
                 old_vx = float(
                     entity.properties.get(
@@ -170,7 +170,7 @@ class ForceDynamicsLaw(Law):
 
                 new_vx = old_vx + ax * dt
 
-                # Euler semi-implicite.
+                # Semi-implicit Euler.
                 new_x = old_x + new_vx * dt
 
                 if new_vx != old_vx:
@@ -193,7 +193,7 @@ class ForceDynamicsLaw(Law):
                         )
                     )
 
-            # --- Intégration pour y (toujours présente dans les tests existants) ---
+            # --- Integration for y (always present in the existing tests) ---
             if "y" in entity.properties:
                 old_vy = float(
                     entity.properties.get(
@@ -208,7 +208,7 @@ class ForceDynamicsLaw(Law):
 
                 new_vy = old_vy + ay * dt
 
-                # Euler semi-implicite.
+                # Semi-implicit Euler.
                 new_y = old_y + new_vy * dt
 
                 if new_vy != old_vy:
@@ -244,14 +244,14 @@ class ForceDynamicsLaw(Law):
 
 class GravityLaw(ForceDynamicsLaw):
     """
-    Dynamique verticale standard de WCE.
+    Standard vertical dynamics of WCE.
 
-    Les forces explicites sont :
-      - poids
-      - force externe
+    The explicit forces are:
+      - weight
+      - external force
 
-    La réaction du support est résolue
-    dynamiquement par ForceDynamicsLaw.
+    The support reaction is resolved
+    dynamically by ForceDynamicsLaw.
     """
 
     def __init__(

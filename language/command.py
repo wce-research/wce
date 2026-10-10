@@ -31,7 +31,7 @@ class AdvanceTimeCommand:
 def parse_command(text: str):
     normalized = normalize(text)
 
-    # Commande temporelle :
+    # Time command:
     # "Avance le temps de 2 secondes"
     match = re.match(
         r"^avance\s+le\s+temps\s+de\s+"
@@ -47,9 +47,9 @@ def parse_command(text: str):
             )
         )
 
-    # On ne devine plus si c'est une question
-    # à partir du premier mot.
-    # On laisse le parseur de questions décider.
+    # We no longer guess whether it is a question
+    # from the first word.
+    # We let the question parser decide.
     try:
         query = parse_query(text)
 
@@ -60,7 +60,7 @@ def parse_command(text: str):
     except QueryParseError:
         pass
 
-    # Sinon, essayer comme action.
+    # Otherwise, try as an action.
     try:
         action = parse_action(text)
 

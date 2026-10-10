@@ -1,22 +1,22 @@
-"""WCE — ALGÈBRE DE MESURE ET D'OBSERVATION.
+"""WCE — ALGEBRA OF MEASUREMENT AND OBSERVATION.
 
-    ÉTAT DU MONDE (latent) → OBSERVABLE → CONTEXTE DE MESURE → OPÉRATEUR → DISTRIBUTION DES ISSUES
-    → OBSERVATION (issue tirée) → ENSEMBLE D'ÉTATS COMPATIBLES → MISE À JOUR DES CROYANCES
+    WORLD STATE (latent) → OBSERVABLE → MEASUREMENT CONTEXT → OPERATOR → DISTRIBUTION OF OUTCOMES
+    → OBSERVATION (drawn outcome) → SET OF COMPATIBLE STATES → BELIEF UPDATE
 
-Ce qui EXISTE (LatentWorldState) ≠ ce qui est MESURÉ (opérateur + contexte) ≠ ce qui est OBSERVÉ (issue enregistrée)
-≠ ce qui est CRU (CompatibleStateSet pondéré).
+What EXISTS (LatentWorldState) ≠ what is MEASURED (operator + context) ≠ what is OBSERVED (recorded outcome)
+≠ what is BELIEVED (weighted CompatibleStateSet).
 
-Inspirations — ANALOGIES ARCHITECTURALES, aucune physique revendiquée :
-  * Dirac (analogie) : séparation ÉTAT / OBSERVABLE / OPÉRATEUR / ISSUE ; aucun espace de Hilbert, aucune amplitude.
-  * Fourier : changement de BASE de représentation (DFT orthonormée, réelle) ; le monde ne change pas.
-  * Einstein (analogie classique) : toute position / vitesse / orientation porte son RÉFÉRENTIEL ; transformations
-    rigides 2D classiques (galiléennes), pas de relativité.
-  * Boltzmann (analogie) : une macro-observation correspond à plusieurs micro-configurations ; multiplicité et
-    entropie de l'ensemble compatible ; aucune thermodynamique.
-  * Shannon : entropie et gain d'information (mathématiques exactes, pas une analogie).
-  * Heisenberg (analogie) : COMPROMIS définis explicitement par le modèle de capteur ; aucune relation ΔxΔp ≥ ħ/2.
-  * Bohm (analogie) : état latent ≠ issue observée ; ce n'est PAS de la mécanique bohmienne.
-Tout est vectorisé (torch) et chaque opération est tracée comme TransformationSpec du domaine MEASUREMENT.
+Inspirations — ARCHITECTURAL ANALOGIES, no physics claimed:
+  * Dirac (analogy): separation STATE / OBSERVABLE / OPERATOR / OUTCOME; no Hilbert space, no amplitude.
+  * Fourier: change of representation BASIS (orthonormal, real DFT); the world does not change.
+  * Einstein (classical analogy): every position / velocity / orientation carries its REFERENCE FRAME; classical
+    2D rigid transformations (Galilean), no relativity.
+  * Boltzmann (analogy): one macro-observation corresponds to several micro-configurations; multiplicity and
+    entropy of the compatible set; no thermodynamics.
+  * Shannon: entropy and information gain (exact mathematics, not an analogy).
+  * Heisenberg (analogy): TRADE-OFFS defined explicitly by the sensor model; no relation ΔxΔp ≥ ħ/2.
+  * Bohm (analogy): latent state ≠ observed outcome; this is NOT Bohmian mechanics.
+Everything is vectorised (torch) and each operation is traced as a TransformationSpec of the MEASUREMENT domain.
 """
 from __future__ import annotations
 
@@ -45,29 +45,29 @@ class MeasurementInvariant(Enum):
 
 
 class FrameError(ValueError):
-    """Comparaison de valeurs exprimées dans des référentiels différents sans transformation."""
+    """Comparison of values expressed in different reference frames without a transformation."""
 
 
 class UnitError(ValueError):
-    """Opération entre grandeurs de dimensions / unités incompatibles."""
+    """Operation between quantities of incompatible dimensions / units."""
 
 
-# ================================================================ référentiels (analogie : Einstein, classique 2D)
+# ================================================================ reference frames (analogy: Einstein, classical 2D)
 
 @dataclass(frozen=True)
 class ReferenceFrame:
-    """Référentiel 2D rigide : origine (dans le monde) + angle. Classique, pas relativiste."""
+    """Rigid 2D reference frame: origin (in the world) + angle. Classical, not relativistic."""
     name: str
     origin: Tuple[float, float] = (0.0, 0.0)
     angle: float = 0.0
-    velocity: Tuple[float, float] = (0.0, 0.0)          # vitesse du référentiel dans le monde (galiléen)
+    velocity: Tuple[float, float] = (0.0, 0.0)          # velocity of the frame in the world (Galilean)
 
     def _R(self):
         c, s = math.cos(self.angle), math.sin(self.angle)
         return torch.tensor([[c, -s], [s, c]], dtype=torch.float64)
 
     def to_world(self, v: "FramedValue") -> "FramedValue":
-        if v.frame != self.name: raise FrameError(f"valeur en {v.frame}, référentiel {self.name}")
+        if v.frame != self.name: raise FrameError(f"value in {v.frame}, reference frame {self.name}")
         x = torch.as_tensor(v.value, dtype=torch.float64)
         if v.kind == "point": out = x @ self._R().T + torch.tensor(self.origin, dtype=torch.float64)
         elif v.kind == "velocity": out = x @ self._R().T + torch.tensor(self.velocity, dtype=torch.float64)
@@ -77,7 +77,7 @@ class ReferenceFrame:
         return FramedValue(out, WORLD_FRAME.name, v.kind, v.unit)
 
     def from_world(self, v: "FramedValue") -> "FramedValue":
-        if v.frame != WORLD_FRAME.name: raise FrameError(f"valeur en {v.frame}, attendu {WORLD_FRAME.name}")
+        if v.frame != WORLD_FRAME.name: raise FrameError(f"value in {v.frame}, expected {WORLD_FRAME.name}")
         x = torch.as_tensor(v.value, dtype=torch.float64)
         if v.kind == "point": out = (x - torch.tensor(self.origin, dtype=torch.float64)) @ self._R()
         elif v.kind == "velocity": out = (x - torch.tensor(self.velocity, dtype=torch.float64)) @ self._R()
@@ -98,12 +98,12 @@ class FramedValue:
     unit: str = "m"
 
     def same_frame(self, other):
-        if self.frame != other.frame: raise FrameError(f"comparaison {self.frame} vs {other.frame} sans transformation")
-        if self.unit != other.unit: raise UnitError(f"unités {self.unit} vs {other.unit}")
+        if self.frame != other.frame: raise FrameError(f"comparison {self.frame} vs {other.frame} without a transformation")
+        if self.unit != other.unit: raise UnitError(f"units {self.unit} vs {other.unit}")
 
 
 def change_frame(v: FramedValue, frames: Dict[str, ReferenceFrame], target: str, graph=None) -> FramedValue:
-    """Transforme v vers le référentiel cible (via le monde) ; tracé comme ChangeFrame."""
+    """Transforms v to the target reference frame (via the world); traced as ChangeFrame."""
     w = v if v.frame == WORLD_FRAME.name else frames[v.frame].to_world(v)
     out = w if target == WORLD_FRAME.name else frames[target].from_world(w)
     trace(graph, MeasurementOp("ChangeFrame", {"from": v.frame, "to": target, "kind": v.kind}))
@@ -115,7 +115,7 @@ def distance(a: FramedValue, b: FramedValue) -> float:
     return float(torch.linalg.norm(torch.as_tensor(a.value, dtype=torch.float64) - torch.as_tensor(b.value, dtype=torch.float64)))
 
 
-# ================================================================ bases de représentation (Fourier)
+# ================================================================ representation bases (Fourier)
 
 @dataclass(frozen=True)
 class RepresentationBasis:
@@ -125,7 +125,7 @@ class RepresentationBasis:
 
 
 class BasisTransform:
-    """Changement de BASE (DFT orthonormée) : la représentation change, le monde (le signal) ne change pas."""
+    """Change of BASIS (orthonormal DFT): the representation changes, the world (the signal) does not change."""
 
     def __init__(self, n, graph=None):
         self.time = RepresentationBasis("time", n, "s")
@@ -150,15 +150,15 @@ class BasisTransform:
                 "dimension_consistent": X.shape[-1] == torch.as_tensor(x).shape[-1]}
 
 
-# ================================================================ mesure : observable, contexte, opérateur
+# ================================================================ measurement: observable, context, operator
 
 @dataclass(frozen=True)
 class Observable:
-    """CE QUI EST INTERROGÉ (pas sa valeur) : propriété d'une entité, domaine, unité, référentiel requis."""
+    """WHAT IS QUERIED (not its value): property of an entity, domain, unit, required reference frame."""
     name: str
     entity: str
     attribute: str
-    domain: Tuple[Any, ...] = ()             # discret ; vide = continu
+    domain: Tuple[Any, ...] = ()             # discrete; empty = continuous
     unit: str = ""
     frame_required: bool = False
 
@@ -170,7 +170,7 @@ class Observable:
 
 @dataclass(frozen=True)
 class NoiseModel:
-    kind: str = "confusion"                   # confusion (discret, fiabilité r) | gaussian (continu, sigma)
+    kind: str = "confusion"                   # confusion (discrete, reliability r) | gaussian (continuous, sigma)
     reliability: float = 0.9
     sigma: float = 0.0
 
@@ -181,7 +181,7 @@ class MeasurementContext:
     sensor: str = "sensor"
     frame: str = "world"
     time: int = 0
-    resolution: float = 0.0                   # granularité de lecture (≠ incertitude)
+    resolution: float = 0.0                   # reading granularity (≠ uncertainty)
     noise: NoiseModel = field(default_factory=NoiseModel)
     cost: float = 1.0
     latency: float = 0.0
@@ -208,7 +208,7 @@ class MeasurementDistribution:
 
 @dataclass
 class MeasurementResolution:
-    """La résolution est la granularité de LECTURE (ex. « à 10 cm près ») : l'issue désigne un intervalle."""
+    """The resolution is the READING granularity (e.g. "to within 10 cm"): the outcome denotes an interval."""
     step: float
 
     def bin(self, x): return math.floor(x / self.step) * self.step if self.step else x
@@ -232,7 +232,7 @@ class MeasurementRecord:
 
 
 class MeasurementOperator:
-    """ÉTAT → DISTRIBUTION SUR LES ISSUES (pas une valeur exacte). Vectorisé sur un lot d'états candidats."""
+    """STATE → DISTRIBUTION OVER THE OUTCOMES (not an exact value). Vectorised over a batch of candidate states."""
 
     def __init__(self, observable: Observable, context: MeasurementContext):
         self.observable, self.context = observable, context
@@ -245,7 +245,7 @@ class MeasurementOperator:
         return list(grid) if grid is not None else []
 
     def likelihood(self, outcome, values: torch.Tensor):
-        """P(issue | valeur vraie) pour un VECTEUR de valeurs candidates (indices du domaine, ou réels)."""
+        """P(outcome | true value) for a VECTOR of candidate values (indices of the domain, or reals)."""
         n = self.context.noise
         if self.observable.discrete:
             K = len(self.observable.domain); r = n.reliability
@@ -254,7 +254,7 @@ class MeasurementOperator:
         reading = outcome.value if isinstance(outcome, MeasurementOutcome) else outcome
         step = self.context.resolution; sig = max(n.sigma, 1e-9)
         vals = values.to(torch.float64)
-        if step:                                                   # issue = intervalle de lecture [reading, reading + step)
+        if step:                                                   # outcome = reading interval [reading, reading + step)
             nd = torch.distributions.Normal(vals, sig)
             return (nd.cdf(torch.tensor(reading + step, dtype=torch.float64)) - nd.cdf(torch.tensor(reading, dtype=torch.float64))).clamp_min(1e-12)
         return torch.exp(-0.5 * ((reading - vals) / sig) ** 2) / (sig * math.sqrt(2 * math.pi))
@@ -279,11 +279,11 @@ class MeasurementOperator:
         return MeasurementOutcome(r, res.interval(r))
 
 
-# ================================================================ monde latent (analogie : Bohm — latent ≠ observé)
+# ================================================================ latent world (analogy: Bohm — latent ≠ observed)
 
 class LatentWorldState:
-    """L'état qui EXISTE. L'agent n'y accède QUE par des opérateurs de mesure ; l'évaluation peut le lire
-    (peek), et chaque lecture est comptée pour vérifier NO_HIDDEN_TRUTH_ACCESS."""
+    """The state that EXISTS. The agent accesses it ONLY through measurement operators; the evaluation can read it
+    (peek), and each read is counted to check NO_HIDDEN_TRUTH_ACCESS."""
 
     def __init__(self, values: Dict[Tuple[str, str], Any], seed=0):
         self._values = dict(values); self.rng = random.Random(seed)
@@ -294,7 +294,7 @@ class LatentWorldState:
         out = op.sample(self._values[key], self.rng)
         rec = MeasurementRecord(op.observable, op.context, out, provenance)
         if op.context.disturbance != PASSIVE and op.context.disturbance_effect is not None:
-            op.context.disturbance_effect(self)                 # une mesure perturbatrice change le monde latent
+            op.context.disturbance_effect(self)                 # a disturbing measurement changes the latent world
         self.log.append(rec)
         trace(graph, MeasurementOp("Measure", {"operator": op.name, "disturbance": op.context.disturbance}))
         return rec
@@ -307,17 +307,17 @@ class LatentWorldState:
     def set(self, key, value): self._values[key] = value
 
 
-# ================================================================ ensemble d'états compatibles (analogie : Boltzmann)
+# ================================================================ set of compatible states (analogy: Boltzmann)
 
 class CompatibleStateSet:
-    """Croyance = ensemble pondéré de mondes possibles {état_i, poids_i}. Les configurations [N, V] sont PARTAGÉES
-    (copy-on-write : conditionner ne copie que les poids). Variables discrètes (indices dans leur domaine)."""
+    """Belief = weighted set of possible worlds {state_i, weight_i}. The configurations [N, V] are SHARED
+    (copy-on-write: conditioning copies only the weights). Discrete variables (indices in their domain)."""
 
     def __init__(self, variables: List[Tuple[str, str]], domains: Dict[Tuple[str, str], Sequence[Any]],
                  states: torch.Tensor, logw: Optional[torch.Tensor] = None, graph=None):
         self.vars = list(variables); self.domains = {k: list(v) for k, v in domains.items()}
         self.index = {v: i for i, v in enumerate(self.vars)}
-        self.states = states                                    # partagé
+        self.states = states                                    # shared
         self.logw = logw if logw is not None else torch.zeros(states.shape[0], dtype=torch.float64)
         self.graph = graph; self.history: List[str] = []
 
@@ -334,7 +334,7 @@ class CompatibleStateSet:
         return s
 
     def _fork(self, logw, note):
-        out = CompatibleStateSet(self.vars, self.domains, self.states, logw, self.graph)   # états partagés
+        out = CompatibleStateSet(self.vars, self.domains, self.states, logw, self.graph)   # shared states
         out.history = self.history + [note]
         return out
 
@@ -348,9 +348,9 @@ class CompatibleStateSet:
 
     def value_index(self, var, value): return self.domains[var].index(value)
 
-    # ---- opérations de l'algèbre (tracées) -------------------------------------------------
+    # ---- operations of the algebra (traced) -------------------------------------------------
     def condition(self, record: MeasurementRecord, var=None, reliability=None) -> "CompatibleStateSet":
-        """ConditionOnMeasurement : prior compatible + mesure → postérieure compatible."""
+        """ConditionOnMeasurement: compatible prior + measurement → compatible posterior."""
         var = var or (record.observable.entity, record.observable.attribute)
         op = MeasurementOperator(record.observable, record.context if reliability is None else
                                  MeasurementContext(**{**record.context.__dict__, "noise": NoiseModel(record.context.noise.kind, reliability, record.context.noise.sigma)}))
@@ -364,20 +364,20 @@ class CompatibleStateSet:
         return self._fork(self.logw + torch.log(L.clamp_min(1e-300)), f"condition {record.observable} = {record.outcome.value}")
 
     def restrict(self, mask: torch.Tensor, note="macro-observation") -> "CompatibleStateSet":
-        """Observation déterministe (macro) : seuls les états compatibles gardent un poids."""
+        """Deterministic (macro) observation: only the compatible states keep a weight."""
         lw = torch.where(mask, self.logw, torch.full_like(self.logw, -float("inf")))
         trace(self.graph, MeasurementOp("Condition", {"kind": "restrict"}))
         return self._fork(lw, note)
 
     def marginal(self, var) -> Dict[Any, float]:
-        """Marginalize : P(var = v) sans choisir une configuration complète."""
+        """Marginalize: P(var = v) without choosing a complete configuration."""
         w = self.weights; col = self.column(var)
         p = torch.zeros(len(self.domains[var]), dtype=torch.float64).index_add_(0, col, w)
         trace(self.graph, MeasurementOp("Marginalize", {"variable": str(var)}))
         return {v: float(p[i]) for i, v in enumerate(self.domains[var])}
 
     def entropy(self, var=None) -> float:
-        """H(S) en nats (ou H de la marginale de var)."""
+        """H(S) in nats (or H of the marginal of var)."""
         if var is not None:
             p = torch.tensor(list(self.marginal(var).values()), dtype=torch.float64)
         else:
@@ -388,7 +388,7 @@ class CompatibleStateSet:
     def support_size(self, eps=1e-12): return int((self.weights > eps).sum())
 
     def multiplicity(self, macro: Callable[[torch.Tensor], torch.Tensor]):
-        """Macro-état -> nombre de micro-configurations compatibles (vectorisé)."""
+        """Macro-state -> number of compatible micro-configurations (vectorised)."""
         m = macro(self.states)
         vals, counts = torch.unique(m, return_counts=True)
         return {int(v): int(c) for v, c in zip(vals.tolist(), counts.tolist())}
@@ -398,7 +398,7 @@ class CompatibleStateSet:
         return {v: self.domains[v][int(self.states[i, j])] for j, v in enumerate(self.vars)}, float(self.weights[i])
 
     def conflict(self, var, records: List[MeasurementRecord], credible=0.6, second=0.2):
-        """CONFLICTED si des mesures crédibles sont incompatibles ET la postérieure reste multimodale (pas de moyenne)."""
+        """CONFLICTED if credible measurements are incompatible AND the posterior remains multimodal (no averaging)."""
         vals = {r.outcome.value for r in records if r.context.noise.reliability >= credible}
         if len(vals) < 2: return False
         m = sorted(self.marginal(var).values(), reverse=True)
@@ -407,7 +407,7 @@ class CompatibleStateSet:
 
 def fuse(prior: CompatibleStateSet, records: List[MeasurementRecord], reliability_of: Callable[[str], float] = None,
          graph=None) -> CompatibleStateSet:
-    """Fusion de mesures (capteurs, documents…) pondérées par la fiabilité (SourceReliabilityModel) ; reste une distribution."""
+    """Fusion of measurements (sensors, documents…) weighted by reliability (SourceReliabilityModel); remains a distribution."""
     post = prior
     for r in records:
         rel = reliability_of(r.provenance) if reliability_of else None
@@ -416,10 +416,10 @@ def fuse(prior: CompatibleStateSet, records: List[MeasurementRecord], reliabilit
     return post
 
 
-# ================================================================ gain d'information (Shannon)
+# ================================================================ information gain (Shannon)
 
 def expected_posterior_entropy(belief: CompatibleStateSet, op: MeasurementOperator, target=None, grid=None):
-    """E_o[H(S | o)] (ou de la marginale cible), vectorisé sur les issues possibles."""
+    """E_o[H(S | o)] (or of the target marginal), vectorised over the possible outcomes."""
     var = (op.observable.entity, op.observable.attribute)
     col = belief.column(var)
     if op.observable.discrete:
@@ -427,7 +427,7 @@ def expected_posterior_entropy(belief: CompatibleStateSet, op: MeasurementOperat
     else:
         vals = torch.tensor([float(x) for x in belief.domains[var]], dtype=torch.float64)[col]
         outs = list(grid); L = torch.stack([op.likelihood(MeasurementOutcome(o), vals) for o in outs])
-        L = L / L.sum(0, keepdim=True).clamp_min(1e-300)                                              # issues discrétisées
+        L = L / L.sum(0, keepdim=True).clamp_min(1e-300)                                              # discretised outcomes
     w = belief.weights
     joint = L * w                                                                                     # [O, N]
     po = joint.sum(1)                                                                                 # p(o)
@@ -442,7 +442,7 @@ def expected_posterior_entropy(belief: CompatibleStateSet, op: MeasurementOperat
 
 
 def information_gain(belief: CompatibleStateSet, op: MeasurementOperator, target=None, grid=None) -> float:
-    """IG(M) = H(S avant) − E[H(S après M)] (sur la variable cible si donnée)."""
+    """IG(M) = H(S before) − E[H(S after M)] (on the target variable if given)."""
     h0 = belief.entropy(target)
     eh, _ = expected_posterior_entropy(belief, op, target, grid)
     return max(0.0, h0 - eh)
@@ -450,8 +450,8 @@ def information_gain(belief: CompatibleStateSet, op: MeasurementOperator, target
 
 def decision_value(belief: CompatibleStateSet, op: MeasurementOperator, target, wrong_cost=20.0, abstain_cost=1.0,
                    calibrate=None, grid=None):
-    """Valeur de l'information POUR LA DÉCISION : perte attendue avant − E[perte après la mesure].
-    perte(b) = min((1 − p_cal(max b)) · C_erreur, C_abstention) ; p_cal = confiance calibrée si fournie."""
+    """Value of information FOR THE DECISION: expected loss before − E[loss after the measurement].
+    loss(b) = min((1 − p_cal(max b)) · C_error, C_abstention); p_cal = calibrated confidence if provided."""
     cal = calibrate or (lambda p: p)
     loss = lambda p: min((1 - cal(p)) * wrong_cost, abstain_cost)
     before = loss(max(belief.marginal(target).values()))
@@ -468,7 +468,7 @@ def decision_value(belief: CompatibleStateSet, op: MeasurementOperator, target, 
     return max(0.0, before - after)
 
 
-# ================================================================ planificateur de mesures
+# ================================================================ measurement planner
 
 @dataclass
 class MeasurementChoice:
@@ -479,8 +479,8 @@ class MeasurementChoice:
 
 
 class MeasurementPlanner:
-    """Choisit la prochaine mesure : utilité = IG − coût − coût de perturbation − coût de latence.
-    Règle d'arrêt : confiance suffisante, IG résiduel faible, ou utilité négative / budget épuisé."""
+    """Chooses the next measurement: utility = IG − cost − disturbance cost − latency cost.
+    Stopping rule: sufficient confidence, low residual IG, or negative utility / budget exhausted."""
 
     POLICIES = ("random", "fixed", "most_reliable", "max_ig", "max_utility")
 
@@ -490,7 +490,7 @@ class MeasurementPlanner:
         self.confidence, self.min_ig, self.budget = confidence, min_ig, budget
         self.rng = random.Random(seed); self.graph = graph; self.spent = 0.0
         self.decision_costs = None; self.calibrate = None
-        self.value_model = None; self.context = {}           # politiques "learned" / "hybrid" (MeasurementValueLearner)
+        self.value_model = None; self.context = {}           # "learned" / "hybrid" policies (MeasurementValueLearner)
 
     def disturbance_cost(self, op, target):
         d = op.context.disturbance
@@ -506,7 +506,7 @@ class MeasurementPlanner:
             f = self.value_model.features(belief, op, target, ig, dv, self.context)
             pred = self.value_model.predict(f, hybrid=self.policy == "hybrid", analytic=dv)
             return MeasurementChoice(op, ig, pred - cost, cost)
-        if self.decision_costs is not None and target is not None:             # utilité décisionnelle (risque)
+        if self.decision_costs is not None and target is not None:             # decision utility (risk)
             v = decision_value(belief, op, target, *self.decision_costs, calibrate=self.calibrate)
             return MeasurementChoice(op, ig, v - cost, cost)
         return MeasurementChoice(op, ig, self.voi * ig - cost, cost)
@@ -527,7 +527,7 @@ class MeasurementPlanner:
         elif self.policy == "max_ig": c = max(scored, key=lambda s: s.information_gain)
         else:
             c = max(scored, key=lambda s: s.utility)
-            if c.utility <= 0 or (self.decision_costs is None and c.information_gain < self.min_ig): return None   # arrêt
+            if c.utility <= 0 or (self.decision_costs is None and c.information_gain < self.min_ig): return None   # stop
         if self.policy != "max_utility" and c.information_gain < self.min_ig * 0.01 and self.policy != "random": return None
         self.spent += c.cost
         trace(self.graph, MeasurementOp("SelectMeasurement", {"operator": c.operator.name, "ig": round(c.information_gain, 4),
@@ -535,12 +535,12 @@ class MeasurementPlanner:
         return c
 
 
-# ================================================================ compromis de capteur (analogie : Heisenberg, défini par le capteur)
+# ================================================================ sensor trade-off (analogy: Heisenberg, defined by the sensor)
 
 @dataclass(frozen=True)
 class MeasurementTradeoff:
-    """Compromis EXPLICITE du modèle de capteur : un réglage a ∈ (0, 1) répartit la précision.
-    σ_position = s0 / a ; σ_vitesse = v0 / (1 − a). Ce n'est PAS un principe d'incertitude quantique."""
+    """EXPLICIT trade-off of the sensor model: a setting a ∈ (0, 1) distributes the precision.
+    σ_position = s0 / a; σ_velocity = v0 / (1 − a). This is NOT a quantum uncertainty principle."""
     s0: float = 0.1
     v0: float = 0.1
 
@@ -548,14 +548,14 @@ class MeasurementTradeoff:
         a = min(max(a, 1e-3), 1 - 1e-3); return self.s0 / a, self.v0 / (1 - a)
 
     def best_setting(self, goal_weights: Tuple[float, float], grid=None):
-        """Réglage minimisant la variance pondérée selon le BUT (poids sur position, vitesse)."""
+        """Setting minimising the weighted variance according to the GOAL (weights on position, velocity)."""
         grid = grid if grid is not None else torch.linspace(0.02, 0.98, 97)
         sp = self.s0 / grid; sv = self.v0 / (1 - grid)
         loss = goal_weights[0] * sp ** 2 + goal_weights[1] * sv ** 2
         return float(grid[int(loss.argmin())])
 
 
-# ================================================================ invariants et trace
+# ================================================================ invariants and trace
 
 def check_invariants(dist: Optional[MeasurementDistribution] = None, record: Optional[MeasurementRecord] = None,
                      frames: Optional[Dict[str, ReferenceFrame]] = None, latent: Optional[LatentWorldState] = None,
@@ -578,8 +578,8 @@ def check_invariants(dist: Optional[MeasurementDistribution] = None, record: Opt
 
 @dataclass(frozen=True)
 class MeasurementOp(TransformationSpec):
-    """Opération de l'algèbre de mesure, tracée dans le TransformGraph (Measure, ChangeBasis, ChangeFrame,
-    Condition, Marginalize, Fuse, SelectMeasurement). Ne modifie pas le monde (sauf mesure perturbatrice)."""
+    """Operation of the measurement algebra, traced in the TransformGraph (Measure, ChangeBasis, ChangeFrame,
+    Condition, Marginalize, Fuse, SelectMeasurement). Does not modify the world (except a disturbing measurement)."""
     name: str = "measure"
     params: Dict[str, Any] = field(default_factory=dict, compare=False)
     domain: TransformationDomain = TransformationDomain.MEASUREMENT

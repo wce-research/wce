@@ -1,13 +1,13 @@
-"""Générateur du banc « Active Structural Discovery » (côté ÉVALUATION : les noms de familles n'existent QU'ICI
-et dans core/boundary_world.py). Le code de découverte (core/active_structure.py) ne voit que des observations.
+"""Generator of the "Active Structural Discovery" benchmark (EVALUATION side: the family names exist ONLY HERE
+and in core/boundary_world.py). The discovery code (core/active_structure.py) sees observations only.
 
-Nouvelles familles :
-  profondeur 3/4 (non représentables à profondeur 2) : triangle (3 demi-espaces), kite (4 demi-espaces),
-      notched_disc (disque − disque, coupé par un demi-espace), lobes_cut ((disque ∪ disque) ∩ demi-espace)
-  négatifs difficiles (identiques à une famille connue dans la région observée, divergents hors région) :
-      disc_cut_far (disque coupé seulement hors région), strip_capped (bande fermée hors région)
-  syntaxe multiple (même fonction, AST différents) : two_lobe_xor (deux disques disjoints ⇒ OR ≡ XOR)
-  scellées : pentagon_cut, ring_cut, triangle_minus_disc, kite_rotated
+New families:
+  depth 3/4 (not representable at depth 2): triangle (3 half-spaces), kite (4 half-spaces),
+      notched_disc (disc − disc, cut by a half-space), lobes_cut ((disc ∪ disc) ∩ half-space)
+  hard negatives (identical to a known family in the observed region, diverging outside the region):
+      disc_cut_far (disc cut only outside the region), strip_capped (band closed outside the region)
+  multiple syntax (same function, different ASTs): two_lobe_xor (two disjoint discs ⇒ OR ≡ XOR)
+  sealed: pentagon_cut, ring_cut, triangle_minus_disc, kite_rotated
 """
 from __future__ import annotations
 
@@ -79,7 +79,7 @@ def balanced_instances(families, seed, per_family):
 
 
 def transformed(inst: FamilyInstance, rng: random.Random):
-    """Même fonction après rotation / translation / échelle / réflexion (représentation transformée)."""
+    """Same function after rotation / translation / scaling / reflection (transformed representation)."""
     phi = rng.uniform(-math.pi, math.pi); s = rng.uniform(0.7, 1.3); t = torch.tensor([rng.uniform(-0.4, 0.4), rng.uniform(-0.4, 0.4)]); refl = rng.random() < 0.5
     c, sn = math.cos(phi), math.sin(phi); R = torch.tensor([[c, -sn], [sn, c]])
     def f(X):
@@ -101,12 +101,12 @@ def sealed_hash():
     return hashlib.sha256(json.dumps([sig, s["noise"]]).encode()).hexdigest()
 
 
-SEALED_SHA256 = "264e73ca91d45f3bfae18081b3b23d4f31fcf68e622ee00f0db7193f5560e733"   # figée AVANT toute évaluation
+SEALED_SHA256 = "264e73ca91d45f3bfae18081b3b23d4f31fcf68e622ee00f0db7193f5560e733"   # frozen BEFORE any evaluation
 
 
 def train_deep_instance(rng: random.Random) -> FamilyInstance:
-    """Compositions PROFONDES (3 atomes) de familles d'ENTRAÎNEMENT seulement — pour apprendre le proposeur
-    sans jamais voir les familles de profondeur 3/4 du test."""
+    """DEEP compositions (3 atoms) of TRAINING families only — to train the proposer
+    without ever seeing the depth 3/4 families of the test."""
     parts = [make_instance(rng.choice(TRAIN), rng) for _ in range(3)]; ops = [rng.choice(["and", "or"]) for _ in range(2)]
     def f(X):
         a = parts[0].label(X).bool()
@@ -116,7 +116,7 @@ def train_deep_instance(rng: random.Random) -> FamilyInstance:
 
 
 def train_tasks(seed, noise=0.05, n=120):
-    """Tâches d'apprentissage du proposeur : familles TRAIN + VALIDATION + compositions profondes de TRAIN."""
+    """Training tasks for the proposer: TRAIN + VALIDATION families + deep compositions of TRAIN."""
     rng = random.Random(seed); g = torch.Generator().manual_seed(seed); insts = balanced_instances(TRAIN + VALIDATION, seed, 1)
     k = 0
     while k < 4:

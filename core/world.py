@@ -31,7 +31,7 @@ class World:
         self.history: list[Any] = []
         self.constraints: list[Any] = []
         self.time: float = 0.0
-        # Import local pour garder World indépendant des détails de l'algèbre.
+        # Local import to keep World independent of the details of the algebra.
         from core.transform_graph import create_world_transform_graph
         self.transform_graph = create_world_transform_graph("C0")
 
@@ -50,7 +50,7 @@ class World:
         self.history.append(transformation)
 
     def get_state_snapshot(self):
-        """Référence légère et immuable des propriétés utiles au raisonnement."""
+        """Lightweight, immutable reference to the properties useful for reasoning."""
         return {
             name: dict(entity.properties)
             for name, entity in self.entities.items()
@@ -94,7 +94,7 @@ class World:
         print("=== HISTORY ===")
 
         if not self.history:
-            print("(vide)")
+            print("(empty)")
             return
 
         for index, transformation in enumerate(

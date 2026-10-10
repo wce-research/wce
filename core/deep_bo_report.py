@@ -1,9 +1,9 @@
-"""Rapports du sous-jalon Boundary Ownership & Fragment Attribution (dev uniquement ; jamais le lot scellé).
+"""Reports of the Boundary Ownership & Fragment Attribution sub-milestone (dev only; never the sealed set).
 
-  smoke / chain-smoke : démonstrations locales courtes (scènes et tâche de MISE AU POINT)
-  tune                : coûts de l'énergie et température de la postérieure, sur scènes de mise au point
-  aggregate           : agrège les runs AWS `deepbo` → results/deep_boundary_ownership_summary.json
-  report              : imprime les tableaux
+  smoke / chain-smoke : short local demonstrations (TUNING scenes and task)
+  tune                : energy costs and posterior temperature, on tuning scenes
+  aggregate           : aggregates the AWS `deepbo` runs → results/deep_boundary_ownership_summary.json
+  report              : prints the tables
 """
 from __future__ import annotations
 
@@ -30,7 +30,7 @@ def load_rows():
 
 
 def calibration(cals):
-    """Histogrammes [n, corrects, somme des confiances] cumulés → fiabilité par tranche et ECE."""
+    """Cumulated histograms [n, correct, sum of confidences] → reliability per bin and ECE."""
     tot = [[0, 0.0, 0.0] for _ in range(10)]
     for c in cals:
         if c:
@@ -79,20 +79,20 @@ def summarize(rows, bad=0):
 
 
 def aggregate():
-    rows, bad = load_rows(); S = summarize(rows, bad); json.dump(S, open(SUMMARY, "w"), indent=1); print("lignes", len(rows), "unités en erreur", bad); return S
+    rows, bad = load_rows(); S = summarize(rows, bad); json.dump(S, open(SUMMARY, "w"), indent=1); print("rows", len(rows), "units in error", bad); return S
 
 
 def show(S):
     ci = lambda v: {x: (y["diff"], y["ci95"]) if y else None for x, y in v.items()}
     print("\nATTRIBUTION"); [print(k.ljust(22), v) for k, v in S["attribution"].items()]; print(); [print(k.ljust(34), ci(v)) for k, v in S["attribution_paired"].items()]
-    print("\npar part masquée"); [print(k.ljust(28), v) for k, v in S["attribution_by_mask"].items()]; print("\npar type"); [print(k.ljust(22), v) for k, v in S["attribution_by_kind"].items()]
-    print("\ncalibration", S["calibration"]); print("par masque", S["calibration_by_mask"]); print("énergie", S["energy"]); print("\nMASQUE"); [print(k.ljust(6), v) for k, v in S["occlusion"].items()]
-    print("\nMATRICE ORACLE"); [print(k.ljust(10), v) for k, v in S["oracle"].items()]; print(ci(S["oracle_paired"]))
-    print("\nVISIBILITÉ CONTREFACTUELLE"); [print(k.ljust(10), v) for k, v in S["visibility"].items()]; print(ci(S["visibility_paired"]))
-    print("\nSECTEURS"); [print(k.ljust(6), v) for k, v in S["sector"].items()]
-    print("\nCHAÎNE AVAL"); K = ("n", "own_f1", "own_top1", "own_top3", "comp_f1", "comp_top1", "kept_fraction", "type_recall", "primitive_recovery", "primitive_precision", "n_literals", "candidate_functional", "final_095", "final_099", "final_full", "own_seconds", "seconds")
-    [print(k.ljust(20), {x: v.get(x) for x in K if v.get(x) is not None}) for k, v in S["chain"].items()]; print("\nappariées"); [print(k.ljust(38), ci(v)) for k, v in S["chain_paired"].items()]
-    print("composition → ré-attribution", ci(S.get("composition_reattribution", {}))); print("\nfeuilles"); [print(k.ljust(20), v) for k, v in S["chain_leaves"].items()]; print("\npar profondeur"); [print(k.ljust(26), v) for k, v in S["chain_by_depth"].items()]
+    print("\nby masked share"); [print(k.ljust(28), v) for k, v in S["attribution_by_mask"].items()]; print("\nby type"); [print(k.ljust(22), v) for k, v in S["attribution_by_kind"].items()]
+    print("\ncalibration", S["calibration"]); print("by mask", S["calibration_by_mask"]); print("energy", S["energy"]); print("\nMASK"); [print(k.ljust(6), v) for k, v in S["occlusion"].items()]
+    print("\nORACLE MATRIX"); [print(k.ljust(10), v) for k, v in S["oracle"].items()]; print(ci(S["oracle_paired"]))
+    print("\nCOUNTERFACTUAL VISIBILITY"); [print(k.ljust(10), v) for k, v in S["visibility"].items()]; print(ci(S["visibility_paired"]))
+    print("\nSECTORS"); [print(k.ljust(6), v) for k, v in S["sector"].items()]
+    print("\nDOWNSTREAM CHAIN"); K = ("n", "own_f1", "own_top1", "own_top3", "comp_f1", "comp_top1", "kept_fraction", "type_recall", "primitive_recovery", "primitive_precision", "n_literals", "candidate_functional", "final_095", "final_099", "final_full", "own_seconds", "seconds")
+    [print(k.ljust(20), {x: v.get(x) for x in K if v.get(x) is not None}) for k, v in S["chain"].items()]; print("\npaired"); [print(k.ljust(38), ci(v)) for k, v in S["chain_paired"].items()]
+    print("composition → re-attribution", ci(S.get("composition_reattribution", {}))); print("\nleaves"); [print(k.ljust(20), v) for k, v in S["chain_leaves"].items()]; print("\nby depth"); [print(k.ljust(26), v) for k, v in S["chain_by_depth"].items()]
 
 
 def report(): show(json.load(open(SUMMARY)))
@@ -113,7 +113,7 @@ def smoke():
 
 
 def tune():
-    """Sur scènes de MISE AU POINT : coûts (lam, gamma) par F1 d'attribution, puis température par erreur de calibration."""
+    """On TUNING scenes: costs (lam, gamma) by attribution F1, then temperature by calibration error."""
     import itertools
     from core.deep_fragments_exp import pair_scores, true_sources
     from core.deep_ownership import CONFIG_FILE, DEFAULTS, solve
@@ -125,7 +125,7 @@ def tune():
     from core.deep_ownership import null_assigned
     nulls = []
     for ch in (0.0, 0.5, 1.0, 1.5, 2.0, 3.0): v = null_assigned({**DEFAULTS, "gamma": 0.0, "chance": ch}); nulls.append({"chance": ch, "assigned_on_random_labels": _mean(v)}); print(nulls[-1], flush=True)
-    chance = next((r["chance"] for r in nulls if r["assigned_on_random_labels"] <= 0.10), nulls[-1]["chance"]); print("coût de hasard retenu (premier sous 10 % d'attribution sur étiquettes aléatoires) :", chance, flush=True); DEFAULTS = {**DEFAULTS, "chance": chance}
+    chance = next((r["chance"] for r in nulls if r["assigned_on_random_labels"] <= 0.10), nulls[-1]["chance"]); print("chance cost selected (first under 10 % of attribution on random labels):", chance, flush=True); DEFAULTS = {**DEFAULTS, "chance": chance}
     res = []
     for lam, gamma in itertools.product((6.0, 10.0, 16.0), (0.0, 0.5, 1.0)):
         sc_ = []
@@ -135,7 +135,7 @@ def tune():
     for T in (0.5, 1.0, 2.0, 4.0, 8.0, 16.0):
         cal = [ownership_accuracy(solve(ob, {**DEFAULTS, "lam": best["lam"], "gamma": best["gamma"], "temperature": T}, i), src, comps)["cal"] for i, (ob, src, comps) in enumerate(data)]; c = calibration(cal); temps.append({"temperature": T, "ece": c["ece"], "accuracy": c.get("accuracy"), "mean_confidence": c.get("mean_confidence")}); print(temps[-1], flush=True)
     bt = min(temps, key=lambda r: r["ece"]); cfg = {"lam": best["lam"], "gamma": best["gamma"], "chance": chance, "temperature": bt["temperature"]}
-    json.dump({"config": cfg, "selected_on": f"{len(data)} scènes de mise au point", "criterion": "coût de hasard par calibration nulle, puis F1 d'attribution + appartenance top-1, puis ECE", "null_calibration": nulls, "grid": res, "temperatures": temps}, open(CONFIG_FILE, "w"), indent=1); print("RETENU", cfg)
+    json.dump({"config": cfg, "selected_on": f"{len(data)} tuning scenes", "criterion": "chance cost by null calibration, then attribution F1 + top-1 membership, then ECE", "null_calibration": nulls, "grid": res, "temperatures": temps}, open(CONFIG_FILE, "w"), indent=1); print("SELECTED", cfg)
 
 
 def chain_smoke():

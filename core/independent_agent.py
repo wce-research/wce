@@ -1,11 +1,11 @@
-"""Agent WCE dans l'environnement indépendant.
+"""WCE agent in the independent environment.
 
-L'agent ne voit QUE : des légendes (phrase + structure perçue) pour apprendre, des observations
-de sources (structurées ou textuelles), et des requêtes. Il n'importe PAS le générateur de langue.
+The agent sees ONLY: captions (sentence + perceived structure) to learn from, observations
+from sources (structured or textual), and queries. It does NOT import the language generator.
 
-Inné (déclaré) : opérateurs interrogatifs, pronoms, « si », « qui », « et », verbes d'attention
-(« regarde »), nom générique « objet », connaissance structurelle des affordances (seule une boîte
-contient). Appris : lexique, rôles, prépositions, connecteurs d'ordre, unités, genres, morphologie.
+Innate (declared): interrogative operators, pronouns, "si", "qui", "et", attention verbs
+("regarde"), generic noun "objet", structural knowledge of affordances (only a box
+contains). Learned: lexicon, roles, prepositions, order connectors, units, genders, morphology.
 """
 from __future__ import annotations
 
@@ -32,10 +32,10 @@ INNATE_OTHER = {"si", "qui", "et", "regarde", "voici", ".", ",", "objet", "l'obj
 SUPPORTS = {"table": 1.0, "shelf": 2.0, "floor": 0.0}
 KIND_DOMAIN = {"color": 4, "loc": 12, "height": 6, "owner": 3, "event": 12}
 ABSTAIN = {"UNKNOWN", "UNKNOWN_WORD", "ASK"}
-CONFLICTED = "CONFLICTED"          # deux valeurs soutenues par des sources fiables, aucune discriminante
+CONFLICTED = "CONFLICTED"          # two values supported by reliable sources, none discriminating
 
 
-# ================================================================ tokenisation propre à l'agent
+# ================================================================ agent-specific tokenisation
 
 def tokenize(text):
     t = text.lower().replace("’", "'")
@@ -56,7 +56,7 @@ def is_number(tok): return re.fullmatch(r"\d+(,\d+)?", tok) is not None
 def to_float(tok): return float(tok.replace(",", "."))
 
 
-# ================================================================ induction lexicale (trans-situationnelle)
+# ================================================================ lexical induction (cross-situational)
 
 def structure_symbols(s):
     out = set()
@@ -101,7 +101,7 @@ class LexiconInducer:
     def meaning(self, token):
         if token in self._cache: return self._cache[token]
         result = None
-        # a priori déclaré : les jetons très courts ou élidés sont grammaticaux (jamais porteurs de sens)
+        # declared prior: very short or elided tokens are grammatical (never meaning-bearing)
         if self.tok[token] >= self.min_count and len(token) > 2 and not token.endswith("'"):
             scored = [(c / self.tok[token], c / self.sym[s], s) for s, c in self.co[token].items()]
             if scored:
@@ -124,7 +124,7 @@ def token_class(meaning):
     return {"type": "N", "color": "C", "person": "P", "rel": "R", "act": "A", "kind": "K", "time": "T", "num": "Q"}.get(prefix, "F")
 
 
-# ================================================================ syntagmes et rôles appris
+# ================================================================ learned phrases and roles
 
 @dataclass
 class NP:
@@ -147,8 +147,8 @@ ROLES = {"loc": ("subject", "target"), "event": ("agent", "patient", "target"), 
 
 
 class GrammarInducer:
-    """Rôles induits : P(rôle | mot précédent), P(rôle | classe précédente), P(rôle | rang), par type de phrase.
-    Décodage conjoint (rôles distincts). Aucune règle de grammaire écrite à la main."""
+    """Induced roles: P(role | previous word), P(role | previous class), P(role | rank), per sentence type.
+    Joint decoding (distinct roles). No grammar rule written by hand."""
 
     def __init__(self, lexicon: LexiconInducer):
         self.lex = lexicon
@@ -255,17 +255,17 @@ class GrammarInducer:
         return None if not c else c.most_common(1)[0][0]
 
     def gender_of(self, head):
-        """Genre d'un nom appris des déterminants observés devant lui (par mot, pas par type)."""
+        """Gender of a noun learned from the determiners observed before it (per word, not per type)."""
         c = self.gender.get(head)
         if not c: return None
         fem = sum(n for t, n in c.items() if t in ("la", "une")); masc = sum(n for t, n in c.items() if t in ("le", "un", "du"))
         return "f" if fem > masc else "m" if masc > fem else None
 
 
-# ================================================================ lexique neuronal (élève distillé)
+# ================================================================ neural lexicon (distilled student)
 
 class NeuralLexicon:
-    """Cœur caractères (réutilisé de language_core) distillé depuis le lexique induit par WCE."""
+    """Character core (reused from language_core) distilled from the lexicon induced by WCE."""
 
     def __init__(self, lexicon: LexiconInducer, size="small", seed=0, steps=300):
         lex = lexicon.lexicon()
@@ -280,7 +280,7 @@ class NeuralLexicon:
     def propose(self, word, k=3): return self.core.propose(word, k)
 
 
-# ================================================================ preuves, sources, croyances
+# ================================================================ evidence, sources, beliefs
 
 FACT, BELIEF, HYPOTHESIS, UNKNOWN, REFUTED = "FACT", "BELIEF", "HYPOTHESIS", "UNKNOWN", "REFUTED"
 
@@ -292,7 +292,7 @@ class Evidence:
     time: int
     via: str
     text: Optional[str] = None
-    weight: float = 1.0          # confiance de l'identité dont dépend la preuve (1 = directe)
+    weight: float = 1.0          # confidence of the identity the evidence depends on (1 = direct)
 
 
 @dataclass
@@ -306,7 +306,7 @@ class BeliefEntry:
 
 
 class SourceReliability:
-    """Beta(a, b) par source ; mis à jour par accord avec le consensus des autres sources (leave-one-out)."""
+    """Beta(a, b) per source; updated by agreement with the consensus of the other sources (leave-one-out)."""
 
     def __init__(self, prior=(3.0, 1.5)):
         self.stats = defaultdict(lambda: list(prior))
@@ -320,8 +320,8 @@ class SourceReliability:
     def table(self): return {s: round(self.estimate(s), 3) for s in sorted(self.stats)}
 
     def fit_em(self, vote_sets, iterations=15, prior=(2.0, 1.0)):
-        """Dawid-Skene simplifié : alterne postérieures des propositions et fiabilité de chaque source.
-        vote_sets : liste de (taille du domaine, {source: valeur})."""
+        """Simplified Dawid-Skene: alternates posteriors of the propositions and reliability of each source.
+        vote_sets: list of (domain size, {source: value})."""
         rel = defaultdict(lambda: 0.7)
         for _ in range(iterations):
             correct, total = Counter(), Counter()
@@ -350,7 +350,7 @@ class EvidenceGraph:
 
     def votes(self, key):
         latest = {}
-        for ev in self.props.get(key, ()): latest[ev.source] = ev          # un vote par source : la répétition ne prouve rien
+        for ev in self.props.get(key, ()): latest[ev.source] = ev          # one vote per source: repetition proves nothing
         return latest
 
     def belief(self, key, exclude=None, via=None) -> BeliefEntry:
@@ -363,7 +363,7 @@ class EvidenceGraph:
         rel_of = getattr(self.reliability, "estimate_for", None)
         est = (lambda s: rel_of(s, key[0])) if rel_of else self.reliability.estimate
         group_of = getattr(self.reliability, "group_of", None)
-        if group_of is not None:                            # sources dépendantes : un seul vote par groupe (le plus fiable)
+        if group_of is not None:                            # dependent sources: a single vote per group (the most reliable)
             by_group = {}
             for s, e in votes.items():
                 g = group_of(s)
@@ -372,7 +372,7 @@ class EvidenceGraph:
         scores = Counter()
         for s, e in votes.items():
             r = min(est(s), 0.99)
-            r = e.weight * r + (1 - e.weight) / k           # identité incertaine : mélange avec un vote aléatoire
+            r = e.weight * r + (1 - e.weight) / k           # uncertain identity: mixture with a random vote
             scores[e.value] += math.log(r * (k - 1) / max(1 - r, 1e-6))
         z = sum(math.exp(v) for v in scores.values()) + (k - len(scores))
         value, sc = max(scores.items(), key=lambda t: t[1])
@@ -383,7 +383,7 @@ class EvidenceGraph:
         status = FACT if post >= 0.95 and strong else BELIEF if post >= 0.9 else HYPOTHESIS if post >= 0.5 else UNKNOWN
         if getattr(self.reliability, "conflict_detection", False) and status in (HYPOTHESIS, UNKNOWN) and len(scores) > 1:
             ranked = sorted((math.exp(v) / z for v in scores.values()), reverse=True)
-            # crédibilité pour un CONFLIT (moyenne a posteriori, seuil propre) ≠ pondération prudente (borne basse)
+            # credibility for a CONFLICT (posterior mean, own threshold) ≠ cautious weighting (lower bound)
             cred = getattr(self.reliability, "conflict_credibility", None) or est
             thr = getattr(self.reliability, "conflict_threshold", 0.7)
             strong_ref = [s for s in refuting if cred(s) >= thr]
@@ -398,7 +398,7 @@ class EvidenceGraph:
 
 
 class BeliefState:
-    """Ce que l'agent croit — distinct de WorldTruth. Inventaire + graphe de preuves."""
+    """What the agent believes — distinct from WorldTruth. Inventory + evidence graph."""
 
     def __init__(self, reliability, naive=False):
         self.inventory: Dict[str, str] = {}
@@ -427,7 +427,7 @@ class BeliefState:
     def objects_of(self, type_): return [o for o, k in self.inventory.items() if k == type_]
 
 
-# ================================================================ spécifications WCE pour les commandes
+# ================================================================ WCE specifications for commands
 
 def put_spec(obj, rel, target):
     def compiler(world):
@@ -439,7 +439,7 @@ def put_spec(obj, rel, target):
 
 
 def affordance(kinds, patient, rel, target):
-    """Connaissance structurelle innée : seule une boîte contient ; on pose sur un support ou une boîte."""
+    """Innate structural knowledge: only a box contains; things are placed on a support or a box."""
     if patient == target or patient in SUPPORTS: return False
     if rel == "in": return kinds.get(target) == "box" and kinds.get(patient) != "box"
     if rel == "on": return target in SUPPORTS or kinds.get(target) == "box"
@@ -447,7 +447,7 @@ def affordance(kinds, patient, rel, target):
     return rel == "next_to" and target not in SUPPORTS
 
 
-# ================================================================ réponse et explication
+# ================================================================ answer and explanation
 
 @dataclass
 class Answer:
@@ -492,7 +492,7 @@ class AgentConfig:
     geometry: bool = True
     correction: bool = True
     plasticity: bool = False
-    verification: str = "geometry"      # exhaustive | selective | geometry (sélectif, exhaustif si risque élevé)
+    verification: str = "geometry"      # exhaustive | selective | geometry (selective, exhaustive if high risk)
     size: str = "small"
     tentative_confidence: float = 0.9
 
@@ -510,7 +510,7 @@ class IndependentAgent:
         self.seed = seed
         self.stats = Counter()
 
-    # ---- apprentissage ------------------------------------------------------
+    # ---- learning ------------------------------------------------------
     def learn_captions(self, caps):
         for c in caps:
             toks = tokenize(c["text"])
@@ -529,7 +529,7 @@ class IndependentAgent:
     def attach_geometry(self, monitor, estimator): self.monitor, self.estimator = monitor, estimator
 
     def warm_up_sources(self, train_worlds):
-        """Estime la fiabilité des sources sur la partition d'entraînement (EM ; aucune donnée de test)."""
+        """Estimates the reliability of the sources on the training split (EM; no test data)."""
         vote_sets = []
         saved = self.cfg.evidence_graph
         for x in train_worlds:
@@ -539,9 +539,9 @@ class IndependentAgent:
                 vote_sets.append((KIND_DOMAIN.get(key[0], 6), votes))
         return self.reliability.fit_em(vote_sets)
 
-    # ---- lexique : mémoire structurelle -> morphologie -> proposition neuronale
+    # ---- lexicon: structural memory -> morphology -> neural proposal
     def word_meaning(self, tok):
-        """(sens, source, confiance). Jamais d'invention silencieuse : un mot sans évidence reste inconnu."""
+        """(meaning, source, confidence). Never any silent invention: a word without evidence remains unknown."""
         if tok in INNATE_QUESTION or tok in INNATE_PRONOUN or tok in INNATE_OTHER or is_number(tok): return None, "innate", 1.0
         if self.lex.seen(tok):
             m = self.lex.meaning(tok)
@@ -557,15 +557,15 @@ class IndependentAgent:
             return (None if sym == "FUNCTION" else sym), "neural", p
         return None, "unknown", 0.0
 
-    # ---- ingestion des observations ------------------------------------------
+    # ---- ingestion of observations ------------------------------------------
     def new_world(self):
         self.belief = BeliefState(self.reliability, naive=not self.cfg.evidence_graph)
         return self.belief
 
     def resolve(self, np: NP, belief=None, discourse=None, strict=True):
-        """Référents candidats d'un syntagme selon les croyances (jamais selon la vérité).
-        strict (requêtes) : une couleur décrite doit être vérifiée, même pour un objet unique.
-        tolérant (ingestion) : un objet unique de ce type suffit."""
+        """Candidate referents of a phrase according to the beliefs (never according to the truth).
+        strict (queries): a described colour must be verified, even for a unique object.
+        tolerant (ingestion): a unique object of this type suffices."""
         belief = belief or self.belief
         if np.pronoun:
             cands = [o for o, g in (discourse or []) if g == np.pronoun or g is None]
@@ -609,7 +609,7 @@ class IndependentAgent:
         return belief
 
     def parse_statement(self, tokens):
-        """Phrase d'observation -> liste (clé, valeur) sur les objets de l'inventaire, ou None."""
+        """Observation sentence -> list of (key, value) on the objects of the inventory, or None."""
         meanings = [self.word_meaning(t)[0] for t in tokens]
         nps = self.grammar.chunks(tokens, meanings)
         syms = set(m for m in meanings if m)
@@ -666,7 +666,7 @@ class IndependentAgent:
                 return round(to_float(t) * (scale if scale is not None else 1.0), 4)
         return None
 
-    # ---- requêtes -----------------------------------------------------------------
+    # ---- queries -----------------------------------------------------------------
     def answer(self, text, mode=None) -> Answer:
         mode = mode or self.cfg.verification
         sentences = [s for s in re.split(r"(?<=[.])\s+", text.strip()) if s]
@@ -712,7 +712,7 @@ class IndependentAgent:
         if unknown:
             ans.output, ans.decision = "UNKNOWN_WORD", "ABSTAIN"
             ans.reasoning.append(f"mot(s) sans évidence suffisante : {', '.join(unknown)}")
-            if self.neural is not None:                      # candidat qu'aurait donné la proposition neuronale brute
+            if self.neural is not None:                      # candidate that the raw neural proposal would have given
                 raw = [(self.neural.propose(t, 1)[0][0] if src in ("neural", "unknown") else m) for t, m, src in zip(tokens, meanings, sources)]
                 raw = [None if r == "FUNCTION" else r for r in raw]
                 ans.candidate_output = self._candidate(tokens, raw, discourse, Answer(text, "", "", "?"))
@@ -724,8 +724,8 @@ class IndependentAgent:
         return self._finalize(ans, text)
 
     def _resolve_oov(self, tokens, meanings, i, ans, mode):
-        """Sens d'un mot hors lexique : proposition neuronale vérifiée (sélectif) ou inférence
-        structurelle exhaustive (tous les sens compatibles avec les croyances ; un seul -> retenu)."""
+        """Meaning of an out-of-lexicon word: verified neural proposal (selective) or exhaustive
+        structural inference (all meanings compatible with the beliefs; a single one -> retained)."""
         word = tokens[i]
         geo_high = False
         if self.neural is not None and mode in ("selective", "geometry"):
@@ -750,7 +750,7 @@ class IndependentAgent:
         return None
 
     def _consistent(self, tokens, meanings, i, sym):
-        """Le sens proposé désigne-t-il un référent existant (et unique au besoin) dans l'état cru ?"""
+        """Does the proposed meaning designate an existing referent (and unique if need be) in the believed state?"""
         prev = tokens[i - 1] if i > 0 else "<s>"
         if not self.grammar.class_plausible(prev, token_class(sym)): return False
         trial = list(meanings); trial[i] = sym
@@ -764,7 +764,7 @@ class IndependentAgent:
         return affordance(kinds, patient, rel, target)
 
     def _neural_ok(self, word):
-        """Une proposition neuronale sur un mot inconnu n'est utilisable que si elle est sûre ET géométriquement saine."""
+        """A neural proposal on an unknown word is usable only if it is confident AND geometrically sound."""
         if not self.cfg.wce: return True
         (sym, p), = self.neural.propose(word, 1)
         if p < self.cfg.tentative_confidence: return False
@@ -778,7 +778,7 @@ class IndependentAgent:
         self.stats[ans.decision] += 1
         return ans
 
-    # ---- interprétation structurée ------------------------------------------------
+    # ---- structured interpretation ------------------------------------------------
     def _candidate(self, tokens, meanings, discourse, ans, force=False):
         syms = set(m for m in meanings if m)
         nps = self.grammar.chunks(tokens, meanings)
@@ -910,7 +910,7 @@ class IndependentAgent:
         return "SUPPORTED" if same else "REFUTED"
 
     def _command(self, tokens, meanings, discourse, ans):
-        """Commandes compositionnelles -> Goals -> planner WCE sur le monde CRU (pas la vérité)."""
+        """Compositional commands -> Goals -> WCE planner on the BELIEVED world (not the truth)."""
         clauses, current = [], []
         for t, m in zip(tokens, meanings):
             if t in ("puis",) or (m == "kind:sequence"): clauses.append(current); current = []
@@ -942,7 +942,7 @@ class IndependentAgent:
     def _command_clause(self, tokens, meanings, discourse, ans):
         nps = self.grammar.chunks(tokens, meanings)
         rels = [(i, m.split(":")[1]) for i, m in enumerate(meanings) if m and m.startswith("rel:")]
-        if "qui" in tokens:                                                   # « pose dans X l'objet qui est R Y »
+        if "qui" in tokens:                                                   # "pose dans X l'objet qui est R Y"
             q = tokens.index("qui")
             head = [np for np in nps if np.end <= q]
             tail = [np for np in nps if np.start > q]
@@ -963,7 +963,7 @@ class IndependentAgent:
             t = self._single(target_np, ans)
             if t in ("ASK", "UNKNOWN", "INVALID_PREMISE"): return t if t != "INVALID_PREMISE" else "UNKNOWN"
             return (matches[0], rel_t, t)
-        if len(rels) >= 2 and len(nps) >= 3:                                  # attachement ambigu : branches
+        if len(rels) >= 2 and len(nps) >= 3:                                  # ambiguous attachment: branches
             (i1, r1), (i2, r2) = rels[0], rels[1]
             patient = self._single(nps[0], ans)
             box = self._single(nps[1], ans)
@@ -999,10 +999,10 @@ class IndependentAgent:
             if self.belief.known(entry): w.add_relation(o, entry.value[0], entry.value[1])
         return w
 
-    # ---- auto-correction --------------------------------------------------------
+    # ---- self-correction --------------------------------------------------------
     def _self_correct(self, ans, text):
-        """Si un mot inconnu a bloqué la réponse, relance une inférence structurelle exhaustive.
-        Ne transforme jamais une abstention en réponse devinée : seule une réponse soutenue est acceptée."""
+        """If an unknown word blocked the answer, reruns an exhaustive structural inference.
+        Never turns an abstention into a guessed answer: only a supported answer is accepted."""
         if ans.output != "UNKNOWN_WORD": return
         if self.neural is not None and self.monitor is not None:
             for w in ans.neural_words:
@@ -1021,10 +1021,10 @@ class IndependentAgent:
         finally: self._retrying = False
 
 
-# ================================================================ baseline neuronale seule
+# ================================================================ neural-only baseline
 
 class NeuralOnlyAgent(IndependentAgent):
-    """Sans vérification ni abstention : lexique neuronal pour tous les mots inconnus, dernière observation gagne."""
+    """Without verification or abstention: neural lexicon for all unknown words, last observation wins."""
 
     def __init__(self, seed=0, plasticity=False, size="small"):
         super().__init__(AgentConfig(neural=True, wce=False, evidence_graph=False, geometry=False, correction=False,
@@ -1038,7 +1038,7 @@ class NeuralOnlyAgent(IndependentAgent):
     def answer(self, text):
         ans = super().answer(text)
         if ans.output in ("UNKNOWN", "UNKNOWN_WORD", "ASK"):
-            ans.output = self._guess(ans)                      # un modèle sans WCE répond toujours
+            ans.output = self._guess(ans)                      # a model without WCE always answers
             ans.decision = "ACCEPT"
         return ans
 

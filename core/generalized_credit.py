@@ -1,16 +1,16 @@
-"""Attribution de crédit GÉNÉRALISÉE sur un système composite (neuronal + symbolique).
+"""GENERALISED credit assignment on a composite system (neural + symbolic).
 
-Le système : un petit ModelState (tâche A) ET une chaîne symbolique de réponse
-  texte → correspondance lexicale → entité → capteur (étalonnage) → transformation d'unités (cm→m)
-  → témoignages de sources (fiabilités estimées) → croyance a priori → fusion → planificateur (seuil d'engagement).
+The system: a small ModelState (task A) AND a symbolic answer chain
+  text → lexical mapping → entity → sensor (calibration) → unit transformation (cm→m)
+  → source testimonies (estimated reliabilities) → prior belief → fusion → planner (commitment threshold).
 
-Une panne (cachée) touche UN composant parmi : weights, expert, routing, lexical, measurement, transformation,
-source, belief, planner. Trois attributions comparées :
-  - gradient seul (observationnel, ne voit que les paramètres différentiables) ;
-  - aléatoire ;
-  - généralisée INTERVENTIONNELLE : remplacer réellement chaque composant par une version par défaut / réestimée
-    (instantané pour le neuronal, défauts ou réestimation sur un petit lot d'étalonnage pour le symbolique), réévaluer.
-Corrélation ≠ causalité : seule l'intervention mesure un effet causal (dans ce banc contrôlé).
+A (hidden) fault affects ONE component among: weights, expert, routing, lexical, measurement, transformation,
+source, belief, planner. Three attributions compared:
+  - gradient only (observational, sees only the differentiable parameters);
+  - random;
+  - generalised INTERVENTIONAL: actually replace each component with a default / re-estimated version
+    (snapshot for the neural part, defaults or re-estimation on a small calibration batch for the symbolic part), re-evaluate.
+Correlation ≠ causation: only the intervention measures a causal effect (in this controlled benchmark).
 """
 from __future__ import annotations
 
@@ -35,9 +35,9 @@ DEFAULTS = {"threshold": 0.7, "prior_long": 0.5, "factor": 0.01, "offset": 0.0}
 @dataclass
 class Pipeline:
     lexicon: Dict[str, str]
-    objects: Dict[str, float]                 # couleur (concept) -> longueur vraie (cm)
-    offset: float = 0.0                       # étalonnage du capteur (cm)
-    factor: float = 0.01                      # transformation cm -> m
+    objects: Dict[str, float]                 # colour (concept) -> true length (cm)
+    offset: float = 0.0                       # sensor calibration (cm)
+    factor: float = 0.01                      # cm -> m transformation
     reliab: Dict[str, float] = field(default_factory=lambda: {"s1": 0.9, "s2": 0.6, "s3": 0.85})
     prior_long: float = 0.5
     threshold: float = 0.7
@@ -51,7 +51,7 @@ def make_pipeline(seed):
 
 
 def queries(pipe: Pipeline, seed, n=40):
-    """Requêtes « longueur du cube <couleur> ? » + témoignages simulés (VRAIES fiabilités : s1 .9, s2 .6, s3 .85)."""
+    """Queries "length of the <colour> cube?" + simulated testimonies (TRUE reliabilities: s1 .9, s2 .6, s3 .85)."""
     rng = random.Random(seed); out = []
     true_r = {"s1": 0.9, "s2": 0.6, "s3": 0.85}
     for i in range(n):
@@ -67,8 +67,8 @@ def queries(pipe: Pipeline, seed, n=40):
 def answer(pipe: Pipeline, q):
     concept = pipe.lexicon.get(q["word"])
     if concept not in pipe.objects: return None
-    reading_cm = pipe.objects[concept] + q["noise"] + pipe.offset          # capteur (avec erreur d'étalonnage éventuelle)
-    meters = reading_cm * pipe.factor                                      # transformation d'unités
+    reading_cm = pipe.objects[concept] + q["noise"] + pipe.offset          # sensor (with possible calibration error)
+    meters = reading_cm * pipe.factor                                      # unit transformation
     p_long = min(max(pipe.prior_long, 1e-6), 1 - 1e-6)
     odds = p_long / (1 - p_long)
     r = pipe.sensor_r; odds *= (r / (1 - r)) if meters >= 0.5 else ((1 - r) / r)
@@ -92,7 +92,7 @@ class CompositeSystem:
     xv: torch.Tensor
     yv: torch.Tensor
     qs: list
-    calib: list                                   # petit lot d'étalonnage étiqueté (diagnostic)
+    calib: list                                   # small labelled calibration batch (diagnostic)
 
 
 def score(sys: CompositeSystem):
@@ -134,10 +134,10 @@ def inject(sys: CompositeSystem, fault, rng: random.Random):
     elif fault == "planner": p.threshold = rng.choice([0.5, 0.9999])
 
 
-# ---- interventions SANS accès à la panne : instantané (neuronal) ou défaut / réestimation (symbolique) ----
+# ---- interventions WITHOUT access to the fault: snapshot (neural) or default / re-estimation (symbolic) ----
 
 def _reestimate_lexicon(sys):
-    """Réapprend la correspondance couleur→concept à partir du lot d'étalonnage (mesures étiquetées)."""
+    """Relearns the colour→concept mapping from the calibration batch (labelled measurements)."""
     p = sys.pipe
     for w in COLORS:
         qs = [q for q in sys.calib if q["word"] == w]
@@ -182,7 +182,7 @@ COMPONENTS = {
 
 
 def generalized_credit(sys):
-    """Crédit interventionnel sur TOUS les types de composants + crédit observationnel (gradient) pour le neuronal."""
+    """Interventional credit on ALL component types + observational credit (gradient) for the neural part."""
     base, credits = interventional_credit(sys, COMPONENTS, score)
     g = gradient_credit(sys.model, sys.xv, sys.yv)
     for c in credits:
@@ -193,7 +193,7 @@ def generalized_credit(sys):
 
 
 def gradient_only_cause(sys):
-    """Cause selon le gradient seul : composant différentiable au plus fort crédit observationnel."""
+    """Cause according to the gradient alone: differentiable component with the highest observational credit."""
     g = gradient_credit(sys.model, sys.xv, sys.yv)
     k = max(g, key=g.get)
     if k.startswith("routing:"): return "routing"
@@ -202,8 +202,8 @@ def gradient_only_cause(sys):
 
 
 def credit_benchmark(n_trials=40, seed=0, min_drop=0.03):
-    """Seules les pannes OBSERVABLES (chute du score ≥ min_drop vs le système sain) sont des « erreurs » à expliquer ;
-    les pannes silencieuses sont comptées à part (aucune méthode ne peut les attribuer par leur effet)."""
+    """Only OBSERVABLE faults (score drop ≥ min_drop vs the healthy system) are "errors" to explain;
+    silent faults are counted separately (no method can attribute them by their effect)."""
     rng = random.Random(seed); res = {"generalized": 0, "gradient_only": 0, "random": 0, "repaired": 0, "n": 0, "silent": 0,
                                        "neural": {"generalized": 0, "gradient_only": 0, "n": 0},
                                        "symbolic": {"generalized": 0, "gradient_only": 0, "n": 0}}

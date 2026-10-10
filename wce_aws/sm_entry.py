@@ -1,11 +1,11 @@
-"""Point d'entrée sur la machine de calcul (conteneur SageMaker ou instance EC2).
+"""Entry point on the compute machine (SageMaker container or EC2 instance).
 
-Une UNITÉ (type, clé) est découpée en SOUS-UNITÉS reproductibles (core.robust_experiments.ALL_SUBUNITS). Le parent :
-  * répartit les sous-unités de toutes les unités sur un Pool `spawn` (un processus par vCPU, 1 thread Torch chacun) ;
-  * écrit un CHECKPOINT par sous-unité terminée (ckpt_<type>_<clé>.jsonl) → une reprise ne recalcule que le reste ;
-  * publie `_progress.json` (étape, items traités, temps écoulé, ETA, CPU, mémoire, dernier checkpoint) ;
-chaque processus de calcul publie un HEARTBEAT `_hb_<pid>.json` (sous-unité en cours, pile Python, CPU, mémoire).
-Le répertoire de sortie est synchronisé vers S3 en continu par le script de lancement.
+A UNIT (kind, key) is split into reproducible SUB-UNITS (core.robust_experiments.ALL_SUBUNITS). The parent:
+  * distributes the sub-units of all units over a `spawn` Pool (one process per vCPU, 1 Torch thread each);
+  * writes one CHECKPOINT per finished sub-unit (ckpt_<kind>_<key>.jsonl) → a resume recomputes only the rest;
+  * publishes `_progress.json` (step, items processed, elapsed time, ETA, CPU, memory, last checkpoint);
+each compute process publishes a HEARTBEAT `_hb_<pid>.json` (current sub-unit, Python stack, CPU, memory).
+The output directory is synchronised to S3 continuously by the launch script.
 """
 import argparse
 import json
@@ -18,7 +18,7 @@ import time
 import traceback
 
 OUT = os.environ.get("WCE_OUT", "/opt/ml/processing/output")
-SPECIAL = ("profile", "bench")                      # unités d'instrumentation (wce_aws.bench)
+SPECIAL = ("profile", "bench")                      # instrumentation units (wce_aws.bench)
 HEARTBEAT_S = float(os.environ.get("WCE_HEARTBEAT_S", "20"))
 _HB = {"sub": None, "since": 0.0, "started": False}
 
@@ -29,7 +29,7 @@ def _instance_type():
 
 
 def _write(path, obj):
-    tmp = path + ".tmp"; json.dump(obj, open(tmp, "w"), default=str); os.replace(tmp, path)        # écriture atomique (jamais de JSON tronqué sur S3)
+    tmp = path + ".tmp"; json.dump(obj, open(tmp, "w"), default=str); os.replace(tmp, path)        # atomic write (never a truncated JSON on S3)
 
 
 def rss_mb():
@@ -38,7 +38,7 @@ def rss_mb():
 
 
 def cpu_times():
-    """(temps occupé, temps total) cumulés de la machine, en ticks (/proc/stat) ; None hors Linux."""
+    """Cumulative (busy time, total time) of the machine, in ticks (/proc/stat); None outside Linux."""
     try: v = [int(x) for x in open("/proc/stat").readline().split()[1:9]]; return sum(v) - v[3] - v[4], sum(v)
     except Exception: return None
 
@@ -49,7 +49,7 @@ def mem_available_mb():
 
 
 class CpuSampler(threading.Thread):
-    """Échantillonne l'utilisation CPU de la machine (moyenne / pic, en % de tous les vCPU) et la mémoire disponible minimale."""
+    """Samples the CPU usage of the machine (mean / peak, in % of all vCPUs) and the minimal available memory."""
     def __init__(self, period=2.0): super().__init__(daemon=True); self.period = period; self.samples = []; self.min_mem = None; self._halt = threading.Event()
 
     def run(self):
@@ -67,7 +67,7 @@ class CpuSampler(threading.Thread):
 
 
 def _stack(main_id, depth=6):
-    """Pile Python du fil principal, réduite aux fonctions du projet (où en est le calcul, sans l'interrompre)."""
+    """Python stack of the main thread, reduced to the functions of the project (where the computation stands, without interrupting it)."""
     fr = sys._current_frames().get(main_id); out = []
     while fr is not None:
         f = fr.f_code.co_filename
@@ -91,7 +91,7 @@ def _start_heartbeat():
 
 
 def run_sub(task):
-    """Exécuté dans un processus de calcul : une sous-unité, 1 thread Torch (le parallélisme est celui des processus)."""
+    """Executed in a compute process: one sub-unit, 1 Torch thread (the parallelism is that of the processes)."""
     kind, key, sid = task
     import torch
     torch.set_num_threads(int(os.environ.get("WCE_TORCH_THREADS", "1")))
@@ -100,7 +100,7 @@ def run_sub(task):
         if kind in SPECIAL:
             from wce_aws import bench
             rows = dict(bench.SUBS[kind](key))[sid]()
-        elif kind.startswith("deep"):                                   # jalon Deep Compositional Structure Discovery
+        elif kind.startswith("deep"):                                   # milestone Deep Compositional Structure Discovery
             from core.deep_experiments import run_subunit as deep_run
             rows = deep_run(kind, key, sid)
         else:
@@ -128,7 +128,7 @@ def ckpt_path(kind, key): return os.path.join(OUT, f"ckpt_{kind}_{key}.jsonl")
 
 
 def load_ckpt(kind, key):
-    """Sous-unités déjà terminées {identifiant: enregistrement} ; une dernière ligne tronquée (interruption) est ignorée."""
+    """Sub-units already finished {identifier: record}; a truncated last line (interruption) is ignored."""
     done = {}
     try:
         for line in open(ckpt_path(kind, key)):
@@ -139,7 +139,7 @@ def load_ckpt(kind, key):
 
 
 def finalize(kind, key, ids, done, errors, resumed):
-    """Résultat final de l'unité = concaténation ORDONNÉE des lignes des sous-unités (identique avec ou sans reprise)."""
+    """Final result of the unit = ORDERED concatenation of the rows of the sub-units (identical with or without resume)."""
     ok = all(s in done for s in ids)
     rec = {"kind": kind, "key": key, "status": "ok" if ok else "error", "runtime_s": round(sum(done[s]["seconds"] for s in ids if s in done), 2),
            "subunits": {s: {"seconds": done[s]["seconds"], "cpu_s": done[s].get("cpu_s")} for s in ids if s in done},
@@ -149,7 +149,7 @@ def finalize(kind, key, ids, done, errors, resumed):
 
 
 def run_units(units, procs=0, pool=True):
-    """Exécute les unités (avec reprise). Renvoie le résumé du shard. `pool=False` : séquentiel dans ce processus (tests)."""
+    """Executes the units (with resume). Returns the summary of the shard. `pool=False`: sequential in this process (tests)."""
     os.makedirs(OUT, exist_ok=True); t0 = time.time(); procs = procs or os.cpu_count() or 1
     plan, done, todo, resumed = {}, {}, [], {}
     for u in units:
@@ -191,7 +191,7 @@ def run_units(units, procs=0, pool=True):
 
     stop_tick = threading.Event()
 
-    def ticker():                                      # la progression est republiée même si aucune sous-unité ne se termine
+    def ticker():                                      # the progress is republished even if no sub-unit finishes
         while not stop_tick.wait(HEARTBEAT_S):
             try: publish("running")
             except Exception: pass
@@ -214,7 +214,7 @@ def run_units(units, procs=0, pool=True):
 
 
 def run_unit(u):
-    """Une unité, séquentiellement dans ce processus (tests, débogage)."""
+    """One unit, sequentially in this process (tests, debugging)."""
     s = run_units([u], pool=False)["units"][0]; return {"kind": s["kind"], "key": s["key"], "status": s["status"], "runtime_s": s["runtime_s"]}
 
 

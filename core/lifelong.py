@@ -1,11 +1,11 @@
-"""Routage autonome + plasticité continue (lifelong).
+"""Autonomous routing + continual plasticity (lifelong).
 
-API publique finale : LifelongModel.predict(x) — aucune étiquette de tâche.
+Final public API: LifelongModel.predict(x) — no task label.
 
-ContextEncoder (petit MLP réel) -> TaskRouter (prototypes appris) -> configuration
-(module + fast weights propres au contexte) -> inférence.
-MetaController orchestre : REUSE / ADAPT / ROUTE / GROW / PRUNE / ROLLBACK / REPAIR.
-Toutes les modifications du modèle passent par des ModelTransformationSpec.
+ContextEncoder (small real MLP) -> TaskRouter (learned prototypes) -> configuration
+(module + fast weights specific to the context) -> inference.
+MetaController orchestrates: REUSE / ADAPT / ROUTE / GROW / PRUNE / ROLLBACK / REPAIR.
+All modifications of the model go through ModelTransformationSpec objects.
 """
 from __future__ import annotations
 
@@ -32,7 +32,7 @@ HEAD_KEYS = ("w2", "b2")
 KNOWN, RELATED, UNKNOWN = "known", "related", "unknown"
 
 
-# ================================================================ tâches
+# ================================================================ tasks
 
 FUNCTIONS = {
     "xor01": lambda p: (p[:, 0] != p[:, 1]).long(),
@@ -91,16 +91,16 @@ def make_task(spec, prototypes, seed=0, n_train=384, n_val=128, n_test=256):
 
 
 def default_stream():
-    """8 tâches : liens positifs (même fonction), conflits, et un retour de contexte connu."""
+    """8 tasks: positive links (same function), conflicts, and a return of a known context."""
     return [
         TaskSpec("T1", 0, "xor01", UNKNOWN),
-        TaskSpec("T2", 1, "xor01", RELATED),      # même fonction, autre contexte : transfert positif
-        TaskSpec("T3", 2, "maj37", UNKNOWN),      # incompatible avec T1 : transfert négatif
-        TaskSpec("T4", 3, "xnor01", RELATED),     # négation de T1 : réutilisation + fast weights
+        TaskSpec("T2", 1, "xor01", RELATED),      # same function, other context: positive transfer
+        TaskSpec("T3", 2, "maj37", UNKNOWN),      # incompatible with T1: negative transfer
+        TaskSpec("T4", 3, "xnor01", RELATED),     # negation of T1: reuse + fast weights
         TaskSpec("T5", 4, "and23_or6", UNKNOWN),
-        TaskSpec("T6", 5, "maj37", RELATED),      # même fonction que T3
+        TaskSpec("T6", 5, "maj37", RELATED),      # same function as T3
         TaskSpec("T7", 6, "xor57", UNKNOWN),
-        TaskSpec("T8", 2, "maj37", KNOWN),        # retour exact du contexte de T3
+        TaskSpec("T8", 2, "maj37", KNOWN),        # exact return of the context of T3
     ]
 
 
@@ -110,11 +110,11 @@ def build_stream(specs=None, seed=0):
     return [make_task(s, protos, seed=seed * 100 + i) for i, s in enumerate(specs)], protos
 
 
-# ================================================================ specs spécifiques
+# ================================================================ specific specs
 
 @_spec
 class CorruptModule(ModelTransformationSpec):
-    """Dommage artificiel contrôlé (test de régénération)."""
+    """Controlled artificial damage (regeneration test)."""
     name: str = "corrupt_module"
     module: str = ""
     scale: float = 1.5
@@ -130,10 +130,10 @@ class CorruptModule(ModelTransformationSpec):
         return {"corrupted": self.module}
 
 
-# ================================================================ encodeur / routeur / nouveauté
+# ================================================================ encoder / router / novelty
 
 class ContextEncoder:
-    """Petit MLP réel (12 -> 16 -> 6), gelé : projection compacte du contexte."""
+    """Small real MLP (12 -> 16 -> 6), frozen: compact projection of the context."""
     MODULE = "context_encoder"
 
     def __init__(self, state, embed_dim=6, hidden=16, seed=11):
@@ -150,7 +150,7 @@ class ContextEncoder:
 
 
 class TaskRouter:
-    """Prototypes gaussiens diagonaux par configuration, appris localement depuis l'expérience."""
+    """Diagonal Gaussian prototypes per configuration, learned locally from experience."""
 
     def __init__(self, var_floor=0.05, confident=0.6):
         self.prototypes: Dict[str, Dict[str, torch.Tensor]] = {}
@@ -210,14 +210,14 @@ class NoveltyReport:
 
 
 class NoveltyDetector:
-    """Trois métriques explicables : couverture z du prototype le plus proche,
-    précision de la configuration la plus proche, accord fonctionnel max(acc, 1-acc)."""
+    """Three explainable metrics: z coverage of the nearest prototype,
+    accuracy of the nearest configuration, functional agreement max(acc, 1-acc)."""
 
     def __init__(self, z_known=3.0, coverage=0.8, known_accuracy=0.9, related_agreement=0.75):
         self.z_known, self.coverage, self.known_accuracy, self.related_agreement = z_known, coverage, known_accuracy, related_agreement
 
     def assess(self, router, emb, accuracies, probes=None):
-        if not router.prototypes: return NoveltyReport(UNKNOWN, reason="aucun contexte connu")
+        if not router.prototypes: return NoveltyReport(UNKNOWN, reason="no known context")
         z = router.z_distance(emb)
         nearest_idx = int(torch.mode(z.argmin(dim=1)).values)
         nearest = router.names[nearest_idx]
@@ -226,15 +226,15 @@ class NoveltyDetector:
         best = max(agreements, key=agreements.get) if agreements else None
         report = NoveltyReport(UNKNOWN, nearest, coverage, best, agreements.get(best, 0.0), dict(accuracies))
         if coverage >= self.coverage and accuracies.get(nearest, 0.0) >= self.known_accuracy:
-            report.kind, report.reason = KNOWN, f"contexte couvert ({coverage:.2f}) et {nearest} précis ({accuracies[nearest]:.2f})"
+            report.kind, report.reason = KNOWN, f"context covered ({coverage:.2f}) and {nearest} accurate ({accuracies[nearest]:.2f})"
         elif report.best_agreement >= self.related_agreement:
-            report.kind, report.reason = RELATED, f"{best} accord fonctionnel {report.best_agreement:.2f}"
+            report.kind, report.reason = RELATED, f"{best} functional agreement {report.best_agreement:.2f}"
         else:
-            report.reason = f"couverture {coverage:.2f}, meilleur accord {report.best_agreement:.2f}"
+            report.reason = f"coverage {coverage:.2f}, best agreement {report.best_agreement:.2f}"
         return report
 
 
-# ================================================================ modèle
+# ================================================================ model
 
 @dataclass
 class Configuration:
@@ -265,7 +265,7 @@ class LifelongModel:
         self.memory = MemorySystem(self.state)
         self.seed = seed
 
-    # ---- routage ------------------------------------------------------
+    # ---- routing ------------------------------------------------------
     def module_of(self, config, state=None):
         return (state or self.state).metadata["routes"].get(config)
 
@@ -288,7 +288,7 @@ class LifelongModel:
         return float((self.config_logits(config, x, **kwargs).argmax(1) == y).float().mean())
 
     def log_prior(self, structural_skill=None):
-        """Mémoire épisodique (usage) + évidence structurelle WCE (skill)."""
+        """Episodic memory (usage) + WCE structural evidence (skill)."""
         prior = torch.tensor([0.1 * math.log1p(self.configs[n].uses) for n in self.router.names])
         if structural_skill:
             prior += torch.tensor([math.log(4.0) if self.configs[n].skill == structural_skill else 0.0
@@ -302,19 +302,19 @@ class LifelongModel:
         return match.strategy.name if match is not None else None
 
     def route(self, x, structural=None):
-        if not self.router.prototypes: raise ValueError("aucune configuration apprise")
+        if not self.router.prototypes: raise ValueError("no configuration learned")
         return self.router.route(self.encoder.encode(x), self.log_prior(self.structural_skill(structural)))
 
     def predict_proba(self, x, structural=None):
         names, conf, probs = self.route(x, structural)
         outputs = torch.stack([torch.softmax(self.config_logits(n, x), dim=1) for n in self.router.names], dim=1)
-        mixture = (probs.unsqueeze(2) * outputs).sum(1)             # configurations superposées
-        hard = outputs[torch.arange(len(x)), probs.argmax(1)]        # configuration dominante
+        mixture = (probs.unsqueeze(2) * outputs).sum(1)             # superposed configurations
+        hard = outputs[torch.arange(len(x)), probs.argmax(1)]        # dominant configuration
         confident = (conf >= self.router.confident).unsqueeze(1)
         return torch.where(confident, hard, mixture)
 
     def predict(self, x, structural=None):
-        """API publique : aucune étiquette de tâche."""
+        """Public API: no task label."""
         return self.predict_proba(x, structural).argmax(1)
 
     def active_parameters(self, x):
@@ -328,7 +328,7 @@ class LifelongModel:
     def experts(self): return sorted(n for n in self.state.modules if n != ContextEncoder.MODULE)
 
 
-# ================================================================ méta-contrôleur
+# ================================================================ meta-controller
 
 @dataclass
 class Candidate:
@@ -378,7 +378,7 @@ class RepairReport:
 
 
 class MetaController:
-    """Petit orchestrateur inspectable : chaque décision garde ses scores et sa raison."""
+    """Small inspectable orchestrator: each decision keeps its scores and its reason."""
 
     ACTIONS = ("REUSE", "ADAPT", "ROUTE", "GROW", "PRUNE", "ROLLBACK", "REPAIR")
 
@@ -396,9 +396,9 @@ class MetaController:
         self._next_expert = 1
         self._task = "init"
 
-    # ---- utilitaires ----------------------------------------------------
+    # ---- utilities ----------------------------------------------------
     def _new_expert_name(self):
-        return f"expert_{self._next_expert}"      # incrémenté seulement si l'expert est adopté
+        return f"expert_{self._next_expert}"      # incremented only if the expert is adopted
 
     def _new_config_name(self):
         return f"cfg_{self._task}"
@@ -411,7 +411,7 @@ class MetaController:
         c = self.model.configs[config]
         return self.model.config_accuracy(config, c.probe_x, c.probe_y, state=state)
 
-    # ---- candidats ------------------------------------------------------
+    # ---- candidates ------------------------------------------------------
     def propose(self, novelty, router_probs, x, y, skill=None):
         m = self.model
         cands: List[Candidate] = []
@@ -467,7 +467,7 @@ class MetaController:
                        added_parameters=cand.added_parameters, score=round(score, 3))
         return score, details, fast
 
-    # ---- boucle lifelong -------------------------------------------------
+    # ---- lifelong loop -------------------------------------------------
     def observe(self, task, x_train, y_train, x_val, y_val, structural=None):
         """input batch -> encoding -> routing -> inference -> evaluation -> novelty -> candidates
         -> branching -> selection -> adaptation -> consolidation -> pruning -> memory update."""
@@ -496,7 +496,7 @@ class MetaController:
             branch.score = score; hyp.evaluations += 1
             results[cand.label] = (cand, branch, fast)
             decision.candidates[cand.label] = details
-        # superposition classique : a priori du routeur x évidence mesurée, puis sélection
+        # classical superposition: router prior x measured evidence, then selection
         hyp._renormalize()
         hyp.reweight({label: math.exp(10 * details["score"]) for label, details in decision.candidates.items()})
         for label, (_, branch, _) in results.items(): decision.candidates[label]["weight"] = round(branch.weight, 3)
@@ -521,7 +521,7 @@ class MetaController:
         config.tasks.append(task); config.uses += 1
         if skill: config.skill = skill
 
-        # capacité insuffisante -> croissance
+        # insufficient capacity -> growth
         if cand.kind == "GROW":
             acc = m.config_accuracy(config.name, x_val, y_val)
             if acc < self.target_accuracy: decision.grew = self._grow(config.name, x_train, y_train, x_val, y_val)
@@ -544,7 +544,7 @@ class MetaController:
         return decision
 
     def head_probes(self, accuracies, x_train, y_train, x_val, y_val, top=2, steps=40):
-        """Accord fonctionnel : précision après 40 pas d'adaptation de la seule tête (w2, b2)."""
+        """Functional agreement: accuracy after 40 adaptation steps of the head alone (w2, b2)."""
         m = self.model; out = {}
         for c in sorted(accuracies, key=lambda c: -max(accuracies[c], 1 - accuracies[c]))[:top]:
             module = m.module_of(c)
@@ -558,8 +558,8 @@ class MetaController:
         return out
 
     def _transfer(self, decision, results, x_train, y_train, x_val, y_val):
-        """Transfert positif : gain d'une réutilisation vs expert neuf à petit budget égal.
-        Transfert négatif : oubli mesuré si le module était partagé, ou perte vs expert dédié."""
+        """Positive transfer: gain of a reuse vs a fresh expert at an equal small budget.
+        Negative transfer: forgetting measured if the module was shared, or loss vs a dedicated expert."""
         share = next((d for label, d in decision.candidates.items() if label.startswith("share:")), None)
         new = decision.candidates.get("new_expert")
         adapt = next((d for label, d in decision.candidates.items() if label.startswith("adapt:")), None)
@@ -607,7 +607,7 @@ class MetaController:
         return False
 
     def _prune(self, module, x_train, y_train, x_val, y_val, step=8, recovery=100, min_keep=8):
-        """Prune after consolidate : seulement si aucune configuration ne dépend de deltas rapides sur ce module."""
+        """Prune after consolidate: only if no configuration depends on fast deltas on this module."""
         m = self.model
         deps = self._dependents(module)
         if any(m.configs[c].fast for c in deps): return None
@@ -626,9 +626,9 @@ class MetaController:
         self.stats["units_pruned"] = self.stats.get("units_pruned", 0) + before - m.state.modules[module].hidden
         return (before, m.state.modules[module].hidden)
 
-    # ---- homéostasie ---------------------------------------------------
+    # ---- homeostasis ---------------------------------------------------
     def homeostasis(self):
-        """Tend vers une plage cible de paramètres totaux : prune au-dessus, autorise la croissance en dessous."""
+        """Tends towards a target range of total parameters: prunes above it, allows growth below it."""
         low, high = self.budget
         m = self.model
         total = m.state.total_parameters()
@@ -643,12 +643,12 @@ class MetaController:
             if after <= high:
                 m.state.metadata["max_capacity"] = 1024
                 return f"over budget ({total} > {high}) -> pruned to {after}"
-            m.state.metadata["max_capacity"] = m.state.capacity  # croissance gelée tant que > budget
+            m.state.metadata["max_capacity"] = m.state.capacity  # growth frozen as long as > budget
             return f"over budget ({total} > {high}) -> pruning floor reached at {after}, growth frozen"
         m.state.metadata["max_capacity"] = 1024
         return "within budget" if total >= low else f"below budget ({total} < {low}) -> growth allowed"
 
-    # ---- dommages et réparation ------------------------------------------
+    # ---- damage and repair ------------------------------------------
     def damage(self, kind, module, seed=0):
         specs = {"corrupt": CorruptModule(module=module, seed=seed), "deactivate": DeactivateModule(module=module),
                  "disconnect": RemoveConnection(source=INPUT, target=module), "delete": PruneModule(module=module)}
@@ -741,15 +741,15 @@ class MetaController:
         return report
 
     def self_repair(self, allow_rollback=True):
-        """Répare les configurations dégradées, une à une, en revérifiant après chaque réparation
-        (une réparation de module partagé peut suffire pour plusieurs configurations)."""
+        """Repairs the degraded configurations, one by one, re-checking after each repair
+        (one repair of a shared module can be enough for several configurations)."""
         reports = []
         while True:
             damaged = [c for c in self.health_check() if c not in {r.config for r in reports}]
             if not damaged: return reports
             reports.append(self.repair(damaged[0], allow_rollback))
 
-    # ---- métriques -----------------------------------------------------
+    # ---- metrics -----------------------------------------------------
     def metrics(self, tasks=None, matrix=None):
         m = self.model
         n = len(self.decisions) or 1
@@ -792,7 +792,7 @@ class NeuralModuleCount:
     def count(input_dim, hidden, output_dim): return hidden * input_dim + hidden + output_dim * hidden + output_dim
 
 
-# ================================================================ expérience complète
+# ================================================================ full experiment
 
 @dataclass
 class LifelongRun:
@@ -814,7 +814,7 @@ class LifelongRun:
         return out
 
     def interference(self):
-        """Baisse moyenne des tâches anciennes à chaque nouvelle tâche."""
+        """Mean drop of the old tasks at each new task."""
         drops = []
         names = list(self.matrix)
         for t in range(1, len(names)):

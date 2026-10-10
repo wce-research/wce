@@ -1,7 +1,7 @@
-"""Benchmark indépendant : ablations, taxonomie des hallucinations, géométrie conditionnelle,
-coûts de vérification, apprentissage de la grammaire, croissance lexicale, représentations.
+"""Independent benchmark: ablations, taxonomy of hallucinations, conditional geometry,
+verification costs, grammar learning, lexical growth, representations.
 
-Règle : tout réglage se fait sur train / calibration / validation ; le test n'est lu qu'à l'évaluation.
+Rule: all tuning is done on train / calibration / validation; the test set is read only at evaluation.
 """
 from __future__ import annotations
 
@@ -27,7 +27,7 @@ from core.trajectory import OBSERVABLES, GeometricRiskEstimator, TrajectoryMonit
 ASSERTIVE_SPECIAL = {"REJECT", "INVALID_PREMISE", "SUPPORTED", "REFUTED", "NONE", "UNKNOWN_CAUSE"}
 
 
-# ================================================================ préparation
+# ================================================================ preparation
 
 @dataclass
 class Setup:
@@ -61,7 +61,7 @@ def make_agent(name, setup: Setup, size="small", seed=0):
         cfg = copy.deepcopy(VARIANTS[name]); cfg.size = size
         agent = IndependentAgent(cfg, seed)
     agent.learn_captions(setup.captions)
-    if name == "B_neural_plasticity":       # plasticité : expérience supplémentaire (légendes neuves), sans vérification
+    if name == "B_neural_plasticity":       # plasticity: additional experience (new captions), without verification
         extra = captions(200, seed=seed + 50)
         agent.learn_captions(setup.captions + extra)
     agent.warm_up_sources(setup.splits["train"])
@@ -70,10 +70,10 @@ def make_agent(name, setup: Setup, size="small", seed=0):
     return agent
 
 
-# ================================================================ géométrie : calibration au niveau des mots
+# ================================================================ geometry: word-level calibration
 
 def oov_words(items, agent):
-    """Mots hors lexique dans des requêtes, avec leur sens de référence (générateur ; évaluation seulement)."""
+    """Out-of-lexicon words in queries, with their reference meaning (generator; evaluation only)."""
     out = {}
     for it in items:
         for tok in tokenize(it.text):
@@ -105,10 +105,10 @@ def calibrate_geometry(agent, setup: Setup):
     return monitor, estimator
 
 
-# ================================================================ évaluation
+# ================================================================ evaluation
 
 def taxonomy(item, answer):
-    """Catégorie d'une réponse fausse et affirmée (évaluation seulement)."""
+    """Category of a wrong and asserted answer (evaluation only)."""
     out, gold = answer.output, item.gold
     kind = item.meta.get("kind")
     for tok, meaning in answer.word_meanings.items():
@@ -168,10 +168,10 @@ def ablations(setup: Setup, size="small", seed=0):
     return results
 
 
-# ================================================================ auto-correction
+# ================================================================ self-correction
 
 def correction_benchmark(setup: Setup, seed=0):
-    """Candidat initial -> corrigé / toujours faux / abstention ; corrections nuisibles."""
+    """Initial candidate -> corrected / still wrong / abstention; harmful corrections."""
     agent = make_agent("G_full", setup, seed=seed)
     rows = run_split(agent, setup.splits["test"])
     stats = Counter()
@@ -194,7 +194,7 @@ def correction_benchmark(setup: Setup, seed=0):
             "harmful_correction_rate": round(stats["harmful"] / max(1, stats["attempted"]), 3) if stats["attempted"] else 0.0}
 
 
-# ================================================================ coûts de vérification
+# ================================================================ verification costs
 
 def verification_costs(setup: Setup, seed=0):
     out = {}
@@ -210,7 +210,7 @@ def verification_costs(setup: Setup, seed=0):
     return {k: {m: v[m] for m in ("success", "false_confident_rate", "abstention_rate", "verification_cost")} for k, v in out.items()}
 
 
-# ================================================================ géométrie : test réel et valeur conditionnelle
+# ================================================================ geometry: real test and conditional value
 
 def auprc(scores, positives):
     pairs = sorted(zip(scores, positives), key=lambda t: -t[0])
@@ -232,7 +232,7 @@ def ece(probs, labels, bins=10):
 
 
 def geometry_word_test(setup: Setup, seed=0, size="small"):
-    """Erreurs lexicales neuronales sur mots hors lexique du TEST (calibration faite sur d'autres mondes)."""
+    """Neural lexical errors on out-of-lexicon words of the TEST set (calibration done on other worlds)."""
     agent = make_agent("G_full", setup, size, seed)
     monitor, estimator = agent.monitor, agent.estimator
     test_items = [it for x in setup.splits["test"] for it in x["items"]]
@@ -295,7 +295,7 @@ def _predict(model, x):
 
 
 def query_level_features(agent, worlds):
-    """Pour chaque requête : candidat AVANT politique, étiquette d'erreur, et variables explicatives."""
+    """For each query: candidate BEFORE policy, error label, and explanatory variables."""
     rows = run_split(agent, worlds)
     out = []
     for r in rows:
@@ -308,8 +308,8 @@ def query_level_features(agent, worlds):
 
 
 def conditional_geometry(setup: Setup, seed=0, bootstrap=300):
-    """La géométrie améliore-t-elle la prédiction d'erreur APRÈS contrôle de la confiance, du support,
-    de la longueur, de la nouveauté lexicale, de l'ambiguïté et de la fiabilité des sources ?"""
+    """Does geometry improve error prediction AFTER controlling for confidence, support,
+    length, lexical novelty, ambiguity and source reliability?"""
     agent = make_agent("G_full", setup, seed=seed)
     agent.cfg.correction = False
     fit_rows = query_level_features(agent, setup.splits["calibration"] + setup.splits["validation"])
@@ -325,7 +325,7 @@ def conditional_geometry(setup: Setup, seed=0, bootstrap=300):
         models[name] = (model, feats, p)
         results[name] = {"auroc": auroc(p, [bool(v) for v in y_test]), "auprc": auprc(p, [bool(v) for v in y_test]),
                          "ece": ece(p, y_test)}
-    # effet de la géométrie : Δ AUROC (controls+geometry - controls) avec IC bootstrap sur le test
+    # effect of geometry: Δ AUROC (controls+geometry - controls) with bootstrap CI on the test set
     rng = random.Random(seed)
     p0, p1 = models["controls"][2], models["controls+geometry"][2]
     deltas = []
@@ -352,7 +352,7 @@ def conditional_geometry(setup: Setup, seed=0, bootstrap=300):
             "subset_with_neural_words": {"n": len(neural_subset), "auroc": sub}}
 
 
-# ================================================================ grammaire : courbe d'apprentissage
+# ================================================================ grammar: learning curve
 
 def grammar_accuracy(agent, held):
     role_ok = role_n = prep_ok = prep_n = conn_ok = conn_n = 0
@@ -394,10 +394,10 @@ def preposition_table(agent):
     return {t: m for t, m in agent.lex.lexicon().items() if m.startswith("rel:")}
 
 
-# ================================================================ classes lexicales induites
+# ================================================================ induced lexical classes
 
 def induced_classes(agent, k=6, iterations=20, seed=0):
-    """Clusters fonctionnels à partir du comportement (symboles co-occurrents, position) — sans noms de classes."""
+    """Functional clusters from behaviour (co-occurring symbols, position) — without class names."""
     toks = [t for t, c in agent.lex.tok.items() if c >= 3]
     prefixes = ["type", "color", "rel", "act", "kind", "time", "person", "num"]
     vecs = []
@@ -421,10 +421,10 @@ def induced_classes(agent, k=6, iterations=20, seed=0):
     return {"clusters": {c: sorted(ts)[:12] for c, ts in clusters.items()}, "purity_vs_meaning_class": round(purity, 3), "tokens": len(toks)}
 
 
-# ================================================================ croissance lexicale et représentations
+# ================================================================ lexical growth and representations
 
 def synthetic_lexicon(n_forms, seed=0):
-    """Formes artificielles (radical + suffixe flexionnel) pour des sens ; variantes tenues à l'écart."""
+    """Artificial forms (stem + inflectional suffix) for meanings; variants held out."""
     rng = random.Random(seed)
     syll = ["ka", "lo", "mi", "ru", "ten", "vo", "shi", "pa", "dor", "lin", "fu", "ze", "bra", "qui", "nel"]
     meanings = [f"m{i}" for i in range(max(4, n_forms // 5))]
@@ -440,7 +440,7 @@ def synthetic_lexicon(n_forms, seed=0):
 
 
 class BPE:
-    """Sous-mots minimal (fusions fréquentes de paires de caractères), sans bibliothèque externe."""
+    """Minimal subwords (frequent merges of character pairs), without external library."""
 
     def __init__(self, words, merges=60):
         self.merges = []
@@ -483,7 +483,7 @@ def _bag(encoded):
 
 
 def representation_comparison(n_forms=250, seed=0):
-    """Caractères vs sous-mots (BPE minimal) vs mots, sur des formes fléchies tenues à l'écart."""
+    """Characters vs subwords (minimal BPE) vs words, on held-out inflected forms."""
     train, held = synthetic_lexicon(n_forms, seed)
     labels = sorted(set(train.values()))
     y = torch.tensor([labels.index(m) for m in train.values()])
@@ -518,7 +518,7 @@ def representation_comparison(n_forms=250, seed=0):
 
 
 def lexicon_growth(sizes=(50, 100, 250, 500, 1000), seed=0):
-    """Taille lexicale vs paramètres neuronaux vs mémoire structurelle vs précision."""
+    """Lexical size vs neural parameters vs structural memory vs accuracy."""
     out = {}
     for n in sizes:
         train, held = synthetic_lexicon(n, seed)
@@ -535,10 +535,10 @@ def lexicon_growth(sizes=(50, 100, 250, 500, 1000), seed=0):
     return out
 
 
-# ================================================================ distillation et échelle
+# ================================================================ distillation and scale
 
 def distillation_report(setup: Setup, seed=0):
-    """WCE (enseignant) -> élève neuronal : lexique distillé ; vérifications structurelles avant/après."""
+    """WCE (teacher) -> neural student: distilled lexicon; structural verifications before/after."""
     exhaustive = IndependentAgent(AgentConfig(neural=False, geometry=False, correction=False, verification="exhaustive"), seed)
     exhaustive.learn_captions(setup.captions); exhaustive.warm_up_sources(setup.splits["train"])
     distilled = IndependentAgent(AgentConfig(geometry=False, correction=False, verification="selective"), seed)

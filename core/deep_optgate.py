@@ -1,18 +1,18 @@
-"""Objective Alignment & Conditional Optimization — quand optimiser, quand préserver, et selon quel objectif.
+"""Objective Alignment & Conditional Optimization — when to optimise, when to preserve, and according to which objective.
 
     candidate → need_for_optimization? → NO : preserve
                                        → YES : optimize proposal → validate → accept / rollback
 
-Tout ce qui est ici n'utilise que des informations OBSERVABLES (observations, état du candidat). Aucune vérité de
-monde, aucun import de module de monde.
+Everything here uses only OBSERVABLE information (observations, state of the candidate). No world
+truth, no import of a world module.
 
-Contenu :
-  * objectifs observables testés SÉPARÉMENT (aucun score composite opaque) ;
-  * signaux internes calculés AVANT tout ajustement ;
-  * `OptimizationDecision` : décision auditable (état initial, signaux, gain et risque estimés, action, résultat,
-    rollback) ;
-  * `conditional_fit` : porte conditionnelle explicite et interprétable (règle à seuils, pas de modèle appris).
-L'état initial n'est jamais perdu : la décision conserve état initial, meilleur état rencontré et état final.
+Contents:
+  * observable objectives testés SÉPARÉMENT [tested SEPARATELY] (no opaque composite score);
+  * internal signals computed BEFORE any fitting;
+  * `OptimizationDecision`: auditable decision (initial state, signals, estimated gain and risk, action, result,
+    rollback);
+  * `conditional_fit`: explicit and interpretable conditional gate (règle à seuils [threshold rule], no learned model).
+The initial state is never lost: the decision keeps the initial state, the best state encountered and the final state.
 """
 from __future__ import annotations
 
@@ -30,10 +30,10 @@ from core.deep_fit import ACCEPT_TOL, DT, FitCounter, FitData, compile_skeleton,
 OBJECTIVES = ("surrogate", "profiled_soft", "discrete_error", "likelihood_prior", "local_boundary", "robust")
 ACTIONS = ("PRESERVE", "OPTIMIZE")
 GATE_FILE = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "results", "deep_configs", "optimization_gate.json")
-DEFAULT_GATE = {"objective": "surrogate", "residual_z": 2.0, "gap_z": 1.0, "min_gain": 0.0}        # remplacé par le réglage fait en dev (results/deep_configs/optimization_gate.json)
+DEFAULT_GATE = {"objective": "surrogate", "residual_z": 2.0, "gap_z": 1.0, "min_gain": 0.0}        # replaced by the tuning done in dev (results/deep_configs/optimization_gate.json)
 
 
-# ================================================================ objectifs observables (testés séparément)
+# ================================================================ observable objectives (tested separately)
 
 def _soft(fn, th, X, k): return fn(th, X, lambda z: torch.sigmoid(k * z)).clamp(1e-6, 1 - 1e-6)
 
@@ -44,14 +44,14 @@ def _nll(p, data: FitData, gamma, w=None):
 
 
 def make_objective(name: str, skel: BNode, data: FitData, theta0, gamma=0.02) -> Callable:
-    """Renvoie loss(theta [K, P], k) → [K] pour l'objectif `name`. Tous n'utilisent que les observations.
-      surrogate        : vraisemblance robuste adoucie actuelle (contamination γ = 0,02)
-      profiled_soft    : vraisemblance PROFILÉE (bruit estimé par l'état lui-même) sur les erreurs adoucies
-      likelihood_prior : surrogate + a priori de simplicité sur le DÉPLACEMENT (‖θ − θ0‖² / 2σ², σ = 0,1) :
-                         « ne s'éloigner de l'état proposé que si les données l'exigent »
-      local_boundary   : surrogate restreint au voisinage de la frontière de l'état initial (poids 1 près, 0,2 loin)
-      robust           : surrogate à contamination forte (γ = 0,2), moins sensible aux outliers
-    `discrete_error` n'est pas différentiable : il est optimisé par recherche directe (`pattern_search`)."""
+    """Returns loss(theta [K, P], k) → [K] for the objective `name`. All of them use only the observations.
+      surrogate        : current softened robust likelihood (contamination γ = 0.02)
+      profiled_soft    : PROFILED likelihood (noise estimated by the state itself) on the softened errors
+      likelihood_prior : surrogate + simplicity prior on the DISPLACEMENT (‖θ − θ0‖² / 2σ², σ = 0.1):
+                         "move away from the proposed state only if the data require it"
+      local_boundary   : surrogate restricted to the neighbourhood of the boundary of the initial state (weight 1 near, 0.2 far)
+      robust           : surrogate with strong contamination (γ = 0.2), less sensitive to outliers
+    `discrete_error` is not differentiable: it is optimised by direct search (`pattern_search`)."""
     fn = compile_skeleton(skel); X = data.X[None]; th0 = torch.as_tensor(theta0, dtype=DT).reshape(1, -1)
     if name == "surrogate": return lambda th, k: _nll(_soft(fn, th, X, k), data, gamma)
     if name == "robust": return lambda th, k: _nll(_soft(fn, th, X, k), data, 0.2)
@@ -69,7 +69,7 @@ def make_objective(name: str, skel: BNode, data: FitData, theta0, gamma=0.02) ->
 
 
 def hard_errors(skel: BNode, th, data: FitData):
-    """Nombre d'erreurs DISCRÈTES sur les observations, par ligne."""
+    """Number of DISCRETE errors on the observations, per row."""
     return ((predict_batch(skel, th, data.X).to(DT) != data.y).to(DT) * data.weight).sum(-1)
 
 
@@ -78,7 +78,7 @@ def profiled(skel: BNode, row, data: FitData): return profiled_loglik(predict_ba
 
 @dataclass
 class OptTrace:
-    """États conservés d'une optimisation : initial, meilleur rencontré (critère interne valide), final."""
+    """States kept from an optimisation: initial, best encountered (valid internal criterion), final."""
     initial: torch.Tensor
     best: torch.Tensor
     best_step: int
@@ -88,9 +88,9 @@ class OptTrace:
 
 
 def optimize(skel: BNode, data: FitData, init, objective="surrogate", steps=100, lr=0.05, every=10, counter: Optional[FitCounter] = None) -> OptTrace:
-    """Optimise UN candidat selon `objective`. Mécanisme inchangé pour tous les objectifs différentiables (Adam,
-    raideur 4 → 24, 100 pas) : seul l'objectif varie. Conserve état initial, meilleur état (vraisemblance profilée
-    sur les observations) et état final."""
+    """Optimises ONE candidate according to `objective`. Mechanism unchanged for all differentiable objectives (Adam,
+    stiffness 4 → 24, 100 steps): only the objective varies. Keeps the initial state, the best state (profiled likelihood
+    on the observations) and the final state."""
     th0 = torch.as_tensor(init, dtype=DT).reshape(1, -1).clone()
     if objective == "discrete_error": return pattern_search(skel, data, th0, counter=counter)
     f = make_objective(objective, skel, data, th0); th = th0.clone().requires_grad_(True); opt = torch.optim.Adam([th], lr=lr); log = []; best = (profiled(skel, th0[0], data), th0[0].clone(), 0)
@@ -107,9 +107,9 @@ def optimize(skel: BNode, data: FitData, init, objective="surrogate", steps=100,
 
 
 def pattern_search(skel: BNode, data: FitData, th0, rounds=4, step0=0.08, counter: Optional[FitCounter] = None) -> OptTrace:
-    """Recherche directe sur l'ERREUR DISCRÈTE observable : chaque paramètre est essayé à ±pas ; un déplacement n'est
-    gardé que s'il réduit strictement le nombre d'erreurs ; le pas est divisé par deux à chaque tour. Monotone par
-    construction sur son propre critère."""
+    """Direct search on the observable DISCRETE ERROR: each parameter is tried at ±step; a move is
+    kept only if it strictly reduces the number of errors; the step is halved at each round. Monotone by
+    construction on its own criterion."""
     cur = th0.clone(); e = float(hard_errors(skel, cur, data)[0]); P = cur.shape[1]; log = [{"step": 0, "objective": e, "profiled": profiled(skel, cur[0], data), "errors": e, "params": cur[0].tolist()}]; step = step0; evals = 0
     for r in range(rounds):
         cand = cur.repeat(2 * P, 1); idx = torch.arange(P); cand[idx, idx] += step; cand[P + idx, idx] -= step; es = hard_errors(skel, cand, data); evals += 2 * P
@@ -117,23 +117,23 @@ def pattern_search(skel: BNode, data: FitData, th0, rounds=4, step0=0.08, counte
         while P and float(es[i]) < e - 1e-9:
             cur = cand[i:i + 1].clone(); e = float(es[i]); cand = cur.repeat(2 * P, 1); cand[idx, idx] += step; cand[P + idx, idx] -= step; es = hard_errors(skel, cand, data); evals += 2 * P; i = int(es.argmin())
         step /= 2; log.append({"step": r + 1, "objective": e, "profiled": profiled(skel, cur[0], data), "errors": e, "params": cur[0].tolist()})
-    if counter is not None: counter.charge(1, max(1, evals // 2))                      # coût : une évaluation ≈ un demi-pas de gradient
+    if counter is not None: counter.charge(1, max(1, evals // 2))                      # cost: one evaluation ≈ half a gradient step
     return OptTrace(th0[0], cur[0].clone(), rounds, cur[0].clone(), log, "discrete_error")
 
 
-# ================================================================ signaux internes (avant tout ajustement)
+# ================================================================ internal signals (before any fitting)
 
 def signals(skel: BNode, data: FitData, init, gamma=0.02) -> dict:
-    """Signaux OBSERVABLES d'un candidat, calculés avant d'optimiser :
-      error_rate         qualité initiale (taux d'erreur sur les observations)
-      profiled_per_point vraisemblance profilée par observation
-      residual_z         résidu : regroupement spatial des erreurs (z > 0 : les erreurs s'agglutinent → désajustement
-                         structuré ; z ≈ 0 : erreurs dispersées comme du bruit)
-      gap_z              confiance : écart à une référence non paramétrique (vote de 7 voisins, validation croisée) ;
-                         z > 0 : un modèle local explique mieux les données que le candidat
-      grad_per_point     gradient initial de l'objectif de substitution (raideur 24)
-      probe_delta_errors désaccord entre critères : variation des erreurs DISCRÈTES après un petit pas de descente sur
-                         l'objectif continu (> 0 : le continu demande un mouvement que le discret refuse)
+    """OBSERVABLE signals of a candidate, computed before optimising:
+      error_rate         initial quality (error rate on the observations)
+      profiled_per_point profiled likelihood per observation
+      residual_z         residual: spatial clustering of the errors (z > 0: the errors clump together → structured
+                         misfit; z ≈ 0: errors scattered like noise)
+      gap_z              confidence: gap to a non-parametric reference (vote of 7 neighbours, cross-validation);
+                         z > 0: a local model explains the data better than the candidate
+      grad_per_point     initial gradient of the surrogate objective (stiffness 24)
+      probe_delta_errors disagreement between criteria: change in the DISCRETE errors after a small descent step on
+                         the continuous objective (> 0: the continuous one asks for a move that the discrete one refuses)
       knn_error, n, n_params"""
     th0 = torch.as_tensor(init, dtype=DT).reshape(1, -1); n = int((data.weight > 0).sum()); pred = predict_batch(skel, th0, data.X)[0].to(DT); err = pred != data.y; k = int(err.sum()); e0 = k / max(1, n)
     D = torch.cdist(data.X, data.X); D.fill_diagonal_(float("inf")); nn = D.argmin(1); joint = float(err[nn][err].double().sum())
@@ -146,21 +146,21 @@ def signals(skel: BNode, data: FitData, init, gamma=0.02) -> dict:
             "probe_delta_errors": de, "n": n, "n_params": int(th0.shape[1])}
 
 
-# ================================================================ décision auditable
+# ================================================================ auditable decision
 
 @dataclass
 class OptimizationDecision:
-    """Décision d'optimisation AUDITABLE. Rien n'est perdu : état initial, meilleur état rencontré et état final de
-    l'optimiseur sont conservés ; `result` est l'état retenu."""
+    """AUDITABLE optimisation decision. Nothing is lost: initial state, best state encountered and final state of
+    the optimiser are kept; `result` is the retained state."""
     initial: tuple
     signals: dict
-    gain_estimate: float                    # erreurs que l'optimisation pourrait corriger (excès sur la référence locale)
-    risk_estimate: float                    # risque de dégrader un état déjà cohérent avec les données (0 … 1)
+    gain_estimate: float                    # errors that the optimisation could correct (excess over the local reference)
+    risk_estimate: float                    # risk of degrading a state already consistent with the data (0 … 1)
     action: str                             # "PRESERVE" | "OPTIMIZE"
     reason: str
     objective: str = ""
-    proposal: Optional[tuple] = None        # état final de l'optimiseur (None si PRESERVE)
-    best_so_far: Optional[tuple] = None     # meilleur état rencontré selon la vraisemblance profilée
+    proposal: Optional[tuple] = None        # final state of the optimiser (None if PRESERVE)
+    best_so_far: Optional[tuple] = None     # best state encountered according to the profiled likelihood
     value_before: Optional[float] = None
     value_after: Optional[float] = None
     accepted: Optional[bool] = None
@@ -176,11 +176,11 @@ def load_gate() -> dict:
 
 
 def need_for_optimization(sig: dict, gate: Optional[dict] = None):
-    """Porte EXPLICITE (règle à seuils, lisible) : optimiser seulement si les observations signalent un désajustement
-    STRUCTURÉ — erreurs agglutinées (residual_z) ou candidat moins bon qu'une référence locale (gap_z). Sinon le
-    résidu ressemble à du bruit : préserver. Renvoie (action, raison, gain estimé, risque estimé)."""
+    """EXPLICIT gate (threshold rule, readable): optimise only if the observations signal a STRUCTURED
+    misfit — clumped errors (residual_z) or candidate worse than a local reference (gap_z). Otherwise the
+    residual looks like noise: preserve. Returns (action, reason, estimated gain, estimated risk)."""
     gate = gate or load_gate(); gain = max(0.0, sig["error_rate"] - sig["knn_error"]) * sig["n"]
-    risk = 1.0 / (1.0 + math.exp(max(sig["residual_z"] - gate["residual_z"], sig["gap_z"] - gate["gap_z"])))             # proche de 1 quand rien ne signale un désajustement
+    risk = 1.0 / (1.0 + math.exp(max(sig["residual_z"] - gate["residual_z"], sig["gap_z"] - gate["gap_z"])))             # close to 1 when nothing signals a misfit
     if sig["residual_z"] >= gate["residual_z"]: return "OPTIMIZE", "résidu spatialement structuré", gain, risk
     if sig["gap_z"] >= gate["gap_z"]: return "OPTIMIZE", "candidat moins bon qu'une référence locale", gain, risk
     return "PRESERVE", "résidu compatible avec du bruit", gain, risk
@@ -188,8 +188,8 @@ def need_for_optimization(sig: dict, gate: Optional[dict] = None):
 
 def conditional_fit(skel: BNode, data: FitData, init, gate: Optional[dict] = None, counter: Optional[FitCounter] = None, steps=100) -> OptimizationDecision:
     """candidate → need_for_optimization? → NO : preserve → YES : optimize proposal → validate → accept / rollback.
-    La validation est celle du garde-fou (vraisemblance profilée), avec un gain minimal `min_gain` (nats) ; le
-    candidat retenu est le MEILLEUR état rencontré (jamais pire que l'état initial sur ce critère)."""
+    The validation is that of the guardrail (profiled likelihood), with a minimal gain `min_gain` (nats); the
+    retained candidate is the BEST state encountered (never worse than the initial state on this criterion)."""
     gate = gate or load_gate(); th0 = torch.as_tensor(init, dtype=DT).reshape(-1).clone(); sig = signals(skel, data, th0); action, reason, gain, risk = need_for_optimization(sig, gate)
     d = OptimizationDecision(tuple(th0.tolist()), sig, gain, risk, action, reason, result=tuple(th0.tolist()))
     if action == "PRESERVE": return d

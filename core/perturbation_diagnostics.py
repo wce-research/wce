@@ -1,7 +1,7 @@
-"""Diagnostic guidé par PERTURBATIONS VIRTUELLES : avant les diagnostics coûteux, de petites perturbations sont
-appliquées à des COPIES du modèle (le modèle diagnostiqué n'est jamais modifié) ; leurs réponses donnent un a priori
-sur les causes (table P(profil | cause) APPRISE par simulation sur des graines d'entraînement), puis le
-MeasurementPlanner habituel termine. Comparé au planificateur seul (a priori uniforme)."""
+"""Diagnosis guided by VIRTUAL PERTURBATIONS: before the costly diagnostics, small perturbations are
+applied to COPIES of the model (the diagnosed model is never modified); their responses give a prior
+over the causes (table P(profile | cause) LEARNED by simulation on training seeds), then the
+usual MeasurementPlanner finishes. Compared with the planner alone (uniform prior)."""
 from __future__ import annotations
 
 import copy
@@ -15,7 +15,7 @@ from core.model_diagnostics import CAUSES, DIAGNOSTICS, MODULES, REPAIR, TableOp
 from core.perturbation import Perturbation
 from core.stability import perturbed_model
 
-PROBE_COST = 0.01                     # coût d'une perturbation virtuelle (une passe avant sur une copie)
+PROBE_COST = 0.01                     # cost of one virtual perturbation (one forward pass on a copy)
 
 
 def response(model, xv, yv, modules, mag, seeds=(0, 1)):
@@ -26,8 +26,8 @@ def response(model, xv, yv, modules, mag, seeds=(0, 1)):
 
 
 def profile(model, healthy_ref, xv, yv, mag=0.05):
-    """Profil discret des réponses : pour chaque module, réponse AMPLIFIÉE / normale vs la référence saine ;
-    réponse au retrait des poids rapides ; réponse à l'affaiblissement de la connexion la plus forte vers la tête."""
+    """Discrete profile of the responses: for each module, AMPLIFIED / normal response vs the healthy reference;
+    response to removing the fast weights; response to weakening the strongest connection to the head."""
     sig, cost = [], 0.0
     for m in MODULES:
         r = response(model, xv, yv, (m,), mag); cost += PROBE_COST
@@ -39,7 +39,7 @@ def profile(model, healthy_ref, xv, yv, mag=0.05):
         incoming = [k for k in model.connectivity if k[1] == "head"]; cost += PROBE_COST * len(incoming)
         best = None
         for k in incoming:
-            acc = Perturbation("connection", k, -1.0).apply(model).accuracy(xv, yv)       # retrait virtuel (force × 0)
+            acc = Perturbation("connection", k, -1.0).apply(model).accuracy(xv, yv)       # virtual removal (strength × 0)
             if acc > base + 0.02: best = k[0]
         sig.append(f"cut_helps:{best}" if best else "cut_neutral")
     return tuple(sig), cost
@@ -59,7 +59,7 @@ def learn_profile_table(n_per_cause=6, seed=0):
 
 
 def prior_from_profile(counts, sig, alpha=0.5):
-    """P(cause | profil) ∝ P(profil | cause) avec lissage (profils jamais vus : quasi uniforme)."""
+    """P(cause | profile) ∝ P(profile | cause) with smoothing (never-seen profiles: nearly uniform)."""
     vocab = set(s for c in counts.values() for s in c) | {sig}
     lik = {c: (counts[c][sig] + alpha) / (sum(counts[c].values()) + alpha * len(vocab)) for c in CAUSES}
     z = sum(lik.values()); return {c: v / z for c, v in lik.items()}

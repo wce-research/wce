@@ -1,13 +1,13 @@
-"""Banc de perturbations INDÉPENDANT (générateurs propres, graines disjointes) + lot scellé + multi-graines.
+"""INDEPENDENT perturbation benchmark (own generators, disjoint seeds) + sealed set + multi-seed.
 
-Familles d'items (vérité = invariant RECALCULÉ sur l'objet transformé) :
-  small         : une transformation connue sur un objet NOUVEAU          → l'invariant survit-il ?
-  composed      : chaîne de 2 à 4 transformations connues                 → survie (prédiction compositionnelle)
-  ood           : paramètres jamais vus (valeurs, échelles, longueurs)    → généralisation par famille
-  interaction   : paires de perturbations de modules d'un modèle neuronal → interaction non additive ?
-  transition    : réponse en marche à seuil caché                         → seuil détecté (erreur absolue)
-L'index de dualité est construit sur les objets d'ESSAI fixes du domaine (core/invariant_algebra), jamais sur le banc.
-Méthodes comparées : dualité (stabilisateur), « toujours préservé », « surface inchangée ⇒ préservé ».
+Item families (truth = invariant RECOMPUTED on the transformed object):
+  small         : one known transformation on a NEW object                → does the invariant survive?
+  composed      : chain of 2 to 4 known transformations                   → survival (compositional prediction)
+  ood           : never-seen parameters (values, scales, lengths)         → generalization by family
+  interaction   : pairs of module perturbations of a neural model         → non-additive interaction?
+  transition    : step response with a hidden threshold                   → threshold detected (absolute error)
+The duality index is built on the fixed TEST objects of the domain (core/invariant_algebra), never on the benchmark.
+Methods compared: duality (stabilizer), "always preserved", "surface unchanged ⇒ preserved".
 """
 from __future__ import annotations
 
@@ -27,7 +27,7 @@ from core.invariant_algebra import (
 FAMILIES = ("small", "composed", "ood", "interaction", "transition")
 
 
-# ================================================================ générateurs d'objets nouveaux
+# ================================================================ generators of new objects
 
 def new_object(domain, rng):
     if domain == "algebra":
@@ -59,7 +59,7 @@ def random_program(rng, n=None):
 
 
 def ood_transformation(domain, rng):
-    """Transformation d'une FAMILLE connue avec un paramètre jamais vu."""
+    """Transformation from a known FAMILY with a never-seen parameter."""
     if domain == "algebra":
         v = rng.choice([7, -5, 11, 0, 0, 13]); fam = rng.choice(["AddBothSides", "MultiplyBothSides", "SubtractBothSides"])
         op = {"AddBothSides": Add, "MultiplyBothSides": Multiply, "SubtractBothSides": __import__("core.algebra", fromlist=["Subtract"]).Subtract}[fam]
@@ -75,8 +75,8 @@ def ood_transformation(domain, rng):
 
 
 def predict_family(name, ix):
-    """Généralisation par famille : préserve ce que préservent TOUTES les transformations connues de la même famille
-    (exception connue : paramètre nul ou symbolique pour les opérations multiplicatives)."""
+    """Generalization by family: preserves what ALL the known transformations of the same family preserve
+    (known exception: zero or symbolic parameter for the multiplicative operations)."""
     fam = name.split("(")[0]; arg = name[len(fam):]
     known = [t for t in ix.transformations if t.name.split("(")[0] == fam and t.name.split("(")[1:] != ["0)"] and "(x)" not in t.name]
     if not known: return frozenset()
@@ -182,7 +182,7 @@ def evaluate_items(items):
     return out
 
 
-# ================================================================ lot scellé
+# ================================================================ sealed set
 
 def sealed_items(): return make_items(990001, n_per=16)
 
@@ -200,14 +200,14 @@ def sealed_hash():
     return hashlib.sha256(json.dumps(_serializable(sealed_items()), sort_keys=True, default=str).encode()).hexdigest()
 
 
-SEALED_SHA256 = "cbe97b61906fb5db53f4859204266db55fef899d4ed90b634e74eafd25c49f68"   # empreinte figée AVANT toute évaluation
+SEALED_SHA256 = "cbe97b61906fb5db53f4859204266db55fef899d4ed90b634e74eafd25c49f68"   # fingerprint frozen BEFORE any evaluation
 
 
-# ================================================================ compression par classes d'équivalence
+# ================================================================ compression by equivalence classes
 
 def compression_experiment(seed=0, n=200):
-    """Stocker tous les exemples vs (formes canoniques uniques + chemin de transformations) ; vérifie aussi que
-    chaque exemple est RECONSTRUCTIBLE (même signature que l'original pour l'invariant de la classe)."""
+    """Storing all the examples vs (unique canonical forms + path of transformations); also checks that
+    each example is RECONSTRUCTIBLE (same signature as the original for the invariant of the class)."""
     from core.invariant_algebra import (
         compression, canonical_equation, canonical_sentence, canonical_program, canonical_geometry, solution_set, LANG_INVARIANTS,
         CODE_INVARIANTS, GEO_INVARIANTS, ALG_INVARIANTS, SEQ_INVARIANTS,
@@ -237,7 +237,7 @@ def compression_experiment(seed=0, n=200):
             items.append(x); paths[id(x)] = path
         inv = invs[inv_name]
         r = compression(items, lambda x: (canon(x), paths.get(id(x), [])))
-        if d == "geometry":       # invariant continu : égalité à tolérance près (arrondi canonique à 1e-3)
+        if d == "geometry":       # continuous invariant: equality up to a tolerance (canonical rounding to 1e-3)
             ok = [bool(torch.allclose(torch.cdist(canon(x), canon(x)), torch.cdist(x, x), atol=1e-2)) for x in items]
         else: ok = [inv.signature(canon(x)) == inv.signature(x) for x in items]
         r["faithful"] = round(sum(ok) / len(items), 3)
@@ -245,7 +245,7 @@ def compression_experiment(seed=0, n=200):
     return out
 
 
-# ================================================================ multi-graines
+# ================================================================ multi-seed
 
 def multi_seed(seeds=range(16), log=print):
     from core.generalized_credit import credit_benchmark

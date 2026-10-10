@@ -1,17 +1,17 @@
-"""Recherche structurelle HIÉRARCHIQUE (jalon Deep Compositional Structure Discovery).
+"""HIERARCHICAL structural search (Deep Compositional Structure Discovery milestone).
 
-Stratégies comparées, toutes sur le même budget d'équivalents-ajustement :
-  flat          : candidats plats (chaîne + atome, ajustement joint depuis des initialisations heuristiques) — ablation
-                  « sans hiérarchie » ;
-  bottom_up     : sous-structures ajustées puis composées ; le nouvel opérande est ajusté sur la CIBLE RÉSIDUELLE
-                  (ce que le parent n'explique pas) ; compositions de sous-structures déjà ajustées criblées sans
-                  nouvel ajustement (prédictions en cache) ;
-  top_down      : décomposition récursive de la cible en (atome ancre, combinateur, cible résiduelle à support
-                  restreint) ;
-  bidirectional : la cible résiduelle descendante est d'abord appariée aux sous-structures montantes déjà ajustées ;
-  best_first    : file de priorité sur un score explicite (évidence, réutilisation, nouveauté, coût).
+Strategies compared, all on the same budget of fit-equivalents:
+  flat          : flat candidates (chain + atom, joint fit from heuristic initialisations) — ablation
+                  "without hierarchy";
+  bottom_up     : substructures fitted then composed; the new operand is fitted on the RESIDUAL TARGET
+                  (what the parent does not explain); compositions of already fitted substructures screened without
+                  any new fit (cached predictions);
+  top_down      : recursive decomposition of the target into (anchor atom, combinator, residual target with
+                  restricted support);
+  bidirectional : the descending residual target is first matched against the ascending substructures already fitted;
+  best_first    : priority queue on an explicit score (evidence, reuse, novelty, cost).
 
-Ce module n'importe aucun module de monde et ne reçoit jamais la vérité.
+This module imports no world module and never receives the truth.
 """
 from __future__ import annotations
 
@@ -36,16 +36,16 @@ def _leaves(p: BNode):
 
 
 def estimate_noise_nn(X, y):
-    """Estimation du bruit SANS modèle : désaccord d'étiquette avec le plus proche voisin, d ≈ 2ε(1−ε) loin des
-    frontières (borne haute : les frontières l'augmentent). Bornée à [0,02 ; 0,30]."""
+    """MODEL-FREE noise estimation: label disagreement with the nearest neighbour, d ≈ 2ε(1−ε) far from the
+    boundaries (upper bound: the boundaries increase it). Bounded to [0.02; 0.30]."""
     D = torch.cdist(X.to(DT), X.to(DT)); D.fill_diagonal_(float("inf")); d = float((y[D.argmin(1)] != y).double().mean())
     eps = (1 - math.sqrt(max(0.0, 1 - 2 * min(d, 0.499)))) / 2
     return min(0.30, max(0.02, eps))
 
 
 def residual_target(comb: str, a, y):
-    """Cible et support de l'opérande R tel que comb(a, R) = y, a étant les prédictions dures (0/1) du parent.
-    Renvoie (cible, poids, part d'erreurs INÉVITABLES quel que soit R)."""
+    """Target and support of the operand R such that comb(a, R) = y, a being the hard predictions (0/1) of the parent.
+    Returns (target, weights, share of UNAVOIDABLE errors whatever R)."""
     a = a.to(DT); y = y.to(DT)
     if comb == "xor": return (y - a).abs(), torch.ones_like(y), 0.0
     if comb == "or": return y, (a == 0).to(DT), float(((a == 1) & (y == 0)).double().mean())
@@ -65,14 +65,14 @@ class SearchOutcome:
     noise: float
     store: StructureStore
     preds: Dict[str, torch.Tensor] = field(default_factory=dict)
-    all: Dict[str, WorldHypothesis] = field(default_factory=dict)        # toutes les structures ajustées (sans dédoublonnage fonctionnel)
-    discovery: object = None                                             # résultat de PrimitiveDiscovery (si utilisée)
+    all: Dict[str, WorldHypothesis] = field(default_factory=dict)        # all the fitted structures (without functional deduplication)
+    discovery: object = None                                             # result of PrimitiveDiscovery (if used)
 
     def best(self): return self.hypotheses[0] if self.hypotheses else None
 
 
 class DeepSearch:
-    """Recherche hiérarchique. `hierarchy=False` désactive résidus, cache et réutilisation (ablation)."""
+    """Hierarchical search. `hierarchy=False` disables residuals, cache and reuse (ablation)."""
 
     def __init__(self, strategy="bottom_up", budget=150.0, max_depth=6, beam=3, gamma=0.02, seed=0, library: Optional[FragmentLibrary] = None,
                  use_families=True, hierarchy=True, top_operands=2, atom_steps=50, dedup=True, time_budget=None, patience=1,
@@ -82,10 +82,10 @@ class DeepSearch:
         self.library, self.use_families, self.hierarchy, self.top_operands, self.atom_steps, self.dedup = library, use_families, hierarchy and strategy != "flat", top_operands, atom_steps, dedup
         self.time_budget, self.patience = time_budget, patience
         self.fact_inits, self.fact_rounds, self.fact_top, self.fact_polish, self.geometry, self.fact_time = fact_inits, fact_rounds, fact_top, fact_polish, geometry, fact_time
-        self.validated = validated                                                               # None (toujours optimiser) | "profiled" | "surrogate" (garde-fou) | "never" | "gate"
+        self.validated = validated                                                               # None (always optimise) | "profiled" | "surrogate" (safeguard) | "never" | "gate"
         self.fact_feedback, self.fact_separation, self.fact_literals, self.fact_discovery, self.fact_residual, self.discovery = fact_feedback, fact_separation, fact_literals, fact_discovery, fact_residual, None
 
-    # ---- état ---------------------------------------------------------------------------------
+    # ---- state ---------------------------------------------------------------------------------
     def _setup(self, data: FitData, noise):
         self.data = data.with_flip(noise) if noise is not None else data; self.noise = float(self.data.flip.mean())
         self.store = StructureStore(); self.counter = FitCounter(self.budget); self.hyps: Dict[str, WorldHypothesis] = {}; self.preds: Dict[str, torch.Tensor] = {}
@@ -97,7 +97,7 @@ class DeepSearch:
     def _log(self, stage, **kw): self.trace.append({"stage": stage, "fit_equivalents": round(self.counter.fit_equivalents, 2), **kw})
 
     def _register(self, prog: BNode, ll: float, origin: str) -> Optional[WorldHypothesis]:
-        """Enregistre une structure ajustée : internement (partage des sous-structures), cache, meilleure version."""
+        """Registers a fitted structure: interning (sharing of the substructures), cache, best version."""
         prog = normalize(prog); node = self.store.intern(prog.skeleton()); d = n_atoms(prog)
         pred = predict_batch(prog.skeleton(), torch.tensor([prog.param_vector()], dtype=DT), self.data.X)[0].to(DT)
         ll = profiled_loglik(pred, self.data); ev = approx_evidence(prog.n_params(), d, ll, self.n)
@@ -111,20 +111,20 @@ class DeepSearch:
         self._log("fit", key=node.key, depth=d, loglik=round(ll, 3), evidence=round(ev, 3), origin=origin); return h
 
     def _fit(self, skel: BNode, inits, steps, origin, data: Optional[FitData] = None):
-        """Ajuste un squelette (K initialisations en lot). Avec `data` (cible résiduelle), renvoie les paramètres sans
-        enregistrer d'hypothèse de monde."""
+        """Fits a skeleton (K initialisations in a batch). With `data` (residual target), returns the parameters without
+        registering a world hypothesis."""
         t = time.time()
         if data is None and self.validated in ("never", "gate") and len(inits) == 1:
-            # Politiques d'optimisation conditionnelle (seul étage modifié) : `never` préserve le candidat tel quel ;
-            # `gate` décide PRESERVE / OPTIMIZE sur des signaux observables puis valide (core.deep_optgate).
+            # Conditional optimisation policies (only stage modified): `never` preserves the candidate as is;
+            # `gate` decides PRESERVE / OPTIMIZE on observable signals then validates (core.deep_optgate).
             if self.validated == "never": row = torch.as_tensor(inits[0], dtype=DT).reshape(-1)
             else:
                 from core.deep_optgate import conditional_fit
                 dec = conditional_fit(skel, self.data, inits[0], counter=self.counter, steps=steps); self.decisions.append(dec); row = torch.tensor(dec.result, dtype=DT)
             th = row.reshape(1, -1); ll = loglik_batch(skel, th, self.data, self.gamma)
         elif data is None and self.validated is not None and len(inits) == 1:
-            # GARDE-FOU (seul étage modifié) : un candidat EXISTANT n'est remplacé par sa version ajustée que si le
-            # critère observable s'améliore — propose → evaluate → commit / rollback (core.deep_fit.validated_fit).
+            # SAFEGUARD (only stage modified): an EXISTING candidate is replaced by its fitted version only if the
+            # observable criterion improves — propose → evaluate → commit / rollback (core.deep_fit.validated_fit).
             row, tx = validated_fit(skel, self.data, inits[0], steps=steps, gamma=self.gamma, counter=self.counter, criterion=self.validated); self.transactions.append(tx)
             th = row.reshape(1, -1); ll = loglik_batch(skel, th, self.data, self.gamma)
         else: th, ll = fit_batch(skel, data or self.data, inits, steps=steps, gamma=self.gamma, counter=self.counter)
@@ -136,7 +136,7 @@ class DeepSearch:
     def _ranked(self, depth=None):
         hs = [h for h in self.hyps.values() if depth is None or h.depth == depth]; hs.sort(key=lambda h: -h.evidence)
         if not self.dedup: return hs
-        out, sigs = [], []                                                # nouveauté : un seul représentant par fonction observée
+        out, sigs = [], []                                                # novelty: a single representative per observed function
         for h in hs:
             p = self.preds[h.key]
             if any(float((p != s).double().mean()) < 0.005 for s in sigs): continue
@@ -146,14 +146,14 @@ class DeepSearch:
     def _errors(self, h): return float((self.preds[h.key] != self.data.y).double().mean())
 
     def _stalled(self):
-        """Règle d'arrêt : `patience` étapes d'approfondissement consécutives sans gain d'évidence (facteur de Bayes
-        < 3) de la meilleure hypothèse. Aucun bruit supposé connu."""
+        """Stopping rule: `patience` consecutive deepening steps without evidence gain (Bayes factor
+        < 3) of the best hypothesis. No noise assumed known."""
         b = self._ranked()[0].evidence
         if b > self._best_ev + math.log(3.0): self._best_ev = b; self._stall = 0
         else: self._stall += 1
         return self._stall >= self.patience
 
-    # ---- briques ------------------------------------------------------------------------------
+    # ---- building blocks ------------------------------------------------------------------------------
     def _atoms(self): return [self.store.nodes[k].skeleton for k in self.store.primitives]
 
     def _fit_atoms(self, n_init=2):
@@ -163,8 +163,8 @@ class DeepSearch:
         self._log("substructure_discovery", level=1, kept=len(self.hyps))
 
     def _operand_skeletons(self, room: int):
-        """Opérandes candidats : atomes, puis fragments de la bibliothèque (et instances de familles) s'ils tiennent
-        dans la profondeur restante."""
+        """Candidate operands: atoms, then fragments of the library (and family instances) if they fit
+        within the remaining depth."""
         ops = [(a, "atom") for a in self._atoms()]
         if self.library is not None and room >= 2:
             ops += [(f, "fragment") for f in self.library.proposals(max_atoms=room)[:6]]
@@ -178,13 +178,13 @@ class DeepSearch:
         return ops
 
     def _extend(self, parent: WorldHypothesis, combs=COMBINATORS, origin="composition"):
-        """Compose `parent` avec un nouvel opérande ajusté sur la cible résiduelle, puis polit l'ensemble conjointement."""
+        """Composes `parent` with a new operand fitted on the residual target, then polishes the whole jointly."""
         out = []; a = self.preds[parent.key]; room = self.max_depth - parent.depth
         if room < 1: return out
         for comb in combs:
             if self._stop(): break
             r, w, unavoidable = residual_target(comb, a, self.data.y)
-            if float(w.sum()) < 8 or unavoidable >= self._errors(parent): self.pruned += 1; continue    # élagage : ce combinateur ne peut pas améliorer le parent
+            if float(w.sum()) < 8 or unavoidable >= self._errors(parent): self.pruned += 1; continue    # pruning: this combinator cannot improve the parent
             rd = self.data.with_target(r, w * self.data.weight); cands = []
             for skel, kind in self._operand_skeletons(room):
                 if self._stop(): break
@@ -200,8 +200,8 @@ class DeepSearch:
         return out
 
     def _compose_cached(self, limit=3):
-        """Réutilisation : compositions de deux sous-structures DÉJÀ ajustées, criblées sur leurs prédictions en cache
-        (aucun ajustement), puis polies conjointement pour les meilleures."""
+        """Reuse: compositions of two ALREADY fitted substructures, screened on their cached predictions
+        (no fitting), then jointly polished for the best ones."""
         hs = self._ranked()[:8]; scored = []; y = self.data.y
         for i, a in enumerate(hs):
             for b in hs[i + 1:]:
@@ -220,10 +220,10 @@ class DeepSearch:
         if scored: self._log("composition", reused_pairs=len(scored[:limit]), screened=len(scored))
         return out
 
-    # ---- stratégies ---------------------------------------------------------------------------
+    # ---- strategies ---------------------------------------------------------------------------
     def _run_flat(self):
-        """Sans hiérarchie : chaîne + atome, ajustement joint depuis une initialisation heuristique (pas de résidu, pas
-        de cache, pas de réutilisation)."""
+        """Without hierarchy: chain + atom, joint fit from a heuristic initialisation (no residual, no
+        cache, no reuse)."""
         level = 1
         while level < self.max_depth and not self._stop():
             parents = self._ranked(level)[: self.beam]
@@ -248,10 +248,10 @@ class DeepSearch:
             self._compose_cached(); level += 1
 
     def _decompose(self, y, w, room, depth_left, tag):
-        """Top-down : meilleur atome ancre sur la cible, puis récursion sur la cible résiduelle. Renvoie un programme
-        (non enregistré) et ses prédictions dures."""
+        """Top-down: best anchor atom on the target, then recursion on the residual target. Returns a program
+        (not registered) and its hard predictions."""
         td = self.data.with_target(y, w * self.data.weight); best = None
-        if self.strategy == "bidirectional":                              # rencontre : une sous-structure montante explique-t-elle déjà la cible ?
+        if self.strategy == "bidirectional":                              # meeting: does an ascending substructure already explain the target?
             for h in self._ranked()[:12]:
                 if h.depth > room: continue
                 err = float(((self.preds[h.key] != y).to(DT) * w).sum() / w.sum().clamp_min(1))
@@ -265,7 +265,7 @@ class DeepSearch:
                 err = float(((p != y).to(DT) * w).sum() / w.sum().clamp_min(1))
                 if best is None or err < best[0]: best = (err, op, p)
         err, prog, pred = best
-        tol = 0.5 / math.sqrt(max(1.0, float(w.sum())))                    # échelle du bruit d'échantillonnage sur ce support
+        tol = 0.5 / math.sqrt(max(1.0, float(w.sum())))                    # scale of the sampling noise on this support
         if room - n_atoms(prog) < 1 or depth_left <= 1 or err <= tol or self._stop(): return prog, pred
         opts = []
         for comb in COMBINATORS:
@@ -291,7 +291,7 @@ class DeepSearch:
             self._fit(joint.skeleton(), torch.tensor([joint.param_vector()], dtype=DT), 100, "top_down_joint"); rounds += 1; self.seed += 101
 
     def _score(self, h: WorldHypothesis):
-        """Score explicite de best-first : évidence + bits économisés par réutilisation − coût de recherche déjà payé."""
+        """Explicit best-first score: evidence + bits saved by reuse − search cost already paid."""
         reuse = (description_bits(h.program) - description_bits(h.program, library=self.library)) * math.log(2) if self.library is not None else 0.0
         return h.evidence + reuse - 0.02 * h.fit_cost
 
@@ -304,9 +304,9 @@ class DeepSearch:
             h = max(cand[: 2 * self.beam], key=self._score); expanded.add(h.key); self._extend(h, origin="best_first")
             if len(expanded) % 2 == 0: self._compose_cached(limit=2)
 
-    # ---- simplification, sortie ---------------------------------------------------------------
+    # ---- simplification, output ---------------------------------------------------------------
     def _simplify(self):
-        """Retire un opérande si l'évidence n'en souffre pas (facteur de Bayes < 3) : contrôle de complexité."""
+        """Removes an operand if the evidence does not suffer from it (Bayes factor < 3): complexity control."""
         best = self._ranked()[0]; changed = True
         while changed and is_composite(best.program):
             changed = False
@@ -318,8 +318,8 @@ class DeepSearch:
         return best
 
     def run(self, data: FitData, noise: Optional[float] = None) -> SearchOutcome:
-        """`noise` : taux de retournement NOMINAL de la vraisemblance adoucie pendant l'ajustement par gradient (défaut
-        0,10). Le classement des hypothèses utilise un bruit profilé par hypothèse : aucun bruit vrai n'est requis."""
+        """`noise`: NOMINAL flip rate of the softened likelihood during the gradient fit (default
+        0.10). The ranking of the hypotheses uses a noise profiled per hypothesis: no true noise is required."""
         if noise is None: noise = 0.10
         self._setup(data, noise); self._log("candidate_generation", strategy=self.strategy, noise=round(self.noise, 4), budget=self.budget)
         self._fit_atoms()
@@ -338,8 +338,8 @@ class DeepSearch:
         return SearchOutcome(ranked, self.trace, stats, self.noise, self.store, self.preds, dict(self.hyps), self.discovery)
 
     def _atom_literals(self, data: FitData, n_init, steps, origin):
-        """Littéraux par gradient : TOUTES les initialisations ajustées de chaque type d'atome sont gardées (des optimums
-        locaux différents correspondent à des atomes différents de la structure)."""
+        """Gradient literals: ALL the fitted initialisations of each atom type are kept (different local
+        optima correspond to different atoms of the structure)."""
         out = []
         for a in self._atoms():
             if self._stop(): break
@@ -348,13 +348,13 @@ class DeepSearch:
         self._log("substructure_discovery", origin=origin, literals=len(out)); return out
 
     def _run_factorized(self):
-        """Génération factorisée (core.deep_generation) : littéraux (gradient multi-initialisations + géométrie des
-        frontières) → synthèse booléenne sur signatures → quelques candidats polis conjointement. Des tours résiduels
-        ajoutent les atomes que la meilleure formule n'explique pas encore."""
+        """Factorised generation (core.deep_generation): literals (multi-initialisation gradient + geometry of the
+        boundaries) → boolean synthesis over signatures → a few candidates polished jointly. Residual rounds
+        add the atoms that the best formula does not yet explain."""
         from core.deep_generation import generate_candidates
         Xf = self.data.X.float(); self.gen_stats = []; seen = set()
-        if self.fact_literals is not None: lits = list(self.fact_literals)                       # littéraux fournis (diagnostic oracle, ou primitives déjà découvertes)
-        elif self.fact_discovery is not None:                                                  # PrimitiveDiscovery : proposition + validation WCE
+        if self.fact_literals is not None: lits = list(self.fact_literals)                       # supplied literals (oracle diagnostic, or primitives already discovered)
+        elif self.fact_discovery is not None:                                                  # PrimitiveDiscovery: WCE proposal + validation
             from core.deep_primitives import discover
             dsc = discover(Xf, self.data.y.long(), self.fact_discovery, seed=self.seed); self.counter.fit_equivalents += dsc.fit_equivalents; self.discovery = dsc
             lits = dsc.primitives.literals(alternatives=2); self._log("substructure_discovery", origin="primitive_discovery", classes=len(dsc.primitives), proposals=dsc.proposals)
@@ -372,16 +372,16 @@ class DeepSearch:
                 if self._stop(): break
                 if (k, rnd) in seen or k in self.hyps: continue
                 seen.add((k, rnd)); h = self._fit(p.skeleton(), torch.tensor([p.param_vector()], dtype=DT), 100, f"factorized_r{rnd}")
-                if h is not None and self.fact_feedback: lits += _leaves(h.program)                  # atomes polis EN CONTEXTE (masquage pris en compte) → nouveaux littéraux
+                if h is not None and self.fact_feedback: lits += _leaves(h.program)                  # atoms polished IN CONTEXT (occlusion taken into account) → new literals
             if rnd == self.fact_rounds or self._stop() or not self._ranked(): break
             if not self.fact_residual: continue
             best = self._ranked()[0]; a = self.preds[best.key]
-            for comb in COMBINATORS:                                          # atomes manquants : ajustés sur ce que la meilleure structure n'explique pas
+            for comb in COMBINATORS:                                          # missing atoms: fitted on what the best structure does not explain
                 r, w, _ = residual_target(comb, a, self.data.y)
                 if float(w.sum()) >= 8: lits += self._atom_literals(self.data.with_target(r, w * self.data.weight), 2, self.atom_steps, f"residual_{comb}")
 
     def _run_bidirectional(self):
-        """Montée courte (niveau 2 par résidu) pour peupler la bibliothèque locale, puis descente avec rencontre."""
+        """Short ascent (level 2 by residual) to populate the local library, then descent with meeting."""
         for par in self._ranked(1)[:2]:
             if self._stop(): break
             self._extend(par)

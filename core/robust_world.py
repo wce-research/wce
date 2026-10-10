@@ -1,12 +1,12 @@
-"""Monde synthétique ROBUSTE (côté évaluation ; le code d'inférence n'importe jamais ce module).
+"""ROBUST synthetic world (evaluation side; the inference code never imports this module).
 
-Structures VRAIES = programmes aléatoires de profondeur 1–4 composés des primitives existantes (AND / OR / XOR /
-NOT, translations, rotations implicites via dot(α)), plus des fonctions NON représentables. Aucune famille n'est
-nommée dans les métadonnées vues par le système (seule la vérité d'évaluation porte un identifiant opaque).
+TRUE structures = random programs of depth 1–4 composed of the existing primitives (AND / OR / XOR /
+NOT, translations, implicit rotations via dot(α)), plus NON-representable functions. No family is
+named in the metadata seen by the system (only the evaluation truth carries an opaque identifier).
 
-Processus de mesure : capteurs hétérogènes (précis / standard / bon marché / flou près des frontières / biaisé),
-bruit i.i.d., bruit concentré près de la frontière, bruit asymétrique, source systématiquement biaisée, outliers
-GROUPÉS, observations manquantes, mesures répétables, régions non observées, horodatage (observation / ingestion).
+Measurement process: heterogeneous sensors (precise / standard / cheap / blurry near the boundaries / biased),
+i.i.d. noise, noise concentrated near the boundary, asymmetric noise, systematically biased source, GROUPED
+outliers, missing observations, repeatable measurements, unobserved regions, timestamps (observation / ingestion).
 """
 from __future__ import annotations
 
@@ -32,7 +32,7 @@ class Sensor:
     name: str
     flip: float                 # taux de retournement de base
     cost: float
-    blur: float = 0.0           # flou près de la frontière (résolution)
+    blur: float = 0.0           # blur near the boundary (resolution)
     latency: float = 0.0
 
 
@@ -57,7 +57,7 @@ def _atom(rng: random.Random, center):
 
 
 def random_program(rng: random.Random, depth: int):
-    """Programme vrai : chaîne gauche de `depth` atomes combinés (profondeur logique = nb d'atomes)."""
+    """True program: left chain of `depth` combined atoms (logical depth = number of atoms)."""
     center = (rng.uniform(-1.0, 0.2), rng.uniform(-0.6, 0.6)); p = _atom(rng, center)
     for _ in range(depth - 1): p = BNode(rng.choice(("and", "or", "xor")), children=(p, _atom(rng, center)))
     return p
@@ -67,7 +67,7 @@ def random_program(rng: random.Random, depth: int):
 class WorldInstance:
     uid: str                                   # identifiant OPAQUE (aucun nom de famille)
     label: Callable
-    truth: Optional[BNode]                     # programme vrai (évaluation seulement) ; None si non représentable
+    truth: Optional[BNode]                     # true program (evaluation only); None if not representable
     depth: int
     representable: bool
 
@@ -107,10 +107,10 @@ class NoiseSpec:
 
 
 def corrupt(world: WorldInstance, X, sensor: Sensor, spec: NoiseSpec, g):
-    """Observation bruitée selon capteur + bruit du monde. Renvoie y (−1 = manquant)."""
+    """Noisy observation according to sensor + world noise. Returns y (−1 = missing)."""
     y = world.label(X).clone(); n = len(X)
     base = torch.full((n,), sensor.flip + spec.rate)
-    if sensor.blur > 0 or spec.kind == "boundary":                        # bruit concentré près de la frontière (proxy : désaccord sous petite perturbation)
+    if sensor.blur > 0 or spec.kind == "boundary":                        # noise concentrated near the boundary (proxy: disagreement under a small perturbation)
         d = torch.randn(X.shape, generator=g) * (sensor.blur + (0.15 if spec.kind == "boundary" else 0.0))
         near = (world.label(X + d) != y).float()
         base = base * (0.5 if spec.kind == "boundary" else 1.0) + near * (0.35 if spec.kind == "boundary" else 0.25)
@@ -136,7 +136,7 @@ class Task:
     seed: int
 
     def oracle(self, x, sensor="standard", g=None):
-        """Mesure ACTIVE : passe par le même processus de bruit (jamais la vérité)."""
+        """ACTIVE measurement: goes through the same noise process (never the truth)."""
         return corrupt(self.world, x, SENSORS[sensor], self.spec, g)
 
 
@@ -147,7 +147,7 @@ def make_task(seed, noise=0.08, kind="iid", n=120, depth=None, representable=Tru
 
 
 def hard_noise_pair(seed):
-    """Cas A : structure SIMPLE + 8 % de bruit ; cas B : structure COMPLEXE + 0 % (mêmes atomes de départ)."""
+    """Case A: SIMPLE structure + 8 % noise; case B: COMPLEX structure + 0 % (same starting atoms)."""
     a = make_task(seed, noise=0.08, depth=1); b = make_task(seed, noise=0.0, depth=3); return a, b
 
 
@@ -168,4 +168,4 @@ def sealed_hash():
     return hashlib.sha256(json.dumps(sig).encode()).hexdigest()
 
 
-SEALED_SHA256 = "5cdbffc6ad8b21eda43f56a7c08219cd2434b789a51d3c2f658bf70bb8517b69"   # figée AVANT toute évaluation
+SEALED_SHA256 = "5cdbffc6ad8b21eda43f56a7c08219cd2434b789a51d3c2f658bf70bb8517b69"   # frozen BEFORE any evaluation

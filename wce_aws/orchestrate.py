@@ -1,9 +1,9 @@
-"""Orchestration LOCALE → SageMaker Processing (via AWS CLI, profil wce-runner). Invoqué UNIQUEMENT par le Makefile.
+"""LOCAL orchestration → SageMaker Processing (via AWS CLI, profile wce-runner). Invoked ONLY by the Makefile.
 
 smoke | package | submit | status | logs | fetch | clean-safe
-Chaque soumission écrit results/aws/<run_id>/manifest.json : run_id, git commit, timestamp, hash de code et de
-configuration, type d'instance, région, jobs, statut, durées, chemins d'artefacts. Aucune action IAM n'est jamais
-tentée (seule une LECTURE IAM est essayée au smoke test pour vérifier qu'elle est refusée)."""
+Each submission writes results/aws/<run_id>/manifest.json: run_id, git commit, timestamp, code and configuration
+hash, instance type, region, jobs, status, durations, artefact paths. No IAM action is ever
+attempted (only an IAM READ is tried at the smoke test to verify that it is denied)."""
 import argparse
 import glob
 import hashlib
@@ -42,15 +42,15 @@ def aws(*args, parse=True, check=True):
         if check:
             err = p.stderr.strip()
             if "AccessDenied" in err or "not authorized" in err or "UnauthorizedOperation" in err:
-                raise AwsDenied(f"PERMISSION MANQUANTE — {' '.join(args[:2])} : {err[:400]}")
+                raise AwsDenied(f"MISSING PERMISSION — {' '.join(args[:2])} : {err[:400]}")
             raise RuntimeError(f"aws {' '.join(args[:3])} : {err[:600]}")
         return None
     return json.loads(p.stdout) if parse and p.stdout.strip() else p.stdout
 
 
 def check_identity(arn):
-    """Échoue proprement si l'identité n'est pas le runner (jamais d'administrateur)."""
-    if EXPECTED_ROLE not in arn or "Admin" in arn: raise SystemExit(f"IDENTITÉ INCORRECTE : {arn} (attendu : rôle {EXPECTED_ROLE})")
+    """Fails cleanly if the identity is not the runner (never an administrator)."""
+    if EXPECTED_ROLE not in arn or "Admin" in arn: raise SystemExit(f"INCORRECT IDENTITY: {arn} (expected: role {EXPECTED_ROLE})")
     return True
 
 
@@ -72,7 +72,7 @@ def build_tarball():
                     rel = os.path.relpath(f, ROOT); h.update(rel.encode()); h.update(open(f, "rb").read()); tar.add(f, arcname=rel)
         res = os.path.join(ROOT, "results", "active_stability_calibration.json")
         if os.path.exists(res): tar.add(res, arcname="results/active_stability_calibration.json")
-        for f in sorted(glob.glob(os.path.join(ROOT, "results", "deep_configs", "*.json"))):                 # configurations figées et poids du proposeur compact
+        for f in sorted(glob.glob(os.path.join(ROOT, "results", "deep_configs", "*.json"))):                 # frozen configurations and weights of the compact proposer
             rel = os.path.relpath(f, ROOT); h.update(rel.encode()); h.update(open(f, "rb").read()); tar.add(f, arcname=rel)
     return buf.getvalue(), h.hexdigest()[:16]
 
@@ -95,9 +95,9 @@ def smoke(submit_job=False):
     try:
         aws("iam", "list-roles", "--max-items", "1"); report["iam_read_expected_denied"] = "ÉCHEC : IAM accessible (séparation non respectée)"
     except (AwsDenied, RuntimeError) as e: report["iam_read_expected_denied"] = "OK (refusé comme attendu)"
-    if submit_job:                                   # sonde de quota : premier type d'instance accepté (aucun quota n'est modifié)
+    if submit_job:                                   # quota probe: first accepted instance type (no quota is modified)
         report["quota_probe"] = {}
-        probes = ("t3.large", "t3.medium") if BACKEND == "ec2" else PROBE_INSTANCES   # types autorisés au runner (c5/m5 refusés par policy)
+        probes = ("t3.large", "t3.medium") if BACKEND == "ec2" else PROBE_INSTANCES   # types allowed to the runner (c5/m5 denied by policy)
         for inst in probes:
             try: report["smoke_run"] = submit("smoke", ["0"], shards=1, instance=inst, max_runtime=1800); report["quota_probe"][inst] = "OK"; break
             except RuntimeError as e:
@@ -107,8 +107,8 @@ def smoke(submit_job=False):
 
 
 def quotas():
-    """LECTURE SEULE : quotas Service Quotas utiles à WCE et historique des demandes. N'appelle que `get-service-quota`,
-    `list-service-quotas` et `list-requested-service-quota-change-history` ; ne soumet et ne modifie rien."""
+    """READ ONLY: Service Quotas quotas useful to WCE and history of the requests. Calls only `get-service-quota`,
+    `list-service-quotas` and `list-requested-service-quota-change-history`; submits and modifies nothing."""
     def call(*args):
         cmd = ["aws", *args, "--region", REGION, "--profile", PROFILE, "--output", "json"]; p = subprocess.run(cmd, capture_output=True, text=True)
         return (json.loads(p.stdout or "{}"), None) if p.returncode == 0 else (None, (p.stderr or "").strip().splitlines()[-1][:300] if p.stderr.strip() else "erreur")
@@ -132,8 +132,8 @@ def quotas():
 
 
 def bench_report(kind="deepbenchhp"):
-    """Banc d'instances : lit les runs `kind` déjà récupérés (aucun appel AWS). Par type : temps, débit, coût, mémoire,
-    erreurs, et comparaison NUMÉRIQUE des résultats avec la référence c6i.xlarge (champs de temps et de mémoire exclus)."""
+    """Instance bench: reads the `kind` runs already fetched (no AWS call). Per type: time, throughput, cost, memory,
+    errors, and NUMERICAL comparison of the results with the c6i.xlarge reference (time and memory fields excluded)."""
     skip = ("seconds", "rss_mb", "runtime_s", "cpu_s"); runs = {}
     def strip(x):
         if isinstance(x, dict): return {k: strip(v) for k, v in sorted(x.items()) if k not in skip}
@@ -163,18 +163,18 @@ def bench_report(kind="deepbenchhp"):
 
 
 def whoami():
-    """`sts get-caller-identity` avec le profil runner ; échoue si l'identité n'est pas WCE-Research-Runner."""
+    """`sts get-caller-identity` with the runner profile; fails if the identity is not WCE-Research-Runner."""
     ident = aws("sts", "get-caller-identity"); arn = ident["Arn"]
     print(json.dumps({"profile": PROFILE, "region": REGION, "account": ident["Account"], "arn": arn}, indent=1)); check_identity(arn)
-    print(f"IDENTITÉ OK : {EXPECTED_ROLE}"); return ident
+    print(f"IDENTITY OK: {EXPECTED_ROLE}"); return ident
 
 
-GUARDRAIL_IAM_PROBES = (("list-roles", "--max-items", "1"), ("list-users", "--max-items", "1"))   # LECTURES seulement : aucune mutation tentée
+GUARDRAIL_IAM_PROBES = (("list-roles", "--max-items", "1"), ("list-users", "--max-items", "1"))   # READS only: no mutation attempted
 
 
 def check_guardrails():
-    """Garde-fous : (1) identité = runner, jamais admin ; (2) les opérations IAM administratives restent REFUSÉES.
-    Sondes en lecture seule (rien n'est créé ni modifié, même si le garde-fou était absent). Code de sortie 4 si échec."""
+    """Guardrails: (1) identity = runner, never admin; (2) the administrative IAM operations remain DENIED.
+    Read-only probes (nothing is created or modified, even if the guardrail were absent). Exit code 4 on failure."""
     report = {"time": datetime.now(timezone.utc).isoformat(), "profile": PROFILE, "region": REGION}; ok = True
     arn = aws("sts", "get-caller-identity")["Arn"]; report["arn"] = arn
     try: check_identity(arn); report["identity"] = f"OK ({EXPECTED_ROLE})"
@@ -198,26 +198,26 @@ def job_spec(name, role, units, code_uri, out, instance, max_runtime, run_id):
             "StoppingCondition": {"MaxRuntimeInSeconds": max_runtime}, "Environment": {"WCE_RUN_ID": run_id, "OMP_NUM_THREADS": "1"}, "Tags": TAGS}
 
 
-BACKEND = os.environ.get("WCE_BACKEND", "processing")        # processing (principal) | training | ec2 (repli EXPLICITE, jamais silencieux)
+BACKEND = os.environ.get("WCE_BACKEND", "processing")        # processing (main) | training | ec2 (EXPLICIT fallback, never silent)
 EC2_PROFILE = "WCE-EC2-ExecutionRole"
 EC2_AMI = "resolve:ssm:/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64"
 EC2_TAGS = TAGS + [{"Key": "Name", "Value": "wce-robust-job"}]
 
 
 def ec2_user_data(max_runtime):
-    """Garde-fou : extinction (= terminaison, InstanceInitiatedShutdownBehavior=terminate) après max_runtime même si le job échoue."""
+    """Guardrail: shutdown (= termination, InstanceInitiatedShutdownBehavior=terminate) after max_runtime even if the job fails."""
     return f"#!/bin/bash\nshutdown -h +{max(10, max_runtime // 60)}\n"
 
 
 SYNC_PERIOD_S = 45
-PRICE_USD_H = {"t3.medium": 0.0432, "t3.large": 0.0864, "c6i.large": 0.091, "c6i.xlarge": 0.182, "c7i.xlarge": 0.1911, "c7i-flex.xlarge": 0.1816, "c8i.xlarge": 0.2007}   # tarifs à la demande eu-north-1 APPROXIMATIFS (à vérifier sur la facture)
+PRICE_USD_H = {"t3.medium": 0.0432, "t3.large": 0.0864, "c6i.large": 0.091, "c6i.xlarge": 0.182, "c7i.xlarge": 0.1911, "c7i-flex.xlarge": 0.1816, "c8i.xlarge": 0.2007}   # APPROXIMATE on-demand eu-north-1 prices (to be verified on the invoice)
 
 
 def ec2_job_script(units, code_uri, out, instance, run_id, procs=0):
-    """Script SSM. (1) REPRISE : les checkpoints déjà présents sous le préfixe de sortie sont rapatriés avant le calcul ;
-    (2) OBSERVABILITÉ : le répertoire de sortie (progression, heartbeats, checkpoints, journal) est synchronisé vers S3
-    toutes les SYNC_PERIOD_S secondes ; (3) tout échec, installation comprise, est journalisé et REMONTÉ par le code de
-    sortie (statut SSM Failed) ; (4) l'instance s'éteint (= se termine) dans tous les cas."""
+    """SSM script. (1) RESUME: the checkpoints already present under the output prefix are pulled back before the computation;
+    (2) OBSERVABILITY: the output directory (progress, heartbeats, checkpoints, log) is synchronised to S3
+    every SYNC_PERIOD_S seconds; (3) any failure, installation included, is logged and REPORTED through the exit
+    code (SSM status Failed); (4) the instance shuts down (= terminates) in all cases."""
     u = json.dumps(units, separators=(",", ":")); sync = f"aws s3 sync /opt/wce/out {out} --quiet --region {REGION} --exclude '*.tmp'"
     setup = " && ".join(["dnf install -y -q python3.11 python3.11-pip tar gzip",
                          "python3.11 -m pip install --no-cache-dir -q --only-binary=:all: torch numpy --index-url https://download.pytorch.org/whl/cpu --extra-index-url https://pypi.org/simple",
@@ -226,17 +226,17 @@ def ec2_job_script(units, code_uri, out, instance, run_id, procs=0):
     timing = ('echo "{\\"setup_s\\": $((t1-t0)), \\"job_s\\": $((t2-t1)), \\"exit_code\\": $rc, \\"vcpus\\": $(nproc), '
               '\\"mem_total_kb\\": $(awk \'/MemTotal/{print $2}\' /proc/meminfo), \\"mem_available_kb\\": $(awk \'/MemAvailable/{print $2}\' /proc/meminfo), '
               f'\\"instance_type\\": \\"{instance}\\"}}" > /opt/wce/out/_timing.json')
-    return ["set -x", "trap 'shutdown -h now' EXIT",                                   # terminaison automatique à la fin du job, quoi qu'il arrive
+    return ["set -x", "trap 'shutdown -h now' EXIT",                                   # automatic termination at the end of the job, whatever happens
             "export HOME=/root TMPDIR=/opt/wce/tmp", "mkdir -p /opt/wce/out /opt/wce/tmp && cd /opt/wce", "rc=0; t0=$(date +%s); t1=$t0",
-            f"aws s3 sync {out} /opt/wce/out --quiet --region {REGION} --exclude '*' --include 'ckpt_*.jsonl' || true",        # reprise
+            f"aws s3 sync {out} /opt/wce/out --quiet --region {REGION} --exclude '*' --include 'ckpt_*.jsonl' || true",        # resume
             f"( set +x; while true; do sleep {SYNC_PERIOD_S}; {sync}; done ) >/dev/null 2>&1 &", "syncpid=$!",
             "{ " + setup + " && t1=$(date +%s) && echo SETUP_OK && " + job + "; } > /opt/wce/out/_log.txt 2>&1 || rc=$?",
             "t2=$(date +%s); kill $syncpid 2>/dev/null || true", timing, "tail -c 1500 /opt/wce/out/_log.txt >&2", sync, "exit $rc"]
 
 
 def ec2_diagnose():
-    """Diagnostic SANS création : `run-instances --dry-run` selon plusieurs variantes (type d'instance, jeu de tags,
-    profil) pour localiser la condition de policy qui refuse. Aucune ressource n'est créée, aucune permission modifiée."""
+    """Diagnostic WITHOUT creation: `run-instances --dry-run` under several variants (instance type, set of tags,
+    profile) to locate the policy condition that denies. No resource is created, no permission modified."""
     project = [{"Key": "Project", "Value": "WCE"}]; out = {}
     def tags(t, kinds): return json.dumps([{"ResourceType": k, "Tags": t} for k in kinds])
     variants = {"complet (tags WCE + Name + WCE-Run, instance+volume, profil)": ("c5.xlarge", tags(EC2_TAGS + [{"Key": "WCE-Run", "Value": "diag"}], ("instance", "volume")), True),
@@ -247,7 +247,7 @@ def ec2_diagnose():
                 "aucun tag": ("c5.xlarge", None, True)}
     for inst in ("t3.medium", "t3.large", "t3.xlarge", "t3.2xlarge", "c6i.large", "c6i.xlarge", "c6i.2xlarge", "c7i.large", "m6i.large", "m5.large", "m5.xlarge", "c5.large", "c5.2xlarge", "c5.4xlarge"):
         variants[f"tag Project=WCE seul, type {inst}"] = (inst, tags(project, ("instance", "volume")), True)
-    for extra in (TAGS[1], TAGS[2], TAGS[3], {"Key": "Name", "Value": "wce-robust-job"}, {"Key": "WCE-Run", "Value": "diag"}):   # quelle clé de tag est refusée ?
+    for extra in (TAGS[1], TAGS[2], TAGS[3], {"Key": "Name", "Value": "wce-robust-job"}, {"Key": "WCE-Run", "Value": "diag"}):   # which tag key is denied?
         variants[f"t3.large, Project=WCE + {extra['Key']}"] = ("t3.large", tags(project + [extra], ("instance", "volume")), True)
     variants["t3.large, jeu complet de tags"] = ("t3.large", tags(EC2_TAGS + [{"Key": "WCE-Run", "Value": "diag"}], ("instance", "volume")), True)
     variants["t3.large, aucun tag"] = ("t3.large", None, True)
@@ -266,8 +266,8 @@ EC2_AMI_ARM = "resolve:ssm:/aws/service/ami-amazon-linux-latest/al2023-ami-kerne
 
 
 def ec2_probe(types=BENCH_TYPES):
-    """LECTURE SEULE / SANS création : pour chaque type candidat, disponibilité dans la région, caractéristiques, et
-    `run-instances --dry-run` avec EXACTEMENT les tags et le profil du lancement réel. Aucune ressource n'est créée."""
+    """READ ONLY / WITHOUT creation: for each candidate type, availability in the region, characteristics, and
+    `run-instances --dry-run` with EXACTLY the tags and the profile of the real launch. No resource is created."""
     out = {}; spec = json.dumps([{"ResourceType": t, "Tags": EC2_TAGS} for t in ("instance", "volume")])
     for inst in types:
         row = {}; off = aws("ec2", "describe-instance-type-offerings", "--location-type", "availability-zone", "--filters", f"Name=instance-type,Values={inst}", check=False)
@@ -282,20 +282,20 @@ def ec2_probe(types=BENCH_TYPES):
 
 
 def ec2_launch(name, units, code_uri, out, instance, max_runtime, run_id):
-    """Lance UNE instance (profil WCE-EC2-ExecutionRole, taguée Project=WCE), attend SSM, envoie le job par SSM
-    (aucun SSH, aucune clé). Renvoie (instance_id, command_id)."""
-    spec = [{"ResourceType": t, "Tags": EC2_TAGS} for t in ("instance", "volume")]     # clés autorisées seulement (la clé WCE-Run est refusée par policy ; l'id de run reste dans le manifeste)
+    """Launches ONE instance (profile WCE-EC2-ExecutionRole, tagged Project=WCE), waits for SSM, sends the job through SSM
+    (no SSH, no key). Returns (instance_id, command_id)."""
+    spec = [{"ResourceType": t, "Tags": EC2_TAGS} for t in ("instance", "volume")]     # allowed keys only (the WCE-Run key is denied by policy; the run id stays in the manifest)
     r = aws("ec2", "run-instances", "--image-id", EC2_AMI, "--instance-type", instance, "--count", "1",
             "--iam-instance-profile", f"Name={EC2_PROFILE}", "--instance-initiated-shutdown-behavior", "terminate",
             "--tag-specifications", json.dumps(spec), "--user-data", ec2_user_data(max_runtime),
             "--metadata-options", "HttpTokens=required", "--block-device-mappings", json.dumps([{"DeviceName": "/dev/xvda", "Ebs": {"VolumeSize": 20, "DeleteOnTermination": True}}]))
     iid = r["Instances"][0]["InstanceId"]
     try:
-        for _ in range(60):                                                             # attente de l'agent SSM (≤ 5 min)
+        for _ in range(60):                                                             # wait for the SSM agent (≤ 5 min)
             info = aws("ssm", "describe-instance-information", "--filters", f"Key=InstanceIds,Values={iid}")
             if info.get("InstanceInformationList"): break
             time.sleep(5)
-        else: raise RuntimeError(f"instance {iid} jamais visible par SSM")
+        else: raise RuntimeError(f"instance {iid} never visible to SSM")
         c = aws("ssm", "send-command", "--instance-ids", iid, "--document-name", "AWS-RunShellScript", "--timeout-seconds", "600",
                 "--parameters", json.dumps({"commands": ec2_job_script(units, code_uri, out, instance, run_id), "executionTimeout": [str(max_runtime)]}),
                 "--comment", f"WCE {name}"[:100])
@@ -305,7 +305,7 @@ def ec2_launch(name, units, code_uri, out, instance, max_runtime, run_id):
 
 
 def training_spec(name, role, units, code_uri, out, instance, max_runtime, run_id):
-    """Repli Training Job : même conteneur, même point d'entrée ; sorties écrites dans /opt/ml/output/data (→ output.tar.gz)."""
+    """Training Job fallback: same container, same entry point; outputs written to /opt/ml/output/data (→ output.tar.gz)."""
     entry = ("mkdir -p /opt/ml/output/data && cd /opt/ml/input/data/code && tar xzf code.tar.gz && "
              f"WCE_OUT=/opt/ml/output/data python3 -m wce_aws.sm_entry --units '{json.dumps(units, separators=(',', ':'))}'")
     return {"TrainingJobName": name, "RoleArn": role,
@@ -318,7 +318,7 @@ def training_spec(name, role, units, code_uri, out, instance, max_runtime, run_i
 def submit(kind, keys, shards, instance, max_runtime=6 * 3600, run_id=None):
     ident = identity(); acct = ident["Account"]; role = f"arn:aws:iam::{acct}:role/{EXEC_ROLE_NAME}"
     code_hash, code_uri = package(); ts = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
-    if ":" in kind:                                                                     # campagne multi-types : "noise:0-15,caltrain:0-5,…"
+    if ":" in kind:                                                                     # multi-kind campaign: "noise:0-15,caltrain:0-5,…"
         units = [{"kind": part.split(":")[0], "key": k} for part in kind.split(";") for k in parse_keys(part.split(":")[1])]
         keys = [f"{u['kind']}:{u['key']}" for u in units]; kind = "campaign"; run_id = run_id or f"wce-campaign-{ts}"; man_kind = True
     else: units = [{"kind": kind, "key": k} for k in keys]
@@ -328,13 +328,13 @@ def submit(kind, keys, shards, instance, max_runtime=6 * 3600, run_id=None):
     d = os.path.join(ROOT, "results", "aws", run_id); os.makedirs(d, exist_ok=True)
     man = {"run_id": run_id, "git_commit": git_commit(), "code_hash": code_hash, "config_hash": cfg_hash, "timestamp": ts, "region": REGION,
            "identity": ident["Arn"].split("/")[1], "instance_type": instance, "image": IMAGE, "backend": BACKEND, "kind": kind, "keys": keys, "jobs": jobs, "status": "Submitted", "max_runtime": max_runtime}
-    save = lambda: json.dump(man, open(os.path.join(d, "manifest.json"), "w"), indent=1)        # écrit après CHAQUE lancement : aucune instance orpheline du manifeste
+    save = lambda: json.dump(man, open(os.path.join(d, "manifest.json"), "w"), indent=1)        # written after EACH launch: no instance orphaned from the manifest
     for i, grp in enumerate(groups):
         if not grp: continue
         name = f"{run_id}-s{i}"[:63]; out = f"s3://{BUCKET}/{PREFIX}/runs/{run_id}/{name}/"
         tmp = os.path.join(d, f"{name}.spec.json")
         if BACKEND == "ec2":
-            print(f"[BACKEND EC2 EXPLICITE] {name} sur {instance}")
+            print(f"[EXPLICIT EC2 BACKEND] {name} on {instance}")
             iid, cid = ec2_launch(name, grp, code_uri, out, instance, max_runtime, run_id)
             jobs.append({"name": name, "units": len(grp), "unit_list": grp, "output": out, "instance_id": iid, "command_id": cid}); save(); continue
         if BACKEND == "training":
@@ -388,9 +388,9 @@ def status(run_id=None):
 def logs(run_id):
     for p, man in manifests(run_id):
         for j in man["jobs"][:3]:
-            if man.get("backend") == "ec2":                                               # sortie de la commande SSM (aucun SSH)
+            if man.get("backend") == "ec2":                                               # output of the SSM command (no SSH)
                 inv = aws("ssm", "get-command-invocation", "--command-id", j["command_id"], "--instance-id", j["instance_id"], check=False)
-                print(f"== {j['name']} [{inv['Status'] if inv else 'inconnu'}]")
+                print(f"== {j['name']} [{inv['Status'] if inv else 'unknown'}]")
                 if inv: print("-- stdout\n" + inv.get("StandardOutputContent", "")[-3000:] + "\n-- stderr\n" + inv.get("StandardErrorContent", "")[-3000:])
                 continue
             try:
@@ -406,16 +406,16 @@ def fetch(run_id=None):
     for p, man in manifests(run_id):
         d = os.path.dirname(p)
         aws("s3", "sync", f"s3://{BUCKET}/{PREFIX}/runs/{man['run_id']}/", os.path.join(d, "artifacts"), "--quiet", parse=False)
-        for tgz in glob.glob(os.path.join(d, "artifacts", "**", "output.tar.gz"), recursive=True):       # backend training : sorties empaquetées
+        for tgz in glob.glob(os.path.join(d, "artifacts", "**", "output.tar.gz"), recursive=True):       # training backend: packaged outputs
             dest = os.path.join(d, "artifacts", tgz.split(os.sep + "artifacts" + os.sep)[1].split(os.sep)[0])
             with tarfile.open(tgz) as t: t.extractall(dest)
-        print(man["run_id"], "artefacts :", len(glob.glob(os.path.join(d, "artifacts", "*", "*.json"))))
+        print(man["run_id"], "artefacts:", len(glob.glob(os.path.join(d, "artifacts", "*", "*.json"))))
 
 
 def timing():
-    """Suivi des temps d'exécution par job : installation, calcul, travail cumulé des sous-unités, efficacité parallèle,
-    CPU moyen/pic, mémoire, coût estimé — pour juger si les ressources suffisent. Lit uniquement les artefacts déjà
-    récupérés (aucun appel AWS)."""
+    """Tracking of the execution times per job: installation, computation, cumulative work of the sub-units, parallel efficiency,
+    mean/peak CPU, memory, estimated cost — to judge whether the resources suffice. Reads only the artefacts already
+    fetched (no AWS call)."""
     rows = []
     for p, man in manifests():
         d = os.path.join(os.path.dirname(p), "artifacts")
@@ -437,7 +437,7 @@ def timing():
 
 
 def _ssm_run(iid, commands, wait=180):
-    """Commande SSM courte sur une instance en marche ; renvoie (statut, stdout, stderr)."""
+    """Short SSM command on a running instance; returns (status, stdout, stderr)."""
     c = aws("ssm", "send-command", "--instance-ids", iid, "--document-name", "AWS-RunShellScript", "--timeout-seconds", "120",
             "--parameters", json.dumps({"commands": commands, "executionTimeout": [str(wait)]}), "--comment", "WCE inspect")["Command"]["CommandId"]
     for _ in range(wait // 4):
@@ -447,8 +447,8 @@ def _ssm_run(iid, commands, wait=180):
 
 
 def inspect_run(run_id, pyspy=True):
-    """Instantané d'un job EC2 EN COURS, sans l'interrompre : processus/threads, charge, mémoire, pile Python (py-spy),
-    et synchronisation du répertoire de sortie (journal, heartbeats, checkpoints) vers S3."""
+    """Snapshot of a RUNNING EC2 job, without interrupting it: processes/threads, load, memory, Python stack (py-spy),
+    and synchronisation of the output directory (log, heartbeats, checkpoints) to S3."""
     for p, man in manifests(run_id):
         if man.get("backend") != "ec2": continue
         for j in man["jobs"]:
@@ -463,15 +463,15 @@ def inspect_run(run_id, pyspy=True):
 
 
 def stop_run(run_id, hard=False):
-    """Arrêt PROPRE d'un run EC2 : instantané + synchronisation des sorties, annulation de la commande SSM, puis
-    terminaison de l'instance — uniquement si elle est listée dans NOTRE manifeste ET taguée Project=WCE / ManagedBy=WCE."""
-    if not run_id: raise SystemExit("stop exige RUN=<run_id>")
+    """CLEAN stop of an EC2 run: snapshot + synchronisation of the outputs, cancellation of the SSM command, then
+    termination of the instance — only if it is listed in OUR manifest AND tagged Project=WCE / ManagedBy=WCE."""
+    if not run_id: raise SystemExit("stop requires RUN=<run_id>")
     for p, man in manifests(run_id):
         if man.get("backend") != "ec2": continue
-        if hard: print("ARRÊT BRUTAL (test d'interruption) : aucune synchronisation finale, seuls les checkpoints déjà publiés survivent")
+        if hard: print("HARD STOP (interruption test): no final synchronisation, only the checkpoints already published survive")
         else:
             try: inspect_run(run_id)
-            except RuntimeError as e: print("instantané impossible :", str(e)[:200])
+            except RuntimeError as e: print("snapshot impossible:", str(e)[:200])
         for j in man["jobs"]:
             aws("ssm", "cancel-command", "--command-id", j["command_id"], "--instance-ids", j["instance_id"], check=False, parse=False)
             di = aws("ec2", "describe-instances", "--instance-ids", j["instance_id"], check=False)
@@ -479,13 +479,13 @@ def stop_run(run_id, hard=False):
                 for ins in res["Instances"]:
                     tags = {t["Key"]: t["Value"] for t in ins.get("Tags", [])}
                     if ins["State"]["Name"] in ("pending", "running", "stopping", "stopped") and tags.get("Project") == "WCE" and tags.get("ManagedBy") == "WCE":
-                        aws("ec2", "terminate-instances", "--instance-ids", ins["InstanceId"], parse=False); print("terminé", ins["InstanceId"])
+                        aws("ec2", "terminate-instances", "--instance-ids", ins["InstanceId"], parse=False); print("terminated", ins["InstanceId"])
             j["status"] = "Stopped"
-        man["status"] = "Stopped"; json.dump(man, open(p, "w"), indent=1); print(man["run_id"], "arrêté")
+        man["status"] = "Stopped"; json.dump(man, open(p, "w"), indent=1); print(man["run_id"], "stopped")
 
 
 def progress(run_id=None, quiet=False):
-    """Progression INTERNE des runs actifs : rapatrie uniquement les fichiers de progression / heartbeat depuis S3."""
+    """INTERNAL progress of the active runs: pulls back only the progress / heartbeat files from S3."""
     rows = []
     for p, man in manifests(run_id):
         if not run_id and man.get("status") in ("Completed", "Failed", "Stopped"): continue
@@ -502,29 +502,29 @@ def progress(run_id=None, quiet=False):
                          "in_flight": [{"sub": h["sub"], "elapsed_s": h["sub_elapsed_s"], "rss_mb": h["rss_mb"], "at": (h.get("stack") or ["?"])[0]} for h in g.get("in_flight", [])]})
     if not quiet:
         for r in rows: print(json.dumps(r, ensure_ascii=False))
-        if not rows: print("aucun run actif")
+        if not rows: print("no active run")
     return rows
 
 
 def resume(run_id):
-    """Relance UNIQUEMENT les jobs non terminés d'un run, sous les MÊMES noms et préfixes S3 : les checkpoints déjà
-    publiés sont rapatriés par le job et seules les sous-unités manquantes sont recalculées."""
-    if not run_id: raise SystemExit("resume exige RUN=<run_id>")
+    """Relaunches ONLY the unfinished jobs of a run, under the SAME names and S3 prefixes: the checkpoints already
+    published are pulled back by the job and only the missing sub-units are recomputed."""
+    if not run_id: raise SystemExit("resume requires RUN=<run_id>")
     (p, man), = manifests(run_id)
-    if BACKEND != man.get("backend"): raise SystemExit(f"backend courant {BACKEND} ≠ backend du run {man.get('backend')} (fixer WCE_BACKEND explicitement)")
-    if BACKEND != "ec2": raise SystemExit("reprise implémentée pour le backend ec2 (SageMaker : resoumettre le run)")
+    if BACKEND != man.get("backend"): raise SystemExit(f"current backend {BACKEND} ≠ backend of the run {man.get('backend')} (set WCE_BACKEND explicitly)")
+    if BACKEND != "ec2": raise SystemExit("resume implemented for the ec2 backend (SageMaker: resubmit the run)")
     identity(); code_hash, code_uri = package()
-    if code_hash != man["code_hash"]: print(f"ATTENTION : le code a changé depuis le run ({man['code_hash']} -> {code_hash}) ; noté dans le manifeste.")
+    if code_hash != man["code_hash"]: print(f"WARNING: the code has changed since the run ({man['code_hash']} -> {code_hash}); noted in the manifest.")
     for j in man["jobs"]:
         if j.get("status") == "Completed": continue
-        print(f"[BACKEND EC2 EXPLICITE] reprise {j['name']} sur {man['instance_type']}")
+        print(f"[EXPLICIT EC2 BACKEND] resume {j['name']} on {man['instance_type']}")
         j["instance_id"], j["command_id"] = ec2_launch(j["name"], j["unit_list"], code_uri, j["output"], man["instance_type"], man.get("max_runtime", 6 * 3600), run_id); j["status"] = "InProgress"
         j["resumes"] = j.get("resumes", 0) + 1
-    man["status"] = "Submitted"; man.setdefault("resume_code_hashes", []).append(code_hash); json.dump(man, open(p, "w"), indent=1); print(run_id, "repris")
+    man["status"] = "Submitted"; man.setdefault("resume_code_hashes", []).append(code_hash); json.dump(man, open(p, "w"), indent=1); print(run_id, "resumed")
 
 
 def clean_safe():
-    """Arrête UNIQUEMENT les jobs listés dans NOS manifestes, encore actifs ET tagués Project=WCE ; supprime uniquement robust/smoke/."""
+    """Stops ONLY the jobs listed in OUR manifests, still active AND tagged Project=WCE; deletes only robust/smoke/."""
     for p, man in manifests():
         for j in man["jobs"]:
             if man.get("backend") == "ec2":
@@ -533,15 +533,15 @@ def clean_safe():
                     for ins in res["Instances"]:
                         tags = {t["Key"]: t["Value"] for t in ins.get("Tags", [])}
                         if ins["State"]["Name"] in ("pending", "running", "stopping", "stopped") and tags.get("Project") == "WCE" and tags.get("ManagedBy") == "WCE":
-                            aws("ec2", "terminate-instances", "--instance-ids", ins["InstanceId"], parse=False); print("terminé", ins["InstanceId"])
+                            aws("ec2", "terminate-instances", "--instance-ids", ins["InstanceId"], parse=False); print("terminated", ins["InstanceId"])
                 continue
             tr = man.get("backend") == "training"; what = "training" if tr else "processing"
             d = aws("sagemaker", f"describe-{what}-job", f"--{what}-job-name", j["name"], check=False)
             if d and d["TrainingJobStatus" if tr else "ProcessingJobStatus"] == "InProgress":
                 tags = aws("sagemaker", "list-tags", "--resource-arn", d["TrainingJobArn" if tr else "ProcessingJobArn"]).get("Tags", [])
                 if any(t["Key"] == "Project" and t["Value"] == "WCE" for t in tags):
-                    aws("sagemaker", f"stop-{what}-job", f"--{what}-job-name", j["name"], parse=False); print("arrêté", j["name"])
-    aws("s3", "rm", f"s3://{BUCKET}/{PREFIX}/smoke/", "--recursive", "--quiet", parse=False); print("nettoyage sûr terminé")
+                    aws("sagemaker", f"stop-{what}-job", f"--{what}-job-name", j["name"], parse=False); print("stopped", j["name"])
+    aws("s3", "rm", f"s3://{BUCKET}/{PREFIX}/smoke/", "--recursive", "--quiet", parse=False); print("safe cleanup finished")
 
 
 def parse_keys(spec):
@@ -575,6 +575,6 @@ if __name__ == "__main__":
         elif a.cmd == "logs": logs(a.run)
         elif a.cmd == "fetch": fetch(a.run)
         elif a.cmd == "clean-safe": clean_safe()
-        else: raise SystemExit(f"commande inconnue {a.cmd}")
+        else: raise SystemExit(f"unknown command {a.cmd}")
     except AwsDenied as e:
-        print(f"ARRÊT PROPRE — {e}\nAucune permission n'a été élargie."); sys.exit(3)
+        print(f"CLEAN STOP — {e}\nNo permission was broadened."); sys.exit(3)

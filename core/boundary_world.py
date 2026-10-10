@@ -1,14 +1,14 @@
-"""Générateur du BANC d'induction de frontières (côté ÉVALUATION — les noms de familles n'existent QU'ICI).
+"""Generator of the boundary induction BENCHMARK (EVALUATION side — the family names exist ONLY HERE).
 
-Le code d'induction (core/boundary_program.py et suivants) ne connaît AUCUNE de ces familles : il ne voit que
-des observations (x, y). Protocole « famille tenue à l'écart » :
-  familles d'ENTRAÎNEMENT (développement / anti-unification) : halfspace, disc, strip, wedge
-  familles de VALIDATION                                       : ring, two_lobe, oriented_rect
-  familles HELD-OUT de test (jamais regardées pendant le dév.) : xor_halfspaces, crescent, capsule, wedge_ring
-  familles SCELLÉES                                            : lens, l_shape, mirrored_crescent, strip_xor_disc
-  partiellement symbolisables                                  : wiggle_halfspace (demi-espace + ondulation)
-  NON représentables (profondeur actuelle)                     : sine5, checker, spiral, radial_wave
-Région OBSERVÉE : x0 ∈ [−2, 0,5], x1 ∈ [−2, 2] ; région d'EXTRAPOLATION : x0 ∈ [0,5, 3], x1 ∈ [−3, 3].
+The induction code (core/boundary_program.py and following) knows NONE of these families: it sees only
+observations (x, y). "Held-out family" protocol:
+  TRAINING families (development / anti-unification)           : halfspace, disc, strip, wedge
+  VALIDATION families                                          : ring, two_lobe, oriented_rect
+  HELD-OUT test families (never looked at during dev.)         : xor_halfspaces, crescent, capsule, wedge_ring
+  SEALED families                                              : lens, l_shape, mirrored_crescent, strip_xor_disc
+  partially symbolisable                                       : wiggle_halfspace (half-space + ripple)
+  NOT representable (current depth)                            : sine5, checker, spiral, radial_wave
+OBSERVED region: x0 ∈ [−2, 0.5], x1 ∈ [−2, 2]; EXTRAPOLATION region: x0 ∈ [0.5, 3], x1 ∈ [−3, 3].
 """
 from __future__ import annotations
 
@@ -45,12 +45,12 @@ class FamilyInstance:
     params: Dict
     label: Callable
     representable: bool
-    oracle: Optional[object] = None      # squelette du programme vrai (BORNE HAUTE « oracle »), jamais vu par l'induction
+    oracle: Optional[object] = None      # skeleton of the true program ("oracle" UPPER BOUND), never seen by the induction
 
 
 def make_instance(family, rng: random.Random) -> FamilyInstance:
-    """Instance d'une famille ; les centres sont près de la frontière observé / extrapolation pour que
-    l'extrapolation soit NON triviale."""
+    """Instance of a family; the centres are near the observed / extrapolation boundary so that
+    the extrapolation is NON-trivial."""
     from core.boundary_program import BNode
     P = lambda *a, **k: BNode(*a, **k)
     T = lambda child: P("translate", children=(child,))
@@ -93,7 +93,7 @@ def make_instance(family, rng: random.Random) -> FamilyInstance:
         def f(X, a=a, t=t):
             R = torch.tensor([[math.cos(a), -math.sin(a)], [math.sin(a), math.cos(a)]]); Z = X @ R
             seg = (Z[:, 1].abs() <= t) & (Z[:, 0] >= c1[0]) & (Z[:, 0] <= c2[0]); return (seg | _disc(Z, c1, t) | _disc(Z, c2, t)).long()
-        return FamilyInstance(family, {}, f, True, None)                       # représentable à profondeur 3 seulement (approx.)
+        return FamilyInstance(family, {}, f, True, None)                       # representable at depth 3 only (approx.)
     if family == "wedge_ring":
         c, r1 = (_u(rng, -0.6, 0.4), _u(rng, -0.4, 0.4)), _u(rng, 0.5, 0.8); r2 = r1 + _u(rng, 0.6, 1.0); th, w = _u(rng, -0.8, 0.8), _u(rng, 0.6, 1.2)
         def f(X, c=c, r1=r1, r2=r2, th=th, w=w):
@@ -137,7 +137,7 @@ def observed(n, g, label_noise=0.03, x_noise=0.02):
 
 
 def sample_task(inst: FamilyInstance, n, g, label_noise=0.03, x_noise=0.02):
-    """Observations dans la région observée : x bruité, étiquettes bruitées."""
+    """Observations in the observed region: noisy x, noisy labels."""
     X = torch.stack([torch.rand(n, generator=g) * 2.5 - 2.0, torch.rand(n, generator=g) * 4 - 2], 1)
     y = inst.label(X); flip = torch.rand(n, generator=g) < label_noise
     return X + x_noise * torch.randn(X.shape, generator=g), torch.where(flip, 1 - y, y)
@@ -178,11 +178,11 @@ def sealed_hash():
 def inst_sig(inst, probe): return "".join(str(int(v)) for v in inst.label(probe).tolist())
 
 
-SEALED_SHA256 = "e163f5b01588c301486ed95545dc48bb95e298b214e1cbe56bb1a1cd777ef42d"   # figée AVANT toute évaluation
+SEALED_SHA256 = "e163f5b01588c301486ed95545dc48bb95e298b214e1cbe56bb1a1cd777ef42d"   # frozen BEFORE any evaluation
 
 
 def composed_instance(rng: random.Random) -> FamilyInstance:
-    """COMPOSITION INÉDITE de familles connues : rotation(A op [NOT] B), op ∈ {OR, AND, XOR} — jamais vue telle quelle."""
+    """NOVEL COMPOSITION of known families: rotation(A op [NOT] B), op ∈ {OR, AND, XOR} — never seen as such."""
     a = make_instance(rng.choice(TRAIN), rng); b = make_instance(rng.choice(TRAIN), rng); op = rng.choice(["or", "and", "xor"]); neg = rng.random() < 0.5
     phi = rng.uniform(-1.0, 1.0); c, s = math.cos(phi), math.sin(phi)
     def f(X):
@@ -193,7 +193,7 @@ def composed_instance(rng: random.Random) -> FamilyInstance:
 
 
 def double_held_out(family, rng: random.Random, shift=(1.6, 0.0), scale=1.6) -> FamilyInstance:
-    """Structure HELD-OUT + paramètres HORS plage : instance dilatée et décalée vers la région d'extrapolation."""
+    """HELD-OUT structure + OUT-of-range parameters: instance dilated and shifted towards the extrapolation region."""
     inst = make_instance(family, rng); sx, sy = shift
     return FamilyInstance(family + ":double", {}, lambda X: inst.label((X - torch.tensor([sx, sy])) / scale), True, inst.oracle)
 

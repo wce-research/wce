@@ -1,10 +1,10 @@
-"""Contexte émergent + séquences symboliques : flux continu non étiqueté.
+"""Emergent context + symbolic sequences: continuous unlabelled stream.
 
-Une expérience = (x, y) sur l'alphabet commun. Le système ne reçoit AUCUNE étiquette (mode "none") :
-il détecte les changements de régime, reconnaît un contexte connu, ou acquiert une nouvelle Skill
-par (1) composition WCE de Skills connues, (2) raffinement structurel, (3) fast weights, (4) nouvel expert.
-Les contextes internes (ctx_1, ctx_2...) émergent du comportement, pas d'un task_id.
-Les familles réelles ne servent qu'à l'évaluation.
+An experience = (x, y) over the common alphabet. The system receives NO label (mode "none"):
+it detects regime changes, recognises a known context, or acquires a new Skill
+by (1) WCE composition of known Skills, (2) structural refinement, (3) fast weights, (4) new expert.
+The internal contexts (ctx_1, ctx_2...) emerge from the behaviour, not from a task_id.
+The real families are used only for evaluation.
 """
 from __future__ import annotations
 
@@ -34,18 +34,18 @@ FEATURES = 2 * L * V + L * L + V
 K_MAX = 32
 
 
-# ================================================================ encodeur de contexte appris
+# ================================================================ learned context encoder
 
 def pair_features(x, y):
-    """Représentation relationnelle d'une expérience : entrée, résultat, alignement des positions,
-    histogramme des décalages de symboles. Aucune dimension de tâche."""
+    """Relational representation of an experience: input, result, alignment of the positions,
+    histogram of the symbol shifts. No task dimension."""
     align = (y.unsqueeze(2) == x.unsqueeze(1)).float().reshape(len(x), -1)
     shift = torch.nn.functional.one_hot((y - x) % V, V).float().mean(1)
     return torch.cat([one_hot(x), one_hot(y), align, shift], dim=1)
 
 
 class LearnedContextEncoder:
-    """MLP 113 -> 48 -> 8 (+ tête 8 -> 16 -> 32), entraîné sur des pseudo-labels comportementaux."""
+    """MLP 113 -> 48 -> 8 (+ head 8 -> 16 -> 32), trained on behavioural pseudo-labels."""
 
     def __init__(self, embed=8, hidden=48, seed=0):
         self.state = ModelState(FEATURES, output_module="ctx_head", max_region_fraction=1.0, max_capacity=4096)
@@ -69,7 +69,7 @@ class LearnedContextEncoder:
         self.trainings += 1
 
 
-# ================================================================ skills et contextes
+# ================================================================ skills and contexts
 
 @dataclass
 class Skill:
@@ -77,8 +77,8 @@ class Skill:
     spec: Any
     kind: str                       # primitive | composition | neural | hybrid | refinement | fast
     parameters: int = 0
-    examples: int = 0               # expériences consommées pour l'acquérir
-    trained: bool = False           # gradient utilisé ?
+    examples: int = 0               # experiences consumed to acquire it
+    trained: bool = False           # gradient used?
     uses: int = 0
 
     @property
@@ -97,17 +97,17 @@ class Context:
     created_step: int
     feats: List[torch.Tensor] = field(default_factory=list)
     prototype: Optional[torch.Tensor] = None
-    families: Counter = field(default_factory=Counter)      # évaluation uniquement
+    families: Counter = field(default_factory=Counter)      # evaluation only
     uses: int = 0
 
 
 @dataclass
 class Thresholds:
-    change_errors: int = 2          # erreurs parmi la fenêtre -> changement de régime
+    change_errors: int = 2          # errors within the window -> regime change
     change_window: int = 3
-    accept: float = 0.9             # précision minimale pour accepter une Skill acquise
-    grow_penalty: float = 0.02      # par millier de paramètres ajoutés
-    routing_confidence: float = 1.01   # au-delà, le routeur neuronal est cru sans vérification (1.01 = toujours vérifier)
+    accept: float = 0.9             # minimum accuracy to accept an acquired Skill
+    grow_penalty: float = 0.02      # per thousand added parameters
+    routing_confidence: float = 1.01   # above this, the neural router is trusted without verification (1.01 = always verify)
     prune_tolerance: float = 0.02
     new_expert_examples: int = 128
 
@@ -116,7 +116,7 @@ ACQUIRE_AT = (3, 4, 6, 8, 12, 16, 24, 32, 48, 64, 96, 128, 160)
 
 
 class SymbolicLifelongSystem:
-    """mode : 'labels' (A), 'boundaries' (B), 'none' (C, continu, sans aucune étiquette)."""
+    """mode: 'labels' (A), 'boundaries' (B), 'none' (C, continuous, without any label)."""
 
     def __init__(self, mode="none", *, structural=True, neural=True, encoder=True, thresholds=None, seed=0):
         self.mode, self.use_structural, self.use_neural, self.use_encoder = mode, structural, neural, encoder
@@ -147,7 +147,7 @@ class SymbolicLifelongSystem:
         self._next_ctx = 1
         self._next_expert = 1
 
-    # ---- bibliothèque WCE --------------------------------------------------
+    # ---- WCE library --------------------------------------------------
     def atoms(self):
         atoms = list(PRIMITIVES.values()) if self.use_structural else []
         atoms += [s.spec for s in self.skills.values() if s.kind == "neural"]
@@ -168,7 +168,7 @@ class SymbolicLifelongSystem:
         return float((self.contexts[cid].skill.spec.apply(xs) == ys).all(1).float().mean())
 
     def neural_ranking(self, xs, ys):
-        """Classement des contextes par la tête apprise de l'encodeur (moyenne des log-probas sur les paires)."""
+        """Ranking of the contexts by the learned head of the encoder (mean of the log-probs over the pairs)."""
         if not self.encoder or self.encoder.trainings == 0: return [], 0.0
         ids = list(self.contexts)[:K_MAX]
         with torch.no_grad():
@@ -179,8 +179,8 @@ class SymbolicLifelongSystem:
         return [ids[i] for i in order], float(probs[order[0]])
 
     def identify(self, xs, ys, strategy="hybrid", tolerant=False):
-        """neural : prototype le plus proche ; structural : vérification exhaustive ;
-        hybrid : ordre neuronal + vérification structurelle (arrêt au premier cohérent)."""
+        """neural: nearest prototype; structural: exhaustive verification;
+        hybrid: neural order + structural verification (stop at the first consistent one)."""
         if not self.contexts: return None
         if strategy == "neural" or (strategy == "hybrid" and not self.use_structural and self.encoder):
             ranking, _ = self.neural_ranking(xs, ys)
@@ -195,15 +195,15 @@ class SymbolicLifelongSystem:
         for cid in order:
             scores[cid] = self._consistent(cid, xs, ys)
             if scores[cid] >= 1.0: return cid
-        # second passage tolérant (experts neuronaux imparfaits) : jamais sur une seule paire
+        # second, tolerant pass (imperfect neural experts): never on a single pair
         if tolerant and len(xs) >= 3 and scores:
             best = max(scores, key=scores.get)
             if scores[best] >= 2 / 3: return best
         return None
 
-    # ---- API publique --------------------------------------------------------
+    # ---- public API --------------------------------------------------------
     def predict(self, x, support=None, token=None):
-        """Aucune étiquette de tâche : commande (lexique appris), exemples de support, ou contexte courant."""
+        """No task label: command (learned lexicon), support examples, or current context."""
         cid = None
         if token is not None and token in self.lexicon: cid = self.lexicon[token].most_common(1)[0][0]
         elif support is not None:
@@ -214,9 +214,9 @@ class SymbolicLifelongSystem:
         if cid is None: return x.clone()
         return self.contexts[cid].skill.spec.apply(x)
 
-    # ---- flux ------------------------------------------------------------------
+    # ---- stream ------------------------------------------------------------------
     def observe(self, x, y, family=None, boundary=False, token=None):
-        """Une expérience. family n'est utilisé qu'en mode 'labels' (et pour l'évaluation)."""
+        """One experience. family is used only in 'labels' mode (and for evaluation)."""
         self.step += 1
         x, y = x.reshape(1, L), y.reshape(1, L)
         correct = False
@@ -271,7 +271,7 @@ class SymbolicLifelongSystem:
         if n in ACQUIRE_AT or (n > ACQUIRE_AT[-1] and n % 40 == 0):
             skill = self._acquire(xs, ys)
             if skill is None and n > 4:
-                # le tampon peut mélanger deux régimes : on tente la fin du tampon seule
+                # the buffer may mix two regimes: the end of the buffer alone is tried
                 skill = self._acquire(xs[-4:], ys[-4:], structural_only=True)
                 if skill is not None: self.buffer = self.buffer[-4:]
             if skill is not None:
@@ -279,7 +279,7 @@ class SymbolicLifelongSystem:
                 cid = self._create_context(skill, xs, ys, family)
                 self._activate(cid, family, token, "new_context")
             elif n >= ACQUIRE_AT[-1] + 40:
-                self.buffer = self.buffer[-ACQUIRE_AT[-1]:]      # fenêtre glissante
+                self.buffer = self.buffer[-ACQUIRE_AT[-1]:]      # sliding window
 
     def _activate(self, cid, family, token, event):
         self.current, self.acquiring = cid, False
@@ -343,7 +343,7 @@ class SymbolicLifelongSystem:
             adopt(self.state, best[3]); self._next_expert += 1
             skill.spec = NeuralSequenceTransformation(name=skill.name, state=self.state, module_name=skill.name)
             self._prune_expert(skill, xs, ys)
-            # consolidation : la validation a réservé 25 % du tampon ; on les rend à l'expert accepté
+            # consolidation: the validation held out 25% of the buffer; they are given back to the accepted expert
             self.state.apply(AdaptWeights(name="consolidate_expert", modules=(skill.name,), fast=False, output=skill.name,
                                           positions=L, inputs=one_hot(xs), targets=ys, steps=200, lr=0.01, local=False))
             skill.parameters = self.state.modules[skill.name].parameter_count
@@ -413,13 +413,13 @@ class SymbolicLifelongSystem:
         return [protos[i][0] for i in dist.argmin(1).tolist()]
 
 
-# ================================================================ flux
+# ================================================================ stream
 
 @dataclass
 class Segment:
     family: str
     length: int
-    token_steps: int = 0            # nombre d'expériences initiales accompagnées d'une commande
+    token_steps: int = 0            # number of initial experiences accompanied by a command
 
 
 def default_segments():
@@ -493,12 +493,12 @@ def run_stream(segments=None, mode="none", seed=0, **kwargs):
 
 
 def _track_family(system, family):
-    """Évaluation uniquement : note quelle famille a alimenté quel contexte (pureté)."""
+    """Evaluation only: records which family fed which context (purity)."""
     if system.current is not None and not system.acquiring and system.mode != "labels":
         system.contexts[system.current].families[family] += 1
 
 
-# ================================================================ métriques
+# ================================================================ metrics
 
 def change_point_scores(run, tolerance=6):
     detected, truth = run.system.changes, run.true_changes
@@ -519,7 +519,7 @@ def cluster_purity(system):
 
 
 def routing_scores(system, families, n=64, seed=321, pairs=1):
-    """Précision d'identification sans étiquette (la bonne Skill ≡ même comportement que la famille)."""
+    """Identification accuracy without label (the right Skill ≡ same behaviour as the family)."""
     out = {}
     gen = torch.Generator().manual_seed(seed)
     probe = random_sequences(n, gen)
@@ -541,7 +541,7 @@ def routing_scores(system, families, n=64, seed=321, pairs=1):
 
 
 def novelty_scores(run):
-    """Pour chaque début de segment : nouveau vs connu, comparé à la vérité (famille déjà vue ?)."""
+    """For each segment start: new vs known, compared with the truth (family already seen?)."""
     seen, correct, total = set(), 0, 0
     events = [e for e in run.system.events if e["event"] in ("new_context", "known_context")]
     steps = [sum(s.length for s in run.segments[:i]) + 1 for i in range(len(run.segments))]
@@ -586,10 +586,10 @@ def summarize(run):
     }
 
 
-# ================================================================ baseline statique
+# ================================================================ static baseline
 
 class StaticBaseline:
-    """Un seul réseau entraîné en continu, sans routage ni contexte : le 'neural static baseline'."""
+    """A single network trained continuously, without routing or context: the 'neural static baseline'."""
 
     def __init__(self, hidden=128, seed=0, every=16, steps=30):
         self.state = ModelState(SEQ_INPUT, output_module="static", max_region_fraction=1.0)
@@ -665,7 +665,7 @@ SENSITIVITY_GRID = {
 
 
 def sensitivity(segments=None, seed=0, grid=None):
-    """Une variable à la fois autour des valeurs par défaut ; 'stable' = à 2 points du meilleur."""
+    """One variable at a time around the default values; 'stable' = within 2 points of the best."""
     segments = segments or small_segments()
     grid = grid or SENSITIVITY_GRID
     table = {}
@@ -684,7 +684,7 @@ def sensitivity(segments=None, seed=0, grid=None):
 
 
 def few_shot_curve(family="map_A2", base="map_A", shots=(2, 4, 8, 16, 32, 64, 128), seed=0):
-    """Précision selon le nombre d'exemples : raffinement WCE vs fast weights vs expert neuf."""
+    """Accuracy as a function of the number of examples: WCE refinement vs fast weights vs fresh expert."""
     from core.symbolic import sample_family
     state = ModelState(SEQ_INPUT, max_region_fraction=1.0, max_capacity=100000)
     xb, yb = sample_family(FAMILIES[base], 512, seed=seed)
@@ -705,7 +705,7 @@ def few_shot_curve(family="map_A2", base="map_A", shots=(2, 4, 8, 16, 32, 64, 12
 
 
 def zero_shot_composition(seed=0):
-    """Reverse et RotateLeft appris séparément ; Reverse>RotateLeft demandé sans entraînement spécifique."""
+    """Reverse and RotateLeft learned separately; Reverse>RotateLeft requested without specific training."""
     from core.symbolic import sample_family
     system = SymbolicLifelongSystem(seed=seed)
     results = {}
@@ -728,10 +728,10 @@ def zero_shot_composition(seed=0):
     return results
 
 
-# ================================================================ commandes / ambiguïté
+# ================================================================ commands / ambiguity
 
 def token_scores(system, n=64, seed=77):
-    """Commande seule (sans support) vs rien : dépendance au signal structurel explicite."""
+    """Command alone (without support) vs nothing: dependence on the explicit structural signal."""
     gen = torch.Generator().manual_seed(seed)
     x = random_sequences(n, gen)
     out = {}
@@ -744,7 +744,7 @@ def token_scores(system, n=64, seed=77):
 
 
 def pairs_to_disambiguate(families=None, trials=200, seed=5, max_pairs=6):
-    """Nombre moyen de paires (x, y) nécessaires pour qu'une seule famille reste cohérente."""
+    """Mean number of pairs (x, y) needed for a single family to remain consistent."""
     families = families or FAMILIES
     gen = torch.Generator().manual_seed(seed)
     names = list(families)

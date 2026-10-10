@@ -1,7 +1,7 @@
-"""Modèle neuronal compact comme état WCE : modules, poids lents/rapides, connectivité.
+"""Compact neural model as a WCE state: modules, slow/fast weights, connectivity.
 
-Toute modification structurelle ou paramétrique passe par une ModelTransformationSpec,
-appliquée via ModelState.apply() et tracée dans le TransformGraph.
+Every structural or parametric modification goes through a ModelTransformationSpec,
+applied via ModelState.apply() and traced in the TransformGraph.
 """
 from __future__ import annotations
 
@@ -23,7 +23,7 @@ PARAM_NAMES = ("w1", "b1", "w2", "b2")
 # ---------------------------------------------------------------- modules
 
 class NeuralModule:
-    """Bloc à deux couches : out = W2·relu(W1·x + b1) + b2 (+ relu si hidden)."""
+    """Two-layer block: out = W2·relu(W1·x + b1) + b2 (+ relu if hidden)."""
 
     def __init__(self, name, input_dim, output_dim, hidden=16, *, specialization="generic",
                  activation=True, active=True, seed=0):
@@ -63,7 +63,7 @@ class Connection:
 
 @dataclass(frozen=True)
 class ModelRelation:
-    """Vue relationnelle du modèle, lue par RuleEngine.refresh_facts()."""
+    """Relational view of the model, read by RuleEngine.refresh_facts()."""
     subject: str
     predicate: str
     object: str
@@ -80,7 +80,7 @@ class ModelSnapshot:
 
 @dataclass(frozen=True)
 class PlasticityRegion:
-    """Sous-ensemble explicite de modules autorisés à changer."""
+    """Explicit subset of modules allowed to change."""
     name: str
     modules: Tuple[str, ...]
 
@@ -91,7 +91,7 @@ class PlasticityRegion:
 # ---------------------------------------------------------------- state
 
 class ModelState:
-    """Le modèle lui-même comme état WCE."""
+    """The model itself as a WCE state."""
 
     def __init__(self, input_dim, output_module="head", *, max_connections=32,
                  max_capacity=512, max_region_fraction=0.6):
@@ -106,7 +106,7 @@ class ModelState:
                          "growths": 0, "prunes": 0, "transformations": 0}
         self.transform_graph = TransformGraph(TransformNode("N0", configuration=self.summary()))
 
-    # ---- vues -------------------------------------------------------
+    # ---- views -------------------------------------------------------
     @property
     def parameters(self): return {n: m.slow for n, m in self.modules.items()}
     @property
@@ -145,11 +145,11 @@ class ModelState:
                 "prune_count": self.counters["prunes"]}
 
     def inference_cost(self):
-        """Nombre approximatif de multiplications par exemple (modules atteints uniquement)."""
+        """Approximate number of multiplications per example (reached modules only)."""
         return sum(self.modules[m].slow["w1"].numel() + self.modules[m].slow["w2"].numel()
                    for m in self._reachable())
 
-    # ---- graphe de calcul ------------------------------------------
+    # ---- computation graph ------------------------------------------
     def _incoming(self, name):
         return [c for c in self.connectivity.values() if c.target == name
                 and (c.source == INPUT or self.modules[c.source].active)]
@@ -188,7 +188,7 @@ class ModelState:
         while len(order) < len(reachable):
             ready = [m for m in sorted(reachable) if m not in placed
                      and all(c.source in placed for c in self._incoming(m) if c.source == INPUT or c.source in reachable)]
-            if not ready: raise ValueError("cycle dans la connectivité active")
+            if not ready: raise ValueError("cycle in the active connectivity")
             order += ready; placed.update(ready)
         return order
 
@@ -203,7 +203,7 @@ class ModelState:
                                            (overrides or {}).get(name))
             module.usage_count += 1
         out = self.metadata["output"]
-        if out not in outputs: raise ValueError(f"module de sortie '{out}' non atteint")
+        if out not in outputs: raise ValueError(f"output module '{out}' not reached")
         return outputs[out]
 
     def predict(self, x):
@@ -250,15 +250,15 @@ class ModelState:
 
     def restore(self, name): return self.apply(RestoreSnapshot(snapshot=name))
 
-    # ---- application gouvernée -------------------------------------
+    # ---- governed application -------------------------------------
     def apply(self, spec: 'ModelTransformationSpec'):
-        """Unique point d'entrée des modifications : préconditions, exécution, trace."""
+        """Single entry point of the modifications: preconditions, execution, trace."""
         from core.reasoning import AssumptionSet, FactBase, ReasoningContext
         context = ReasoningContext(self, FactBase(), AssumptionSet())
         status = spec.applicability(context)
         if status is not TruthValue.TRUE:
             failed = [str(c) for c in spec.preconditions if c.evaluate(context) is not TruthValue.TRUE]
-            raise ModelTransformationError(f"{spec.name} refusée : {', '.join(failed)}")
+            raise ModelTransformationError(f"{spec.name} refused: {', '.join(failed)}")
         before = self.summary()
         effects = spec.execute(self) or {}
         self.counters["transformations"] += 1
@@ -370,7 +370,7 @@ class CapacityBudget(Condition):
 
 @dataclass(frozen=True)
 class RegionIsLocal(Condition):
-    """Une adaptation ne peut toucher qu'une fraction bornée du réseau."""
+    """An adaptation can touch only a bounded fraction of the network."""
     modules: Tuple[str, ...]
     def evaluate(self, context):
         s = context.state
@@ -497,7 +497,7 @@ class CloneModule(ModelTransformationSpec):
 
 @_spec
 class MergeModule(ModelTransformationSpec):
-    """Fusionne `other` dans `module` (moyenne des poids), redirige ses connexions."""
+    """Merges `other` into `module` (mean of the weights), redirects its connections."""
     name: str = "merge_module"
     module: str = ""
     other: str = ""
@@ -508,7 +508,7 @@ class MergeModule(ModelTransformationSpec):
     def execute(self, model):
         a, b = model.modules[self.module], model.modules[self.other]
         if any(a.slow[k].shape != b.slow[k].shape for k in PARAM_NAMES):
-            raise ModelTransformationError("formes incompatibles pour une fusion")
+            raise ModelTransformationError("incompatible shapes for a merge")
         for k in PARAM_NAMES: a.slow[k] = (a.slow[k] + b.slow[k]) / 2
         a.usage_count += b.usage_count
         for key, c in list(model.connectivity.items()):
@@ -541,7 +541,7 @@ class PruneModule(ModelTransformationSpec):
 
 @_spec
 class GrowModule(ModelTransformationSpec):
-    """Ajoute des unités cachées ; les nouvelles colonnes de W2 sont nulles : fonction préservée."""
+    """Adds hidden units; the new columns of W2 are zero: function preserved."""
     name: str = "grow_module"
     module: str = ""
     units: int = 8
@@ -565,7 +565,7 @@ class GrowModule(ModelTransformationSpec):
 
 @_spec
 class PruneUnits(ModelTransformationSpec):
-    """Garde les `keep` unités de plus forte contribution |W1_i|·|W2_:,i|."""
+    """Keeps the `keep` units of strongest contribution |W1_i|·|W2_:,i|."""
     name: str = "prune_units"
     module: str = ""
     keep: int = 8
@@ -658,7 +658,7 @@ class WeakenConnection(ModelTransformationSpec):
 
 @_spec
 class RerouteConnection(ModelTransformationSpec):
-    """source->old_target devient source->new_target (même force)."""
+    """source->old_target becomes source->new_target (same strength)."""
     name: str = "reroute_connection"
     source: str = ""
     old_target: str = ""
@@ -681,10 +681,10 @@ class RerouteConnection(ModelTransformationSpec):
 
 @_spec
 class AdaptWeights(ModelTransformationSpec):
-    """Apprentissage local : seuls les modules de la région reçoivent des gradients.
+    """Local learning: only the modules of the region receive gradients.
 
-    fast=True : entraîne des deltas rapides (slow weights intacts).
-    fast=False : entraîne directement les slow weights de la région.
+    fast=True: trains fast deltas (slow weights intact).
+    fast=False: trains the slow weights of the region directly.
     """
     name: str = "adapt_weights"
     modules: Tuple[str, ...] = ()
@@ -697,7 +697,7 @@ class AdaptWeights(ModelTransformationSpec):
     seed: int = 0
     keys: Tuple[str, ...] = PARAM_NAMES
     output: str = ""
-    positions: int = 0          # >0 : sortie = positions x vocabulaire, perte par position
+    positions: int = 0          # >0: output = positions x vocabulary, loss per position
     invertible: bool = False
     changes: frozenset = frozenset({"weights"})
     preserves: InvariantSet = field(default_factory=lambda: InvariantSet({Invariant.MODULE_SET, Invariant.MODEL_TOPOLOGY}))
@@ -751,7 +751,7 @@ class AdaptWeights(ModelTransformationSpec):
 
 @_spec
 class RestoreModule(ModelTransformationSpec):
-    """Régénération ciblée : un seul module revient à son état de snapshot."""
+    """Targeted regeneration: a single module returns to its snapshot state."""
     name: str = "restore_module"
     module: str = ""
     snapshot: str = ""
@@ -769,7 +769,7 @@ class RestoreModule(ModelTransformationSpec):
 
 @_spec
 class BindRoute(ModelTransformationSpec):
-    """Table de routage : une configuration pointe vers un module."""
+    """Routing table: a configuration points to a module."""
     name: str = "bind_route"
     configuration: str = ""
     module: str = ""
@@ -786,7 +786,7 @@ class BindRoute(ModelTransformationSpec):
 
 @_spec
 class CommitFastWeights(ModelTransformationSpec):
-    """Consolidation : slow += fast pour les modules donnés."""
+    """Consolidation: slow += fast for the given modules."""
     name: str = "commit_fast_weights"
     modules: Tuple[str, ...] = ()
     invertible: bool = False
@@ -811,7 +811,7 @@ class ClearFastWeights(ModelTransformationSpec):
 
 @_spec
 class RestoreSnapshot(ModelTransformationSpec):
-    """Régénération : l'état revient au snapshot, l'historique est conservé (nouveau noeud)."""
+    """Regeneration: the state returns to the snapshot, the history is kept (new node)."""
     name: str = "restore_snapshot"
     snapshot: str = ""
     invertible: bool = False
@@ -827,7 +827,7 @@ class RestoreSnapshot(ModelTransformationSpec):
 
 @_spec
 class LoadFastDelta(ModelTransformationSpec):
-    """Charge la mémoire paramétrique rapide d'une configuration dans le tampon de travail."""
+    """Loads the fast parametric memory of a configuration into the working buffer."""
     name: str = "load_fast_delta"
     module: str = ""
     delta: Any = field(default=None, compare=False, repr=False)
@@ -844,7 +844,7 @@ class LoadFastDelta(ModelTransformationSpec):
 
 @_spec
 class RestoreIncremental(ModelTransformationSpec):
-    """Restauration exacte depuis un IncrementalSnapshot (références partagées, pas de copie profonde)."""
+    """Exact restoration from an IncrementalSnapshot (shared references, no deep copy)."""
     name: str = "restore_incremental"
     snapshot: Any = field(default=None, compare=False, repr=False)
     invertible: bool = False

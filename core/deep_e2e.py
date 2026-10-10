@@ -1,19 +1,19 @@
-"""End-to-End Composition with Discovered Atoms — de primitives découvertes, imparfaites et parfois fausses, à une
-composition sur classes d'équivalence.
+"""End-to-End Composition with Discovered Atoms — from discovered primitives, imperfect and sometimes false, to a
+composition over equivalence classes.
 
-    DiscoveredPrimitive → PrimitiveHypothesis → réduction → composition sur classes → finalisation validée → décision
+    DiscoveredPrimitive → PrimitiveHypothesis → reduction → composition over classes → validated finalisation → decision
 
-Couche explicite entre découverte et composition :
-  PrimitiveHypothesis   type, paramètres, confiance, incertitude, provenance, alternatives équivalentes — une
-                        primitive découverte n'est jamais traitée comme une vérité
-  reduce                une vingtaine de littéraux → au plus six atomes, par mécanismes compacts et comparables
-  compose               moteur exact sur cellules (≤ 6 atomes) ; `wide_compose` : faisceau sur classes pour plus d'atomes ;
-                        `hierarchical` : classes d'un premier groupe réutilisées comme unités d'un second niveau
-  finalize              aucun ajustement, ou ajustement VALIDÉ (l'état initial est conservé ; commit seulement si le
-                        critère observable progresse) ; l'ajustement forcé n'existe que comme bras de comparaison
-  decide                KNOWN / UNKNOWN / NONE_OF_THE_ABOVE à partir de signaux explicites
+Explicit layer between discovery and composition:
+  PrimitiveHypothesis   type, parameters, confidence, uncertainty, provenance, equivalent alternatives — a
+                        discovered primitive is never treated as a truth
+  reduce                about twenty literals → at most six atoms, through compact and comparable mechanisms
+  compose               exact engine over cells (≤ 6 atoms); `wide_compose`: beam over classes for more atoms;
+                        `hierarchical`: classes of a first group reused as units of a second level
+  finalize              no fit, or VALIDATED fit (the initial state is kept; commit only if the
+                        observable criterion improves); the forced fit exists only as a comparison arm
+  decide                KNOWN / UNKNOWN / NONE_OF_THE_ABOVE from explicit signals
 
-Aucune vérité de monde ; aucun oracle de type, de paramètre, d'atome ou d'appartenance.
+No world truth; no oracle of type, parameter, atom or membership.
 """
 from __future__ import annotations
 
@@ -39,25 +39,25 @@ CONFIG_FILE = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__fil
 
 
 def load_config() -> dict:
-    """Configuration de la chaîne, réglée sur les tâches de MISE AU POINT uniquement ; valeurs par défaut sinon."""
+    """Configuration of the chain, tuned on the TUNING tasks only; default values otherwise."""
     try: return {**DEFAULTS, **json.load(open(CONFIG_FILE))["config"]}
     except (OSError, ValueError, KeyError): return dict(DEFAULTS)
 FITS = ("none", "validated", "forced")
 
 
-# ================================================================ hypothèses de primitives
+# ================================================================ primitive hypotheses
 
 @dataclass
 class PrimitiveHypothesis:
-    """Une primitive DÉCOUVERTE, avec ce qu'on sait de sa fiabilité. `alternatives` : primitives observationnellement
-    équivalentes (ou complémentaires) qu'elle représente — elles restent disponibles, elles ne sont pas des atomes de plus."""
+    """A DISCOVERED primitive, with what is known about its reliability. `alternatives`: observationally
+    equivalent (or complementary) primitives that it represents — they remain available, they are not additional atoms."""
     program: BNode
     type: str
-    confidence: float               # score de découverte, ramené à [0, 1] dans la scène
+    confidence: float               # discovery score, rescaled to [0, 1] within the scene
     provenance: str
-    signature: np.ndarray           # valeur sur les observations
+    signature: np.ndarray           # value on the observations
     alternatives: List[BNode] = field(default_factory=list)
-    uncertainty: Optional[float] = None       # désaccord fonctionnel moyen avec ses alternatives (None s'il n'y en a pas)
+    uncertainty: Optional[float] = None       # mean functional disagreement with its alternatives (None if there are none)
 
     @property
     def params(self): return self.program.param_vector()
@@ -66,9 +66,9 @@ class PrimitiveHypothesis:
 
 
 def hypotheses_from(discovered: Sequence[Tuple[BNode, float, str]], X: torch.Tensor, same=0.97) -> List[PrimitiveHypothesis]:
-    """(programme, score, provenance) → hypothèses. Deux primitives de même signature sur les observations, ou de
-    signatures complémentaires (accord ≥ `same` ou ≤ 1 − `same`), sont UNE hypothèse : la mieux notée la représente, les
-    autres deviennent ses alternatives. C'est le dédoublonnage et l'équivalence de primitives."""
+    """(program, score, provenance) → hypotheses. Two primitives with the same signature on the observations, or with
+    complementary signatures (agreement ≥ `same` or ≤ 1 − `same`), are ONE hypothesis: the best-scored one represents it, the
+    others become its alternatives. This is the deduplication and the equivalence of primitives."""
     items = sorted(discovered, key=lambda d: -d[1]); top = max((s for _, s, _ in items), default=1.0) or 1.0; out: List[PrimitiveHypothesis] = []
     for p, s, src in items:
         sig = predict(p, X.float()).numpy().astype(bool); host = None
@@ -80,11 +80,11 @@ def hypotheses_from(discovered: Sequence[Tuple[BNode, float, str]], X: torch.Ten
     return out
 
 
-# ================================================================ réduction avant composition
+# ================================================================ reduction before composition
 
 def floor_errors(sigs: Sequence[np.ndarray], y: np.ndarray) -> float:
-    """Plus petit nombre d'erreurs atteignable par UNE fonction booléenne quelconque de ces atomes : étiquette
-    majoritaire de chaque cellule. Ne dépend d'aucune structure."""
+    """Smallest number of errors reachable by ANY single Boolean function of these atoms: majority
+    label of each cell. Depends on no structure."""
     if not sigs: return float(min(y.sum(), len(y) - y.sum()))
     code = np.zeros(len(y), dtype=np.uint64)
     for i, s in enumerate(sigs): code |= s.astype(np.uint64) << np.uint64(i)
@@ -92,13 +92,13 @@ def floor_errors(sigs: Sequence[np.ndarray], y: np.ndarray) -> float:
 
 
 def reduce(hyps: Sequence[PrimitiveHypothesis], y: torch.Tensor, method="greedy_floor", max_atoms=6, min_gain=4.0, per_family=2, dominance=0.90) -> Tuple[List[PrimitiveHypothesis], dict]:
-    """Une vingtaine d'hypothèses → au plus `max_atoms`. Mécanismes (comparables séparément) :
-      confidence    les plus confiantes
-      dedupe        idem — le dédoublonnage est déjà fait par `hypotheses_from` ; ce bras prend les premières SANS autre critère que l'ordre
-      family        au plus `per_family` par type, puis les plus confiantes
-      dominance     une hypothèse est écartée si une plus confiante lui est fonctionnellement proche (accord ≥ `dominance`)
-      greedy_floor  sélection avant : à chaque pas, l'atome qui réduit le plus l'erreur plancher (étiquette majoritaire par
-                    cellule) ; arrêt quand le gain passe sous `min_gain` erreurs — l'utilité pour la COMPOSITION décide"""
+    """About twenty hypotheses → at most `max_atoms`. Mechanisms (separately comparable):
+      confidence    the most confident ones
+      dedupe        same — the deduplication is already done by `hypotheses_from`; this arm takes the first ones with NO criterion other than the order
+      family        at most `per_family` per type, then the most confident ones
+      dominance     a hypothesis is discarded if a more confident one is functionally close to it (agreement ≥ `dominance`)
+      greedy_floor  forward selection: at each step, the atom that most reduces the floor error (majority label per
+                    cell); stop when the gain falls below `min_gain` errors — usefulness for the COMPOSITION decides"""
     H = sorted(hyps, key=lambda h: -h.confidence); yb = y.numpy().astype(bool); info = {"method": method, "input": len(H)}
     if method in ("confidence", "dedupe"): kept = H[:max_atoms]
     elif method == "family":
@@ -126,14 +126,14 @@ def reduce(hyps: Sequence[PrimitiveHypothesis], y: torch.Tensor, method="greedy_
     info["kept"] = len(kept); info["floor"] = floor_errors([o.signature for o in kept], yb); return kept, info
 
 
-# ================================================================ moteur large : faisceau sur classes, plus de six atomes
+# ================================================================ wide engine: beam over classes, more than six atoms
 
 class WideSpace:
-    """Cellules pour un nombre quelconque d'atomes (≤ 60) : une fonction est un vecteur booléen sur les cellules
-    occupées (au plus N), plus un masque de 64 bits."""
+    """Cells for any number of atoms (≤ 60): a function is a Boolean vector over the occupied
+    cells (at most N), no longer a 64-bit mask."""
 
     def __init__(self, atoms: Sequence[BNode], X: torch.Tensor, y: torch.Tensor):
-        if not 1 <= len(atoms) <= 60: raise ValueError("entre 1 et 60 atomes")
+        if not 1 <= len(atoms) <= 60: raise ValueError("between 1 and 60 atoms")
         self.atoms = list(atoms); self.n = len(atoms); self.N = len(X); A = np.stack([predict(a, X.float()).numpy().astype(bool) for a in atoms]); code = np.zeros(self.N, dtype=np.uint64)
         for i in range(self.n): code |= A[i].astype(np.uint64) << np.uint64(i)
         self.codes, first, inv = np.unique(code, return_index=True, return_inverse=True); self.K = len(self.codes); yb = y.numpy().astype(np.float64)
@@ -150,10 +150,10 @@ def _np_op(op: int, a: np.ndarray, b: np.ndarray) -> np.ndarray: return a & b if
 
 
 def wide_compose(atoms: Sequence[BNode], X: torch.Tensor, y: torch.Tensor, max_size=6, beam=300, pair=48, selector="bic", budget: Optional[int] = None, seeds: Sequence[Tuple[Tree, int]] = ()) -> CompositionResult:
-    """Composition ascendante avec FAISCEAU SUR LES CLASSES, pour plus de six atomes. Niveau s : les `beam` classes les
-    moins erronées de taille s. Un niveau est combiné avec les atomes (tous) et avec les `pair` meilleures classes des
-    niveaux inférieurs : jamais d'énumération exhaustive. `seeds` : (arbre, taille) de classes déjà construites
-    ailleurs, réutilisées comme unités (composition hiérarchique). `budget` : lignes évaluées au total."""
+    """Bottom-up composition with a BEAM OVER THE CLASSES, for more than six atoms. Level s: the `beam` classes with the
+    fewest errors of size s. A level is combined with the atoms (all of them) and with the `pair` best classes of the
+    lower levels: never an exhaustive enumeration. `seeds`: (tree, size) of classes already built
+    elsewhere, reused as units (hierarchical composition). `budget`: rows evaluated in total."""
     t0 = time.time(); sp = WideSpace(atoms, X, y); seen = set(); levels: Dict[int, Tuple[np.ndarray, List[Tree]]] = {}; considered = 0; trunc = False
 
     def keep(rows: np.ndarray, trees: List[Tree], limit: int):
@@ -193,29 +193,29 @@ def wide_compose(atoms: Sequence[BNode], X: torch.Tensor, y: torch.Tensor, max_s
 
 
 def with_complements(atoms: Sequence[BNode]) -> List[BNode]:
-    """Unités de composition : chaque atome et son complément. Une primitive découverte peut avoir la mauvaise polarité,
-    et la grammaire de composition (et / ou / ou exclusif) ne sait pas nier : le complément est donc fourni comme unité.
-    Il ne crée aucune cellule nouvelle."""
+    """Composition units: each atom and its complement. A discovered primitive may have the wrong polarity,
+    and the composition grammar (and / or / exclusive or) cannot negate: the complement is therefore supplied as a unit.
+    It creates no new cell."""
     return list(atoms) + [BNode("not", children=(a,)) for a in atoms]
 
 
 def compose(atoms: Sequence[BNode], X: torch.Tensor, y: torch.Tensor, selector="bic", top=20, max_size: Optional[int] = None, complements=True) -> CompositionResult:
-    """Moteur exact sur cellules (au plus six atomes, plus leurs compléments) : toutes les classes jusqu'à `max_size`
-    feuilles (défaut : le nombre d'atomes), classées par le sélecteur. Les arbres renvoyés portent sur `R.units`."""
+    """Exact engine over cells (at most six atoms, plus their complements): all the classes up to `max_size`
+    leaves (default: the number of atoms), ranked by the selector. The returned trees refer to `R.units`."""
     units = with_complements(atoms) if complements else list(atoms); sp = CellSpace(units, X, y, max_atoms=12); T = bottom_up(sp, max_size or len(atoms), budget=3_000_000); R = select(T, selector, top); R.stats["atoms"] = len(atoms); R.units = units; R.table = T; return R
 
 
 def hierarchical(atoms: Sequence[BNode], X: torch.Tensor, y: torch.Tensor, group=6, keep=12, selector="bic", beam=300) -> CompositionResult:
-    """primitive hypotheses → small equivalence classes → higher-level classes : les `group` premiers atomes sont
-    composés exactement ; leurs `keep` meilleures classes deviennent des unités, combinées avec les atomes restants par
-    le moteur large (taille ≤ 3 unités). Étend la composition au-delà de six atomes sans énumération."""
+    """primitive hypotheses → small equivalence classes → higher-level classes: the first `group` atoms are
+    composed exactly; their `keep` best classes become units, combined with the remaining atoms by
+    the wide engine (size ≤ 3 units). Extends the composition beyond six atoms without enumeration."""
     t0 = time.time(); atoms = list(atoms)
     if len(atoms) <= group: R = compose(atoms, X, y, selector, complements=False); R.stats["levels"] = 1; return R
     first = compose(atoms[:group], X, y, selector, top=keep, complements=False); seeds = [(c.tree, c.size) for c in first.ranked]; R = wide_compose(atoms, X, y, max_size=min(8, group + 2), beam=beam, pair=24, selector=selector, seeds=seeds)
     R.stats.update({"levels": 2, "first_level_classes": first.stats.get("classes"), "seconds": round(time.time() - t0, 4)}); return R
 
 
-# ================================================================ finalisation : conserver l'état initial
+# ================================================================ finalisation: keep the initial state
 
 @dataclass
 class Finalization:
@@ -227,9 +227,9 @@ class Finalization:
 
 
 def finalize(tree: Tree, atoms: Sequence[BNode], X: torch.Tensor, y: torch.Tensor, fit="validated", steps=100) -> Finalization:
-    """Structure retenue → programme final. `none` : les paramètres découverts sont gardés tels quels. `validated` :
-    l'optimiseur PROPOSE, la proposition n'est acceptée que si le critère observable progresse, sinon l'état initial est
-    rendu intact. `forced` : l'optimiseur remplace toujours l'état (bras de comparaison uniquement)."""
+    """Selected structure → final program. `none`: the discovered parameters are kept as they are. `validated`:
+    the optimiser PROPOSES, the proposal is accepted only if the observable criterion improves, otherwise the initial state is
+    returned intact. `forced`: the optimiser always replaces the state (comparison arm only)."""
     prog = to_program(tree, atoms); e0 = float((predict(prog, X.float()) != y).sum())
     if fit == "none" or prog.n_params() == 0: return Finalization(prog, fit, False, e0, e0)
     data = FitData.build(X, y, 0.10); sk = prog.skeleton(); init = torch.tensor(prog.param_vector(), dtype=DT)
@@ -242,26 +242,26 @@ def finalize(tree: Tree, atoms: Sequence[BNode], X: torch.Tensor, y: torch.Tenso
 # ================================================================ KNOWN / UNKNOWN / NONE_OF_THE_ABOVE
 
 def knn_errors(X: torch.Tensor, y: torch.Tensor, k=7) -> float:
-    """Erreurs d'un classifieur des k plus proches voisins, un point laissé de côté : ce qu'une méthode SANS structure
-    explique déjà (même calcul que `core.deep_boundary.knn_loo_error`, sans objet intermédiaire)."""
+    """Errors of a k-nearest-neighbours classifier, leave-one-out: what a method WITHOUT structure
+    already explains (same computation as `core.deep_boundary.knn_loo_error`, without an intermediate object)."""
     D = torch.cdist(X.double(), X.double()); D.fill_diagonal_(float("inf")); nb = D.topk(min(k, len(X) - 1), largest=False).indices; return float(((y[nb].float().mean(1) > 0.5).long() != y).sum())
 
 
 def decide(result: CompositionResult, final_errors: float, X: torch.Tensor, y: torch.Tensor, gap_unknown=0.04, gap_none=0.10, tie=2.0) -> dict:
-    """Décision à trois issues, sur des signaux explicites :
-      gap        (erreurs de la structure retenue − erreurs des plus proches voisins) / N : ce que la structure N'EXPLIQUE
-                 PAS alors que les données le permettent
-      rivals     classes dont le score est à moins de `tie` du premier (structures concurrentes non départagées)
-    gap ≥ gap_none → NONE_OF_THE_ABOVE ; gap ≥ gap_unknown, ou aucune structure → UNKNOWN (modèle partiel) ; sinon KNOWN."""
+    """Three-outcome decision, on explicit signals:
+      gap        (errors of the selected structure − errors of the nearest neighbours) / N: what the structure DOES NOT
+                 EXPLAIN although the data allow it
+      rivals     classes whose score is within `tie` of the first (competing structures not separated)
+    gap ≥ gap_none → NONE_OF_THE_ABOVE; gap ≥ gap_unknown, or no structure → UNKNOWN (partial model); otherwise KNOWN."""
     N = len(X); kn = knn_errors(X, y); gap = (final_errors - kn) / max(1, N); rivals = sum(1 for c in result.ranked[1:] if result.ranked and abs(c.score - result.ranked[0].score) <= tie) if result.ranked else 0
     label = UNKNOWN if result.selected is None else NONE_OF_THE_ABOVE if gap >= gap_none else UNKNOWN if gap >= gap_unknown else KNOWN
     return {"label": label, "gap": gap, "knn_error_rate": kn / max(1, N), "error_rate": final_errors / max(1, N), "rivals": rivals, "partial_model": label == UNKNOWN and result.selected is not None}
 
 
-# ================================================================ chaîne complète
+# ================================================================ full chain
 
-# `CompositionResult` reçoit deux attributs facultatifs posés par `compose` : `units` (atomes et compléments sur lesquels
-# portent les arbres) et `table` (toutes les classes construites).
+# `CompositionResult` receives two optional attributes set by `compose`: `units` (atoms and complements that the
+# trees refer to) and `table` (all the classes built).
 
 @dataclass
 class EndToEnd:
@@ -276,15 +276,15 @@ class EndToEnd:
 
 
 def discover(X: torch.Tensor, y: torch.Tensor, k=3, seed=0) -> List[Tuple[BNode, float, str]]:
-    """Source de primitives de la chaîne principale : `flat_scene_k` (baseline candidate) — chaque type essayé sur la
-    scène entière, k hypothèses par type. Aucun oracle."""
+    """Primitive source of the main chain: `flat_scene_k` (candidate baseline) — each type tried on the
+    whole scene, k hypotheses per type. No oracle."""
     from core.deep_fragments import flat_types
     from core.deep_partial import observe
     return [(h.program, float(h.score), f"flat_scene:{h.type}") for h in flat_types(observe(X, y), k, seed)]
 
 
 def run_chain(X: torch.Tensor, y: torch.Tensor, seed=0, cfg: Optional[dict] = None, discovered: Optional[Sequence[Tuple[BNode, float, str]]] = None) -> EndToEnd:
-    """découverte → hypothèses → réduction → composition sur classes → finalisation → décision."""
+    """discovery → hypotheses → reduction → composition over classes → finalisation → decision."""
     c = {**load_config(), **(cfg or {})}; t0 = time.time(); disc = list(discovered) if discovered is not None else discover(X, y, c["k"], seed); t1 = time.time(); H = hypotheses_from(disc, X, c["same"]); kept, info = reduce(H, y, c["reduction"], c["max_atoms"], c["min_gain"])
     st = {"literals": len(disc), "hypotheses": len(H), "kept": len(kept), "discover_seconds": round(t1 - t0, 3), "reduction": info}
     if not kept:

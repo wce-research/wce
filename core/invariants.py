@@ -1,10 +1,10 @@
 """
-Invariants pour WCE Transformation Algebra.
+Invariants for WCE Transformation Algebra.
 
-Ce module définit les invariants fondamentaux qui peuvent être préservés
-ou modifiés par les transformations.
+This module defines the fundamental invariants that can be preserved
+or modified by transformations.
 
-Un invariant est une propriété qui reste inchangée sous certaines transformations.
+An invariant is a property that remains unchanged under certain transformations.
 """
 
 from dataclasses import dataclass, field
@@ -14,75 +14,75 @@ from typing import Set, Optional
 
 class Invariant(Enum):
     """
-    Invariants fondamentaux supportés par WCE.
+    Fundamental invariants supported by WCE.
     
     GEOMETRY:
-    - DISTANCE: distances entre points sont préservées
-    - ANGLE: angles entre vecteurs sont préservés  
-    - ORIENTATION: orientation (sens horaire/anti-horaire) est préservée
-    - AREA: aire/surface est préservée
-    - VOLUME: volume (futur 3D) est préservé
+    - DISTANCE: distances between points are preserved
+    - ANGLE: angles between vectors are preserved  
+    - ORIENTATION: orientation (clockwise/anticlockwise) is preserved
+    - AREA: area/surface is preserved
+    - VOLUME: volume (future 3D) is preserved
     
     TOPOLOGY:
-    - CONNECTIVITY: composantes connexes sont préservées
-    - HOLES: nombre de trous est préservé
-    - BOUNDARY_COMPONENTS: nombre de composantes de frontière est préservé
-    - DIMENSION: dimension de l'objet est préservée
+    - CONNECTIVITY: connected components are preserved
+    - HOLES: number of holes is preserved
+    - BOUNDARY_COMPONENTS: number of boundary components is preserved
+    - DIMENSION: dimension of the object is preserved
     
     PHYSICS:
-    - ENERGY: énergie totale est préservée
-    - MOMENTUM: quantité de mouvement est préservée
-    - MASS: masse est préservée
+    - ENERGY: total energy is preserved
+    - MOMENTUM: momentum is preserved
+    - MASS: mass is preserved
     
     GENERAL:
     - TIME: temporal coherence
-    - ENTITY_IDENTITY: identité des entités est préservée
-    - RELATIONS: relations entre entités sont préservées
+    - ENTITY_IDENTITY: identity of the entities is preserved
+    - RELATIONS: relations between entities are preserved
     """
-    # Géométrie
+    # Geometry
     DISTANCE = auto()
     ANGLE = auto()
     ORIENTATION = auto()
     AREA = auto()
     VOLUME = auto()
     
-    # Topologie
+    # Topology
     CONNECTIVITY = auto()
     HOLES = auto()
     BOUNDARY_COMPONENTS = auto()
     DIMENSION = auto()
     
-    # Physique
+    # Physics
     ENERGY = auto()
     MOMENTUM = auto()
     MASS = auto()
     
-    # Général
+    # General
     TIME = auto()
     ENTITY_IDENTITY = auto()
     RELATIONS = auto()
 
-    # Algèbre symbolique
+    # Symbolic algebra
     EQUALITY = auto()
     SOLUTION_SET = auto()
     DEGREE = auto()
     SIGN = auto()
     DOMAIN = auto()
 
-    # Modèle neuronal (auto-transformation)
+    # Neural model (self-transformation)
     SLOW_WEIGHTS = auto()
     MODEL_FUNCTION = auto()
     MODULE_SET = auto()
     MODEL_TOPOLOGY = auto()
 
-    # Séquences symboliques
+    # Symbolic sequences
     SYMBOL_MULTISET = auto()
     SEQUENCE_LENGTH = auto()
 
 
-# Ensembles d'invariants prédéfinis pour les catégories courantes
+# Predefined invariant sets for the common categories
 
-# Transformations géométriques qui préservent tout
+# Geometric transformations that preserve everything
 RIGID_TRANSFORMATION_INVARIANTS: Set[Invariant] = {
     Invariant.DISTANCE,
     Invariant.ANGLE,
@@ -95,7 +95,7 @@ RIGID_TRANSFORMATION_INVARIANTS: Set[Invariant] = {
     Invariant.DIMENSION,
 }
 
-# Transformations qui préservent la topologie (mais pas nécessairement la géométrie)
+# Transformations that preserve the topology (but not necessarily the geometry)
 TOPOLOGY_PRESERVING_INVARIANTS: Set[Invariant] = {
     Invariant.CONNECTIVITY,
     Invariant.HOLES,
@@ -103,14 +103,14 @@ TOPOLOGY_PRESERVING_INVARIANTS: Set[Invariant] = {
     Invariant.DIMENSION,
 }
 
-# Transformations qui préservent la géométrie (isométries)
+# Transformations that preserve the geometry (isometries)
 ISOMETRY_INVARIANTS: Set[Invariant] = {
     Invariant.DISTANCE,
     Invariant.ANGLE,
     Invariant.ORIENTATION,
 }
 
-# Transformations affines
+# Affine transformations
 AFFINE_INVARIANTS: Set[Invariant] = {
     Invariant.CONNECTIVITY,
     Invariant.HOLES,
@@ -122,50 +122,50 @@ AFFINE_INVARIANTS: Set[Invariant] = {
 @dataclass(frozen=True)
 class InvariantSet:
     """
-    Ensemble d'invariants avec des opérations utilitaires.
+    Set of invariants with utility operations.
     
-    Permet de représenter quels invariants sont préservés par une transformation
-    ou un ensemble de transformations.
+    Makes it possible to represent which invariants are preserved by a transformation
+    or a set of transformations.
     """
     invariants: Set[Invariant] = field(default_factory=set)
     
     def preserves(self, invariant: Invariant) -> bool:
-        """Vérifie si un invariant spécifique est préservé."""
+        """Checks whether a specific invariant is preserved."""
         return invariant in self.invariants
     
     def preserves_all(self, invariants: Set[Invariant]) -> bool:
-        """Vérifie si tous les invariants spécifiés sont préservés."""
+        """Checks whether all the specified invariants are preserved."""
         return invariants.issubset(self.invariants)
     
     def preserves_any(self, invariants: Set[Invariant]) -> bool:
-        """Vérifie si au moins un des invariants spécifiés est préservé."""
+        """Checks whether at least one of the specified invariants is preserved."""
         return bool(self.invariants & invariants)
     
     def union(self, other: 'InvariantSet') -> 'InvariantSet':
-        """Union avec un autre ensemble d'invariants."""
+        """Union with another set of invariants."""
         return InvariantSet(self.invariants | other.invariants)
     
     def intersection(self, other: 'InvariantSet') -> 'InvariantSet':
-        """Intersection avec un autre ensemble d'invariants."""
+        """Intersection with another set of invariants."""
         return InvariantSet(self.invariants & other.invariants)
     
     def lost(self, original: 'InvariantSet') -> 'InvariantSet':
-        """Retourne les invariants perdus par rapport à l'original."""
+        """Returns the invariants lost relative to the original."""
         return InvariantSet(original.invariants - self.invariants)
     
     @property
     def preserves_geometry(self) -> bool:
-        """Préserve la géométrie (distances et angles)."""
+        """Preserves the geometry (distances and angles)."""
         return self.preserves_all(ISOMETRY_INVARIANTS)
     
     @property
     def preserves_topology(self) -> bool:
-        """Préserve la topologie."""
+        """Preserves the topology."""
         return self.preserves_all(TOPOLOGY_PRESERVING_INVARIANTS)
     
     @property
     def preserves_orientation(self) -> bool:
-        """Préserve l'orientation."""
+        """Preserves the orientation."""
         return self.preserves(Invariant.ORIENTATION)
     
     def __repr__(self) -> str:
@@ -173,7 +173,7 @@ class InvariantSet:
         return f"InvariantSet({invariant_names})"
 
 
-# Ensembles prédéfinis pour les types de transformations courants
+# Predefined sets for the common transformation types
 
 IDENTITY_INVARIANTS = InvariantSet(RIGID_TRANSFORMATION_INVARIANTS | {Invariant.MASS, Invariant.ENERGY, Invariant.ENTITY_IDENTITY, Invariant.RELATIONS, Invariant.TIME})
 
@@ -210,7 +210,7 @@ SHEAR_INVARIANTS = InvariantSet(TOPOLOGY_PRESERVING_INVARIANTS | {Invariant.MASS
 
 STRETCH_INVARIANTS = NON_UNIFORM_SCALE_INVARIANTS
 
-# Transformations qui peuvent modifier la topologie
+# Transformations that may modify the topology
 CUT_INVARIANTS = InvariantSet({
     Invariant.DIMENSION,
     Invariant.MASS,

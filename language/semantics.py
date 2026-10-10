@@ -9,8 +9,8 @@ class Intent:
     entity: str
     quantity: Quantity | None = None
     direction: str | None = None
-    # Composantes vectorielles pour les actions 2D
-    # Si présentes, priment sur quantity/direction
+    # Vector components for 2D actions
+    # If present, they take precedence over quantity/direction
     force_x: float | None = None
     force_y: float | None = None
     impulse_x: float | None = None

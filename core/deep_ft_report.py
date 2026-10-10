@@ -1,8 +1,8 @@
-"""Rapports du sous-jalon Fragment Attribution & Primitive Type Inference (dev uniquement ; jamais le lot scellé).
+"""Reports of the Fragment Attribution & Primitive Type Inference sub-milestone (dev only; never the sealed set).
 
-  smoke / chain-smoke : démonstrations locales courtes sur scènes et tâche de MISE AU POINT
-  aggregate           : agrège les runs AWS `deepft` → results/deep_fragment_type_summary.json
-  report              : imprime les tableaux
+  smoke / chain-smoke : short local demonstrations on TUNING scenes and task
+  aggregate           : aggregates the AWS `deepft` runs → results/deep_fragment_type_summary.json
+  report              : prints the tables
 """
 from __future__ import annotations
 
@@ -57,23 +57,23 @@ def summarize(rows, bad=0):
     for r in hx:
         for k, v in (r.get("signals") or {}).items(): sg["correct" if r["correct"] else "wrong"][k].append(v)
     S["signals"] = {c: {k: _mean(v) for k, v in d.items()} for c, d in sg.items()}
-    # ---- matrice oracle
+    # ---- oracle matrix
     orc = [r for r in rows if r["experiment"] == "oracle"]; O = ("TT", "TI", "TI_type", "ET", "EI")
     S["oracle"] = {"all": {"n": len(orc), **{k: _mean(r[k] for r in orc) for k in O}}, **{f"mask{int(ms * 100)}": {k: _mean(r[k] for r in orc if r["mask"] == ms) for k in O} for ms in masks}, **{kd: {k: _mean(r[k] for r in orc if r["kind"] == kd) for k in O} for kd in kinds}}
     if orc: S["oracle_paired"] = {f"{b} − {a}": paired_ci([r[a] for r in orc], [r[b] for r in orc]) for a, b in (("EI", "ET"), ("EI", "TI"), ("ET", "TT"), ("TI", "TT"), ("EI", "TT"))}
-    # ---- propriété du masquage
+    # ---- occlusion ownership
     ow = [r for r in rows if r["experiment"] == "own"]; W = ("hidden_as_occluded", "hidden_as_absent", "visible_as_observed", "visible_as_occluded", "visible_as_absent", "owner_found", "owner_is_occluder")
     S["ownership"] = {str(int(ms * 100)): {"n": sum(r["mask"] == ms for r in ow), **{k: _mean(r[k] for r in ow if r["mask"] == ms) for k in W}} for ms in masks}
-    # ---- secteurs
+    # ---- sectors
     sx = [r for r in rows if r["experiment"] == "sector"]
     S["sector"] = {str(int(ms * 100)): {"n": sum(r["mask"] == ms for r in sx), "exact_1": _mean(r["exact_1"] for r in sx if r["mask"] == ms), "rays_found": _mean(r["rays_found"] for r in sx if r["mask"] == ms), "vertex_relations": _mean(r["vertex_relations"] > 0 for r in sx if r["mask"] == ms),
                                            "confused_with_disc": _mean(r["confused_with_disc"] for r in sx if r["mask"] == ms), "stages": dict(Counter(r["stage"] for r in sx if r["mask"] == ms)), "top_types": dict(Counter(r["top_type"] for r in sx if r["mask"] == ms))} for ms in masks}
-    # ---- mesure active
+    # ---- active measurement
     ac = [r for r in rows if r["experiment"] == "active"]; ba = {p: {(r["scene"], r["mask"]): r for r in ac if r["policy"] == p} for p in sorted({r["policy"] for r in ac})}
     S["active"] = {p: {"n": len(v), **{k: _mean(r[k] for r in v.values()) for k in ("correct", "exact_1", "type_1", "functional_1")}} for p, v in ba.items()}; S["active_paired"] = {}
     for p in ba:
         if p != "random" and "random" in ba: ks = sorted(set(ba[p]) & set(ba["random"])); S["active_paired"][f"{p} − random"] = {k: paired_ci([ba["random"][s][k] for s in ks], [ba[p][s][k] for s in ks]) for k in ("correct", "exact_1")}
-    # ---- chaîne aval
+    # ---- downstream chain
     ch = [r for r in rows if r["experiment"] == "chain"]; arms = sorted({r["arm"] for r in ch}); cb = {a: {r["task_id"]: r for r in ch if r["arm"] == a} for a in arms}; S["chain"] = {}; S["chain_paired"] = {}; S["chain_by_depth"] = {}; S["chain_leaves"] = {}
     C = ("attribution_f1", "type_recall", "parameter_recovery", "primitive_equivalence", "primitive_precision", "n_literals", "candidate_functional", "candidate_best", "final_095", "final_099", "final_full", "types_tested", "fragments", "groups", "inference_seconds", "fit_equivalents", "seconds")
     for a in arms:
@@ -89,25 +89,25 @@ def summarize(rows, bad=0):
 
 
 def aggregate():
-    rows, bad = load_rows(); S = summarize(rows, bad); json.dump(S, open(SUMMARY, "w"), indent=1); print("lignes", len(rows), "unités en erreur", bad); return S
+    rows, bad = load_rows(); S = summarize(rows, bad); json.dump(S, open(SUMMARY, "w"), indent=1); print("rows", len(rows), "units in error", bad); return S
 
 
 def show(S):
     ci = lambda v: {x: (y["diff"], y["ci95"]) if y else None for x, y in v.items()}
-    print("\nATTRIBUTION (paires de milieux)"); [print(k.ljust(14), v) for k, v in S["grouping"].items()]; [print(k.ljust(28), ci(v)) for k, v in S["grouping_paired"].items()]
-    print("\npar part masquée"); [print(k.ljust(20), v) for k, v in S["grouping_by_mask"].items()]
+    print("\nATTRIBUTION (pairs of midpoints)"); [print(k.ljust(14), v) for k, v in S["grouping"].items()]; [print(k.ljust(28), ci(v)) for k, v in S["grouping_paired"].items()]
+    print("\nby occluded share"); [print(k.ljust(20), v) for k, v in S["grouping_by_mask"].items()]
     print("\nTYPE"); [print(k.ljust(22), v) for k, v in S["type"].items()]; [print(k.ljust(34), ci(v)) for k, v in S["type_paired"].items()]
-    print("\npar part masquée"); [print(k.ljust(28), v) for k, v in S["type_by_mask"].items()]
-    print("\npar type vrai"); [print(k.ljust(30), v) for k, v in S["type_by_kind"].items()]
-    print("\nhier, par type et masque"); [print(k.ljust(16), v) for k, v in S["type_by_kind_mask"].items()]
-    print("\nconfusion (type vrai → type prédit pour le groupe de la cible)"); [print(k.ljust(10), v) for k, v in S["confusion"].items()]; print("calibration", S["calibration"], "ECE", S["ece"]); print("signaux", S["signals"])
-    print("\nMATRICE ORACLE (récupération exacte)"); [print(k.ljust(10), v) for k, v in S["oracle"].items()]; print(ci(S.get("oracle_paired", {})))
-    print("\nPROPRIÉTÉ DU MASQUAGE"); [print(k.ljust(6), v) for k, v in S["ownership"].items()]
-    print("\nSECTEURS"); [print(k.ljust(6), v) for k, v in S["sector"].items()]
-    print("\nMESURE ACTIVE"); [print(k.ljust(20), v) for k, v in S["active"].items()]; [print(k.ljust(30), ci(v)) for k, v in S["active_paired"].items()]
-    print("\nCHAÎNE AVAL"); K = ("n", "attribution_f1", "type_recall", "parameter_recovery", "primitive_equivalence", "primitive_precision", "n_literals", "candidate_functional", "final_095", "final_099", "final_full", "types_tested", "inference_seconds", "seconds")
-    [print(k.ljust(30), {x: v.get(x) for x in K}) for k, v in S["chain"].items()]; print("\nappariées"); [print(k.ljust(46), ci(v)) for k, v in S["chain_paired"].items()]
-    print("\nfeuilles"); [print(k.ljust(30), v) for k, v in S["chain_leaves"].items()]; print("\npar profondeur"); [print(k.ljust(34), v) for k, v in S["chain_by_depth"].items()]
+    print("\nby occluded share"); [print(k.ljust(28), v) for k, v in S["type_by_mask"].items()]
+    print("\nby true type"); [print(k.ljust(30), v) for k, v in S["type_by_kind"].items()]
+    print("\nhier, by type and mask"); [print(k.ljust(16), v) for k, v in S["type_by_kind_mask"].items()]
+    print("\nconfusion (true type → predicted type for the target's group)"); [print(k.ljust(10), v) for k, v in S["confusion"].items()]; print("calibration", S["calibration"], "ECE", S["ece"]); print("signals", S["signals"])
+    print("\nORACLE MATRIX (exact recovery)"); [print(k.ljust(10), v) for k, v in S["oracle"].items()]; print(ci(S.get("oracle_paired", {})))
+    print("\nOCCLUSION OWNERSHIP"); [print(k.ljust(6), v) for k, v in S["ownership"].items()]
+    print("\nSECTORS"); [print(k.ljust(6), v) for k, v in S["sector"].items()]
+    print("\nACTIVE MEASUREMENT"); [print(k.ljust(20), v) for k, v in S["active"].items()]; [print(k.ljust(30), ci(v)) for k, v in S["active_paired"].items()]
+    print("\nDOWNSTREAM CHAIN"); K = ("n", "attribution_f1", "type_recall", "parameter_recovery", "primitive_equivalence", "primitive_precision", "n_literals", "candidate_functional", "final_095", "final_099", "final_full", "types_tested", "inference_seconds", "seconds")
+    [print(k.ljust(30), {x: v.get(x) for x in K}) for k, v in S["chain"].items()]; print("\npaired"); [print(k.ljust(46), ci(v)) for k, v in S["chain_paired"].items()]
+    print("\nleaves"); [print(k.ljust(30), v) for k, v in S["chain_leaves"].items()]; print("\nby depth"); [print(k.ljust(34), v) for k, v in S["chain_by_depth"].items()]
 
 
 def report(): show(json.load(open(SUMMARY)))

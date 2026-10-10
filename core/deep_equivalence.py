@@ -1,9 +1,9 @@
-"""Classes d'équivalence observationnelle, identifiabilité structurelle et mesures actives dirigées par identifiabilité.
+"""Observational equivalence classes, structural identifiability and identifiability-driven active measurements.
 
-S1 ~ S2 si les deux structures ajustées sont indiscernables sous l'ensemble ACTUEL des mesures. Le système maintient
-la classe {S1, S2, …} au lieu de choisir arbitrairement, et les mesures actives cherchent à la casser.
+S1 ~ S2 if the two fitted structures are indistinguishable under the CURRENT set of measurements. The system maintains
+the class {S1, S2, …} instead of choosing arbitrarily, and the active measurements try to break it.
 
-Ce module n'importe aucun module de monde et ne reçoit jamais la vérité.
+This module imports no world module and never receives the truth.
 """
 from __future__ import annotations
 
@@ -18,17 +18,17 @@ from core.deep_fit import DT, FitData, approx_evidence
 from core.deep_search import SearchOutcome, profiled_loglik
 from core.deep_structure import WorldHypothesis, algebraic_form, anti_unify, n_atoms
 
-EQUIV_AGREEMENT = 0.99                    # accord minimal sur les points mesurés pour être indiscernables
-EVIDENCE_WINDOW = math.log(20.0)          # fenêtre de plausibilité autour de la meilleure évidence
+EQUIV_AGREEMENT = 0.99                    # minimal agreement on the measured points to be indistinguishable
+EVIDENCE_WINDOW = math.log(20.0)          # plausibility window around the best evidence
 POLICIES = ("class_split", "structural_ig", "disagreement", "random", "efa")
 
 
 class StructuralIdentifiability:
-    IDENTIFIABLE = "IDENTIFIABLE"                                       # une seule structure plausible
-    PARAMETERS_ONLY = "PARAMETERS_IDENTIFIABLE_STRUCTURE_NOT"           # même fonction, plusieurs structures
-    PARTIAL = "PARTIALLY_IDENTIFIABLE"                                  # une sous-structure commune, le reste indéterminé
-    OBSERVATIONALLY_EQUIVALENT = "OBSERVATIONALLY_EQUIVALENT"           # fonctions différentes, indiscernables sur les mesures
-    NOT_IDENTIFIABLE = "NOT_IDENTIFIABLE"                               # indiscernables même sur les points mesurables
+    IDENTIFIABLE = "IDENTIFIABLE"                                       # a single plausible structure
+    PARAMETERS_ONLY = "PARAMETERS_IDENTIFIABLE_STRUCTURE_NOT"           # same function, several structures
+    PARTIAL = "PARTIALLY_IDENTIFIABLE"                                  # a common sub-structure, the rest undetermined
+    OBSERVATIONALLY_EQUIVALENT = "OBSERVATIONALLY_EQUIVALENT"           # different functions, indistinguishable on the measurements
+    NOT_IDENTIFIABLE = "NOT_IDENTIFIABLE"                               # indistinguishable even on the measurable points
     ALL = (IDENTIFIABLE, PARAMETERS_ONLY, PARTIAL, OBSERVATIONALLY_EQUIVALENT, NOT_IDENTIFIABLE)
 
 
@@ -38,7 +38,7 @@ FAILURE_REASONS = ("insufficient_data", "observational_equivalence", "missing_pr
 
 @dataclass
 class ObservationalEquivalenceClass:
-    """Ensemble de structures indiscernables sous les mesures actuelles. `forms` = formes algébriques distinctes."""
+    """Set of structures indistinguishable under the current measurements. `forms` = distinct algebraic forms."""
     members: List[WorldHypothesis]
     forms: List[str] = field(default_factory=list)
 
@@ -51,8 +51,8 @@ class ObservationalEquivalenceClass:
 
 
 class HypothesisPool:
-    """Hypothèses plausibles + prédictions en cache sur les points mesurés et sur un vivier de points mesurables.
-    Tout est recalculé SANS réajustement quand une mesure arrive (rescoring à bruit profilé)."""
+    """Plausible hypotheses + cached predictions on the measured points and on a pool of measurable points.
+    Everything is recomputed WITHOUT refitting when a measurement arrives (profiled-noise rescoring)."""
 
     def __init__(self, hyps: Sequence[WorldHypothesis], data: FitData, pool: Optional[torch.Tensor] = None, window=EVIDENCE_WINDOW, max_hyps=40):
         hs = sorted(hyps, key=lambda h: -h.evidence)[:max_hyps]; self.window = window; self.pool = pool
@@ -62,7 +62,7 @@ class HypothesisPool:
         self.forms = [algebraic_form(h.program) for h in hs]; self.rescore()
 
     def rescore(self):
-        """Évidence (bruit profilé) et masses de toutes les hypothèses sur les mesures actuelles."""
+        """Evidence (profiled noise) and masses of all the hypotheses on the current measurements."""
         n = len(self.data)
         self.ev = torch.tensor([approx_evidence(h.n_params, n_atoms(h.program), profiled_loglik(p, self.data), n) for h, p in zip(self.hyps, self.P_obs)], dtype=DT)
         self.mass = torch.softmax(self.ev, 0) if len(self.hyps) else self.ev
@@ -77,7 +77,7 @@ class HypothesisPool:
         i = self.best_index(); return min(0.45, max(0.01, float((self.P_obs[i] != self.data.y).double().mean())))
 
     def classes(self) -> List[ObservationalEquivalenceClass]:
-        """Partition des hypothèses plausibles par liaison simple : accord ≥ EQUIV_AGREEMENT sur les points mesurés."""
+        """Partition of the plausible hypotheses by single linkage: agreement ≥ EQUIV_AGREEMENT on the measured points."""
         idx = self.plausible(); parent = {i: i for i in idx}
         def find(i):
             while parent[i] != i: parent[i] = parent[parent[i]]; i = parent[i]
@@ -101,7 +101,7 @@ class HypothesisPool:
     def class_indices(self): keys = set(self.best_class().keys()); return [i for i, h in enumerate(self.hyps) if h.key in keys]
 
     def breakable(self):
-        """Part des paires de la meilleure classe qui diffèrent sur le vivier mesurable (cassables par une mesure)."""
+        """Share of the pairs of the best class that differ on the measurable pool (breakable by a measurement)."""
         idx = self.class_indices()
         if self.P_pool is None or len(idx) < 2: return 0.0
         pairs = [(i, j) for a, i in enumerate(idx) for j in idx[a + 1:]]
@@ -109,7 +109,7 @@ class HypothesisPool:
 
 
 def identifiability(pool: HypothesisPool, budget_exhausted=False, cap_reached=False) -> dict:
-    """Diagnostic d'identifiabilité structurelle de la meilleure classe + raisons possibles de non-récupération."""
+    """Structural identifiability diagnostic of the best class + possible reasons for non-recovery."""
     c = pool.best_class(); idx = pool.class_indices(); SI = StructuralIdentifiability; reasons = []
     if c.size <= 1: status = SI.IDENTIFIABLE
     else:
@@ -125,28 +125,28 @@ def identifiability(pool: HypothesisPool, budget_exhausted=False, cap_reached=Fa
             "plausible": len(pool.plausible())}
 
 
-# ================================================================ politiques de mesure (vectorisées sur le vivier)
+# ================================================================ measurement policies (vectorised over the pool)
 
 def _posteriors(mass, P, eps):
-    """Masses a posteriori pour chaque point candidat et chaque issue y ∈ {0, 1}. mass [H], P [H, Q] → post [Q, 2, H], p(y) [Q, 2]."""
+    """Posterior masses for each candidate point and each outcome y ∈ {0, 1}. mass [H], P [H, Q] → post [Q, 2, H], p(y) [Q, 2]."""
     l1 = torch.where(P.T == 1, 1 - eps, eps); lik = torch.stack([1 - l1, l1], 1)                 # [Q, 2, H]
     w = lik * mass[None, None, :]; py = w.sum(2); return w / py.clamp_min(1e-300)[..., None], py
 
 
 def score_class_split(pool: HypothesisPool):
-    """Réduction attendue de la classe d'équivalence : une FORME par voix (pas de masse), le point qui partage la
-    meilleure classe le plus également élimine le plus de formes quelle que soit la réponse."""
+    """Expected reduction of the equivalence class: one vote per FORM (no mass), the point that splits the
+    best class most evenly eliminates the most forms whatever the answer."""
     idx = pool.class_indices(); forms = {}
     for i in idx: forms.setdefault(pool.forms[i], i)
     rep = list(forms.values())
-    if len(rep) < 2: return score_disagreement(pool)                    # classe réduite à une forme : départager les classes voisines
+    if len(rep) < 2: return score_disagreement(pool)                    # class reduced to one form: separate the neighbouring classes
     p = pool.P_pool[rep].mean(0); return 2 * p * (1 - p)
 
 
 def score_structural_ig(pool: HypothesisPool):
     idx = pool.plausible(); m = pool.mass[idx] / pool.mass[idx].sum(); post, py = _posteriors(m, pool.P_pool[idx], pool.noise())
     H = lambda q: -(q.clamp_min(1e-300) * q.clamp_min(1e-300).log()).sum(-1)
-    return (H(m[None]) - (py * H(post)).sum(1)).clamp_min(0.0)                 # ≥ 0 en théorie ; l'arrondi peut donner −1e-9
+    return (H(m[None]) - (py * H(post)).sum(1)).clamp_min(0.0)                 # ≥ 0 in theory; rounding can give −1e-9
 
 
 def score_disagreement(pool: HypothesisPool):
@@ -154,7 +154,7 @@ def score_disagreement(pool: HypothesisPool):
 
 
 def score_efa(pool: HypothesisPool, n_probe=200):
-    """EFA historique : gain attendu d'exactitude fonctionnelle du vote pondéré, sur des sondes du vivier."""
+    """Historical EFA: expected gain in functional accuracy of the weighted vote, on probes from the pool."""
     idx = pool.plausible(); m = pool.mass[idx] / pool.mass[idx].sum(); P = pool.P_pool[idx]; post, py = _posteriors(m, P, pool.noise()); probes = P[:, :n_probe]
     pred = post @ probes; acc = torch.maximum(pred, 1 - pred).mean(2); base = (m[None] @ probes); return (py * acc).sum(1) - torch.maximum(base, 1 - base).mean()
 
@@ -171,9 +171,9 @@ class ActiveResult:
 
 def active_identification(outcome: SearchOutcome, data: FitData, oracle: Callable, pool_points: torch.Tensor, policy="class_split", budget=16, seed=0,
                           sensor="standard", chooser: Optional[Callable] = None) -> ActiveResult:
-    """Boucle de mesure active : choisir un point du vivier selon la politique, mesurer, rescorer (sans réajustement).
-    `oracle(x, sensor, g)` renvoie une étiquette BRUITÉE. `chooser(pool)` remplace la politique (politique oracle
-    d'évaluation, fournie de l'extérieur)."""
+    """Active measurement loop: choose a point of the pool according to the policy, measure, rescore (without refitting).
+    `oracle(x, sensor, g)` returns a NOISY label. `chooser(pool)` replaces the policy (evaluation oracle
+    policy, supplied from outside)."""
     g = torch.Generator().manual_seed(seed); hp = HypothesisPool(list(outcome.all.values()), data, pool_points); trace = []; used = torch.zeros(len(pool_points), dtype=torch.bool)
     for q in range(budget):
         before = hp.best_class().size

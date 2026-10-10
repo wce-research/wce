@@ -37,7 +37,7 @@ def parse_query(text: str) -> Query:
     tokens = tokenize(text)
 
     if not tokens:
-        raise QueryParseError("Question vide")
+        raise QueryParseError("Empty question")
 
     words = [
         canonical(token)
@@ -188,7 +188,7 @@ def parse_query(text: str) -> Query:
         )
 
     raise QueryParseError(
-        f"Question non comprise : {text!r}"
+        f"Question not understood: {text!r}"
     )
 
 
@@ -202,7 +202,7 @@ def _last_entity(words: list[str]) -> str:
 
     if not candidates:
         raise QueryParseError(
-            "Entité manquante"
+            "Missing entity"
         )
 
     return candidates[-1]

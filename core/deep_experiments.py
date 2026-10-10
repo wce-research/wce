@@ -1,12 +1,12 @@
-"""Expériences du jalon Deep Compositional Structure Discovery — côté ÉVALUATION (seul module qui voit à la fois le
-monde et le système). Les diagnostics qui utilisent la vérité ne renvoient jamais rien au système.
+"""Experiments of the milestone Deep Compositional Structure Discovery — EVALUATION side (the only module that sees both the
+world and the system). The diagnostics that use the truth never return anything to the system.
 
-Unités AWS = (type, clé) découpées en sous-unités déterministes (checkpoints, reprise) :
-  deepprofile : coût et devenir de la vraie structure par profondeur, toutes méthodes (micro-benchmark)
-  deepdev     : exploration en dev (réglages)
-  deepval     : validation (sélection de la primaire, calibration de la frontière)
-  deeptest    : test confirmatoire (16 graines)
-  deepsealed  : lot scellé (une seule fois)
+AWS units = (type, key) split into deterministic sub-units (checkpoints, resume):
+  deepprofile : cost and fate of the true structure per depth, all methods (micro-benchmark)
+  deepdev     : exploration in dev (settings)
+  deepval     : validation (selection of the primary, calibration of the boundary)
+  deeptest    : confirmatory test (16 seeds)
+  deepsealed  : sealed set (only once)
 """
 from __future__ import annotations
 
@@ -30,7 +30,7 @@ from core.deep_search import STRATEGIES, DeepSearch
 from core.deep_structure import KNOWN, NONE_OF_THE_ABOVE, UNKNOWN, FragmentLibrary, algebraic_form, n_atoms, skel_key, structurally_equivalent, subtrees
 from core.deep_world import DEPTHS, HARD_VALID, OOC_CATEGORIES, full_region, make_task, obs_region, out_region, sealed_spec, sealed_task
 
-QUERY_BUDGET, PRECISE_BUDGET, REPEAT_BUDGET = 16, 24, 24            # pré-enregistrés (addendum §10)
+QUERY_BUDGET, PRECISE_BUDGET, REPEAT_BUDGET = 16, 24, 24            # preregistered (addendum §10)
 
 
 @dataclass
@@ -44,8 +44,8 @@ class DeepConfig:
     use_classes: bool = True
     use_none: bool = True
     use_families: bool = True
-    library: Optional[dict] = None                # bibliothèque de fragments (apprise en dev), sérialisée
-    boundary: Optional[dict] = None               # BoundaryModel sérialisé (ajusté sur validation)
+    library: Optional[dict] = None                # fragment library (learned in dev), serialised
+    boundary: Optional[dict] = None               # serialised BoundaryModel (fitted on validation)
     tau_none: float = 0.5
     tau_known: float = 0.2
     max_depth: int = 6
@@ -56,10 +56,10 @@ class DeepConfig:
 def _mem_mb(): return round(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024, 1)
 
 
-# ================================================================ métriques (vérité : évaluation seulement)
+# ================================================================ metrics (truth: evaluation only)
 
 def evaluate_program(prog: Optional[BNode], task):
-    """ExactStructure / EquivalentStructure / FunctionallyEquivalent / PredictivelyAdequate, jamais fusionnées."""
+    """ExactStructure / EquivalentStructure / FunctionallyEquivalent / PredictivelyAdequate, never merged."""
     g = torch.Generator().manual_seed(11); F, I, O = full_region(4000, g), obs_region(2000, g), out_region(2000, g); lab = lambda X: task.world.label(X, 1.0)
     if prog is None: return {"exact": False, "equivalent": False, "functional": False, "adequate": False, "full": 0.0, "in_region": 0.0, "extrapolation": 0.0, "atoms": 0, "params": 0}
     a = float((predict(prog, F) == lab(F)).float().mean()); ai = float((predict(prog, I) == lab(I)).float().mean()); ao = float((predict(prog, O) == lab(O)).float().mean()); tr = task.world.truth
@@ -68,13 +68,13 @@ def evaluate_program(prog: Optional[BNode], task):
 
 
 def truth_fate(task, candidates: Dict[str, BNode], selected: Optional[BNode], class_forms=()):
-    """Devenir de la vraie structure dans une recherche. `candidates` : {clé: programme ajusté} de TOUT ce qui a été
-    ajusté. Catégories : never_generated / generated_bad_fit / good_fit_misranked / equivalent_class / selected."""
+    """Fate of the true structure in a search. `candidates`: {key: fitted program} of EVERYTHING that was
+    fitted. Categories: never_generated / generated_bad_fit / good_fit_misranked / equivalent_class / selected."""
     tr = task.world.truth
     if tr is None: return {"fate": "out_of_class", "rank": None}
     form = algebraic_form(tr); F = full_region(3000, torch.Generator().manual_seed(12)); lab = task.world.label(F, 1.0)
     same = [p for p in candidates.values() if algebraic_form(p) == form]
-    cand_forms = {algebraic_form(s) for c in candidates.values() for s in subtrees(c, min_atoms=2)}          # sous-structures présentes dans les candidats
+    cand_forms = {algebraic_form(s) for c in candidates.values() for s in subtrees(c, min_atoms=2)}          # sub-structures present in the candidates
     sub_found = sum(1 for s in subtrees(tr, min_atoms=2) if algebraic_form(s) in cand_forms)
     out = {"generated": bool(same), "true_substructures_found": sub_found, "true_substructures": len(subtrees(tr, min_atoms=2)), "candidates": len(candidates)}
     if not same: return {**out, "fate": "never_generated"}
@@ -85,10 +85,10 @@ def truth_fate(task, candidates: Dict[str, BNode], selected: Optional[BNode], cl
     return {**out, "fate": "good_fit_misranked"}
 
 
-# ================================================================ nouveau système
+# ================================================================ new system
 
 def run_new(task, cfg: DeepConfig, seed=0):
-    """Pipeline complet du nouveau système sur une tâche. Le bruit du monde n'est PAS fourni."""
+    """Full pipeline of the new system on a task. The noise of the world is NOT supplied."""
     t0 = time.time(); g = torch.Generator().manual_seed(seed); data = FitData.build(task.X, task.y, 0.10); train, hold, itr, iho = split_holdout(data, 0.2, seed)
     lib = FragmentLibrary.from_dict(cfg.library) if cfg.library else None
     out = DeepSearch(cfg.strategy, budget=cfg.budget, max_depth=cfg.max_depth, beam=cfg.beam, seed=seed, library=lib, use_families=cfg.use_families, hierarchy=cfg.hierarchy,
@@ -98,7 +98,7 @@ def run_new(task, cfg: DeepConfig, seed=0):
     policy = cfg.policy if cfg.use_classes or cfg.policy != "class_split" else "structural_ig"
     act = active_identification(out, train, oracle, pool_pts, policy=policy, budget=QUERY_BUDGET, seed=seed); hp = act.pool
     best = hp.hyps[hp.best_index()]; ident = identifiability(hp, out.stats["budget_exhausted"], any(h.depth >= cfg.max_depth for h in hp.hyps[:3]))
-    # mesures de validation de frontière (ne servent PAS à l'ajustement)
+    # boundary validation measurements (NOT used for the fit)
     Xin, Xout = obs_region(PRECISE_BUDGET // 2, g), out_region(PRECISE_BUDGET // 2, g); yin, yout = task.oracle(Xin, "precise", g), task.oracle(Xout, "precise", g)
     ri = torch.randperm(len(task.X), generator=g)[:REPEAT_BUDGET]; yrep = task.oracle(task.X[ri], "standard", g); eps_rep = repeat_noise(task.y[ri], yrep)
     tq = torch.cat([task.t[itr], torch.linspace(1.0, 1.0 + 0.02 * QUERY_BUDGET, QUERY_BUDGET)])
@@ -130,11 +130,11 @@ def _stage_counts(trace):
     return c
 
 
-# ================================================================ baseline gelée (jalon précédent), instrumentée sans la modifier
+# ================================================================ frozen baseline (previous milestone), instrumented without modifying it
 
 def run_baseline(task, seed=0, internal=False):
-    """Système du jalon précédent (configuration « système complet »), inchangé. Il reçoit le bruit VRAI du monde.
-    L'instrumentation est une sous-classe qui ENREGISTRE les ajustements sans changer aucun calcul."""
+    """System of the previous milestone ("full system" configuration), unchanged. It receives the TRUE noise of the world.
+    The instrumentation is a subclass that RECORDS the fits without changing any computation."""
     from core.robust_reconstruction import SENSOR_MODELS, Observations, RobustMeasurementPlanner, RobustStructuralReconstruction
     rec = {"fits": {}, "fe": 0.0}
 
@@ -156,7 +156,7 @@ def run_baseline(task, seed=0, internal=False):
             "seconds": round(time.time() - t0, 2), "memory_mb": _mem_mb(), "queries": r.queries, "search_depth": r.depth, "program": render(best), "class_size": 1}
 
 
-# ================================================================ sous-unités
+# ================================================================ sub-units
 
 PROFILE_METHODS = ("baseline",) + STRATEGIES
 
@@ -171,8 +171,8 @@ def _run(task, method, cfg: DeepConfig, seed):
 
 
 def profile_subunits(key):
-    """Micro-benchmark : profondeurs 1–6, 2 tâches dev par profondeur (régime standard), toutes les méthodes au budget
-    par défaut. Sert à connaître le coût par profondeur et la consommation de la baseline (budget apparié)."""
+    """Micro-benchmark: depths 1–6, 2 dev tasks per depth (standard regime), all the methods at the default
+    budget. Used to learn the cost per depth and the consumption of the baseline (matched budget)."""
     key = int(key); out = []
     for d in DEPTHS:
         for j in range(2):
@@ -182,19 +182,19 @@ def profile_subunits(key):
 
 
 def load_config(name: str) -> DeepConfig:
-    """Configuration figée lue dans results/deep_configs/<nom>.json (créée en dev / validation, empreinte au manifeste)."""
+    """Frozen configuration read from results/deep_configs/<name>.json (created in dev / validation, fingerprint in the manifest)."""
     import os
     p = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "results", "deep_configs", f"{name}.json")
     return DeepConfig(**json.load(open(p))) if os.path.exists(p) else DeepConfig()
 
 
 def dev_grid():
-    """Grille d'exploration EN DEV (réglages) : stratégie × budget × patience. Jamais appliquée au test ni au scellé."""
+    """Exploration grid IN DEV (settings): strategy × budget × patience. Never applied to the test nor to the sealed set."""
     return [{"strategy": s, "budget": b, "patience": p} for s in STRATEGIES for b in (150.0,) for p in (1, 2)]
 
 
 def dev_tasks(key):
-    """Tâches de dev de la clé : profondeurs 1–5 en régime standard + un monde hors classe + un difficile-valide."""
+    """Dev tasks of the key: depths 1–5 in the standard regime + one out-of-class world + one hard-valid one."""
     key = int(key); T = [("in", make_task(key * 40 + d, d, "standard", kind=("iid", "boundary", "grouped_outliers")[(key + d) % 3], split="dev")) for d in (1, 2, 3, 4, 5)]
     T.append(("ooc", make_task(key * 40 + 10, category=OOC_CATEGORIES[key % len(OOC_CATEGORIES)], split="dev")))
     T.append(("hard", make_task(key * 40 + 11, category=HARD_VALID[key % len(HARD_VALID)], split="dev")))
@@ -210,7 +210,7 @@ def dev_subunits(key):
     return out
 
 
-# ================================================================ sous-jalon Deep Candidate Generation (dev uniquement)
+# ================================================================ sub-milestone Deep Candidate Generation (dev only)
 
 GEN_METHODS = (("baseline", 0.0), ("flat", 150.0), ("bottom_up", 50.0), ("bottom_up", 150.0), ("bottom_up", 450.0), ("bidirectional", 150.0),
                ("factorized", 50.0), ("factorized", 150.0), ("factorized", 450.0), ("factorized_sep", 150.0))
@@ -221,8 +221,8 @@ def gen_task(key, d, regime): return make_task(7000 + int(key) * 20 + d, d, regi
 
 
 def run_generation(task, method, budget, seed=0):
-    """Recherche SEULE (pas de mesures actives ni de frontière) + diagnostic de génération : rappels de la vraie
-    structure à chaque étape, cause principale de l'échec, coûts séparés (candidats, ajustements, compositions, CPU)."""
+    """Search ALONE (no active measurements and no boundary) + generation diagnostic: recalls of the true
+    structure at each stage, main cause of the failure, separate costs (candidates, fits, compositions, CPU)."""
     from core.deep_reachability import classify
     t0 = time.time(); tr = task.world.truth; F = full_region(3000, torch.Generator().manual_seed(12)); lab = task.world.label(F, 1.0)
     if method == "baseline":
@@ -242,9 +242,9 @@ def run_generation(task, method, budget, seed=0):
 
 
 def mechanics(task, seed=0):
-    """Diagnostics MÉCANIQUES d'une tâche (vérité utilisée, diagnostic seulement) : reachability par jeu d'opérateurs,
-    chemin oracle, borne d'identifiabilité, étage logique avec les vrais atomes, rappel des atomes par méthode de
-    découverte."""
+    """MECHANICAL diagnostics of a task (truth used, diagnostic only): reachability per operator set,
+    oracle path, identifiability bound, logic stage with the true atoms, atom recall per discovery
+    method."""
     from core.boundary_program import atoms
     from core.deep_fit import FitCounter, approx_evidence, fit_batch, heuristic_inits
     from core.deep_generation import discover_atoms_by_separation, generate_candidates
@@ -265,7 +265,7 @@ def mechanics(task, seed=0):
     c2 = FitCounter(); sep, st = discover_atoms_by_separation(A, task.X, task.y, seed=seed, counter=c2)
     out["atom_recall"] = {"global_gradient": recall(glob), "global_gradient_090": recall(glob, 0.90), "separation": recall(sep), "separation_090": recall(sep, 0.90)}
     out["atom_fit_equivalents"] = {"global_gradient": c1.fit_equivalents, "separation": c2.fit_equivalents}; out["boundary_pairs"] = st["pairs"]
-    for name, lits in (("true_atoms", tl), ("true_atoms_plus_distractors", tl + glob[:12])):                      # ORACLE DE LITTÉRAUX : l'étage logique seul
+    for name, lits in (("true_atoms", tl), ("true_atoms_plus_distractors", tl + glob[:12])):                      # LITERAL ORACLE: the logic stage alone
         t0 = time.time(); gen = generate_candidates(task.X, task.y, max_depth=n_atoms(tr), top=6, extra_literals=lits, geometry=False, max_literals=18)
         order = sorted(range(len(gen.programs)), key=lambda i: -gen.info[i]["score"]); hit = [order.index(i) for i, p in enumerate(gen.programs) if algebraic_form(p) == form]
         out[f"logic_{name}"] = {"generated": bool(hit), "rank": hit[0] if hit else None, "seconds": round(time.time() - t0, 3), "pairs_scored": gen.stats.get("pairs_scored"), "attempted": gen.stats.get("attempted"),
@@ -283,7 +283,7 @@ def gen_subunits(key):
     return out
 
 
-# ---- couverture exhaustive à petite profondeur -------------------------------------------------------------------
+# ---- exhaustive coverage at small depth -------------------------------------------------------------------
 
 COVER_CHUNKS = 8
 COVER_STRATEGIES = ("baseline", "flat", "bottom_up", "bidirectional", "factorized")
@@ -300,8 +300,8 @@ def _all_forms(max_depth):
 
 
 def cover_exhaustive(task, depth, chunk, n_init=4, seed=0):
-    """ÉNUMÉRATION EXHAUSTIVE : toutes les formes de profondeur ≤ `depth` sont ajustées (lot de `n_init`
-    initialisations). Renvoie, pour le morceau `chunk`, l'évidence de chaque forme et l'accord de la meilleure."""
+    """EXHAUSTIVE ENUMERATION: all the forms of depth ≤ `depth` are fitted (batch of `n_init`
+    initialisations). Returns, for the chunk `chunk`, the evidence of each form and the agreement of the best one."""
     from core.deep_fit import approx_evidence, fit_batch, heuristic_inits
     from core.deep_search import profiled_loglik
     forms = _all_forms(depth); mine = forms[chunk::COVER_CHUNKS]; data = FitData.build(task.X, task.y, 0.10); tf = algebraic_form(task.world.truth); F = full_region(3000, torch.Generator().manual_seed(12)); lab = task.world.label(F, 1.0); out = []
@@ -313,7 +313,7 @@ def cover_exhaustive(task, depth, chunk, n_init=4, seed=0):
 
 
 def cover_strategy(task, depth, method, seed=0):
-    """Couverture d'une stratégie au budget de référence : formes distinctes générées, par profondeur."""
+    """Coverage of a strategy at the reference budget: distinct forms generated, per depth."""
     if method == "baseline": cands = run_baseline(task, seed, internal=True)[0].values()
     else: cands = [h.program for h in DeepSearch(method, budget=150.0, seed=seed, max_depth=depth).run(FitData.build(task.X, task.y, 0.10)).all.values()]
     by = {}
@@ -330,7 +330,7 @@ def cover_subunits(key):
     return out
 
 
-# ================================================================ sous-jalon Primitive Discovery (dev uniquement)
+# ================================================================ sub-milestone Primitive Discovery (dev only)
 
 PRIM_METHODS = ("gradient", "geometric", "contrast", "hybrid", "hybrid_minimal", "neural", "neural_hybrid")
 CHAIN_METHODS = ("gradient", "hybrid", "hybrid_minimal", "neural_hybrid")
@@ -338,7 +338,7 @@ CHAIN_DEPTHS = (2, 3, 4, 5)
 
 
 def prim_proposer(name):
-    """Proposeurs comparés : gradient direct (référence), géométrique analytique, contraste, hybride, neuronal compact."""
+    """Proposers compared: direct gradient (reference), analytic geometric, contrast, hybrid, compact neural."""
     from core.deep_neural_proposer import NeuralProposer
     from core.deep_primitives import ContrastProposer, GeometricProposer, GradientProposer, RefiningProposer
     if name == "gradient": return GradientProposer()
@@ -358,7 +358,7 @@ def _neural_missing(name):
 
 
 def prim_scene(scene, method, seed=0, extra=None):
-    """Découverte de primitives sur une scène atomique + métriques (vérité : évaluation seulement)."""
+    """Primitive discovery on an atomic scene + metrics (truth: evaluation only)."""
     from core.deep_primitive_eval import primitive_metrics
     from core.deep_primitives import discover
     t = scene.task
@@ -373,7 +373,7 @@ def prim_scene(scene, method, seed=0, extra=None):
 
 
 def prim_active(scene, policy, seed=0, budget=16):
-    """Mesures actives dirigées vers les primitives (désaccord interne aux classes) contre mesures aléatoires."""
+    """Active measurements directed at the primitives (disagreement internal to the classes) versus random measurements."""
     from core.deep_primitives import discover, primitive_query_scores
     t = scene.task; g = torch.Generator().manual_seed(seed); pool = obs_region(400, g); d = discover(t.X, t.y, prim_proposer("hybrid"), seed=seed)
     if policy == "primitive": sc = primitive_query_scores(d.primitives, pool); idx = sc.topk(budget).indices if float(sc.max()) > 0 else torch.randperm(len(pool), generator=g)[:budget]
@@ -382,8 +382,8 @@ def prim_active(scene, policy, seed=0, budget=16):
 
 
 def prim_chain(task, method, seed=0):
-    """Chaîne causale : rappel des primitives → rappel de la structure candidate → récupération finale, et matrice
-    de décomposition oracle (vrais atomes / atomes découverts) × (vraie composition / composition WCE)."""
+    """Causal chain: recall of the primitives → recall of the candidate structure → final recovery, and oracle
+    decomposition matrix (true atoms / discovered atoms) × (true composition / WCE composition)."""
     from core.deep_primitive_eval import primitive_metrics
     from core.deep_primitives import discover
     from core.deep_reachability import leaves
@@ -392,14 +392,14 @@ def prim_chain(task, method, seed=0):
         out = DeepSearch("factorized", budget=150.0, seed=seed, max_depth=min(6, n_atoms(tr) + 1), **kw).run(data); best = out.best(); acc = [float((predict(h.program, F) == lab).float().mean()) for h in out.all.values()]
         return out, {"candidate_form": form in {algebraic_form(h.program) for h in out.all.values()}, "candidate_functional": max(acc, default=0.0) >= 0.97, "final_functional": float((predict(best.program, F) == lab).float().mean()) >= 0.99,
                      "final_full": float((predict(best.program, F) == lab).float().mean()), "final_form": algebraic_form(best.program) == form, "fit_equivalents": out.stats["fit_equivalents"], "seconds": out.stats["seconds"]}
-    if method == "oracle_atoms":                                              # vrais atomes + composition WCE (diagnostic)
+    if method == "oracle_atoms":                                              # true atoms + WCE composition (diagnostic)
         _, c = compose({"fact_literals": tl, "fact_residual": False}); return {"method": method, "primitive_equivalence": 1.0, "primitive_exact": 1.0, **c, "discovered_true_composition": 1.0}
     if _neural_missing(method): return {"method": method, "unavailable": True}
     if method == "gradient": out, c = compose({}); found = [l for h in out.all.values() for l in leaves(h.program)]
     else:
         out, c = compose({"fact_discovery": prim_proposer(method)}); found = [m.program for cl in out.discovery.primitives.classes for m in cl.members] if out.discovery is not None else []
     m = primitive_metrics(tl, found, task.X, task.y, P)
-    def sub(n):                                                               # atomes découverts + VRAIE composition
+    def sub(n):                                                               # discovered atoms + TRUE composition
         if n.kind in ("and", "or", "xor"): return BNode(n.kind, children=tuple(sub(ch) for ch in n.children))
         tn = predict(n, P); return max(found, key=lambda q: float((predict(q, P) == tn).float().mean())) if found else n
     dtc = float((predict(sub(tr), F) == lab).float().mean()) if found else 0.0
@@ -429,8 +429,8 @@ def prim_subunits(key):
 
 
 def neural_train_scenes(variant, n):
-    """Scènes d'ENTRAÎNEMENT du proposeur (partition dev, base dédiée, distribution nominale). `single` : un seul atome ;
-    `full` : curriculum complet (scènes atomiques de toutes catégories + compositions profondes de dev)."""
+    """TRAINING scenes of the proposer (dev partition, dedicated base, nominal distribution). `single`: a single atom;
+    `full`: full curriculum (atomic scenes of all categories + deep dev compositions)."""
     from core.deep_primitive_eval import components
     from core.deep_primitive_world import CATEGORIES, TRAIN_BASE, make_scene
     from core.deep_reachability import leaves
@@ -444,7 +444,7 @@ def neural_train_scenes(variant, n):
 
 
 def neural_subunits(key):
-    """Entraînement du proposeur neuronal compact sur AWS. Clé 0 : curriculum complet ; clé 1 : atomes seuls."""
+    """Training of the compact neural proposer on AWS. Key 0: full curriculum; key 1: atoms alone."""
     variant = {0: "full", 1: "single"}[int(key)]
     def run():
         from core.deep_neural_proposer import state_to_json, train
@@ -453,7 +453,7 @@ def neural_subunits(key):
     return [("train", run)]
 
 
-# ================================================================ sous-jalon Downstream Selection Loss (dev, vrais atomes fournis)
+# ================================================================ sub-milestone Downstream Selection Loss (dev, true atoms supplied)
 
 DOWN_DEPTHS = (2, 3, 4, 5)
 
@@ -466,13 +466,13 @@ def down_subunits(key):
     return [(f"d{d}_{reg}", (lambda d=d, reg=reg: [_row(down_task(key, d, reg), {"experiment": "downstream", **trace_task(down_task(key, d, reg), int(key))})])) for d in DOWN_DEPTHS for reg in GEN_REGIMES]
 
 
-# ================================================================ sous-jalon Validated Optimizer (dev, vrais atomes fournis)
+# ================================================================ sub-milestone Validated Optimizer (dev, true atoms supplied)
 
 VO_ARMS = ("A", "B", "C")
 
 
 def vo_subunits(key):
-    """Expérience contrôlée : clés 0–15 = les 128 tâches du diagnostic aval ; clés 100–115 = 128 NOUVELLES tâches de dev."""
+    """Controlled experiment: keys 0–15 = the 128 tasks of the downstream diagnostic; keys 100–115 = 128 NEW dev tasks."""
     from core.deep_validated import arm_run
     return [(f"d{d}_{reg}_{arm}", (lambda d=d, reg=reg, arm=arm: [_row(down_task(key, d, reg), {"experiment": "arms", "task_set": "new" if int(key) >= 100 else "diagnostic", "task_id": f"{key}_{d}_{reg}", **arm_run(down_task(key, d, reg), arm, int(key))})]))
             for d in DOWN_DEPTHS for reg in GEN_REGIMES for arm in VO_ARMS]
@@ -483,10 +483,10 @@ def opt_subunits(key):
     return [(f"d{d}_{reg}", (lambda d=d, reg=reg: [_row(down_task(key, d, reg), optimizer_diagnosis(down_task(key, d, reg), int(key)))])) for d in DOWN_DEPTHS for reg in GEN_REGIMES]
 
 
-# ================================================================ sous-jalon Objective Alignment & Conditional Optimization (dev)
+# ================================================================ sub-milestone Objective Alignment & Conditional Optimization (dev)
 
 def obj_subunits(key):
-    """Étude par candidat. Clés 300–307 : jeu de RÉGLAGE de la porte ; clés 200–215 : jeu d'ÉVALUATION (structures disjointes)."""
+    """Per-candidate study. Keys 300–307: TUNING set of the gate; keys 200–215: EVALUATION set (disjoint structures)."""
     from core.deep_objective import candidate_study
     return [(f"d{d}_{reg}", (lambda d=d, reg=reg: [_row(down_task(key, d, reg), {"task_set": "tuning" if int(key) >= 300 else "evaluation", "task_id": f"{key}_{d}_{reg}", **r}) for r in candidate_study(down_task(key, d, reg), int(key))])) for d in DOWN_DEPTHS for reg in GEN_REGIMES]
 
@@ -502,66 +502,66 @@ def resid_subunits(key):
     return [(f"t{k}_{d}_{reg}", (lambda k=k, d=d, reg=reg: [_row(down_task(k, d, reg), {"task_id": f"{k}_{d}_{reg}", **residual_case(down_task(k, d, reg), int(k))})])) for k, d, reg in RESIDUAL_TASKS]
 
 
-# ================================================================ sous-jalon Robust Primitive Discovery (dev)
+# ================================================================ sub-milestone Robust Primitive Discovery (dev)
 
 def rp_subunits(key):
-    """Clés 0–15 : banc atomique (scènes 2000+) ; clés 400+ : chaîne aval avec plafonds oracle (tâches jamais utilisées)."""
+    """Keys 0–15: atomic bench (scenes 2000+); keys 400+: downstream chain with oracle ceilings (tasks never used)."""
     from core.deep_robust_prim import subunits
     return subunits(key)
 
 
-# ================================================================ sous-jalon Partial-Observation Primitive Parameter Inference (dev)
+# ================================================================ sub-milestone Partial-Observation Primitive Parameter Inference (dev)
 
 def po_subunits(key):
-    """Clés 0–15 : masquage contrôlé et mesures actives ; clés 500+ : chaîne aval à type connu (tâches jamais utilisées)."""
+    """Keys 0–15: controlled occlusion and active measurements; keys 500+: downstream chain with known type (tasks never used)."""
     from core.deep_partial_exp import subunits
     return subunits(key)
 
 
-# ================================================================ sous-jalon Fragment Attribution & Primitive Type Inference (dev)
+# ================================================================ sub-milestone Fragment Attribution & Primitive Type Inference (dev)
 
 def ft_subunits(key):
-    """Clés 0–15 : attribution, type, propriété du masquage, secteurs ; clés 600+ : chaîne aval SANS oracle de type."""
+    """Keys 0–15: attribution, type, occlusion ownership, sectors; keys 600+: downstream chain WITHOUT type oracle."""
     from core.deep_fragments_exp import subunits
     return subunits(key)
 
 
-# ================================================================ sous-jalon Boundary Ownership & Fragment Attribution (dev)
+# ================================================================ sub-milestone Boundary Ownership & Fragment Attribution (dev)
 
 def bo_subunits(key):
-    """Clés 0–15 : attribution, matrice oracle, visibilité, secteurs ; clés 700+ : chaîne aval et confirmation de flat_scene_k3."""
+    """Keys 0–15: attribution, oracle matrix, visibility, sectors; keys 700+: downstream chain and confirmation of flat_scene_k3."""
     from core.deep_ownership_exp import subunits
     return subunits(key)
 
 
-# ================================================================ sous-jalon Deep Composition & Final Reconstruction with Oracle Atoms (dev)
+# ================================================================ sub-milestone Deep Composition & Final Reconstruction with Oracle Atoms (dev)
 
 def dc_subunits(key):
-    """Clés 800–831 : vrais atomes fournis ; composition, sélection, ajustement ; pipeline existant en comparaison."""
+    """Keys 800–831: true atoms supplied; composition, selection, fit; existing pipeline for comparison."""
     from core.deep_compose_exp import subunits
     return subunits(key)
 
 
-# ================================================================ sous-jalon End-to-End Composition with Discovered Atoms (dev)
+# ================================================================ sub-milestone End-to-End Composition with Discovered Atoms (dev)
 
 def ee_subunits(key):
-    """Clés 900–931 : trois chaînes sans oracle, sources, réduction, cas contrôlés, frontière de classe."""
+    """Keys 900–931: three chains without oracle, sources, reduction, controlled cases, class boundary."""
     from core.deep_e2e_exp import subunits
     return subunits(key)
 
 
-# ================================================================ sous-jalon Latent Primitive Recovery (dev)
+# ================================================================ sub-milestone Latent Primitive Recovery (dev)
 
 def lp_subunits(key):
-    """Clés 1000–1031 : trois sources de primitives dans le même aval fort, sensibilité, faux positifs, complétude."""
+    """Keys 1000–1031: three primitive sources in the same strong downstream, sensitivity, false positives, completeness."""
     from core.deep_lpr_exp import subunits
     return subunits(key)
 
 
-# ================================================================ sous-jalon High-Precision Primitive Estimation (dev)
+# ================================================================ sub-milestone High-Precision Primitive Estimation (dev)
 
 def hp_subunits(key):
-    """Clés 1100–1131 : banc par primitive, carte de sensibilité, naissance, chaînes A / B / C (standard, rich, dense), OOD."""
+    """Keys 1100–1131: per-primitive bench, sensitivity map, birth, chains A / B / C (standard, rich, dense), OOD."""
     from core.deep_hp_exp import subunits
     return subunits(key)
 

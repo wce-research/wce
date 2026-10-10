@@ -1,21 +1,21 @@
-"""Moteur d'ajustement PAR LOTS — une AUTRE IMPLÉMENTATION de l'ajustement, pas une optimisation transparente.
+"""BATCH fitting engine — ANOTHER IMPLEMENTATION of the fit, not a transparent optimisation.
 
-Même vraisemblance (contamination), même schéma de raideur, même optimiseur (Adam, mêmes hyperparamètres) que
-`fit_robust` (jalon précédent). Ce qui change :
-  * le parcours d'arbre est COMPILÉ une fois par squelette (décalages de paramètres pré-calculés) ;
-  * K initialisations (ou K candidats de même squelette) sont ajustées EN UN SEUL passage, tenseur [K, P].
+Same likelihood (contamination), same stiffness schedule, same optimiser (Adam, same hyperparameters) as
+`fit_robust` (previous milestone). What changes:
+  * the tree traversal is COMPILED once per skeleton (parameter offsets precomputed);
+  * K initialisations (or K candidates with the same skeleton) are fitted IN A SINGLE pass, tensor [K, P].
 
-Compromis vitesse / fidélité MESURÉ (docs/rapport_validated_optimizer.md) :
-  * vitesse : ≈ 7× par lot de 8 initialisations ; ≈ 1,1× pour un ajustement isolé ;
-  * fidélité : sur des cas courts et bien conditionnés l'écart avec `fit_robust` est ≈ 1e-7 ; sur des candidats
-    composites et 100 pas, l'écart de paramètres dépasse 1e-3 dans une part non négligeable des tâches (l'ancien
-    ajusteur arrondit l'initialisation en simple précision et l'optimisation amplifie cet écart). Le premier classé
-    reste le même dans ≈ 98 % des tâches, l'ordre complet dans ≈ 87 %.
-L'hypothèse pré-enregistrée H10(b) (écart ≤ 1e-6) est donc RÉFUTÉE sur les composites : ce moteur n'est PAS
-numériquement équivalent à l'ancien en général, bien que les deux aient le même comportement scientifique mesuré
-(même issue au seuil 0,99 sur les mêmes points de départ).
+MEASURED speed / fidelity trade-off (docs/rapport_validated_optimizer.md):
+  * speed: ≈ 7× per batch of 8 initialisations; ≈ 1.1× for an isolated fit;
+  * fidelity: on short, well-conditioned cases the gap with `fit_robust` is ≈ 1e-7; on composite
+    candidates and 100 steps, the parameter gap exceeds 1e-3 in a non-negligible share of the tasks (the old
+    fitter rounds the initialisation to single precision and the optimisation amplifies this gap). The top-ranked one
+    stays the same in ≈ 98 % of the tasks, the full order in ≈ 87 %.
+The preregistered hypothesis H10(b) (gap ≤ 1e-6) is therefore REFUTED on the composites: this engine is NOT
+numerically equivalent to the old one in general, although both have the same measured scientific behaviour
+(same outcome at the 0.99 threshold on the same starting points).
 
-Ce fichier contient aussi l'ajustement VALIDÉ (propose → evaluate → commit / rollback), seul garde-fou du pipeline.
+This file also contains the VALIDATED fit (propose → evaluate → commit / rollback), the only safeguard of the pipeline.
 """
 from __future__ import annotations
 
@@ -32,7 +32,7 @@ DT = torch.float64
 
 @dataclass
 class FitData:
-    """Observations pour l'ajustement : points, étiquettes, bruit par observation, poids (0 = point indifférent)."""
+    """Observations for the fit: points, labels, per-observation noise, weights (0 = don't-care point)."""
     X: torch.Tensor
     y: torch.Tensor
     flip: torch.Tensor
@@ -56,7 +56,7 @@ _COMPILED: Dict[str, Callable] = {}
 
 
 def compile_skeleton(skel: BNode) -> Callable:
-    """Compile un squelette en fonction f(theta [K, P], X [1 ou K, N, 2], sig) → [K, N]. Mêmes formules que
+    """Compiles a skeleton into a function f(theta [K, P], X [1 or K, N, 2], sig) → [K, N]. Same formulas as
     `core.boundary_program.evaluate`."""
     key = repr(skel.skeleton())
     if key in _COMPILED: return _COMPILED[key]
@@ -103,7 +103,7 @@ def compile_skeleton(skel: BNode) -> Callable:
 
 
 def forward(skel: BNode, theta, X, k: Optional[float]):
-    """Probabilités adoucies [K, N] (k fini) ou valeurs dures (k None)."""
+    """Soft probabilities [K, N] (finite k) or hard values (k None)."""
     sig = (lambda z: torch.sigmoid(k * z)) if k is not None else (lambda z: (z >= 0).to(DT))
     return compile_skeleton(skel)(theta, X[None] if X.dim() == 2 else X, sig)
 
@@ -112,13 +112,13 @@ def predict_batch(skel: BNode, theta, X): return (forward(skel, theta, torch.nan
 
 
 def loglik_batch(skel: BNode, theta, data: FitData, gamma=0.02, k=30.0):
-    """log P(D | structure, θ) par ligne du lot (mélange de contamination, comme `obs_loglik`)."""
+    """log P(D | structure, θ) per row of the batch (contamination mixture, like `obs_loglik`)."""
     p = forward(skel, theta, data.X, k).clamp(1e-6, 1 - 1e-6); p1 = (1 - gamma) * (data.flip + (1 - 2 * data.flip) * p) + gamma * 0.5
     return (data.weight * (data.y * torch.log(p1) + (1 - data.y) * torch.log(1 - p1))).sum(1)
 
 
 class FitCounter:
-    """Compte le calcul en « équivalents-ajustement » (une initialisation × 100 pas) et en candidats."""
+    """Counts the computation in "fit-equivalents" (one initialisation × 100 steps) and in candidates."""
     def __init__(self, budget: Optional[float] = None): self.fit_equivalents = 0.0; self.candidates = 0; self.calls = 0; self.budget = budget
     def charge(self, k, steps): self.fit_equivalents += k * steps / 100.0; self.calls += 1
     def exhausted(self): return self.budget is not None and self.fit_equivalents >= self.budget
@@ -126,16 +126,16 @@ class FitCounter:
 
 
 def profiled_loglik(pred, data: FitData):
-    """logL des prédictions DURES avec bruit PROFILÉ : le taux de retournement ε est un paramètre de nuisance estimé
-    par hypothèse (ε̂ = taux d'erreur lissé). Le bruit du monde n'a donc pas à être connu : une structure plus profonde
-    n'est préférée que si la baisse d'erreur paie sa pénalité de complexité."""
+    """logL of the HARD predictions with PROFILED noise: the flip rate ε is a nuisance parameter estimated
+    per hypothesis (ε̂ = smoothed error rate). The noise of the world therefore does not have to be known: a deeper structure
+    is preferred only if the drop in error pays for its complexity penalty."""
     w = data.weight; n = float(w.sum()); e = float(((pred != data.y).to(DT) * w).sum()); eps = min(0.49, max(1e-3, (e + 0.5) / (n + 1.0)))
     return e * math.log(eps) + (n - e) * math.log(1 - eps)
 
 
 def fit_batch(skel: BNode, data: FitData, inits, steps=100, gamma=0.02, lr=0.05, counter: Optional[FitCounter] = None):
-    """Ajuste K jeux de paramètres d'un même squelette en un passage. Renvoie (theta [K, P], logL [K]).
-    Schéma identique à `fit_robust` : Adam(lr), raideur k = 4 + 20·t/steps, vraisemblance à contamination."""
+    """Fits K parameter sets of the same skeleton in one pass. Returns (theta [K, P], logL [K]).
+    Schedule identical to `fit_robust`: Adam(lr), stiffness k = 4 + 20·t/steps, contamination likelihood."""
     th0 = inits if torch.is_tensor(inits) else torch.stack([torch.as_tensor(i, dtype=DT) for i in inits])
     th = th0.clone().to(DT).requires_grad_(True)
     if th.shape[1] == 0: return th.detach(), loglik_batch(skel, th.detach(), data, gamma)
@@ -150,31 +150,31 @@ def fit_batch(skel: BNode, data: FitData, inits, steps=100, gamma=0.02, lr=0.05,
 
 
 def heuristic_inits(skel: BNode, data: FitData, n_init: int, seed: int):
-    """Initialisations heuristiques du jalon précédent (`_inits`), sur les points de poids non nul."""
+    """Heuristic initialisations of the previous milestone (`_inits`), on the points with non-zero weight."""
     m = data.weight > 0; g = torch.Generator().manual_seed(seed)
     return torch.stack([v.to(DT) for v in _inits(skel, data.X[m].float(), data.y[m].long(), n_init, g)])
 
 
 def best_of(skel: BNode, theta, ll):
-    """Meilleure ligne du lot → (programme ajusté, logL)."""
+    """Best row of the batch → (fitted program, logL)."""
     i = int(ll.argmax()); return skel.skeleton().with_params(theta[i].tolist()), float(ll[i])
 
 
 def approx_evidence(n_params: int, n_atoms: int, ll: float, n_obs: int, bits_per_node=3.0):
-    """Évidence APPROCHÉE (type BIC + a priori structurel), même forme que le jalon précédent : ce n'est pas une
-    marginale exacte."""
+    """APPROXIMATE evidence (BIC-type + structural prior), same form as the previous milestone: it is not an
+    exact marginal."""
     return ll - 0.5 * n_params * math.log(max(1, n_obs)) - (2 * n_atoms - 1) * bits_per_node * math.log(2)
 
 
-# ================================================================ ajustement par SÉPARATION (changement scientifique, pas une optimisation)
+# ================================================================ fit by SEPARATION (scientific change, not an optimisation)
 
 def separation_fit(skel: BNode, P, Q, pair_weight, inits, steps=50, lr=0.05, counter: Optional[FitCounter] = None):
-    """SCIENTIFIC CHANGE (génération de candidats) — objectif indépendant de la polarité : ajuster un atome pour que sa
-    frontière passe ENTRE les deux points de chaque paire de frontière (points voisins d'étiquettes opposées).
-    Dans une composition and / or / xor, un atome masqué par un XOR n'est pas corrélé à la cible, mais sa frontière reste
-    visible localement : cet objectif la trouve là où l'ajustement sur la cible échoue.
-    Probabilité de séparation d'une paire : m(P)(1 − m(Q)) + m(Q)(1 − m(P)), m = appartenance adoucie.
-    Renvoie (theta [K, np], séparation pondérée dure [K])."""
+    """SCIENTIFIC CHANGE (candidate generation) — polarity-independent objective: fit an atom so that its
+    boundary passes BETWEEN the two points of each boundary pair (neighbouring points with opposite labels).
+    In an and / or / xor composition, an atom masked by an XOR is not correlated with the target, but its boundary remains
+    locally visible: this objective finds it where the fit on the target fails.
+    Separation probability of a pair: m(P)(1 − m(Q)) + m(Q)(1 − m(P)), m = soft membership.
+    Returns (theta [K, np], hard weighted separation [K])."""
     th = (inits if torch.is_tensor(inits) else torch.stack([torch.as_tensor(i, dtype=DT) for i in inits])).clone().to(DT).requires_grad_(True)
     fn = compile_skeleton(skel); P, Q, w = P.to(DT)[None], Q.to(DT)[None], pair_weight.to(DT); opt = torch.optim.Adam([th], lr=lr)
     for t in range(steps):
@@ -185,18 +185,18 @@ def separation_fit(skel: BNode, P, Q, pair_weight, inits, steps=50, lr=0.05, cou
     hard = lambda z: (z >= 0).to(DT); return th, (w * (fn(th, P, hard) != fn(th, Q, hard)).to(DT)).sum(1)
 
 
-# ================================================================ ajustement VALIDÉ : propose → evaluate → commit / rollback
+# ================================================================ VALIDATED fit: propose → evaluate → commit / rollback
 
-ACCEPT_TOL = 1e-9                 # tolérance numérique (nats) : en deçà, l'état ajusté n'est pas considéré comme meilleur
+ACCEPT_TOL = 1e-9                 # numerical tolerance (nats): below it, the fitted state is not considered better
 CRITERIA = ("profiled", "surrogate")
 
 
 @dataclass(frozen=True)
 class FitTransaction:
-    """Trace d'un ajustement validé. L'état initial n'est jamais modifié : c'est un tenseur distinct, conservé jusqu'à
-    la décision."""
-    before: tuple                  # paramètres de l'état initial (immuable)
-    proposal: tuple                # paramètres proposés par l'optimiseur
+    """Trace of a validated fit. The initial state is never modified: it is a distinct tensor, kept until
+    the decision."""
+    before: tuple                  # parameters of the initial state (immutable)
+    proposal: tuple                # parameters proposed by the optimiser
     criterion: str
     value_before: float
     value_after: float
@@ -208,9 +208,9 @@ class FitTransaction:
 
 
 def fit_criterion(skel: BNode, theta_row, data: FitData, criterion="profiled", gamma=0.02) -> float:
-    """Critère OBSERVABLE d'un état (aucune vérité) : `profiled` = vraisemblance profilée des prédictions dures sur les
-    observations (celle que le système utilise ensuite pour enregistrer et classer) ; `surrogate` = vraisemblance
-    robuste adoucie (raideur 30) que l'optimiseur maximise."""
+    """OBSERVABLE criterion of a state (no truth): `profiled` = profiled likelihood of the hard predictions on the
+    observations (the one the system then uses to record and rank); `surrogate` = soft robust
+    likelihood (stiffness 30) that the optimiser maximises."""
     th = theta_row.reshape(1, -1).to(DT)
     if criterion == "profiled": return profiled_loglik(predict_batch(skel, th, data.X)[0].to(DT), data)
     if criterion == "surrogate": return float(loglik_batch(skel, th, data, gamma)[0])
@@ -218,13 +218,13 @@ def fit_criterion(skel: BNode, theta_row, data: FitData, criterion="profiled", g
 
 
 def decide(value_before: float, value_after: float, proposal_finite: bool, tol=ACCEPT_TOL):
-    """Règle d'acceptation, déterministe :
-      * proposition non finie (NaN / inf dans les paramètres ou dans le critère) → rollback ;
-      * état initial au critère non fini et proposition finie → commit (on ne peut pas faire pire) ;
-      * amélioration stricte au-delà de la tolérance (après − avant > tol) → commit ;
-      * égalité à la tolérance près (|après − avant| ≤ tol) → rollback : sans preuve d'amélioration, l'état initial
-        est conservé ;
-      * sinon → rollback."""
+    """Acceptance rule, deterministic:
+      * non-finite proposal (NaN / inf in the parameters or in the criterion) → rollback;
+      * initial state with a non-finite criterion and finite proposal → commit (one cannot do worse);
+      * strict improvement beyond the tolerance (after − before > tol) → commit;
+      * equality up to the tolerance (|after − before| ≤ tol) → rollback: without evidence of improvement, the initial state
+        is kept;
+      * otherwise → rollback."""
     if not proposal_finite or not math.isfinite(value_after): return False, "non_finite_proposal"
     if not math.isfinite(value_before): return True, "non_finite_before"
     d = value_after - value_before
@@ -233,12 +233,12 @@ def decide(value_before: float, value_after: float, proposal_finite: bool, tol=A
 
 
 def validated_fit(skel: BNode, data: FitData, init_row, steps=100, gamma=0.02, lr=0.05, counter: Optional[FitCounter] = None, criterion="profiled", tol=ACCEPT_TOL):
-    """Ajustement à sémantique transactionnelle : état initial → proposition de l'optimiseur → évaluation sur le
-    critère observable → commit ou rollback. L'optimiseur (`fit_batch`) est inchangé ; seul le remplacement de l'état
-    est conditionné. Renvoie (paramètres retenus [P], FitTransaction)."""
-    before = torch.as_tensor(init_row, dtype=DT).reshape(-1).clone(); frozen = before.clone()                       # l'état initial n'est pas modifié en place
+    """Fit with transactional semantics: initial state → proposal of the optimiser → evaluation on the
+    observable criterion → commit or rollback. The optimiser (`fit_batch`) is unchanged; only the replacement of the state
+    is conditional. Returns (retained parameters [P], FitTransaction)."""
+    before = torch.as_tensor(init_row, dtype=DT).reshape(-1).clone(); frozen = before.clone()                       # the initial state is not modified in place
     prop, _ = fit_batch(skel, data, before.reshape(1, -1), steps=steps, gamma=gamma, lr=lr, counter=counter); prop = prop[0]
-    assert torch.equal(before, frozen), "l'optimiseur a modifié l'état initial en place"
+    assert torch.equal(before, frozen), "the optimiser modified the initial state in place"
     finite = bool(torch.isfinite(prop).all()); vb = fit_criterion(skel, before, data, criterion, gamma); va = fit_criterion(skel, prop, data, criterion, gamma) if finite else float("nan")
     ok, reason = decide(vb, va, finite, tol); tx = FitTransaction(tuple(before.tolist()), tuple(prop.tolist()), criterion, vb, va, ok, reason)
     return (prop if ok else before), tx

@@ -1,12 +1,12 @@
-"""Monitoring géométrique des trajectoires du cœur neuronal — prototype mesurable.
+"""Geometric monitoring of the trajectories of the neural core — measurable prototype.
 
-Inspiré du transport de distributions de représentations couche à couche. Honnêteté :
-- on ne calcule PAS W2 exact en grande dimension ;
-- chaque couche est projetée (projection aléatoire fixe) dans un espace commun de dimension 16,
-  normalisée par une échelle de référence : les distances inter-couches sont donc des PROXIES ;
-- les distributions sont des nuages de passes bruitées (bruit gaussien sur les embeddings de caractères) ;
-- les distances entre nuages sont des Wasserstein-2 « sliced » (projections 1D, 32 directions).
-Aucune de ces quantités n'est une preuve causale de vérité ou d'erreur.
+Inspired by the layer-to-layer transport of representation distributions. Honesty:
+- exact W2 in high dimension is NOT computed;
+- each layer is projected (fixed random projection) into a common space of dimension 16,
+  normalised by a reference scale: the inter-layer distances are therefore PROXIES;
+- the distributions are clouds of noisy passes (Gaussian noise on the character embeddings);
+- the distances between clouds are "sliced" Wasserstein-2 (1D projections, 32 directions).
+None of these quantities is a causal proof of truth or of error.
 """
 from __future__ import annotations
 
@@ -20,7 +20,7 @@ OBSERVABLES = ("transport_length", "geodesic_defect", "dissipation", "sensitivit
 
 
 def sliced_w2(a: torch.Tensor, b: torch.Tensor, directions: torch.Tensor) -> float:
-    """Approximation sliced-Wasserstein-2 entre deux nuages de même taille."""
+    """Sliced-Wasserstein-2 approximation between two clouds of the same size."""
     pa, pb = (a @ directions.T).sort(0).values, (b @ directions.T).sort(0).values
     return float(((pa - pb) ** 2).mean().sqrt())
 
@@ -60,7 +60,7 @@ class TrajectoryMonitor:
         return out
 
     def fit_reference(self, core, words: Sequence[str], labels: Sequence[str]):
-        """Échelles par couche et centroïdes de trajectoires fiables (mots que le cœur classe correctement)."""
+        """Per-layer scales and centroids of reliable trajectories (words that the core classifies correctly)."""
         layers = self._layers(core, words)
         self.scales = None
         proj = self._project(layers)
@@ -87,20 +87,20 @@ class TrajectoryMonitor:
         probs_clean, probs_noisy = clean[-1][0], noisy[-1]
         latent = clean[3][0]
         drift = min((float((latent - c).norm()) for c in self.centroids.values()), default=0.0) / self.latent_scale
-        z = {"transport_length": length,                                        # sliced-W2 proxy, somme inter-couches
-             "geodesic_defect": length / max(direct, 1e-6),                      # >= 1 ; proxy de non-géodésicité
-             "dissipation": math.log(spread[-1] / spread[0]),                    # proxy : contraction/expansion du nuage
+        z = {"transport_length": length,                                        # sliced-W2 proxy, inter-layer sum
+             "geodesic_defect": length / max(direct, 1e-6),                      # >= 1; proxy of non-geodesicity
+             "dissipation": math.log(spread[-1] / spread[0]),                    # proxy: contraction/expansion of the cloud
              "sensitivity": float((probs_noisy - probs_clean).abs().sum(1).mean()),
              "branch_disagreement": float((probs_noisy.argmax(1) != probs_clean.argmax()).float().mean()),
              "drift": drift,
-             "confidence": float(probs_clean.max())}                             # neuronal, pas géométrique
+             "confidence": float(probs_clean.max())}                             # neural, not geometric
         self.records.append(z)
         return z
 
 
 class GeometricRiskEstimator:
-    """Régression logistique L2 sur les observables géométriques standardisés -> risque [0, 1].
-    Ce signal ne décide jamais seul : il alimente la politique du MetaController."""
+    """L2 logistic regression on the standardised geometric observables -> risk [0, 1].
+    This signal never decides alone: it feeds the policy of the MetaController."""
 
     def __init__(self, features=OBSERVABLES, low=0.33, high=0.66):
         self.features, self.low, self.high = tuple(features), low, high
@@ -143,7 +143,7 @@ def auroc(scores: Sequence[float], positives: Sequence[bool]) -> Optional[float]
     return round(wins / (len(pos) * len(neg)), 3)
 
 
-# ================================================================ protocole d'audit
+# ================================================================ audit protocol
 
 EXTRA_NONSENSE = ["brudel", "kaflo", "mizrant", "plonque", "vardix", "sulbre", "gronfu", "tepalo", "quirse",
                   "flandor", "moxite", "zebrule", "crapsin", "dulmex", "frovi", "jastel", "noquipe", "palvor"]
@@ -179,7 +179,7 @@ def audit_cases(lc, monitor, words_by_category: Dict[str, List[str]], core=None)
 
 
 def audit_split(lc, exclude=()):
-    """Mots d'audit, partitionnés de façon déterministe en calibration / test (disjoints)."""
+    """Audit words, deterministically partitioned into calibration / test (disjoint)."""
     from core.language_core import NONSENSE, TRAPS, TRUE_CONCEPT
     known = sorted(lc.lexicon.grounded)
     heldout = sorted(f for f, c in TRUE_CONCEPT.items() if isinstance(c, str) and f not in lc.lexicon.grounded and f not in exclude)
@@ -194,7 +194,7 @@ def audit_split(lc, exclude=()):
 
 
 def calibrate(lc, exclude=(), monitor=None):
-    """Monitor ajusté sur les trajectoires fiables ; estimateur calibré sur les cas de calibration uniquement."""
+    """Monitor fitted on the reliable trajectories; estimator calibrated on the calibration cases only."""
     from core.language_core import OTHER_WORDS
     monitor = monitor or TrajectoryMonitor()
     words = list(lc.lexicon.grounded) + OTHER_WORDS
@@ -207,7 +207,7 @@ def calibrate(lc, exclude=(), monitor=None):
 
 
 def hallucination_audit(lc, exclude=()):
-    """Compare Z entre sorties correctes et incorrectes, par catégorie ; AUROC sur l'ensemble de test."""
+    """Compares Z between correct and incorrect outputs, by category; AUROC on the test set."""
     import copy
     from core.language_core import CorruptCore
     monitor, estimator = calibrate(lc, exclude)
@@ -216,7 +216,7 @@ def hallucination_audit(lc, exclude=()):
     corrupted = copy.deepcopy(lc.core); CorruptCore(scale=1.5, seed=3).apply(corrupted)
     cases += [AuditCase(c.word, "corrupted_module", c.truth, c.predicted, c.correct, c.z)
               for c in audit_cases(lc, monitor, {"corrupted_module": test["known"] + test["heldout_forms"]}, core=corrupted)]
-    # mauvais routage : on force le 2e concept ; la trajectoire d'entrée est identique par construction
+    # wrong routing: the 2nd concept is forced; the input trajectory is identical by construction
     for w in test["known"]:
         second = lc.core.propose(w, 2)[1][0]
         cases.append(AuditCase(w, "wrong_routing", _truth(w), second, False, monitor.observe(lc.core, w)))
@@ -254,7 +254,7 @@ def hallucination_audit(lc, exclude=()):
 
 
 def monitor_factory(exclude=()):
-    """Pour language_core.experiment_matrix : calibration sur des mots disjoints de l'évaluation."""
+    """For language_core.experiment_matrix: calibration on words disjoint from the evaluation."""
     def factory(lc):
         return calibrate(lc, exclude=exclude)
     return factory

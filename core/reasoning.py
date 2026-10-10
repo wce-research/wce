@@ -340,7 +340,7 @@ class RuleEngine:
     def applicable_rules(self): return [rule for rule in self.rules if rule.status(self.context) is TruthValue.TRUE]
 
     def match_rule(self, rule):
-        """Unification plate des FactPattern d'une règle, sans termes récursifs."""
+        """Flat unification of the FactPattern of a rule, without recursive terms."""
         bindings_list = [dict()]
         for premise in rule.premises:
             if not isinstance(premise, FactPattern): continue

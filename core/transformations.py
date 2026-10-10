@@ -1,12 +1,12 @@
 """
 WCE Transformation Algebra.
 
-Ce module fournit l'abstraction fondamentale des transformations comme concept
-de premier ordre dans WCE.
+This module provides the fundamental abstraction of transformations as a first-class
+concept in WCE.
 
-Une transformation est une opération qui peut être appliquée à une configuration
-pour produire une nouvelle configuration, avec des invariants et des changements
-explicites.
+A transformation is an operation that can be applied to a configuration
+to produce a new configuration, with explicit invariants and
+changes.
 """
 
 from abc import ABC, abstractmethod
@@ -19,36 +19,36 @@ from core.topology import TopologySignature, DISK_TOPOLOGY
 
 
 class TransformationDomain(Enum):
-    """Domaine d'application d'une transformation."""
-    GEOMETRY = "geometry"           # Transformations géométriques (2D/3D)
-    TOPOLOGY = "topology"           # Transformations topologiques
-    PHYSICS = "physics"             # Transformations physiques
-    WORLD = "world"                 # Transformations du monde (état)
-    TIME = "time"                   # Transformations temporelles
-    LANGUAGE = "language"            # Transformations linguistiques
-    ALGEBRA = "algebra"              # Transformations symboliques
-    SEQUENCE = "sequence"            # Transformations de séquences symboliques
-    MODEL = "model"                  # Auto-transformations du modèle neuronal
-    MEASUREMENT = "measurement"      # Mesure, changement de base / de référentiel, conditionnement (algèbre de mesure)
-    GENERIC = "generic"             # Domaine générique/indéfini
+    """Domain of application of a transformation."""
+    GEOMETRY = "geometry"           # Geometric transformations (2D/3D)
+    TOPOLOGY = "topology"           # Topological transformations
+    PHYSICS = "physics"             # Physical transformations
+    WORLD = "world"                 # Transformations of the world (state)
+    TIME = "time"                   # Temporal transformations
+    LANGUAGE = "language"            # Linguistic transformations
+    ALGEBRA = "algebra"              # Symbolic transformations
+    SEQUENCE = "sequence"            # Transformations of symbolic sequences
+    MODEL = "model"                  # Self-transformations of the neural model
+    MEASUREMENT = "measurement"      # Measurement, change of basis / of reference frame, conditioning (measurement algebra)
+    GENERIC = "generic"             # Generic/undefined domain
 
 
 @dataclass(frozen=True)
 class TransformationSpec(ABC):
     """
-    Spécification abstraite d'une transformation WCE.
+    Abstract specification of a WCE transformation.
     
-    Une TransformationSpec décrit une transformation de manière conceptuelle,
-    indépendamment de son implémentation concrète.
+    A TransformationSpec describes a transformation conceptually,
+    independently of its concrete implementation.
     
-    Attributs :
-        name : Nom descriptif de la transformation
-        domain : Domaine d'application (geometry, physics, etc.)
-        parameters : Dictionnaire des paramètres de la transformation
-        invertible : Indique si la transformation a une inverse
-        preserves : Ensemble d'invariants préservés par cette transformation
-        changes : Ensemble de propriétés qui changent (optionnel)
-        cost : Coût estimé de l'application (pour optimisation)
+    Attributes:
+        name: Descriptive name of the transformation
+        domain: Domain of application (geometry, physics, etc.)
+        parameters: Dictionary of the parameters of the transformation
+        invertible: Indicates whether the transformation has an inverse
+        preserves: Set of invariants preserved by this transformation
+        changes: Set of properties that change (optional)
+        cost: Estimated cost of the application (for optimisation)
     """
     name: str
     domain: TransformationDomain = TransformationDomain.GENERIC
@@ -63,45 +63,45 @@ class TransformationSpec(ABC):
     @abstractmethod
     def apply(self, *args, **kwargs) -> Any:
         """
-        Applique la transformation à un objet donné.
+        Applies the transformation to a given object.
         
-        L'implémentation dépend du domaine et du type de transformation.
+        The implementation depends on the domain and on the type of transformation.
         """
         pass
     
     def is_invertible(self) -> bool:
-        """Indique si cette transformation a une inverse."""
+        """Indicates whether this transformation has an inverse."""
         return self.invertible
     
     def preserves_invariant(self, invariant: Invariant) -> bool:
-        """Vérifie si un invariant spécifique est préservé."""
+        """Checks whether a specific invariant is preserved."""
         return self.preserves.preserves(invariant)
     
     def preserves_geometry(self) -> bool:
-        """Indique si la géométrie est préservée (isométrie)."""
+        """Indicates whether the geometry is preserved (isometry)."""
         return self.preserves.preserves_geometry
     
     def preserves_topology(self) -> bool:
-        """Indique si la topologie est préservée."""
+        """Indicates whether the topology is preserved."""
         return self.preserves.preserves_topology
     
     def get_inverse(self) -> Optional['TransformationSpec']:
         """
-        Retourne la transformation inverse si elle existe.
+        Returns the inverse transformation if it exists.
         
-        Doit être implémenté par les sous-classes pour fournir l'inverse.
+        Must be implemented by the subclasses to provide the inverse.
         """
         if not self.invertible:
             return None
-        # Par défaut, retourne None - les sous-classes doivent implémenter
+        # By default, returns None - the subclasses must implement
         return None
 
     def compile(self, world) -> 'Transformation':
-        """Compile la description en mutation atomique du World."""
-        raise TypeError(f"{type(self).__name__} ne sait pas compiler un World")
+        """Compiles the description into an atomic mutation of the World."""
+        raise TypeError(f"{type(self).__name__} cannot compile a World")
 
     def applicability(self, context):
-        """Retourne TRUE/FALSE/UNKNOWN pour les préconditions déclarées."""
+        """Returns TRUE/FALSE/UNKNOWN for the declared preconditions."""
         from core.reasoning import TruthValue
         values = [condition.evaluate(context) for condition in self.preconditions]
         if any(value is TruthValue.FALSE for value in values): return TruthValue.FALSE
@@ -110,10 +110,10 @@ class TransformationSpec(ABC):
     
     def compose(self, other: 'TransformationSpec') -> 'CompositeTransformation':
         """
-        Crée une composition de cette transformation avec une autre.
+        Creates a composition of this transformation with another.
         
-        Le résultat est une CompositeTransformation qui applique les deux
-        transformations dans l'ordre : self puis other (self est appliqué en premier).
+        The result is a CompositeTransformation that applies the two
+        transformations in order: self then other (self is applied first).
         """
         return CompositeTransformation(transformations=(self, other))
     
@@ -121,55 +121,55 @@ class TransformationSpec(ABC):
         return f"{self.__class__.__name__}(name='{self.name}', domain={self.domain.value})"
     
     def __matmul__(self, other: 'TransformationSpec') -> 'CompositeTransformation':
-        """Opérateur de composition : T1 @ T2 = T2 ∘ T1 (T1 appliqué en premier)."""
+        """Composition operator: T1 @ T2 = T2 ∘ T1 (T1 applied first)."""
         return self.compose(other)
 
 
 @dataclass(frozen=True)
 class IdentityTransformation(TransformationSpec):
     """
-    Transformation identité (ne change rien).
+    Identity transformation (changes nothing).
     
-    Préserve tous les invariants.
+    Preserves all invariants.
     """
     name: str = "identity"
     domain: TransformationDomain = TransformationDomain.GENERIC
     preserves: InvariantSet = field(default_factory=lambda: IDENTITY_INVARIANTS)
     
     def apply(self, *args, **kwargs) -> Any:
-        """Ne change pas l'input."""
+        """Does not change the input."""
         if len(args) == 1:
             return args[0]
         return args
     
     def get_inverse(self) -> 'IdentityTransformation':
-        """L'inverse de l'identité est l'identité."""
+        """The inverse of the identity is the identity."""
         return IdentityTransformation()
 
 
 @dataclass(frozen=True)
 class CompositeTransformation(TransformationSpec):
     """
-    Composition de plusieurs transformations.
+    Composition of several transformations.
     
-    Applique les transformations dans l'ordre de la liste :
-    [T1, T2, T3] signifie T3 ∘ T2 ∘ T1 (T1 est appliqué en premier).
+    Applies the transformations in the order of the list:
+    [T1, T2, T3] means T3 ∘ T2 ∘ T1 (T1 is applied first).
     
-    Les invariants préservés sont l'intersection des invariants de toutes
-    les transformations composées.
+    The preserved invariants are the intersection of the invariants of all
+    the composed transformations.
     """
     name: str = "composite"
     transformations: Tuple[TransformationSpec, ...] = ()
     domain: TransformationDomain = TransformationDomain.GENERIC
     
     def __post_init__(self):
-        # Calculer les paramètres agrégés
+        # Compute the aggregated parameters
         params = {}
         for i, t in enumerate(self.transformations):
             params[f'transform_{i}'] = t.name
         object.__setattr__(self, 'parameters', params)
         
-        # Calculer les invariants préservés (intersection)
+        # Compute the preserved invariants (intersection)
         if self.transformations:
             preserved = self.transformations[0].preserves
             for t in self.transformations[1:]:
@@ -178,22 +178,22 @@ class CompositeTransformation(TransformationSpec):
         else:
             object.__setattr__(self, 'preserves', InvariantSet(set()))
         
-        # Invertible si toutes les composantes le sont
+        # Invertible if all the components are
         invertible = all(t.invertible for t in self.transformations)
         object.__setattr__(self, 'invertible', invertible)
         
-        # Coût cumulé
+        # Cumulative cost
         cost = sum(t.cost for t in self.transformations)
         object.__setattr__(self, 'cost', cost)
         
-        # Changements agrégés
+        # Aggregated changes
         changes = set()
         for t in self.transformations:
             changes.update(t.changes)
         object.__setattr__(self, 'changes', changes)
     
     def apply(self, obj: Any, *args, **kwargs) -> Any:
-        """Applique toutes les transformations dans l'ordre."""
+        """Applies all the transformations in order."""
         result = obj
         for t in self.transformations:
             result = t.apply(result, *args, **kwargs)
@@ -201,17 +201,17 @@ class CompositeTransformation(TransformationSpec):
     
     def get_inverse(self) -> Optional['CompositeTransformation']:
         """
-        Retourne la composition inverse (ordre inversé, chaque transformation inversée).
+        Returns the inverse composition (reversed order, each transformation inverted).
         """
         if not self.invertible:
             return None
         
-        # Créer la liste des inverses dans l'ordre inverse
+        # Create the list of inverses in reverse order
         inverse_transforms = []
         for t in reversed(self.transformations):
             inv = t.get_inverse()
             if inv is None:
-                return None  # Ne devrait pas arriver si invertible=True
+                return None  # Should not happen if invertible=True
             inverse_transforms.append(inv)
         
         return CompositeTransformation(
@@ -231,11 +231,11 @@ class CompositeTransformation(TransformationSpec):
         return _compile_geometry_spec(self, world)
     
     def get_transformations(self) -> List[TransformationSpec]:
-        """Retourne la liste des transformations composées."""
+        """Returns the list of the composed transformations."""
         return list(self.transformations)
     
     def get_depth(self) -> int:
-        """Retourne le nombre de transformations dans la composition."""
+        """Returns the number of transformations in the composition."""
         return len(self.transformations)
     
     def __repr__(self) -> str:
@@ -246,15 +246,15 @@ class CompositeTransformation(TransformationSpec):
 @dataclass(frozen=True)
 class MacroTransformation(TransformationSpec):
     """
-    Macro-transformation : encapsulation d'une composition fréquente comme nouvelle opération.
+    Macro-transformation: encapsulation of a frequent composition as a new operation.
     
-    Permet de créer des opérations réutilisables à partir de compositions de transformations
-    primitives.
+    Makes it possible to create reusable operations from compositions of primitive
+    transformations.
     
-    Exemple : place_on_table = MacroTransformation("place_on_table", base_transformation=composed)
+    Example: place_on_table = MacroTransformation("place_on_table", base_transformation=composed)
     
-    Note : Cette classe est un wrapper simple autour d'une TransformationSpec,
-    pas une sous-classe.
+    Note: This class is a simple wrapper around a TransformationSpec,
+    not a subclass.
     """
     
     name: str = "macro"
@@ -275,11 +275,11 @@ class MacroTransformation(TransformationSpec):
         object.__setattr__(self, 'changes', set(base.changes))
     
     def apply(self, obj: Any, *args, **kwargs) -> Any:
-        """Applique la transformation de base."""
+        """Applies the base transformation."""
         return self.base_transformation.apply(obj, *args, **kwargs)
     
     def get_inverse(self) -> Optional['MacroTransformation']:
-        """Retourne l'inverse si la transformation de base est inversible."""
+        """Returns the inverse if the base transformation is invertible."""
         inv = self.base_transformation.get_inverse()
         if inv is None:
             return None
@@ -295,7 +295,7 @@ class MacroTransformation(TransformationSpec):
         return compiled.with_spec(self, TransformationSource.MACRO)
     
     def unwrap(self) -> TransformationSpec:
-        """Retourne la transformation de base sous-jacente."""
+        """Returns the underlying base transformation."""
         if isinstance(self.base_transformation, MacroTransformation):
             return self.base_transformation.unwrap()
         return self.base_transformation
@@ -306,7 +306,7 @@ class MacroTransformation(TransformationSpec):
 
 @dataclass(frozen=True)
 class DeclarativeTransformationSpec(TransformationSpec):
-    """Spec multi-domaine dont le compilateur est fourni par son producteur."""
+    """Multi-domain spec whose compiler is provided by its producer."""
     compiler: Optional[Callable[[Any], Any]] = field(default=None, repr=False, compare=False)
 
     def apply(self, obj: Any, *args, **kwargs) -> Any:
@@ -324,13 +324,13 @@ class DeclarativeTransformationSpec(TransformationSpec):
 @dataclass(frozen=True)
 class CutTransformation(TransformationSpec):
     """
-    Transformation de découpe - peut modifier la topologie.
+    Cut transformation - may modify the topology.
     
-    Cette transformation annonce qu'elle peut changer la topologie en créant
-    de nouvelles composantes connexes ou de nouveaux trous.
+    This transformation announces that it may change the topology by creating
+    new connected components or new holes.
     
-    Note : L'implémentation concrète de la découpe n'est pas encore complète,
-    mais cette classe permet de représenter conceptuellement l'opération.
+    Note: The concrete implementation of the cut is not yet complete,
+    but this class makes it possible to represent the operation conceptually.
     """
     name: str = "cut"
     domain: TransformationDomain = TransformationDomain.TOPOLOGY
@@ -345,16 +345,16 @@ class CutTransformation(TransformationSpec):
         "connected_components",
         "boundary",
     })
-    cost: float = 10.0  # Coût élevé car change la topologie
+    cost: float = 10.0  # High cost because it changes the topology
     
     def apply(self, topology: TopologySignature, **kwargs) -> TopologySignature:
         """
-        Applique conceptuellement une découpe à une signature topologique.
+        Conceptually applies a cut to a topological signature.
         
-        Augmente le nombre de composantes connexes et potentiellement de trous.
+        Increases the number of connected components and potentially of holes.
         """
-        # Cette implémentation est conceptuelle
-        # En réalité, la découpe dépend de la géométrie spécifique
+        # This implementation is conceptual
+        # In reality, the cut depends on the specific geometry
         new_components = topology.connected_components + 1
         return TopologySignature(
             connected_components=new_components,
@@ -366,9 +366,9 @@ class CutTransformation(TransformationSpec):
 @dataclass(frozen=True)
 class MergeTransformation(TransformationSpec):
     """
-    Transformation de fusion - peut modifier la topologie.
+    Merge transformation - may modify the topology.
     
-    Fusionne des composantes connexes.
+    Merges connected components.
     """
     name: str = "merge"
     domain: TransformationDomain = TransformationDomain.TOPOLOGY
@@ -386,9 +386,9 @@ class MergeTransformation(TransformationSpec):
     
     def apply(self, topology: TopologySignature, **kwargs) -> TopologySignature:
         """
-        Applique conceptuellement une fusion à une signature topologique.
+        Conceptually applies a merge to a topological signature.
         
-        Réduit le nombre de composantes connexes.
+        Reduces the number of connected components.
         """
         new_components = max(1, topology.connected_components - 1)
         return TopologySignature(
@@ -398,14 +398,14 @@ class MergeTransformation(TransformationSpec):
         )
 
 
-# Fonctions utilitaires pour créer des transformations courantes
+# Utility functions to create common transformations
 
 def create_translation_transformation(tx: float, ty: float) -> TransformationSpec:
-    """Crée une TransformationSpec pour une translation 2D."""
+    """Creates a TransformationSpec for a 2D translation."""
     from core.transform import Transform2D
     from core.invariants import TRANSLATION_INVARIANTS
     
-    # Créer un wrapper qui utilise Transform2D
+    # Create a wrapper that uses Transform2D
     class TranslationTransformation(TransformationSpec):
         def __init__(self, tx: float, ty: float):
             object.__setattr__(self, 'name', f'translate({tx}, {ty})')
@@ -436,7 +436,7 @@ def create_translation_transformation(tx: float, ty: float) -> TransformationSpe
 
 
 def create_rotation_transformation(theta: float, name: str = None) -> TransformationSpec:
-    """Crée une TransformationSpec pour une rotation 2D."""
+    """Creates a TransformationSpec for a 2D rotation."""
     from core.invariants import ROTATION_INVARIANTS
     from math import cos, sin
     
@@ -468,7 +468,7 @@ def create_rotation_transformation(theta: float, name: str = None) -> Transforma
 
 
 def create_scale_transformation(sx: float, sy: float) -> TransformationSpec:
-    """Crée une TransformationSpec pour un scale 2D."""
+    """Creates a TransformationSpec for a 2D scale."""
     from core.invariants import UNIFORM_SCALE_INVARIANTS, NON_UNIFORM_SCALE_INVARIANTS
     
     class ScaleTransformation(TransformationSpec):
@@ -478,7 +478,7 @@ def create_scale_transformation(sx: float, sy: float) -> TransformationSpec:
             object.__setattr__(self, 'parameters', {'sx': sx, 'sy': sy})
             object.__setattr__(self, 'invertible', sx != 0 and sy != 0)
             
-            # Déterminer les invariants en fonction du type de scale
+            # Determine the invariants according to the type of scale
             if sx == sy:
                 invariants = UNIFORM_SCALE_INVARIANTS
             else:
@@ -505,7 +505,7 @@ def create_scale_transformation(sx: float, sy: float) -> TransformationSpec:
 
 
 def _compile_geometry_spec(spec: TransformationSpec, world, entity_name: str = None):
-    """Compile une primitive ponctuelle sur les entités possédant x et y."""
+    """Compiles a pointwise primitive on the entities that have x and y."""
     from core.transformation import Change, Transformation, TransformationSource
     changes = []
     entities = ([world.entities[entity_name]] if entity_name else world.entities.values())
@@ -525,7 +525,7 @@ def _compile_geometry_spec(spec: TransformationSpec, world, entity_name: str = N
 
 @dataclass(frozen=True)
 class ReflectionTransformation(TransformationSpec):
-    """Réflexion primitive autour de l'axe x, y ou d'une droite par l'origine."""
+    """Primitive reflection about the x axis, the y axis or a line through the origin."""
     name: str = "reflection"
     axis: str = "x"
     domain: TransformationDomain = TransformationDomain.GEOMETRY
@@ -537,7 +537,7 @@ class ReflectionTransformation(TransformationSpec):
         x, y = obj
         if self.axis == "x": return (x, -y)
         if self.axis == "y": return (-x, y)
-        raise ValueError("axis doit être 'x' ou 'y'")
+        raise ValueError("axis must be 'x' or 'y'")
 
     def get_inverse(self): return self
     def compile(self, world): return _compile_geometry_spec(self, world)
@@ -545,7 +545,7 @@ class ReflectionTransformation(TransformationSpec):
 
 @dataclass(frozen=True)
 class ShearTransformation(TransformationSpec):
-    """Cisaillement affine primitif x'=x+kx*y, y'=y+ky*x."""
+    """Primitive affine shear x'=x+kx*y, y'=y+ky*x."""
     name: str = "shear"
     shear_x: float = 0.0
     shear_y: float = 0.0

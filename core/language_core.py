@@ -1,12 +1,12 @@
-"""Compact WCE Language Model — premier prototype intégré.
+"""Compact WCE Language Model — first integrated prototype.
 
-TEXTE -> caractères -> petit cœur neuronal (candidats de concepts)
-      -> analyse structurée (clauses, entités, relations, 'puis')
-      -> Goals (planner WCE) / programmes (CompositeTransformation)
-      -> vérification structurelle WCE -> risque (neuronal, structurel, géométrique, externe)
-      -> politique ACCEPT / VERIFY / REROUTE / ABSTAIN / REJECT / ASK -> exécution / réponse.
+TEXT -> characters -> small neural core (concept candidates)
+      -> structured parsing (clauses, entities, relations, 'puis')
+      -> Goals (WCE planner) / programs (CompositeTransformation)
+      -> WCE structural verification -> risk (neural, structural, geometric, external)
+      -> policy ACCEPT / VERIFY / REROUTE / ABSTAIN / REJECT / ASK -> execution / answer.
 
-Le corpus est artificiel et contrôlé : il ne prétend pas couvrir le français réel.
+The corpus is artificial and controlled: it does not claim to cover real French.
 """
 from __future__ import annotations
 
@@ -30,7 +30,7 @@ from core.world import Entity, World
 
 torch.set_num_threads(1)
 
-# ================================================================ A. caractères
+# ================================================================ A. characters
 
 CHARSET = " 'abcdefghijklmnopqrstuvwxyzàâäçéèêëîïôöûùüÿœ-.,?!0123456789"
 PAD, UNK = 0, 1
@@ -58,14 +58,14 @@ def tokenize_fr(text: str) -> List[str]:
     return out
 
 
-# ================================================================ corpus contrôlé
+# ================================================================ controlled corpus
 
 CONCEPTS = ["FALL", "RISE", "PLACE", "REVERSE", "ROTL", "ROTR", "SHIFT", "SORT", "SWAP", "OTHER"]
 PHYSICAL = {"FALL", "RISE", "PLACE"}
 SEQUENCE_CONCEPTS = {"REVERSE": "reverse", "ROTL": "rotl1", "ROTR": "rotr1", "SHIFT": "sub1", "SORT": "sort", "SWAP": "swap"}
 PRIMITIVE_TO_CONCEPT = {v: k for k, v in SEQUENCE_CONCEPTS.items()}
 
-# (racine, classe) ; classes : 'er' (tombe, tomber, tombait, tombé, tombent, tombera), 're' (descend, descendre...)
+# (stem, class); classes: 'er' (tombe, tomber, tombait, tombé, tombent, tombera), 're' (descend, descendre...)
 LEMMAS = {
     "FALL": [("tomb", "er"), ("chut", "er"), ("descend", "re"), ("dégringol", "er")],
     "RISE": [("mont", "er"), ("grimp", "er"), ("s'élev", "elev")],
@@ -90,8 +90,8 @@ TRUE_CONCEPT: Dict[str, Any] = {}
 for _concept, _lemmas in LEMMAS.items():
     for _stem, _cls in _lemmas:
         for _f in forms_of(_stem, _cls): TRUE_CONCEPT[_f] = _concept
-TRUE_CONCEPT["tourne"] = {"ROTL", "ROTR"}       # ambiguïté lexicale réelle dans le corpus
-TRUE_CONCEPT["range"] = {"SORT", "PLACE"}       # ambiguïté résolue par le domaine des arguments
+TRUE_CONCEPT["tourne"] = {"ROTL", "ROTR"}       # real lexical ambiguity in the corpus
+TRUE_CONCEPT["range"] = {"SORT", "PLACE"}       # ambiguity resolved by the domain of the arguments
 
 ENTITIES = {"balle": ("sol", {"couleur": "rouge"}), "bloc": ("table", {"couleur": "bleu"}),
             "cube": ("étagère", {"couleur": "vert"}), "boîte": ("sol", {"couleur": "jaune"})}
@@ -104,7 +104,7 @@ NOUNS = set(ENTITIES) | set(SUPPORTS) | {"girafe", "lampe"}
 OTHER_WORDS = sorted(NOUNS | DETERMINERS | PREPOSITIONS | UNITS | {"puis", "et", "est", "où", "quelle", "hauteur",
                                                                     "rouge", "bleu", "bois", "verre"})
 NONSENSE = ["zorphe", "blimpe", "trakule", "vornit", "glissouille", "frumax"]
-TRAPS = ["montagne", "tombola", "triangle", "tournesol", "décalcomanie", "posture"]   # préfixes trompeurs
+TRAPS = ["montagne", "tombola", "triangle", "tournesol", "décalcomanie", "posture"]   # misleading prefixes
 
 
 def is_number(tok):
@@ -115,14 +115,14 @@ def is_sequence(tok):
     return len(tok) == 5 and tok.isalpha() and tok.isascii()
 
 
-# ================================================================ A. cœur neuronal caractères
+# ================================================================ A. character neural core
 
 SIZES = {"tiny": (8, 16), "small": (16, 32), "medium": (32, 96)}
 
 
 class CharCore(torch.nn.Module):
-    """Embeddings de caractères -> 2 convolutions -> max-pool -> tête -> concepts.
-    Les poids rapides (fast) portent sur la couche de sortie ; tout entraînement est tracé."""
+    """Character embeddings -> 2 convolutions -> max-pool -> head -> concepts.
+    The fast weights (fast) act on the output layer; every training run is traced."""
 
     def __init__(self, size="small", seed=0, concepts=CONCEPTS):
         super().__init__()
@@ -142,7 +142,7 @@ class CharCore(torch.nn.Module):
     def parameter_count(self): return sum(p.numel() for p in self.parameters())
 
     def layers(self, ids, noise=0.0, gen=None):
-        """Activations par couche (pour le TrajectoryMonitor) : emb, conv1, conv2, tête, logits."""
+        """Per-layer activations (for the TrajectoryMonitor): emb, conv1, conv2, head, logits."""
         e = self.emb(ids)
         if noise: e = e + noise * torch.randn(e.shape, generator=gen)
         mask = (ids != PAD).float().unsqueeze(-1)
@@ -180,7 +180,7 @@ class CharCore(torch.nn.Module):
 
 @dataclass(frozen=True)
 class TrainCore(TransformationSpec):
-    """Entraînement (lent) du cœur neuronal sur des paires mot -> concept vérifiées par WCE (distillation)."""
+    """(Slow) training of the neural core on word -> concept pairs verified by WCE (distillation)."""
     name: str = "train_char_core"
     domain: TransformationDomain = TransformationDomain.LANGUAGE
     words: Tuple[str, ...] = ()
@@ -201,7 +201,7 @@ class TrainCore(TransformationSpec):
 
 @dataclass(frozen=True)
 class FastAdaptCore(TransformationSpec):
-    """Plasticité rapide : seul un delta sur la couche de sortie apprend (poids lents intacts)."""
+    """Fast plasticity: only a delta on the output layer learns (slow weights intact)."""
     name: str = "fast_adapt_core"
     domain: TransformationDomain = TransformationDomain.LANGUAGE
     words: Tuple[str, ...] = ()
@@ -242,7 +242,7 @@ class RollbackCore(TransformationSpec):
 
 @dataclass(frozen=True)
 class CorruptCore(TransformationSpec):
-    """Dommage contrôlé (protocole d'audit)."""
+    """Controlled damage (audit protocol)."""
     name: str = "corrupt_core"
     domain: TransformationDomain = TransformationDomain.LANGUAGE
     scale: float = 1.0
@@ -259,7 +259,7 @@ class CorruptCore(TransformationSpec):
 
 
 class WordCore(torch.nn.Module):
-    """Baseline tokeniseur-mot : un embedding par mot vu ; mot inconnu -> OOV."""
+    """Word-tokenizer baseline: one embedding per seen word; unknown word -> OOV."""
 
     def __init__(self, vocab, size="small", seed=0):
         super().__init__()
@@ -283,11 +283,11 @@ class WordCore(torch.nn.Module):
         with torch.no_grad(): return CONCEPTS[int(self.head(self.emb(torch.tensor([self.vocab[word]]))).argmax())]
 
 
-# ================================================================ B. morphologie apprise
+# ================================================================ B. learned morphology
 
 @dataclass(frozen=True)
 class SuffixRule(TransformationSpec):
-    """Transformation morphologique apprise : forme -> forme de référence (strip/add de suffixe)."""
+    """Learned morphological transformation: form -> reference form (suffix strip/add)."""
     name: str = "suffix_rule"
     domain: TransformationDomain = TransformationDomain.LANGUAGE
     strip: str = ""
@@ -306,8 +306,8 @@ def _common_prefix(a, b):
 
 
 class MorphologyLearner:
-    """Règles de suffixe induites de paires (forme, forme de référence) de même concept et même radical.
-    Une règle n'est 'confiante' qu'après observation sur >= 2 radicaux distincts."""
+    """Suffix rules induced from pairs (form, reference form) with the same concept and the same stem.
+    A rule is 'confident' only after observation on >= 2 distinct stems."""
 
     def __init__(self, min_stem=3, confident_support=2):
         self.rules: Dict[Tuple[str, str], set] = {}
@@ -334,7 +334,7 @@ class MorphologyLearner:
         return sorted(out, key=lambda t: -t[3])
 
 
-# ================================================================ C. mémoire lexicale
+# ================================================================ C. lexical memory
 
 @dataclass
 class LexicalEvidence:
@@ -342,7 +342,7 @@ class LexicalEvidence:
     concepts: Counter
     source: str                 # grounded | morphology | morphology_weak | unknown
     support: int = 0
-    via: Optional[str] = None   # forme de référence / règle
+    via: Optional[str] = None   # reference form / rule
 
     @property
     def known(self): return self.source in ("grounded", "morphology")
@@ -355,8 +355,8 @@ class LexicalEvidence:
 
 
 class LexicalConceptMemory:
-    """Formes de surface -> concepts, uniquement à partir d'expériences expliquées par WCE.
-    Un mot jamais ancré ni relié par une règle morphologique reste UNKNOWN."""
+    """Surface forms -> concepts, only from experiences explained by WCE.
+    A word never grounded nor linked by a morphological rule remains UNKNOWN."""
 
     def __init__(self):
         self.grounded: Dict[str, Counter] = {}
@@ -392,7 +392,7 @@ class LexicalConceptMemory:
         return [e for e in self.episodes if e["form"] == form]
 
 
-# ================================================================ scène physique et specs WCE
+# ================================================================ physical scene and WCE specs
 
 def make_scene() -> World:
     w = World()
@@ -431,7 +431,7 @@ def lift_spec(entity, height):
 
 
 def physical_candidate_generator(state, goal):
-    """Propositions pour le planner WCE : poser sur chaque support, soulever à la hauteur visée."""
+    """Proposals for the WCE planner: place on each support, lift to the target height."""
     target = goal.target if isinstance(goal.target, tuple) else (goal.target,)
     entity = target[0]
     supports = [n for n, e in state.entities.items() if e.properties.get("support") and n != entity]
@@ -453,7 +453,7 @@ def describe(world, entity):
     return f"{entity}: y={world.entities[entity].properties['y']:g}, sur={support_of(world, entity) or '-'}"
 
 
-# ================================================================ D. analyse de phrases
+# ================================================================ D. sentence parsing
 
 @dataclass
 class Clause:
@@ -473,7 +473,7 @@ class Parsed:
     sequence: Optional[str] = None
     invalid_sequence: Optional[str] = None
     question: Optional[Tuple[str, str]] = None
-    claim: Optional[Tuple[str, str, str]] = None      # (sujet, 'sur'|'attr', valeur)
+    claim: Optional[Tuple[str, str, str]] = None      # (subject, 'sur'|'attr', value)
 
 
 def parse(text) -> Parsed:
@@ -520,7 +520,7 @@ def parse(text) -> Parsed:
     return Parsed(text, "command", out, seq, bad)
 
 
-# ================================================================ E/F. interprétations -> Goals / programmes
+# ================================================================ E/F. interpretations -> Goals / programs
 
 @dataclass
 class Check:
@@ -557,7 +557,7 @@ class Interpretation:
 
 
 def goal_for(concept, clause, world):
-    """Le langage produit un Goal (pas une action) ; le planner WCE trouve les transformations."""
+    """Language produces a Goal (not an action); the WCE planner finds the transformations."""
     e = clause.entity
     if concept == "FALL":
         if clause.support: return Goal("supported_by", (e, clause.support))
@@ -585,7 +585,7 @@ def build_interpretation(parsed, concepts, world):
     return interp
 
 
-# ================================================================ W. vérification externe
+# ================================================================ W. external verification
 
 class ExternalVerifier(ABC):
     @abstractmethod
@@ -593,7 +593,7 @@ class ExternalVerifier(ABC):
 
 
 class FakeExternalVerifier(ExternalVerifier):
-    """Source factuelle simulée : SUPPORTED / REFUTED / UNKNOWN (aucun accès réseau)."""
+    """Simulated factual source: SUPPORTED / REFUTED / UNKNOWN (no network access)."""
 
     def __init__(self, facts=None):
         self.facts = facts or {("table", "bois"): True, ("balle", "verre"): False, ("bloc", "bois"): True,
@@ -606,7 +606,7 @@ class FakeExternalVerifier(ExternalVerifier):
         return "SUPPORTED" if self.facts[(subject, value)] else "REFUTED"
 
 
-# ================================================================ H. vérification structurelle WCE
+# ================================================================ H. WCE structural verification
 
 class StructuralVerifier:
     def __init__(self, lexicon: LexicalConceptMemory):
@@ -626,14 +626,14 @@ class StructuralVerifier:
             self._add(interp, f"concept({clause.verb}={concept})", value,
                       f"{ev.source}{' via ' + ev.via if ev.via else ''}", contradiction=value is TruthValue.FALSE)
         if interp.domain == "invalid":
-            self._add(interp, "domain", TruthValue.FALSE, "concepts de domaines incompatibles", True); return interp
+            self._add(interp, "domain", TruthValue.FALSE, "concepts from incompatible domains", True); return interp
         if interp.domain == "unknown":
-            self._add(interp, "domain", TruthValue.UNKNOWN, "concept inconnu"); return interp
+            self._add(interp, "domain", TruthValue.UNKNOWN, "unknown concept"); return interp
         if interp.domain == "sequence":
             self._add(interp, "context_match(sequence)", TruthValue.TRUE if p.sequence else TruthValue.FALSE,
-                      p.sequence or "aucune séquence", contradiction=p.invalid_sequence is not None or not p.sequence)
+                      p.sequence or "no sequence", contradiction=p.invalid_sequence is not None or not p.sequence)
             if p.invalid_sequence:
-                self._add(interp, "program_executable", TruthValue.FALSE, f"symboles hors alphabet: {p.invalid_sequence}", True)
+                self._add(interp, "program_executable", TruthValue.FALSE, f"symbols outside the alphabet: {p.invalid_sequence}", True)
             elif p.sequence:
                 out = interp.program.apply(seq_encode(p.sequence).unsqueeze(0))[0]
                 interp.answer = seq_decode(out)
@@ -642,39 +642,39 @@ class StructuralVerifier:
                 expected = not all(Invariant.SYMBOL_MULTISET in s.preserves.invariants
                                    for s in getattr(interp.program, "transformations", (interp.program,)))
                 self._add(interp, "invariant(multiset)", TruthValue.TRUE if changed == expected or not changed else TruthValue.FALSE,
-                          "multiset conforme aux invariants déclarés")
+                          "multiset consistent with the declared invariants")
             return interp
-        # physique : entités, relations, cohérence, préconditions, plan, invariants
+        # physics: entities, relations, coherence, preconditions, plan, invariants
         branch = copy.deepcopy(world)
         from core.planner import TransformationPlanner
         planner = TransformationPlanner([physical_candidate_generator], max_depth=2, max_nodes=60)
         for concept, clause, goal in zip(interp.concepts, p.clauses, interp.goals):
             ent = clause.entity
             self._add(interp, f"entity({ent})", TruthValue.TRUE if ent in branch.entities else TruthValue.FALSE,
-                      "entité absente du monde" if ent not in branch.entities else "", contradiction=ent is not None and ent not in branch.entities)
+                      "entity absent from the world" if ent not in branch.entities else "", contradiction=ent is not None and ent not in branch.entities)
             if ent not in branch.entities: continue
             if goal is None:
-                self._add(interp, "goal_complete", TruthValue.FALSE, f"{concept} exige un complément (sur X / à N)", True); continue
+                self._add(interp, "goal_complete", TruthValue.FALSE, f"{concept} requires a complement (sur X / à N)", True); continue
             if clause.support:
                 ok = clause.support in branch.entities and branch.entities[clause.support].properties.get("support") and clause.support != ent
                 self._add(interp, f"relation_plausible(sur {clause.support})", TruthValue.TRUE if ok else TruthValue.FALSE,
-                          "" if ok else "support impossible", contradiction=not ok)
+                          "" if ok else "impossible support", contradiction=not ok)
                 if not ok: continue
             if clause.height is not None:
                 ok = clause.height >= 0
                 self._add(interp, "goal_coherent(hauteur >= 0)", TruthValue.TRUE if ok else TruthValue.FALSE,
-                          f"hauteur {clause.height:g}", contradiction=not ok)
+                          f"height {clause.height:g}", contradiction=not ok)
                 if not ok: continue
             if clause.source:
                 ok = support_of(branch, ent) == clause.source
                 self._add(interp, f"precondition(sur {clause.source})", TruthValue.TRUE if ok else TruthValue.FALSE,
-                          f"{ent} est sur {support_of(branch, ent)}", contradiction=not ok)
+                          f"{ent} is on {support_of(branch, ent)}", contradiction=not ok)
                 if not ok: continue
             y = branch.entities[ent].properties["y"]
             if concept == "RISE" and clause.support and SUPPORTS.get(clause.support, 0) <= y:
-                self._add(interp, "goal_coherent(monter)", TruthValue.FALSE, f"{clause.support} n'est pas plus haut", True); continue
+                self._add(interp, "goal_coherent(monter)", TruthValue.FALSE, f"{clause.support} is not higher", True); continue
             if concept == "FALL" and clause.support and SUPPORTS.get(clause.support, 0) >= y:
-                self._add(interp, "goal_coherent(tomber)", TruthValue.FALSE, f"{clause.support} n'est pas plus bas", True); continue
+                self._add(interp, "goal_coherent(tomber)", TruthValue.FALSE, f"{clause.support} is not lower", True); continue
             result = planner.search(branch, goal)
             self.search_nodes += result.explored_nodes; interp.search_nodes += result.explored_nodes
             self._add(interp, f"plan({goal.predicate})", TruthValue.TRUE if result.success else TruthValue.FALSE,
@@ -691,7 +691,7 @@ class StructuralVerifier:
         return interp
 
 
-# ================================================================ I/M. risque et politique
+# ================================================================ I/M. risk and policy
 
 SUPPORTED, UNCERTAIN, CONTRADICTED, UNKNOWN_STATUS, NEEDS_VERIFICATION = \
     "SUPPORTED", "UNCERTAIN", "CONTRADICTED", "UNKNOWN", "NEEDS_VERIFICATION"
@@ -725,28 +725,28 @@ ACCEPT, VERIFY, REROUTE, ABSTAIN, REJECT, ASK, ACCEPT_TENTATIVE = \
 
 
 class AntiHallucinationPolicy:
-    """Politique explicite multi-signaux. Le score neuronal seul n'autorise jamais une action physique."""
+    """Explicit multi-signal policy. The neural score alone never authorises a physical action."""
 
     def __init__(self, use_geometric=True, tentative_confidence=0.9):
         self.use_geometric, self.tentative_confidence = use_geometric, tentative_confidence
 
     def decide(self, risk: HallucinationRiskState, domain="physics"):
         geo = risk.geometric_level if self.use_geometric else None
-        # un concept inconnu passe avant tout : les contradictions d'un concept deviné n'ont pas de sens
-        if risk.unknown_concepts: return ABSTAIN, f"concept inconnu : {', '.join(risk.unknown_concepts)}"
+        # an unknown concept comes before everything: the contradictions of a guessed concept are meaningless
+        if risk.unknown_concepts: return ABSTAIN, f"unknown concept: {', '.join(risk.unknown_concepts)}"
         if risk.contradiction_count and risk.lexical_conflict_only and geo == "HIGH":
-            return REROUTE, "proposition neuronale contredite par la mémoire lexicale + risque géométrique élevé"
-        if risk.contradiction_count: return REJECT, "contradiction structurelle : branche rejetée"
-        if risk.external_support_state == "REFUTED": return REJECT, "réfuté par la vérification externe"
-        if geo == "HIGH" and risk.branch_disagreement >= 0.3: return REROUTE, "risque géométrique élevé + désaccord de branches"
-        if risk.branch_disagreement >= 0.5: return ASK, "interprétations valides mais divergentes"
+            return REROUTE, "neural proposal contradicted by the lexical memory + high geometric risk"
+        if risk.contradiction_count: return REJECT, "structural contradiction: branch rejected"
+        if risk.external_support_state == "REFUTED": return REJECT, "refuted by the external verification"
+        if geo == "HIGH" and risk.branch_disagreement >= 0.3: return REROUTE, "high geometric risk + branch disagreement"
+        if risk.branch_disagreement >= 0.5: return ASK, "valid but divergent interpretations"
         if risk.neural_only_concepts:
             if domain == "sequence" and geo == "LOW" and risk.neural_confidence >= self.tentative_confidence:
-                return ACCEPT_TENTATIVE, "proposition neuronale sûre, risque géométrique faible, domaine réversible"
-            return VERIFY, f"support neuronal seul pour {', '.join(risk.neural_only_concepts)}"
-        if risk.external_support_state == "UNKNOWN": return VERIFY, "cohérent en interne, non vérifiable en externe"
-        if risk.structural_support >= 1.0: return ACCEPT, "support structurel complet"
-        return VERIFY, "support structurel partiel"
+                return ACCEPT_TENTATIVE, "confident neural proposal, low geometric risk, reversible domain"
+            return VERIFY, f"neural support only for {', '.join(risk.neural_only_concepts)}"
+        if risk.external_support_state == "UNKNOWN": return VERIFY, "internally coherent, not externally verifiable"
+        if risk.structural_support >= 1.0: return ACCEPT, "complete structural support"
+        return VERIFY, "partial structural support"
 
 
 # ================================================================ pipeline
@@ -770,7 +770,7 @@ class Response:
 
     @property
     def output(self):
-        """Forme comparable à l'oracle."""
+        """Form comparable with the oracle."""
         if self.decision in (ACCEPT, ACCEPT_TENTATIVE): return self.answer
         if self.decision == REJECT: return "REJECT"
         return "ABSTAIN"
@@ -801,10 +801,10 @@ class LanguageCore:
         self.pending: Dict[str, set] = {}
         self.seed = seed
 
-    # ---- apprentissage par l'expérience (WCE explique, le neuronal distille) ----
+    # ---- learning from experience (WCE explains, the neural part distils) ----
     def learn_physics(self, text, before: World, after: World, label=None):
-        """Explique l'observation : quels concepts, via le planner WCE, reproduisent l'état observé ?
-        Apprentissage trans-situationnel : intersection des explications ; ancrage quand il n'en reste qu'une."""
+        """Explains the observation: which concepts, via the WCE planner, reproduce the observed state?
+        Cross-situational learning: intersection of the explanations; grounding when only one remains."""
         parsed = parse(text); clause = parsed.clauses[0]
         if not clause.verb or clause.entity not in before.entities: return None
         if not self.use_wce:
@@ -846,12 +846,12 @@ class LanguageCore:
         self.lexicon.ground(form, concept, text, evidence)
         if self.core is not None and self.plasticity:
             words, labels = [form] * 4, [concept] * 4
-            for f, counts in self.lexicon.grounded.items():      # rejeu : évite l'interférence d'un seul mot
+            for f, counts in self.lexicon.grounded.items():      # replay: avoids interference from a single word
                 words.append(f); labels.append(counts.most_common(1)[0][0])
             FastAdaptCore(words=tuple(words), labels=tuple(labels)).apply(self.core)
 
     def fit_core(self, steps=300):
-        """Distillation : le cœur neuronal apprend les liaisons vérifiées (et les mots non-verbes)."""
+        """Distillation: the neural core learns the verified bindings (and the non-verb words)."""
         if self.core is None: return
         words, labels = [], []
         for form, counts in self.lexicon.grounded.items():
@@ -864,9 +864,9 @@ class LanguageCore:
     def attach_monitor(self, monitor, estimator):
         self.monitor, self.risk_estimator = monitor, estimator
 
-    # ---- candidats -------------------------------------------------------
+    # ---- candidates -------------------------------------------------------
     def concept_candidates(self, verb, k=3):
-        """Liste ordonnée : propositions neuronales d'abord (rapides), puis mémoire lexicale."""
+        """Ordered list: neural proposals first (fast), then lexical memory."""
         cands: Dict[str, Dict[str, Any]] = {}
         if self.use_neural and verb:
             for concept, p in self.core.propose(verb, k):
@@ -893,13 +893,13 @@ class LanguageCore:
             lexical = min(l for _, _, l in combo)
             interp.prior = (interp.neural_confidence if self.use_neural else 0) + (lexical if self.use_wce else 0)
             out.append(interp)
-        if self.use_neural:   # le neuronal propose : son ordre fait foi, la mémoire départage
+        if self.use_neural:   # the neural part proposes: its order prevails, the memory breaks ties
             out.sort(key=lambda i: (-i.neural_confidence, -i.prior))
         else:
             out.sort(key=lambda i: -i.prior)
         return out[:9]
 
-    # ---- risque ----------------------------------------------------------
+    # ---- risk ----------------------------------------------------------
     def risk_for(self, interp, others):
         risk = HallucinationRiskState(neural_confidence=interp.neural_confidence,
                                       structural_support=interp.structural_support,
@@ -910,7 +910,7 @@ class LanguageCore:
             if ev is not None and ev.known: continue
             if ev is not None and ev.source == "morphology_weak":
                 risk.neural_only_concepts.append(clause.verb); continue
-            # inconnu de WCE : une proposition neuronale n'est retenue (à vérifier) que si elle est sûre et saine
+            # unknown to WCE: a neural proposal is retained (to be verified) only if it is confident and sound
             confident = self.use_neural and concept is not None and \
                 dict(self.core.propose(clause.verb, 3)).get(concept, 0.0) >= 0.9
             healthy = not self.use_geometric or self.monitor is None or self._geometric(clause.verb)[1] == "LOW"
@@ -932,7 +932,7 @@ class LanguageCore:
         z = self.monitor.observe(self.core, word)
         return self.risk_estimator.score(z), self.risk_estimator.level(z)
 
-    # ---- traitement --------------------------------------------------------
+    # ---- processing --------------------------------------------------------
     def process(self, text, world: World, *, execute=True) -> Response:
         parsed = parse(text)
         if parsed.kind == "question": return self._question(parsed, world)
@@ -940,7 +940,7 @@ class LanguageCore:
         if not self.use_wce: return self._neural_only(parsed, world, execute)
 
         interps = self.interpretations(parsed, world)
-        budget = 1 if self.use_neural else len(interps)       # neural+WCE : seul le 1er candidat est vérifié
+        budget = 1 if self.use_neural else len(interps)       # neural+WCE: only the 1st candidate is verified
         checks_before, nodes_before = self.verifier.checks_run, self.verifier.search_nodes
         for interp in interps[:budget]: self.verifier.verify(interp, world)
         if any(len(self.lexicon.lookup(c.verb).concepts) > 1 for c in parsed.clauses if c.verb):
@@ -950,9 +950,9 @@ class LanguageCore:
         chosen = self._select(interps[:budget])
         risk = self.risk_for(chosen, interps[:budget]) if chosen else HallucinationRiskState(unknown_concepts=[c.verb or "?" for c in parsed.clauses])
         decision, reason = self.policy.decide(risk, chosen.domain if chosen else "physics")
-        trace = [f"candidats: {[i.label for i in interps]}", f"vérifié: {chosen.label if chosen else None} -> {decision}"]
+        trace = [f"candidates: {[i.label for i in interps]}", f"verified: {chosen.label if chosen else None} -> {decision}"]
         if decision == REROUTE and self.use_geometric and len(interps) > budget:
-            # le risque géométrique déclenche la vérification des branches alternatives
+            # the geometric risk triggers the verification of the alternative branches
             for interp in interps[budget:]: self.verifier.verify(interp, world)
             budget = len(interps)
             alt = self._select([i for i in interps if not i.failures] or interps)
@@ -964,7 +964,7 @@ class LanguageCore:
             chosen, risk, decision, reason, steps, budget = self._self_correct(parsed, world, interps, chosen, risk, decision, reason, budget)
             trace += steps; corrected = any(s.startswith("✓") for s in steps)
         if decision == VERIFY and chosen is not None and not risk.neural_only_concepts and risk.external_support_state == "NOT_APPLICABLE":
-            decision, reason = (ACCEPT, "vérification structurelle complète") if chosen.structural_support >= 1.0 else (ABSTAIN, reason)
+            decision, reason = (ACCEPT, "complete structural verification") if chosen.structural_support >= 1.0 else (ABSTAIN, reason)
         if decision == VERIFY: decision, reason = ABSTAIN, f"NEEDS_VERIFICATION : {reason}"
         if decision == ASK: reason = f"ASK : {reason} ({', '.join(sorted({i.answer for i in interps if i.answer and not i.failures}))})"
         if decision in (ACCEPT, ACCEPT_TENTATIVE) and execute and chosen.domain == "physics":
@@ -986,37 +986,37 @@ class LanguageCore:
         return scored[0]
 
     def _self_correct(self, parsed, world, interps, chosen, risk, decision, reason, budget):
-        """1 rollback du cœur, 2 reroute, 3 recherche structurelle, 4 interprétation alternative,
-        5 mémoire épisodique, 6 ré-exécution. Chaque étape est tracée."""
-        steps = [f"auto-correction: départ {chosen.label if chosen else None} ({decision})"]
+        """1 rollback of the core, 2 reroute, 3 structural search, 4 alternative interpretation,
+        5 episodic memory, 6 re-execution. Every step is traced."""
+        steps = [f"self-correction: start {chosen.label if chosen else None} ({decision})"]
         if risk.unknown_concepts and not any(self.lexicon.retrieve(w) for w in risk.unknown_concepts):
-            steps.append("mémoire: aucune expérience pour " + ", ".join(risk.unknown_concepts) + " -> abstention maintenue")
+            steps.append("memory: no experience for " + ", ".join(risk.unknown_concepts) + " -> abstention maintained")
             return chosen, risk, decision, reason, steps, budget
         if risk.geometric_level == "HIGH" and self.core is not None and self.core._snapshots:
-            self.core.rollback("good"); steps.append("1. rollback du cœur neuronal vers le snapshot 'good'")
+            self.core.rollback("good"); steps.append("1. rollback of the neural core to the snapshot 'good'")
             interps = self.interpretations(parsed, world)
         for interp in interps:
             if not interp.checks: self.verifier.verify(interp, world)
         budget = len(interps)
-        steps.append(f"2-4. reroute + recherche structurelle sur {len(interps)} interprétation(s)")
+        steps.append(f"2-4. reroute + structural search over {len(interps)} interpretation(s)")
         valid = [i for i in interps if not i.failures]
         if not valid:
             saved = self.use_neural; self.use_neural = False
             alt = self.interpretations(parsed, world); self.use_neural = saved
             for interp in alt: self.verifier.verify(interp, world)
             valid = [i for i in alt if not i.failures]; interps = interps + alt
-            steps.append(f"3. recherche structurelle sans proposition neuronale : {len(valid)} valide(s)")
+            steps.append(f"3. structural search without neural proposal: {len(valid)} valid")
         for clause in parsed.clauses:
             if clause.verb and self.lexicon.retrieve(clause.verb):
-                steps.append(f"5. mémoire épisodique : '{clause.verb}' vu dans « {self.lexicon.retrieve(clause.verb)[-1]['utterance']} »")
+                steps.append(f"5. episodic memory: '{clause.verb}' seen in « {self.lexicon.retrieve(clause.verb)[-1]['utterance']} »")
         if not valid:
-            steps.append("6. aucune branche valide -> décision inchangée")
+            steps.append("6. no valid branch -> decision unchanged")
             return chosen, risk, decision, reason, steps, budget
         new = self._select(valid)
         new_risk = self.risk_for(new, valid)
         new_decision, new_reason = self.policy.decide(new_risk, new.domain)
         mark = "✓" if new_decision in (ACCEPT, ACCEPT_TENTATIVE) and (chosen is None or new.label != chosen.label or decision != new_decision) else "·"
-        steps.append(f"{mark} 6. ré-exécution : {new.label} -> {new_decision}")
+        steps.append(f"{mark} 6. re-execution: {new.label} -> {new_decision}")
         return new, new_risk, new_decision, new_reason, steps, budget
 
     def _execute(self, interp, world):
@@ -1050,7 +1050,7 @@ class LanguageCore:
                 answer = describe(target, next((c.entity for c in reversed(parsed.clauses) if c.entity), None))
         except Exception:
             answer = "ERREUR"
-        response = Response(parsed.text, ACCEPT, UNCERTAIN, answer, "neuronal seul, sans vérification", interp,
+        response = Response(parsed.text, ACCEPT, UNCERTAIN, answer, "neural only, without verification", interp,
                             memory={"slow_parametric"} | ({"fast_parametric"} if self.core.fast else set()))
         self.log.append(response)
         return response
@@ -1063,7 +1063,7 @@ class LanguageCore:
             answer = f"{entity} est sur {support_of(world, entity) or 'rien'}"
         else:
             answer = f"{entity}: y={world.entities[entity].properties['y']:g}"
-        return self._finish(Response(parsed.text, ACCEPT, SUPPORTED, answer, "lu dans l'état du monde", memory={"current_world", "structural"}, checks=1))
+        return self._finish(Response(parsed.text, ACCEPT, SUPPORTED, answer, "read from the world state", memory={"current_world", "structural"}, checks=1))
 
     def _claim(self, parsed, world):
         subject, kind, value = parsed.claim
@@ -1073,10 +1073,10 @@ class LanguageCore:
         if kind == "sur":
             truth = support_of(world, subject) == value
             return self._finish(Response(parsed.text, ACCEPT, SUPPORTED if truth else CONTRADICTED, "VRAI" if truth else "FAUX",
-                                         "cohérence interne (état du monde)", risk=risk, memory={"current_world"}, checks=1))
+                                         "internal coherence (world state)", risk=risk, memory={"current_world"}, checks=1))
         props = world.entities[subject].properties
         if value in props.values():
-            return self._finish(Response(parsed.text, ACCEPT, SUPPORTED, "VRAI", "cohérence interne (propriété du monde)",
+            return self._finish(Response(parsed.text, ACCEPT, SUPPORTED, "VRAI", "internal coherence (world property)",
                                          risk=risk, memory={"current_world"}, checks=1))
         state = self.external.verify(subject, value) if self.external else "UNKNOWN"
         risk.external_support_state = state
@@ -1084,7 +1084,7 @@ class LanguageCore:
         elif state == "REFUTED": decision, answer = ACCEPT, "FAUX"
         else: decision, answer = ABSTAIN, None
         return self._finish(Response(parsed.text, decision, SUPPORTED if state == "SUPPORTED" else CONTRADICTED if state == "REFUTED" else NEEDS_VERIFICATION,
-                                     answer, f"vérification externe : {state} (le monde interne ne dit rien)", risk=risk,
+                                     answer, f"external verification: {state} (the internal world says nothing)", risk=risk,
                                      memory={"external_verification", "current_world"}, checks=1))
 
     def _finish(self, response):
@@ -1105,10 +1105,10 @@ class LanguageCore:
         return used
 
 
-# ================================================================ Y. amorçage, flux, évaluation
+# ================================================================ Y. bootstrapping, stream, evaluation
 
 def bootstrap_experiences():
-    """Expériences initiales (phrase + observation). Les étiquettes ne servent qu'aux systèmes sans WCE."""
+    """Initial experiences (sentence + observation). The labels are used only by the systems without WCE."""
     phys = [("le cube tombe", "cube", "FALL"), ("le cube tomber", "cube", "FALL"), ("le cube tombait", "cube", "FALL"),
             ("le cube tombé", "cube", "FALL"), ("la balle monte", "balle", "RISE"),
             ("place la balle sur la table", "balle", "PLACE"), ("place le cube sur la table", "cube", "PLACE"),
@@ -1121,8 +1121,8 @@ def bootstrap_experiences():
 
 
 def observe_physics_event(text, concept):
-    """Simule l'observation : le monde change selon la VRAIE sémantique du concept (générateur de données,
-    jamais transmis comme réponse au système)."""
+    """Simulates the observation: the world changes according to the TRUE semantics of the concept (data generator,
+    never transmitted as an answer to the system)."""
     world = make_scene()
     parsed = parse(text)
     lex = LexicalConceptMemory(); lex.ground(parsed.clauses[0].verb, concept)
@@ -1147,7 +1147,7 @@ def build_core(size="small", seed=0, bootstrap=True, fit=True, **flags):
 
 
 def language_stream():
-    """Flux continu sans étiquette de tâche : apprentissages (avec observation) et requêtes mêlés."""
+    """Continuous stream without task label: learning steps (with observation) and queries mixed."""
     L = []
     def learn(text, concept, domain): L.append({"type": "learn", "text": text, "concept": concept, "domain": domain})
     def ask(text, category): L.append({"type": "query", "text": text, "category": category})
@@ -1168,7 +1168,7 @@ def language_stream():
 
 
 def evaluation_set():
-    """Requêtes de test indépendantes (monde réinitialisé à chaque fois)."""
+    """Independent test queries (world reset every time)."""
     cases = []
     for e in ENTITIES:
         cases += [f"le {e} tombe" if e != "balle" and e != "boîte" else f"la {e} tombe", ]
@@ -1191,7 +1191,7 @@ def evaluation_set():
 
 
 def oracle(text):
-    """Réponse attendue selon la VRAIE sémantique du corpus (indépendante des mémoires du système)."""
+    """Expected answer according to the TRUE semantics of the corpus (independent of the memories of the system)."""
     world = make_scene()
     parsed = parse(text)
     if parsed.kind == "question":
@@ -1252,8 +1252,8 @@ def evaluate(system: LanguageCore, cases=None, corrupt=False):
 
 
 def run_stream(system: LanguageCore):
-    """Traite le flux ; renvoie les résultats par catégorie (les étiquettes de concept ne sont
-    transmises qu'aux systèmes sans WCE, qui ne savent pas expliquer une observation)."""
+    """Processes the stream; returns the results per category (the concept labels are
+    transmitted only to the systems without WCE, which cannot explain an observation)."""
     results = []
     for event in language_stream():
         if event["type"] == "learn":
@@ -1273,7 +1273,7 @@ def run_stream(system: LanguageCore):
 
 
 def experiment_matrix(size="small", seed=0, monitor_factory=None):
-    """Les 6 systèmes, même flux d'apprentissage, même jeu d'évaluation."""
+    """The 6 systems, same learning stream, same evaluation set."""
     out = {}
     for name, flags in SYSTEMS.items():
         system = build_core(size=size, seed=seed, **flags)
@@ -1288,7 +1288,7 @@ def experiment_matrix(size="small", seed=0, monitor_factory=None):
 
 
 def char_vs_word(seed=0):
-    """Référence caractères vs tokeniseur-mot sur formes jamais vues à l'entraînement."""
+    """Character vs word-tokenizer reference on forms never seen in training."""
     lc = build_core(seed=seed)
     words = list(lc.lexicon.grounded) + OTHER_WORDS
     labels = [lc.lexicon.grounded[w].most_common(1)[0][0] for w in lc.lexicon.grounded] + ["OTHER"] * len(OTHER_WORDS)
@@ -1304,7 +1304,7 @@ def char_vs_word(seed=0):
 
 
 def morphology_report(system: LanguageCore):
-    """Généralisation morphologique prudente : correctes / sur-généralisations / abstentions."""
+    """Cautious morphological generalisation: correct / over-generalisations / abstentions."""
     rows = []
     for form, truth in TRUE_CONCEPT.items():
         if form in system.lexicon.grounded or isinstance(truth, set): continue
@@ -1323,7 +1323,7 @@ def morphology_report(system: LanguageCore):
 
 
 def parameter_scaling(sizes=("tiny", "small", "medium"), seed=0, monitor_factory=None):
-    """Taille du cœur neuronal vs précision neuronale vs dépendance à WCE."""
+    """Size of the neural core vs neural accuracy vs dependence on WCE."""
     out = {}
     held = [f for f, c in TRUE_CONCEPT.items() if isinstance(c, str)]
     for size in sizes:

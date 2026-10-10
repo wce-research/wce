@@ -1,15 +1,15 @@
-"""Dynamique temporelle des croyances : ÉTAT_t + ÉVÉNEMENTS + PERSISTANCE + CHANGEMENT NON OBSERVÉ -> CROYANCE_t+1.
+"""Temporal dynamics of beliefs: STATE_t + EVENTS + PERSISTENCE + UNOBSERVED CHANGE -> BELIEF_t+1.
 
-Pour chaque propriété dynamique (entité, clé), un modèle de Markov caché discret, vectorisé (torch) :
-  transition t -> t+1 :
-      sans événement rapporté : rester avec prob. exp(−λ_k) ; sinon changer vers une AUTRE valeur, uniforme
-                                (changement non observé : possible, jamais inventé précisément)
-      événement rapporté (source s, fiabilité r_e) : avec prob. r_e l'événement a eu lieu -> valeur cible,
-                                avec prob. 1 − r_e il n'a pas eu lieu -> transition de persistance ci-dessus
-  observation au temps t par une source de fiabilité r : P(dit v | état x) = r si v = x, (1 − r)/(K − 1) sinon
-Filtrage avant = croyance PRÉSENTE ; lissage avant-arrière = croyance HISTORIQUE (et correction rétroactive
-automatique quand une information sur le passé arrive). « Je n'ai pas vu de changement » ≠ « rien n'a changé » :
-la confiance décroît avec l'âge de la dernière preuve, selon le taux λ appris par type de clé.
+For each dynamic property (entity, key), a discrete hidden Markov model, vectorised (torch):
+  transition t -> t+1:
+      without a reported event: stay with prob. exp(−λ_k); otherwise change to ANOTHER value, uniform
+                                (unobserved change: possible, never invented precisely)
+      reported event (source s, reliability r_e): with prob. r_e the event took place -> target value,
+                                with prob. 1 − r_e it did not take place -> persistence transition above
+  observation at time t by a source of reliability r: P(says v | state x) = r if v = x, (1 − r)/(K − 1) otherwise
+Forward filtering = PRESENT belief; forward-backward smoothing = HISTORICAL belief (and automatic retroactive
+correction when information about the past arrives). "I have not seen any change" ≠ "nothing has changed":
+confidence decays with the age of the last piece of evidence, according to the rate λ learned per key type.
 """
 from __future__ import annotations
 
@@ -26,12 +26,12 @@ ASSERTED, QUALIFIED, WITHHELD = "ASSERTED", "QUALIFIED", "WITHHELD"
 KNOWN, LIKELY, UNKNOWN, CONFLICTED = "KNOWN", "LIKELY", "UNKNOWN", "CONFLICTED"
 
 
-# ================================================================ dynamique par type de clé
+# ================================================================ dynamics per key type
 
 @dataclass
 class KeyDynamics:
     key_type: str
-    hazard: float                    # λ : taux de changement par pas de temps
+    hazard: float                    # λ: rate of change per time step
     klass: str = FAST
     changes: float = 0.0
     exposure: float = 0.0
@@ -39,7 +39,7 @@ class KeyDynamics:
     def persistence(self, dt): return math.exp(-self.hazard * max(dt, 0))
 
 
-CLASS_PRIORS = {STATIC: (0.5, 2000.0), SLOW: (1.0, 100.0), FAST: (2.0, 10.0)}   # Gamma(a, b) sur λ par classe
+CLASS_PRIORS = {STATIC: (0.5, 2000.0), SLOW: (1.0, 100.0), FAST: (2.0, 10.0)}   # Gamma(a, b) on λ per class
 
 
 def classify(hazard):
@@ -47,14 +47,14 @@ def classify(hazard):
 
 
 class HazardModel:
-    """λ_k estimé sur des trajectoires d'ENTRAÎNEMENT (changements / exposition), rétréci vers la classe (Gamma)."""
+    """λ_k estimated on TRAINING trajectories (changes / exposure), shrunk towards the class (Gamma)."""
 
     def __init__(self, default=None):
         self.dyn: Dict[str, KeyDynamics] = {}
         for k, (lam, kl) in (default or {}).items(): self.dyn[k] = KeyDynamics(k, lam, kl)
 
     def fit(self, trajectories, classes: Dict[str, str] = None):
-        """trajectories : liste de (type de clé, [valeurs aux temps 0..T]) — vérité des mondes d'entraînement."""
+        """trajectories: list of (key type, [values at times 0..T]) — truth of the training worlds."""
         stats = defaultdict(lambda: [0.0, 0.0])
         for kt, values in trajectories:
             stats[kt][0] += sum(1 for a, b in zip(values, values[1:]) if a != b)
@@ -63,14 +63,14 @@ class HazardModel:
             raw = ch / max(ex, 1e-9)
             kl = (classes or {}).get(kt, classify(raw))
             a, b = CLASS_PRIORS[kl]
-            lam = (ch + a) / (ex + b)                                 # moyenne a posteriori Gamma
+            lam = (ch + a) / (ex + b)                                 # Gamma posterior mean
             self.dyn[kt] = KeyDynamics(kt, lam, classify(lam), ch, ex)
         return self
 
     def get(self, kt): return self.dyn.get(kt, KeyDynamics(kt, 0.1, FAST))
 
 
-# ================================================================ état temporel d'une propriété
+# ================================================================ temporal state of a property
 
 @dataclass
 class Report:
@@ -79,7 +79,7 @@ class Report:
     source: str
     reliability: float
     kind: str = "observation"         # observation | event
-    ingested_at: int = 0             # temps d'ingestion (≠ temps de l'observation ou de l'événement)
+    ingested_at: int = 0             # ingestion time (≠ time of the observation or of the event)
 
 
 @dataclass
@@ -105,13 +105,13 @@ class TemporalBeliefState:
 
     def idx(self, v): return self.domain.index(v)
 
-    # ---- preuves ----------------------------------------------------------------------------
+    # ---- evidence ----------------------------------------------------------------------------
     def observe(self, t, value, source, reliability, ingested_at=None):
         self.reports.append(Report(t, value, source, reliability, "observation", ingested_at if ingested_at is not None else t))
         self._cache.clear()
 
     def event(self, t, target_value, source, reliability, ingested_at=None):
-        """Événement rapporté qui mène à target_value au temps t (appliqué avec son poids de preuve)."""
+        """Reported event that leads to target_value at time t (applied with its evidence weight)."""
         self.reports.append(Report(t, target_value, source, reliability, "event", ingested_at if ingested_at is not None else t))
         self._cache.clear()
 
@@ -127,10 +127,10 @@ class TemporalBeliefState:
         M = self._persist()
         events = [r for r in events if not getattr(r, "defeated", False)]
         if not events: return M
-        if len({r.value for r in events}) == 1 and len(events) == 1:   # un événement : a eu lieu (r) ou non (1 − r)
+        if len({r.value for r in events}) == 1 and len(events) == 1:   # one event: took place (r) or not (1 − r)
             r = events[0]; E = torch.zeros(self.K, self.K); E[:, self.idx(r.value)] = 1.0
             return r.reliability * E + (1 - r.reliability) * M
-        # événements CONCURRENTS : P(un changement a eu lieu) = 1 − Π(1 − r_i) ; cible votée entre les rapports
+        # CONCURRENT events: P(a change took place) = 1 − Π(1 − r_i); target voted among the reports
         p_h = 1.0 - math.prod(1 - r.reliability for r in events)
         q = torch.ones(self.K)
         for r in events:
@@ -147,9 +147,9 @@ class TemporalBeliefState:
             L = L * v
         return L
 
-    # ---- filtrage / lissage -----------------------------------------------------------------------
+    # ---- filtering / smoothing -----------------------------------------------------------------------
     def posterior(self, T):
-        """(filtré[0..T], lissé[0..T]) : [T+1, K] — vectorisé, renormalisé à chaque pas."""
+        """(filtered[0..T], smoothed[0..T]): [T+1, K] — vectorised, renormalised at each step."""
         key = ("post", T, len(self.reports), sum(getattr(r, "defeated", False) for r in self.reports))
         if key in self._cache: return self._cache[key]
         obs, ev, hidden = defaultdict(list), defaultdict(list), set()
@@ -161,7 +161,7 @@ class TemporalBeliefState:
         trans = [self._event_matrix(ev[t]) if ev[t] else None for t in range(T + 1)]
         U = torch.full((self.K, self.K), 1.0 / self.K)
         for t in hidden:
-            if t <= T: trans[t] = U if trans[t] is None else 0.5 * (U + trans[t])      # changement caché possible : pas inventé
+            if t <= T: trans[t] = U if trans[t] is None else 0.5 * (U + trans[t])      # hidden change possible: not invented
         P1 = self._persist()
         f = torch.zeros(T + 1, self.K)
         a = prior * self._likelihood(obs[0]); f[0] = a / a.sum()
@@ -177,17 +177,17 @@ class TemporalBeliefState:
         return f, s
 
     def current(self, now):
-        """Croyance PRÉSENTE (filtrée jusqu'à maintenant)."""
+        """PRESENT belief (filtered up to now)."""
         f, _ = self.posterior(now); return self._dist(f[now])
 
     def historical(self, t, now=None):
-        """Croyance HISTORIQUE au temps t (lissée avec toute l'information disponible jusqu'à now)."""
+        """HISTORICAL belief at time t (smoothed with all the information available up to now)."""
         now = max(now if now is not None else self.known_until(), t)
         _, s = self.posterior(now); return self._dist(s[t])
 
     def _dist(self, v): return {self.domain[i]: float(v[i]) for i in range(self.K)}
 
-    # ---- statut, droit d'affirmer, conflits --------------------------------------------------------
+    # ---- status, entitlement to assert, conflicts --------------------------------------------------------
     def last_observed(self, now):
         ts = [r.t for r in self.reports if r.kind == "observation" and r.t <= now and not getattr(r, "defeated", False)]
         return max(ts) if ts else None
@@ -200,12 +200,12 @@ class TemporalBeliefState:
         if p >= assert_t: return KNOWN, v, p
         if lo is not None:
             h = self.historical(lo, now); hv, hp = max(h.items(), key=lambda kv: kv[1])
-            if hp >= assert_t and lo < now: return STALE, hv, p              # vrai alors, trop ancien pour maintenant
+            if hp >= assert_t and lo < now: return STALE, hv, p              # true then, too old for now
         if p >= qualify_t: return LIKELY, v, p
         return UNKNOWN, None, p
 
     def conflict_at(self, t, min_second=0.2, credible=0.6):
-        """Conflit TEMPOREL : deux sources crédibles se contredisent AU MÊME instant (≠ changement d'état)."""
+        """TEMPORAL conflict: two credible sources contradict each other AT THE SAME instant (≠ change of state)."""
         same = [r for r in self.reports if r.kind == "observation" and r.t == t]
         vals = {r.value for r in same if r.reliability >= credible}
         if len(vals) < 2: return False
@@ -219,7 +219,7 @@ class TemporalBeliefState:
         if st == LIKELY or (st == STALE and p >= qualify_t): return QUALIFIED, v, p
         return WITHHELD, None, p
 
-    # ---- trajectoire, branches, compression ----------------------------------------------------------
+    # ---- trajectory, branches, compression ----------------------------------------------------------
     def trajectory(self, now=None):
         now = now if now is not None else self.known_until()
         _, s = self.posterior(now)
@@ -229,13 +229,13 @@ class TemporalBeliefState:
         return out
 
     def branches(self, t, now=None, min_p=0.1):
-        """Treillis d'événements : à un instant d'événement rapporté, les issues possibles (a eu lieu / non)."""
+        """Event lattice: at an instant of a reported event, the possible outcomes (took place / not)."""
         now = now if now is not None else self.known_until()
         d = self.historical(t, now)
         return sorted(((v, p) for v, p in d.items() if p >= min_p), key=lambda kv: -kv[1])
 
     def segments(self, now=None, min_conf=0.9):
-        """Compression : périodes stables -> intervalles (valeur, de, à, confiance minimale)."""
+        """Compression: stable periods -> intervals (value, from, to, minimum confidence)."""
         segs = []
         for t, v, p in self.trajectory(now):
             if segs and segs[-1].value == v and (p >= min_conf) == (segs[-1].confidence >= min_conf):
@@ -243,11 +243,11 @@ class TemporalBeliefState:
             else: segs.append(Segment(v, t, t, p))
         return segs
 
-    # ---- auto-correction temporelle minimale ------------------------------------------------------
+    # ---- minimal temporal self-correction ------------------------------------------------------
     def minimal_revision(self, now, refuted_value):
-        """Réponse réfutée (« ce n'est pas refuted_value ») : on classe les causes possibles par suspicion et on ne
-        révise que la plus suspecte : rapport d'une source peu fiable, événement rapporté, ou hypothèse de
-        PERSISTANCE (preuve trop ancienne) remplacée par un changement caché possible à partir de la dernière preuve."""
+        """Refuted answer ("it is not refuted_value"): the possible causes are ranked by suspicion and only
+        the most suspect one is revised: report from an unreliable source, reported event, or PERSISTENCE
+        assumption (evidence too old) replaced by a possible hidden change starting from the last piece of evidence."""
         cands = []
         for r in self.reports:
             if r.t > now or getattr(r, "defeated", False) or r.value != refuted_value: continue
@@ -265,7 +265,7 @@ class TemporalBeliefState:
         return {"cause": cause, "suspicion": round(susp, 3), "revised": 1, "candidates": len(cands)}
 
     def prediction_set(self, t, level=0.9, now=None, present=False):
-        """Ensemble de valeurs de plus haute probabilité couvrant ≥ level (intervalle prédictif catégoriel)."""
+        """Set of highest-probability values covering ≥ level (categorical predictive interval)."""
         d = self.current(t) if present else self.historical(t, now)
         out, acc = [], 0.0
         for v, p in sorted(d.items(), key=lambda kv: -kv[1]):
@@ -274,10 +274,10 @@ class TemporalBeliefState:
         return out
 
 
-# ================================================================ mémoire de toutes les propriétés
+# ================================================================ memory of all the properties
 
 class TemporalMemory:
-    """Toutes les propriétés dynamiques ; maintient l'historique (le TMS temporel ne détruit pas t1 quand t2 change)."""
+    """All the dynamic properties; maintains the history (the temporal TMS does not destroy t1 when t2 changes)."""
 
     def __init__(self, hazards: HazardModel, domains: Dict[str, List[Any]]):
         self.hz, self.domains = hazards, domains
@@ -294,11 +294,11 @@ class TemporalMemory:
         return {"properties": len(self.states), "reports": raw, "segments": segs, "time_steps": now * len(self.states)}
 
 
-# ================================================================ intervalles prédictifs des sources
+# ================================================================ predictive intervals of the sources
 
 def beta_binomial_interval(alpha, beta, n, level=0.9):
-    """Intervalle PRÉDICTIF sur la proportion de réponses justes parmi n FUTURES affirmations :
-    k ~ BetaBinomial(n, α, β) (incertitude du posterior + bruit d'échantillonnage futur). Vectorisé."""
+    """PREDICTIVE interval on the proportion of correct answers among n FUTURE claims:
+    k ~ BetaBinomial(n, α, β) (posterior uncertainty + future sampling noise). Vectorised."""
     k = torch.arange(n + 1, dtype=torch.float64)
     a, b = torch.tensor(float(alpha), dtype=torch.float64), torch.tensor(float(beta), dtype=torch.float64)
     logp = (torch.lgamma(torch.tensor(n + 1.0, dtype=torch.float64)) - torch.lgamma(k + 1) - torch.lgamma(n - k + 1)
@@ -312,12 +312,12 @@ def beta_binomial_interval(alpha, beta, n, level=0.9):
     return lo / max(n, 1), min(hi, n) / max(n, 1)
 
 
-# ================================================================ propriété dérivée d'un état joint (ex. hauteur)
+# ================================================================ property derived from a joint state (e.g. height)
 
 class JointDerivedState:
-    """Propriété DÉRIVÉE d'un état caché joint (base × modificateur), ex. hauteur = f(support, surélévation).
-    La base suit sa propre dynamique (événements, persistance) ; le modificateur bascule avec un taux appris ;
-    les rapports sur la base et sur la valeur dérivée sont des émissions du même état (vectorisé)."""
+    """Property DERIVED from a joint hidden state (base × modifier), e.g. height = f(support, elevation).
+    The base follows its own dynamics (events, persistence); the modifier toggles with a learned rate;
+    the reports on the base and on the derived value are emissions of the same state (vectorised)."""
 
     def __init__(self, base: TemporalBeliefState, modifiers, derive, toggle, derived_domain, mod_prior=None):
         self.base, self.mods, self.derive, self.toggle = base, list(modifiers), derive, toggle
@@ -372,12 +372,12 @@ class JointDerivedState:
 
 
 
-# ================================================================ maintenance de vérité temporelle
+# ================================================================ temporal truth maintenance
 
 class TemporalTMS:
-    """Historique conservé : une croyance au temps t1 n'est pas détruite quand l'état change en t2 ; chaque croyance
-    datée garde ses justifications (rapports) ; une information tardive sur le passé révise la trajectoire à partir
-    de ce point (lissage) sans effacer les instants antérieurs."""
+    """History preserved: a belief at time t1 is not destroyed when the state changes at t2; each dated
+    belief keeps its justifications (reports); late information about the past revises the trajectory from
+    that point on (smoothing) without erasing the earlier instants."""
 
     def __init__(self, state: TemporalBeliefState): self.state = state; self.log = []
 
@@ -389,7 +389,7 @@ class TemporalTMS:
     def timeline(self, now): return [self.belief_at(t, now) for t in range(now + 1)]
 
     def late_report(self, t, value, source, reliability, kind="event", ingested_at=None):
-        """Rapport RETARDÉ (ex. à t5 : « elle est tombée à t3 ») : la trajectoire est recalculée à partir de t3."""
+        """DELAYED report (e.g. at t5: "it fell at t3"): the trajectory is recomputed from t3 on."""
         before = [b["value"] for b in self.timeline(ingested_at or t)]
         (self.state.event if kind == "event" else self.state.observe)(t, value, source, reliability, ingested_at)
         after = [b["value"] for b in self.timeline(ingested_at or t)]

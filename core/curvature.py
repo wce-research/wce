@@ -1,12 +1,12 @@
-"""Stabilité du SECOND ORDRE pour les sous-systèmes différentiables (sans Hessienne dense).
+"""SECOND-ORDER stability for the differentiable subsystems (without a dense Hessian).
 
-Pour une compétence protégée de sorties f_i(θ) (marge signée m_i = y_i·f_i) sur des sondes générées :
+For a protected skill with outputs f_i(θ) (signed margin m_i = y_i·f_i) on generated probes:
   m_i(θ+δ) ≈ m_i + y_i·(J δ)_i + ½·y_i·δᵀH_iδ
-- dérivée seconde DIRECTIONNELLE exacte δᵀH_iδ par double produit jvp (torch.func) — coût ≈ 2 passes ;
-- courbure faible rang : directions propres dominantes de A = −Σ_i y_i H_i / max(m_i, ε) (les directions où les
-  marges se referment au second ordre), par itération de puissance sur des produits Hessienne-vecteur ;
-- ellipsoïde de stabilité anisotrope : δᵀQδ ≤ 1 avec Q = JᵀJ/τ² (premier ordre, faible rang) + U diag(λ/τ) Uᵀ
-  (courbure, faible rang) + ε·I.
+- exact DIRECTIONAL second derivative δᵀH_iδ by a double jvp product (torch.func) — cost ≈ 2 passes;
+- low-rank curvature: dominant eigendirections of A = −Σ_i y_i H_i / max(m_i, ε) (the directions along which the
+  margins close at second order), by power iteration on Hessian-vector products;
+- anisotropic stability ellipsoid: δᵀQδ ≤ 1 with Q = JᵀJ/τ² (first order, low rank) + U diag(λ/τ) Uᵀ
+  (curvature, low rank) + ε·I.
 """
 from __future__ import annotations
 
@@ -34,7 +34,7 @@ def unflat(v, like):
 
 
 def margin_fn(p, X, y, forward=mlp):
-    """Fonction vec(θ) -> marges signées (y∈{0,1} -> ±1) des sondes."""
+    """Function vec(θ) -> signed margins (y∈{0,1} -> ±1) of the probes."""
     s = (2 * y - 1).to(torch.float32)
     def f(v):
         o = forward(unflat(v, p), X); return s * (o[:, 1] - o[:, 0])
@@ -47,7 +47,7 @@ def jacobian(p, X, y, forward=mlp):
 
 
 def directional_second(p, X, y, delta, forward=mlp):
-    """δᵀH_iδ pour chaque sonde i (dérivée seconde exacte le long de δ), sans Hessienne."""
+    """δᵀH_iδ for each probe i (exact second derivative along δ), without a Hessian."""
     f = margin_fn(p, X, y, forward); v = flat(p).detach()
     def first(t): return jvp(f, (t,), (delta,))[1]
     return jvp(first, (v,), (delta,))[1]
@@ -61,7 +61,7 @@ def predicted_margins(p, X, y, delta, forward=mlp, order=2):
 
 
 def low_rank_curvature(p, X, y, k=4, iters=20, eps=0.1, forward=mlp, seed=0):
-    """k directions de courbure dominante de A(θ) = −Σ_i y-signé H_i / max(m_i, ε) (itération de puissance + déflation)."""
+    """k directions of dominant curvature of A(θ) = −Σ_i signed-y H_i / max(m_i, ε) (power iteration + deflation)."""
     f = margin_fn(p, X, y, forward); v0 = flat(p).detach()
     with torch.no_grad(): m = f(v0)
     w = -1.0 / m.clamp_min(eps)
@@ -83,10 +83,10 @@ def low_rank_curvature(p, X, y, k=4, iters=20, eps=0.1, forward=mlp, seed=0):
 
 @dataclass
 class StabilityEllipsoid:
-    """δᵀQδ ≤ 1 : région locale de stabilité anisotrope, Q = Aᵀ diag(a) A (faible rang) + ε·I (stockage compact)."""
-    J_basis: torch.Tensor          # [P, r] directions sensibles premier ordre
-    J_scale: torch.Tensor          # [r] valeurs singulières² / τ²
-    C_basis: torch.Tensor          # [P, k] directions de courbure
+    """δᵀQδ ≤ 1: local region of anisotropic stability, Q = Aᵀ diag(a) A (low rank) + ε·I (compact storage)."""
+    J_basis: torch.Tensor          # [P, r] first-order sensitive directions
+    J_scale: torch.Tensor          # [r] singular values² / τ²
+    C_basis: torch.Tensor          # [P, k] curvature directions
     C_scale: torch.Tensor          # [k] |λ| / τ
     eps: float = 1e-4
 
@@ -114,8 +114,8 @@ def null_projector(p, X, y, energy=0.999, forward=mlp):
 
 
 def safe_step(p, X, y, delta, forward=mlp, max_flip=0.0, order=2, shrink=0.5, tries=12):
-    """Réduit l'amplitude α de δ jusqu'à ce que le nombre prédit de marges retournées (ordre 1 ou 2) ≤ max_flip.
-    Renvoie (α, flips prédits)."""
+    """Shrinks the amplitude α of δ until the predicted number of flipped margins (order 1 or 2) ≤ max_flip.
+    Returns (α, predicted flips)."""
     with torch.no_grad(): m0 = margin_fn(p, X, y, forward)(flat(p))
     ok0 = m0 > 0; a = 1.0
     for _ in range(tries):

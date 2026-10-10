@@ -1,20 +1,20 @@
-"""État cognitif unifié : OBSERVATIONS -> DISCOURS -> IDENTITÉ -> PREUVES -> CROYANCES -> QUESTIONS.
+"""Unified cognitive state: OBSERVATIONS -> DISCOURSE -> IDENTITY -> EVIDENCE -> BELIEFS -> QUESTIONS.
 
-Un seul état (UnifiedCognitiveState) et un seul résolveur servent à l'ingestion, aux questions et aux commandes ;
-seul le niveau de risque accepté change (observation < question < action).
+A single state (UnifiedCognitiveState) and a single resolver serve ingestion, questions and commands;
+only the accepted risk level changes (observation < question < action).
 
-Formule d'identité explicite (testable), pour une mention m émise par la source s et un candidat e :
+Explicit (testable) identity formula, for a mention m emitted by source s and a candidate e:
     score(e)  = log prior(e) + log compat(e) + support(e) + log temporal(e)
     p_lang(e) = softmax(score)
-    P(e | m)  = r_s · p_lang(e) + (1 − r_s) · prior(e)          (une source peu fiable peut décrire faux)
-prior : uniforme sur les candidats du bon type ; compat : marginale de la satisfaction de contraintes jointe
-(identité, distinction, injectivité) ; support : log-vraisemblance de l'attribut décrit selon le graphe de preuves ;
-temporal : cohérence des états datés (un état mutable ancien n'exclut pas un candidat si un événement l'a changé).
+    P(e | m)  = r_s · p_lang(e) + (1 − r_s) · prior(e)          (an unreliable source may describe wrongly)
+prior: uniform over the candidates of the right type; compat: marginal of the joint constraint satisfaction
+(identity, distinctness, injectivity); support: log-likelihood of the described attribute under the evidence graph;
+temporal: consistency of the dated states (an old mutable state does not exclude a candidate if an event changed it).
 
-Les croyances dépendent explicitement de leurs preuves, et les preuves textuelles de l'identité de leur mention.
-Un mini-TMS (JUSTIFIED / DEFEATED / SUSPENDED / UNKNOWN) propage les révisions : si l'identité change,
-les croyances dépendantes sont retirées puis recalculées. Tout est recalculé à partir des enregistrements
-actifs (pas de copie divergente de croyance).
+Beliefs depend explicitly on their evidence, and textual evidence on the identity of its mention.
+A mini-TMS (JUSTIFIED / DEFEATED / SUSPENDED / UNKNOWN) propagates revisions: if the identity changes,
+the dependent beliefs are retracted then recomputed. Everything is recomputed from the active
+records (no divergent copy of a belief).
 """
 from __future__ import annotations
 
@@ -33,11 +33,11 @@ SUPPORTED, LIKELY, CONFLICTED, REFUTED, UNKNOWN_ANS = "SUPPORTED", "LIKELY", "CO
 ANSWER, ASK, ABSTAIN, VERIFY = "ANSWER", "ASK", "ABSTAIN", "VERIFY"
 ATTR_DOMAIN = {"color": 4, "loc": 12}
 USER = "user"
-NONE = "∅"                     # hypothèse « la description ne désigne aucun objet » (présupposition fausse)
-PRESUPPOSITION_FAILURE = 0.02  # a priori explicite de cette hypothèse (descriptions définies seulement)
+NONE = "∅"                     # hypothesis "the description denotes no object" (false presupposition)
+PRESUPPOSITION_FAILURE = 0.02  # explicit prior of this hypothesis (definite descriptions only)
 
 
-# ================================================================ identité calibrée par la source
+# ================================================================ source-calibrated identity
 
 @dataclass
 class IdentityEvidence:
@@ -53,7 +53,7 @@ class IdentityEvidence:
 
 
 def identity_posterior(prior, compat, support, temporal, reliability):
-    """Vecteurs [n candidats] -> P(e | preuves). Vectorisé ; chaque terme est séparé et testable."""
+    """Vectors [n candidates] -> P(e | evidence). Vectorised; each term is separate and testable."""
     prior = prior / prior.sum()
     score = prior.clamp_min(1e-12).log() + compat.clamp_min(1e-12).log() + support + temporal.clamp_min(1e-12).log()
     if not torch.isfinite(score).any() or float((compat * temporal).sum()) <= 0:
@@ -66,7 +66,7 @@ def identity_posterior(prior, compat, support, temporal, reliability):
 # ================================================================ calibration
 
 def calibration_report(conf, correct, bins=10):
-    """Bacs de fiabilité, ECE et Brier (vectorisé)."""
+    """Reliability bins, ECE and Brier (vectorised)."""
     c = torch.as_tensor(conf, dtype=torch.float); y = torch.as_tensor(correct, dtype=torch.float)
     if c.numel() == 0: return {"n": 0, "ece": None, "brier": None, "bins": []}
     idx = (c * bins).long().clamp(0, bins - 1)
@@ -81,34 +81,34 @@ def calibration_report(conf, correct, bins=10):
 
 
 class IsotonicCalibrator:
-    """Régression isotone (PAV) ajustée sur une partition de calibration ; identité si pas de données."""
+    """Isotonic regression (PAV) fitted on a calibration split; identity if there is no data."""
 
     def __init__(self, prior_strength=10.0, bins=20):
         self.x = self.y = None; self.prior_strength = prior_strength; self.bins = bins
 
     def fit(self, conf, correct):
-        """PAV, puis contraction vers l'identité : chaque palier reçoit `prior_strength` pseudo-observations dont
-        l'exactitude vaut la confiance annoncée (petit échantillon -> peu de correction ; jamais 1,0 par 20 succès)."""
+        """PAV, then shrinkage towards the identity: each step receives `prior_strength` pseudo-observations whose
+        accuracy equals the stated confidence (small sample -> little correction; never 1.0 from 20 successes)."""
         pairs = sorted(zip(map(float, conf), map(float, correct)))
         if len(pairs) < 5: return self
         c = torch.tensor([x for x, _ in pairs]); y = torch.tensor([v for _, v in pairs])
-        b = (c * self.bins).long().clamp(0, self.bins - 1)                # histogramme puis PAV (vectorisé)
+        b = (c * self.bins).long().clamp(0, self.bins - 1)                # histogram then PAV (vectorised)
         cnt = torch.bincount(b, minlength=self.bins).float()
         sy = torch.zeros(self.bins).index_add_(0, b, y); sc = torch.zeros(self.bins).index_add_(0, b, c)
         out = []
         for i in torch.nonzero(cnt).view(-1).tolist():
-            out.append([i / self.bins, float(sy[i]), float(cnt[i]), float(sc[i])])  # [bord inférieur, Σ exact, n, Σ confiance]
+            out.append([i / self.bins, float(sy[i]), float(cnt[i]), float(sc[i])])  # [lower edge, Σ correct, n, Σ confidence]
             while len(out) > 1 and out[-2][1] / out[-2][2] > out[-1][1] / out[-1][2]:
                 _, y2, n2, c2 = out.pop(); out[-1][1] += y2; out[-1][2] += n2; out[-1][3] += c2
         self.n = len(pairs)
         s = self.prior_strength
         self.x = torch.tensor([b[0] for b in out])
         self.y = torch.tensor([(b[1] + s * b[3] / b[2]) / (b[2] + s) for b in out])
-        self.y = torch.cummax(self.y, 0).values                          # rester monotone après contraction
+        self.y = torch.cummax(self.y, 0).values                          # stay monotone after shrinkage
         return self
 
     def __call__(self, p):
-        """Palier isotone du plus grand point de calibration ≤ p ; sous les données : jamais au-dessus de p."""
+        """Isotonic step of the largest calibration point ≤ p; below the data: never above p."""
         if self.x is None: return p
         t = torch.as_tensor(p, dtype=torch.float).reshape(-1).contiguous()
         i = torch.searchsorted(self.x, t, right=True) - 1
@@ -116,14 +116,14 @@ class IsotonicCalibrator:
         return float(out[0]) if torch.as_tensor(p).dim() == 0 else out
 
 
-# ================================================================ décision par risque attendu
+# ================================================================ decision by expected risk
 
 COSTS = {"wrong": {"observation": 3.0, "query": 20.0, "action": 100.0}, "abstain": 1.0, "ask": 0.5, "verify": 0.2}
 
 
 class RiskPolicy:
-    """decision = argmin risque attendu. Coûts : mauvaise réponse assurée > abstention > clarification > vérification.
-    Seuil implicite d'une réponse : p ≥ 1 − C_abstain / C_wrong(contexte) (0,67 / 0,95 / 0,99)."""
+    """decision = argmin expected risk. Costs: confident wrong answer > abstention > clarification > verification.
+    Implicit threshold of an answer: p ≥ 1 − C_abstain / C_wrong(context) (0.67 / 0.95 / 0.99)."""
 
     def __init__(self, costs=None, thresholds=None):
         self.costs = costs or COSTS
@@ -134,7 +134,7 @@ class RiskPolicy:
         return 1 - self.costs["abstain"] / self.costs["wrong"][context]
 
     def risks(self, p, context, can_ask=False, can_verify=False, p_after_ask=1.0):
-        # coût effectif d'une erreur : C_abstain / (1 − seuil) ; sans seuil calibré, c'est C_wrong(contexte)
+        # effective cost of an error: C_abstain / (1 − threshold); without a calibrated threshold, it is C_wrong(context)
         cw = self.costs["abstain"] / max(1 - self.threshold(context), 1e-9)
         out = {ANSWER: (1 - p) * cw, ABSTAIN: self.costs["abstain"]}
         if can_ask: out[ASK] = self.costs["ask"] + (1 - p_after_ask) * self.costs["abstain"]
@@ -147,16 +147,16 @@ class RiskPolicy:
 
 
 def calibrate_threshold(conf, correct, cost_wrong, cost_abstain=1.0, grid=None):
-    """Seuil minimisant le risque empirique sur une partition de VALIDATION (jamais le test)."""
+    """Threshold minimising the empirical risk on a VALIDATION split (never the test)."""
     c = torch.as_tensor(conf, dtype=torch.float); y = torch.as_tensor(correct, dtype=torch.float)
     grid = torch.as_tensor(grid if grid is not None else [i / 100 for i in range(50, 100)] + [0.995, 1.0])
     if c.numel() == 0: return float(1 - cost_abstain / cost_wrong)
-    commit = c.view(1, -1) >= grid.view(-1, 1)                                   # [seuils, items]
+    commit = c.view(1, -1) >= grid.view(-1, 1)                                   # [thresholds, items]
     risk = (commit * (1 - y) * cost_wrong + (~commit) * cost_abstain).float().mean(1)
     return float(grid[int(risk.argmin())])
 
 
-# ================================================================ maintenance de vérité
+# ================================================================ truth maintenance
 
 @dataclass
 class Node:
@@ -166,17 +166,17 @@ class Node:
     deps: List[str] = field(default_factory=list)
     rule: str = ""
     info: Dict[str, Any] = field(default_factory=dict)
-    justifications: List[List[str]] = field(default_factory=list)   # OU de ET : (A ∧ C) ∨ (D) ∨ (E ∧ F)
+    justifications: List[List[str]] = field(default_factory=list)   # OR of ANDs: (A ∧ C) ∨ (D) ∨ (E ∧ F)
 
 
 class TruthMaintenance:
-    """Justifications multiples (OU de ET) : un nœud est JUSTIFIED si AU MOINS UNE de ses justifications a toutes ses
-    dépendances JUSTIFIED ; sinon SUSPENDED si une dépendance est défaite / suspendue, UNKNOWN sinon."""
+    """Multiple justifications (OR of ANDs): a node is JUSTIFIED if AT LEAST ONE of its justifications has all its
+    dependencies JUSTIFIED; otherwise SUSPENDED if a dependency is defeated / suspended, UNKNOWN otherwise."""
 
     def __init__(self): self.nodes: Dict[str, Node] = {}; self.log: List[Tuple[str, str, str, str]] = []
 
     def add(self, nid, kind, deps=(), rule="", status=JUSTIFIED, justifications=None, **info):
-        """deps : une justification ET ; justifications : plusieurs justifications INDÉPENDANTES (OU de ET)."""
+        """deps: one AND justification; justifications: several INDEPENDENT justifications (OR of ANDs)."""
         just = [list(j) for j in justifications] if justifications else ([list(deps)] if deps else [])
         flat = list(dict.fromkeys(d for j in just for d in j))
         self.nodes[nid] = Node(nid, kind, status, flat, rule, info, just)
@@ -184,7 +184,7 @@ class TruthMaintenance:
         return self.nodes[nid]
 
     def add_justification(self, nid, deps):
-        """Ajoute une justification indépendante à un nœud existant (ex. une deuxième source)."""
+        """Adds an independent justification to an existing node (e.g. a second source)."""
         n = self.nodes[nid]
         n.justifications.append(list(deps))
         n.deps = list(dict.fromkeys(n.deps + list(deps)))
@@ -207,8 +207,8 @@ class TruthMaintenance:
                 n.info.setdefault("own", n.status if n.status != SUSPENDED else JUSTIFIED)
                 st = lambda d: self.nodes[d].status if d in self.nodes else UNKNOWN_STATUS
                 just = n.justifications or [n.deps]
-                if n.info["own"] in (DEFEATED, SUSPENDED): new = n.info["own"]     # décision explicite : persistante
-                elif any(all(st(d) == JUSTIFIED for d in j) for j in just): new = JUSTIFIED   # UNE justification suffit
+                if n.info["own"] in (DEFEATED, SUSPENDED): new = n.info["own"]     # explicit decision: persistent
+                elif any(all(st(d) == JUSTIFIED for d in j) for j in just): new = JUSTIFIED   # ONE justification is enough
                 elif any(st(d) in (DEFEATED, SUSPENDED) for j in just for d in j): new = SUSPENDED
                 else: new = UNKNOWN_STATUS
                 if new != n.status: self.log.append((n.id, n.status, new, "propagation")); n.status = new; changed = True
@@ -228,7 +228,7 @@ class TruthMaintenance:
         return out
 
     def support_of(self, nid):
-        """Remonte les dépendances (observations, identités, sources, règles)."""
+        """Walks back up the dependencies (observations, identities, sources, rules)."""
         seen, stack = [], [nid]
         while stack:
             x = stack.pop()
@@ -239,7 +239,7 @@ class TruthMaintenance:
     def counts(self): return dict(Counter(n.status for n in self.nodes.values()))
 
 
-# ================================================================ affirmations candidates et réponses
+# ================================================================ candidate claims and answers
 
 @dataclass
 class CandidateClaim:
@@ -255,10 +255,10 @@ class CandidateClaim:
     identity_confidence: float = 0.0
     status: str = SUSPENDED
     evidence_node: Optional[str] = None
-    origin: str = "prédicat"                  # prédicat | description (présupposition)
-    frozen: bool = False                     # consolidée : plus réévaluée (dégelée par une contradiction)
-    best_candidate: Optional[str] = None     # meilleur candidat quand l'identité n'est pas engagée
-    contested: bool = False                  # contestée (révision minimale) : exclue des preuves du référent
+    origin: str = "prédicat"                  # prédicat | description (presupposition)
+    frozen: bool = False                     # consolidated: no longer re-evaluated (thawed by a contradiction)
+    best_candidate: Optional[str] = None     # best candidate when the identity is not committed
+    contested: bool = False                  # contested (minimal revision): excluded from the evidence of the referent
 
 
 @dataclass
@@ -274,12 +274,12 @@ class EpistemicAnswer:
     dependencies: List[str] = field(default_factory=list)
     reason: str = ""
     risks: Dict[str, float] = field(default_factory=dict)
-    linguistic_uncertainty: float = 0.0     # la phrase est-elle comprise ? (sens des mots)
-    epistemic_uncertainty: float = 0.0      # le monde est-il établi ? (croyance × identité)
+    linguistic_uncertainty: float = 0.0     # is the sentence understood? (word meanings)
+    epistemic_uncertainty: float = 0.0      # is the world established? (belief × identity)
 
     @property
     def output(self):
-        """Forme courte évaluable : valeur engagée, ou ASK / UNKNOWN / CONFLICTED / INVALID_PREMISE."""
+        """Short evaluable form: committed value, or ASK / UNKNOWN / CONFLICTED / INVALID_PREMISE."""
         if self.action == ANSWER: return self.value if self.status in (SUPPORTED, REFUTED) else self.status
         if self.action == ASK: return "ASK"
         return self.reason if self.reason in ("INVALID_PREMISE", CONFLICTED) else "UNKNOWN"
@@ -296,7 +296,7 @@ PLACE_WORD = {"on": "sur", "in": "dans", "under": "sous", "next_to": "à côté 
 COMMANDS = {"prends", "donne", "pose", "mets", "range", "apporte"}
 
 
-# ================================================================ état cognitif unifié
+# ================================================================ unified cognitive state
 
 class UnifiedCognitiveState:
     def __init__(self, lexicon_agent, reliability: SourceReliability = None, policy: RiskPolicy = None,
@@ -304,21 +304,21 @@ class UnifiedCognitiveState:
         self.lx = lexicon_agent
         self.reliability = reliability or SourceReliability()
         self.reliability.stats[USER] = [99.0, 1.0]
-        self.belief = BeliefState(self.reliability)                    # EvidenceGraph + inventaire
+        self.belief = BeliefState(self.reliability)                    # EvidenceGraph + inventory
         self.discourse = DiscourseResolver(lexicon_agent, [])          # DiscourseState + EntityIdentityGraph
         self.discourse.predicate_attrs_identity = False
-        self.ref_graph = BeliefState(self.reliability).graph            # preuves au niveau du référent de discours
+        self.ref_graph = BeliefState(self.reliability).graph            # evidence at the level of the discourse referent
         self.tms = TruthMaintenance()
         self.policy = policy or RiskPolicy()
-        self.calibrator = calibrator                                   # isotone (partition de calibration) ou None
-        self.answer_calibrator = answer_calibrator                     # confiance de réponse -> exactitude (calibration)
+        self.calibrator = calibrator                                   # isotonic (calibration split) or None
+        self.answer_calibrator = answer_calibrator                     # answer confidence -> accuracy (calibration)
         self.source_calibrated = source_calibrated
         self.lexical = getattr(lexicon_agent, "lexmem", None)
         self.records: Dict[str, Tuple] = {}                             # id -> (source, key, value, time, via, text)
         self.claims: Dict[str, CandidateClaim] = {}
         self.identity_log: List[IdentityEvidence] = []
         self.revisions: List[Tuple] = []
-        self.transitions: List[Tuple] = []                              # (événement, entité, avant, après, temps)
+        self.transitions: List[Tuple] = []                              # (event, entity, before, after, time)
         self.observation_requests = 0
         self.source_revisions = []
         self.consolidate_every, self.consolidate_age = consolidate_every, consolidate_age
@@ -327,7 +327,7 @@ class UnifiedCognitiveState:
         self.time = 0
         self._n = 0
 
-    # ---- vues -------------------------------------------------------------------------
+    # ---- views ------------------------------------------------------------------------
     @property
     def graph(self): return self.discourse.graph
 
@@ -335,7 +335,7 @@ class UnifiedCognitiveState:
     def state(self): return self.discourse.state
 
     def place_domain(self):
-        """Nombre de lieux possibles dans CE monde (supports connus + contenants), pas une constante globale."""
+        """Number of possible places in THIS world (known supports + containers), not a global constant."""
         return 3 + sum(1 for k in self.belief.inventory.values() if k == "box")
 
     def entities(self, type_=None):
@@ -344,7 +344,7 @@ class UnifiedCognitiveState:
     def _id(self, prefix):
         self._n += 1; return f"{prefix}{self._n}"
 
-    # ---- observations structurées (capteurs) ---------------------------------------------
+    # ---- structured observations (sensors) -----------------------------------------------
     def observe(self, source, key, value, time=None):
         self.time = time if time is not None else self.time + 1
         if key[0] == "type":
@@ -357,17 +357,17 @@ class UnifiedCognitiveState:
         self.refresh()
         return rid
 
-    # ---- langue -> affirmations candidates --------------------------------------------------
+    # ---- language -> candidate claims -------------------------------------------------------
     def say(self, source, text, time=None):
-        """Phrase déclarative -> CandidateClaim -> identité (même résolveur) -> preuves -> croyances."""
+        """Declarative sentence -> CandidateClaim -> identity (same resolver) -> evidence -> beliefs."""
         self.time = time if time is not None else self.time + 1
-        self.state.time = self.time - 1                              # une seule horloge : phrases et observations
+        self.state.time = self.time - 1                              # a single clock: sentences and observations
         n0 = len(self.discourse.predicates)
         self.discourse.predicate_enabled = True
         mentions = self.discourse.process(text)
         out = []
         items = [(rid, kind, value, tense, "prédicat") for _, rid, kind, value, tense in self.discourse.predicates[n0:]]
-        # présupposition descriptive : « le cube rouge » affirme implicitement « rouge » (preuve dépendante de l'identité)
+        # descriptive presupposition: « le cube rouge » implicitly asserts « rouge » (evidence dependent on the identity)
         items += [(m.referent, "attr", m.attrs["attr"], "now", "description") for m in mentions
                   if m.referent and m.attrs.get("attr") and m.kind in ("np", "adj")
                   and not any(r == m.referent and k == "attr" for r, k, *_ in items)]
@@ -377,7 +377,7 @@ class UnifiedCognitiveState:
             c = CandidateClaim(cid, source, text, self.time, rid, kind, value, tense)
             c.origin = origin
             if kind == "attr" and origin == "prédicat" and described.get(rid) not in (None, value):
-                c.status = DEFEATED                        # « le cube rouge est bleu » : affirmation incohérente, rejetée
+                c.status = DEFEATED                        # « le cube rouge est bleu »: inconsistent claim, rejected
                 self.tms.add(self._id("x"), "claim", rule="contradiction interne", status=DEFEATED, claim=cid)
             self.claims[cid] = c; out.append(c)
         self.refresh()
@@ -385,7 +385,7 @@ class UnifiedCognitiveState:
         return mentions, out
 
     def consolidate_stable(self):
-        """Identités stabilisées (engagées au seuil des questions, assez anciennes) -> figées ; provenance conservée."""
+        """Stabilised identities (committed at the question threshold, old enough) -> frozen; provenance preserved."""
         n = 0
         for c in self.claims.values():
             if c.frozen or c.entity is None or c.identity_confidence < self.policy.threshold("query"): continue
@@ -397,15 +397,15 @@ class UnifiedCognitiveState:
         return n
 
     def thaw(self, entity):
-        """Une contradiction sur une entité dégèle les identités consolidées qui la concernent."""
+        """A contradiction on an entity thaws the consolidated identities that concern it."""
         for c in self.claims.values():
             if c.frozen and c.entity == entity: c.frozen = False
         for r in self.state.entities_mentioned.values():
             if r.frozen == entity: r.frozen = None
 
-    # ---- identité : UNE fonction pour ingestion, questions et commandes --------------------
+    # ---- identity: ONE function for ingestion, questions and commands ----------------------
     def identity(self, rid, source=USER, context="query", mention=None):
-        """Distribution calibrée P(entité | preuves) pour un référent de discours."""
+        """Calibrated distribution P(entity | evidence) for a discourse referent."""
         dist = self.discourse.dists.get(rid, {})
         ref = self.state.entities_mentioned.get(rid)
         if not dist or ref is None: return {}, None
@@ -419,7 +419,7 @@ class UnifiedCognitiveState:
         prior = torch.ones(n)
         compat = torch.tensor([dist.get(e, 0.0) for e in cands])
         temporal = torch.tensor([1.0 if self.discourse._compatible(ref, e) else 0.0 for e in cands])
-        if presupposes:                                   # ∅ : a priori explicite, vraisemblance neutre
+        if presupposes:                                   # ∅: explicit prior, neutral likelihood
             cands = cands + [NONE]; n += 1
             prior = torch.cat([torch.full((n - 1,), (1 - PRESUPPOSITION_FAILURE) / max(1, n - 1)), torch.tensor([PRESUPPOSITION_FAILURE])])
             compat = torch.cat([compat / compat.sum().clamp_min(1e-12), torch.tensor([1.0])])
@@ -434,11 +434,11 @@ class UnifiedCognitiveState:
                 b = self.belief.graph.belief(("color", e))
                 if b.value is None: continue
                 q = b.posterior if b.value == described else (1 - b.posterior) / (k - 1)
-                support[i] = math.log(max(q, 1e-6) * k)                   # rapport à l'a priori uniforme
-                if presupposes and b.value == described:                  # sous ∅, cette croyance devrait être fausse
+                support[i] = math.log(max(q, 1e-6) * k)                   # ratio to the uniform prior
+                if presupposes and b.value == described:                  # under ∅, this belief should be false
                     support[-1] += math.log(max(1 - b.posterior, 1e-6) * k / (k - 1))
                 (supporting if b.value == described else contradicting).append(e)
-        # relations DESCRIPTIVES (« le cube sur la table ») : même vraisemblance que l'attribut décrit
+        # DESCRIPTIVE relations (« le cube sur la table »): same likelihood as the described attribute
         for st, tense, (rel, place) in ref.states:
             if not isinstance(place, str) or tense not in ("now", "past"): continue
             kl = self.place_domain()
@@ -449,7 +449,7 @@ class UnifiedCognitiveState:
                 match = b.value == (rel, place)
                 support[i] += math.log(max(b.posterior if match else (1 - b.posterior) / (kl - 1), 1e-6) * kl)
                 if presupposes and match: support[-1] += math.log(max(1 - b.posterior, 1e-6) * kl / (kl - 1))
-        # attributs AFFIRMÉS sur ce référent (preuve douce, pondérée par la fiabilité de chaque locuteur)
+        # attributes ASSERTED about this referent (soft evidence, weighted by the reliability of each speaker)
         for c in self.claims.values():
             if c.referent != rid or c.kind not in ("attr", "loc") or c.origin != "prédicat" or c.status == DEFEATED: continue
             rc = min(self.reliability.estimate(c.source) if self.source_calibrated else 0.99, 0.99)
@@ -460,7 +460,7 @@ class UnifiedCognitiveState:
                 b = self.belief.graph.belief(key)
                 if b.status not in (FACT, BELIEF) or b.supporting == [c.source]: continue
                 if c.kind == "loc" and c.tense != "past" and max((ev.time for ev in self.belief.graph.props.get(key, ())), default=0) > c.time:
-                    continue                                              # état observé PLUS TARD : l'objet a pu bouger
+                    continue                                              # state observed LATER: the object may have moved
                 lik = rc if b.value == c.value else (1 - rc) / (kk - 1)
                 support[i] += math.log(max(lik, 1e-6) * kk)
         self.checks += n
@@ -475,7 +475,7 @@ class UnifiedCognitiveState:
                               round(conf, 4), out)
         return out, ev
 
-    # ---- recalcul : identités -> preuves -> croyances -> monde du résolveur (point fixe) -------
+    # ---- recomputation: identities -> evidence -> beliefs -> resolver world (fixed point) -------
     def refresh(self, max_iter=4):
         for _ in range(max_iter):
             self._rebuild_graph()
@@ -485,8 +485,8 @@ class UnifiedCognitiveState:
         self._rebuild_graph(); self._sync_world(); self._rebuild_ref_graph()
 
     def _rebuild_ref_graph(self):
-        """Preuves rattachées au RÉFÉRENT DE DISCOURS (indépendantes de l'identité monde) : « le cube jaune tombe »
-        permet de répondre où il est même si l'on ne sait pas lequel des cubes du monde il est."""
+        """Evidence attached to the DISCOURSE REFERENT (independent of the world identity): « le cube jaune tombe »
+        makes it possible to answer where it is even if we do not know which of the cubes of the world it is."""
         g = self.ref_graph; g.props.clear()
         latest = {}
         for c in self.claims.values():
@@ -503,7 +503,7 @@ class UnifiedCognitiveState:
                     latest[(key, c.source)] = (t, value)
                     g.props[key] = [e for e in g.props.get(key, []) if e.source != c.source]
                 g.add(key, Evidence(c.source, value, t, via))
-        for key in list(g.props):                                         # états dépassés par un événement ultérieur
+        for key in list(g.props):                                         # states superseded by a later event
             if key[0] == "loc" and len(g.props[key]) > 1:
                 events = [e.time for e in g.props[key] if e.via == "event"]
                 if events: g.props[key] = [e for e in g.props[key] if e.time >= max(events)]
@@ -525,7 +525,7 @@ class UnifiedCognitiveState:
             if target == c.entity and (c.evidence_node is None or abs(conf - c.identity_confidence) < 1e-6): continue
             if target == c.entity and c.evidence_node is not None:
                 c.identity_confidence = conf; self.tms.nodes[c.evidence_node].info["weight"] = conf; changed = True; continue
-            # révision : l'ancienne identité est défaite, les croyances dépendantes sont suspendues puis recalculées
+            # revision: the old identity is defeated, the dependent beliefs are suspended then recomputed
             if c.evidence_node is not None:
                 idn = self.tms.nodes[c.evidence_node].deps[0]
                 self.tms.defeat(idn, f"identité révisée : {c.entity} -> {target}")
@@ -553,7 +553,7 @@ class UnifiedCognitiveState:
         return None
 
     def _transition(self, c, e, enode):
-        """Provenance de transformation : événement -> nouvel état (pas une causalité générale)."""
+        """Transformation provenance: event -> new state (not a general causality)."""
         if c.value != "fall": return
         before = self.current_loc(e)
         dn = self.tms.add(self._id("dv"), "derived", deps=[enode], rule="tomber -> sur le sol",
@@ -562,16 +562,16 @@ class UnifiedCognitiveState:
         self.transitions.append((f"fall@{c.time}", e, before, ("on", "floor"), c.time, dn.id))
 
     def _rebuild_graph(self):
-        """Le graphe de preuves est reconstruit depuis les nœuds JUSTIFIED : aucune croyance orpheline."""
+        """The evidence graph is rebuilt from the JUSTIFIED nodes: no orphan belief."""
         g = self.belief.graph
         g.props.clear()
         latest = {}
-        # un état « maintenant » antérieur à une observation fiable plus récente est un état PASSÉ (trajectoire)
+        # a "now" state earlier than a more recent reliable observation is a PAST state (trajectory)
         fresh = defaultdict(float)
         for nid, n in self.tms.nodes.items():
             if n.status != JUSTIFIED or n.info.get("key") is None: continue
             k = self._now_key(n)
-            # seuls un capteur fiable ou un événement (transformation) remplacent un état ; deux témoignages = conflit
+            # only a reliable sensor or an event (transformation) replace a state; two testimonies = conflict
             if k and (n.kind == "derived" or (n.kind == "premise" and self.reliability.estimate(n.info["source"]) >= 0.9)):
                 fresh[k] = max(fresh[k], self._time_of(nid, n))
         for nid, n in self.tms.nodes.items():
@@ -580,7 +580,7 @@ class UnifiedCognitiveState:
             t = n.info.get("time", 0)
             if n.kind == "premise": key, t = self._premise_key(key), self.records[nid][3]
             if self._now_key(n) and t < fresh.get(self._now_key(n), -1): continue
-            if len(key) == 3 and key[2] == ("now", "t"):                  # état courant = dernier état daté
+            if len(key) == 3 and key[2] == ("now", "t"):                  # current state = last dated state
                 key = ("loc", key[1], "now")
                 if (key, src) in latest and latest[(key, src)][0] > t: continue
                 latest[(key, src)] = (t, nid)
@@ -601,24 +601,24 @@ class UnifiedCognitiveState:
         return key
 
     def _sync_world(self):
-        """Le résolveur lit les CROYANCES (FACT/BELIEF), jamais la vérité ni les observations brutes."""
+        """The resolver reads the BELIEFS (FACT/BELIEF), never the truth nor the raw observations."""
         for e in self.entities():
             f = self.discourse.world[e]
             for field_, key in (("attr", ("color", e)), ("loc", ("loc", e, "now")), ("loc0", ("loc", e, 0))):
                 b = self.belief.graph.belief(key)
                 if b.status in (FACT, BELIEF):
                     f[field_] = b.value
-                    if field_ == "loc":                                       # date du dernier état connu
+                    if field_ == "loc":                                       # date of the last known state
                         f["loc_time"] = max((ev.time for ev in self.belief.graph.props.get(key, ())), default=0)
                 else: f.pop(field_, None)
 
-    # ---- trajectoires ----------------------------------------------------------------
+    # ---- trajectories ---------------------------------------------------------------
     def current_loc(self, e):
         b = self.belief.graph.belief(("loc", e, "now"))
         return b.value if b.status in (FACT, BELIEF) else None
 
     def trajectory(self, e):
-        """États datés d'une même entité (l'identité reste stable ; les états changent)."""
+        """Dated states of a single entity (the identity stays stable; the states change)."""
         out = []
         for nid, n in self.tms.nodes.items():
             if n.info.get("key") is None or n.status != JUSTIFIED: continue
@@ -630,7 +630,7 @@ class UnifiedCognitiveState:
 
     # ---- questions ----------------------------------------------------------------------
     def query(self, text, context=None):
-        """Question / commande interprétée par le MÊME résolveur ; réponse fondée sur le BeliefState seul."""
+        """Question / command interpreted by the SAME resolver; answer grounded in the BeliefState alone."""
         tokens = tokenize(text)
         intent = "command" if tokens and tokens[0] in COMMANDS else "where" if "où" in tokens else \
             "color" if "couleur" in tokens else "check"
@@ -660,20 +660,20 @@ class UnifiedCognitiveState:
         return a
 
     def linguistic_uncertainty(self, tokens, intent):
-        """Incertitude LINGUISTIQUE (séparée de l'épistémique) : verbe polysémique sans contexte, mots sans sens."""
+        """LINGUISTIC uncertainty (separate from the epistemic one): polysemous verb without context, words without meaning."""
         unc = 0.0
         if intent == "command":
             verb = tokens[0]
             senses = self.lx.senses(verb) if hasattr(self.lx, "senses") else []
             has_target = any((self.discourse.meaning(t) or "").startswith("rel:") for t in tokens[1:])
-            if len(senses) >= 2 and not has_target: unc = max(unc, 1 - 1 / len(senses))     # sens non départagés
+            if len(senses) >= 2 and not has_target: unc = max(unc, 1 - 1 / len(senses))     # senses not disambiguated
         unknown = [t for t in tokens if t.isalpha() and len(t) > 3 and self.discourse.meaning(t) is None
                    and t not in QUESTION_WORDS | COMMANDS | {"est", "était", "quelle", "pourquoi", "sont", "reste", "tombe"}]
         if unknown: unc = max(unc, 0.5)
         return round(unc, 4)
 
     def _value_distribution(self, key_of, dist):
-        """P(valeur) = Σ_e P(e) · P(valeur | croyances sur e) — identité ET croyance, sans choix prématuré."""
+        """P(value) = Σ_e P(e) · P(value | beliefs about e) — identity AND belief, without premature choice."""
         mix, deps, conflict = defaultdict(float), [], 0.0
         for e, pe in dist.items():
             if pe < 1e-6: continue
@@ -704,9 +704,9 @@ class UnifiedCognitiveState:
             best_w = max(known.values()) if known else 0.0
             if best_w >= 0.65 and ref.posterior >= 0.65 and max(known, key=known.get) != ref.value:
                 conflict = max(conflict, 0.5)
-            elif ref.posterior > best_w:                              # référent de discours mieux établi que l'entité monde
+            elif ref.posterior > best_w:                              # discourse referent better established than the world entity
                 known = {ref.value: ref.posterior}
-                id_conf = 1.0                                         # la question vise le référent, déjà identifié
+                id_conf = 1.0                                         # the question targets the referent, already identified
                 if ref.refuting and ref.supporting and ref.posterior < 0.9: conflict = max(conflict, 1 - ref.posterior)
         if self.answer_calibrator is not None and known:
             known = {v: float(self.answer_calibrator(p)) for v, p in known.items()}
@@ -767,9 +767,9 @@ class UnifiedCognitiveState:
         else: a.phrase, a.reason = PHRASES["NO_ID"], "identity"
         return a
 
-    # ---- clarification et observation active ----------------------------------------------
+    # ---- clarification and active observation ---------------------------------------------
     def clarification_question(self, dist):
-        """Question discriminante construite depuis les croyances : teinte, sinon position, sinon nombre."""
+        """Discriminating question built from the beliefs: hue, otherwise position, otherwise number."""
         cands = [e for e, p in sorted(dist.items(), key=lambda t: -t[1]) if p > 0.05 and e != NONE]
         for key_of, word in ((lambda e: ("color", e), lambda v: COLOR_WORD.get(v, v)),
                              (lambda e: ("loc", e, "now"), lambda v: f"celui {PLACE_WORD.get(v[0], v[0])} {PLACE_WORD.get(v[1], v[1])}")):
@@ -783,7 +783,7 @@ class UnifiedCognitiveState:
         self.refresh()
 
     def information_request(self, rid):
-        """Quelle observation (couleur / position de quel candidat) réduit le plus l'entropie d'identité ?"""
+        """Which observation (colour / position of which candidate) most reduces the identity entropy?"""
         dist, ev = self.identity(rid)
         cands = [e for e, p in dist.items() if p > 1e-6 and e != NONE]
         if len(cands) < 2: return None, 0.0
@@ -796,7 +796,7 @@ class UnifiedCognitiveState:
             if desc is None: continue
             for j, c in enumerate(cands):
                 if self.belief.graph.belief(key_of(c)).status in (FACT, BELIEF): continue
-                # issue « c a la valeur décrite » : c seul reste ; sinon c est exclu (vectorisé sur les deux issues)
+                # outcome "c has the described value": c alone remains; otherwise c is excluded (vectorised over the two outcomes)
                 p_yes = float(p[j])
                 keep_no = p.clone(); keep_no[j] = 0
                 h_no = float(-(keep_no / keep_no.sum() * (keep_no / keep_no.sum()).clamp_min(1e-12).log()).sum()) if keep_no.sum() > 0 else 0.0
@@ -805,7 +805,7 @@ class UnifiedCognitiveState:
         return best, gain
 
     def request_observation(self, rid, oracle, max_requests=3):
-        """Demande des observations (simulateur capteur) jusqu'à engagement ou budget épuisé."""
+        """Requests observations (sensor simulator) until commitment or budget exhausted."""
         used = 0
         for _ in range(max_requests):
             dist, ev = self.identity(rid)
@@ -819,9 +819,9 @@ class UnifiedCognitiveState:
             self.observe("capteur", key, value); used += 1; self.observation_requests += 1
         return used
 
-    # ---- contradictions et auto-correction ----------------------------------------------------
+    # ---- contradictions and self-correction ---------------------------------------------------
     def contradict(self, key, value, source="capteur"):
-        """Nouvelle observation fiable : les preuves textuelles incompatibles sont DÉFAITES (pas seulement notées)."""
+        """New reliable observation: the incompatible textual evidence is DEFEATED (not merely noted)."""
         if key[0] != "type": self.thaw(key[1])
         rid = self.observe(source, key, value)
         k = self._premise_key(key)
@@ -830,7 +830,7 @@ class UnifiedCognitiveState:
             for nid, n in list(self.tms.nodes.items()):
                 if n.kind in ("evidence", "derived") and n.status == JUSTIFIED:
                     nk = n.info["key"]; nk = ("loc", nk[1], "now") if len(nk) == 3 and nk[2] == ("now", "t") else nk
-                    state_change = k[0] == "loc" and n.info.get("time", 0) < self.time     # changement d'état, pas contradiction
+                    state_change = k[0] == "loc" and n.info.get("time", 0) < self.time     # state change, not contradiction
                     if nk == k and n.info["value"] != value and not state_change:
                         self.tms.defeat(nid, f"contredit par {source}"); defeated.append(nid)
                         self.source_revision(n.info.get("source"), n.info.get("key", k))
@@ -838,8 +838,8 @@ class UnifiedCognitiveState:
         return rid, defeated
 
     def source_revision(self, source, key=None):
-        """Auto-correction par révision de SOURCE : une affirmation réfutée par une observation fiable est une erreur
-        dans l'historique de la source ; son posterior baisse et toutes ses autres preuves sont repondérées (localement)."""
+        """Self-correction by SOURCE revision: a claim refuted by a reliable observation is an error
+        in the history of the source; its posterior drops and all its other evidence is reweighted (locally)."""
         if not source or source == USER: return
         before = self.reliability.estimate(source)
         if hasattr(self.reliability, "observe"): self.reliability.observe(source, False, key[0] if key else None)
@@ -847,7 +847,7 @@ class UnifiedCognitiveState:
         self.source_revisions.append((source, round(before, 3), round(self.reliability.estimate(source), 3)))
 
     def self_correct(self, answer: EpistemicAnswer, text):
-        """Réponse contredite -> dépendances -> identités faibles / sources peu fiables suspendues -> recalcul."""
+        """Contradicted answer -> dependencies -> weak identities / unreliable sources suspended -> recomputation."""
         trace = []
         for d in answer.dependencies:
             for n in self.tms.support_of(d):
@@ -861,9 +861,9 @@ class UnifiedCognitiveState:
         return new, trace
 
     def minimal_revision(self, answer: EpistemicAnswer, text, max_steps=4):
-        """Réponse contredite (sans nouvelle observation) : on remonte le graphe de dépendances, on classe les causes
-        possibles (identité, source, règle d'inférence) par suspicion = 1 − confiance, et on ne révise QUE la plus
-        suspecte ; on recalcule ; on continue seulement si la réponse n'a pas changé. Pas de retour arrière global."""
+        """Contradicted answer (without a new observation): we walk back up the dependency graph, rank the possible
+        causes (identity, source, inference rule) by suspicion = 1 − confidence, and revise ONLY the most
+        suspect one; we recompute; we continue only if the answer has not changed. No global backtracking."""
         cands = {}
         for d in answer.dependencies:
             for n in self.tms.support_of(d):
@@ -885,9 +885,9 @@ class UnifiedCognitiveState:
             if (new.status, new.value) != (answer.status, answer.value): break
         return new, {"revised": revised, "support_size": total, "cause": revised[0][1] if revised else None}
 
-    # ---- mémoire -------------------------------------------------------------------------
+    # ---- memory --------------------------------------------------------------------------
     def consolidate(self):
-        """Croyances stabilisées (FACT) -> résumé compact ; la provenance est gardée sous forme d'identifiants."""
+        """Stabilised beliefs (FACT) -> compact summary; the provenance is kept in the form of identifiers."""
         summary = {}
         for key in list(self.belief.graph.props):
             b = self.belief.graph.belief(key)

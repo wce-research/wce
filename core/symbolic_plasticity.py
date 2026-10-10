@@ -1,10 +1,10 @@
-"""Même mécanique de plasticité compositionnelle dans des domaines SYMBOLIQUES (langage, algèbre, mini-code) et
-un domaine NOUVEAU (chaînes de caractères) jamais vu pendant le développement du planificateur.
+"""Same mechanics of compositional plasticity in SYMBOLIC domains (language, algebra, mini-code) and
+a NEW domain (character strings) never seen during the development of the planner.
 
-Une compétence = programme de primitives du domaine (DomainTransformation). Une tâche = exemples entrée→sortie
-(sans identifiant). Ordre commun : réutilisation > composition de deux compétences > adaptation locale (changer
-UN paramètre d'une primitive d'une compétence existante) > croissance (recherche bornée d'un nouveau programme
-de primitives). Certificats : sondes canoniques + sorties attendues ; vérification avant consolidation.
+A skill = program of primitives of the domain (DomainTransformation). A task = input→output examples
+(without identifier). Common order: reuse > composition of two skills > local adaptation (changing
+ONE parameter of a primitive of an existing skill) > growth (bounded search for a new program
+of primitives). Certificates: canonical probes + expected outputs; verification before consolidation.
 """
 from __future__ import annotations
 
@@ -20,7 +20,7 @@ from core.invariant_algebra import (
 )
 
 
-# ================================================================ primitives paramétrées par domaine
+# ================================================================ primitives parameterised by domain
 
 @dataclass(frozen=True)
 class Prim:
@@ -33,8 +33,8 @@ class Prim:
 @dataclass
 class Domain:
     name: str
-    families: Dict[str, Callable]             # famille -> (param) -> fonction
-    params: Dict[str, Sequence]               # valeurs de paramètres possibles (None si sans paramètre)
+    families: Dict[str, Callable]             # family -> (param) -> function
+    params: Dict[str, Sequence]               # possible parameter values (None if parameter-free)
     inputs: Callable[[random.Random, int], list]
     key: Callable = str
 
@@ -78,7 +78,7 @@ def _code():
 
 
 def _strings():
-    """Domaine NOUVEAU (jamais vu pendant le développement du planificateur)."""
+    """NEW domain (never seen during the development of the planner)."""
     fam = {"Reverse": lambda p: (lambda s: s[::-1]), "Upper": lambda p: (lambda s: s.upper()),
            "RotateLeft": lambda p: (lambda s: s[p:] + s[:p]), "Append": lambda p: (lambda s: s + p),
            "DropFirst": lambda p: (lambda s: s[1:]), "Double": lambda p: (lambda s: s + s)}
@@ -89,7 +89,7 @@ def _strings():
 DOMAINS = {"language": _lang, "algebra": _alg, "code": _code, "strings": _strings}
 
 
-# ================================================================ planificateur symbolique (même mécanique)
+# ================================================================ symbolic planner (same mechanics)
 
 @dataclass
 class SymCertificate:
@@ -108,7 +108,7 @@ class SymbolicSkillLibrary:
 
     def learn(self, xs, ys, probe_inputs, max_len=3):
         evals = 0; kind = None; prog = None
-        for name, p in self.skills.items():                                         # 1 réutilisation
+        for name, p in self.skills.items():                                         # 1 reuse
             evals += 1
             if self.fits(p, xs, ys): kind, prog = "reuse", p; break
         if prog is None:
@@ -116,7 +116,7 @@ class SymbolicSkillLibrary:
                 evals += 1
                 if self.fits(pa + pb, xs, ys): kind, prog = "compose", pa + pb; break
         if prog is None:
-            for name, p in self.skills.items():                                     # 3 adaptation locale (un paramètre)
+            for name, p in self.skills.items():                                     # 3 local adaptation (one parameter)
                 for i, pr in enumerate(p):
                     for v in self.dom.params.get(pr.family) or []:
                         if v == pr.param: continue
@@ -124,7 +124,7 @@ class SymbolicSkillLibrary:
                         if self.fits(q, xs, ys): kind, prog = "adapt", q; break
                     if prog: break
                 if prog: break
-        if prog is None:                                                            # 4 croissance : recherche bornée
+        if prog is None:                                                            # 4 growth: bounded search
             for L in range(1, max_len + 1):
                 for q in itertools.product(self.dom.prims(), repeat=L):
                     evals += 1
@@ -147,9 +147,9 @@ def symbolic_stream(dom: Domain, seed=0, n_tasks=10, max_len=2):
     rng = random.Random(seed); progs = []
     while len(progs) < n_tasks:
         u = rng.random()
-        if progs and u < 0.2: progs.append(rng.choice(progs))                       # récurrence
+        if progs and u < 0.2: progs.append(rng.choice(progs))                       # recurrence
         elif len(progs) >= 2 and u < 0.45: a, b = rng.sample(progs, 2); progs.append(a + b)     # composition
-        elif progs and u < 0.6:                                                     # variante paramétrique
+        elif progs and u < 0.6:                                                     # parametric variant
             p = list(rng.choice(progs)); i = rng.randrange(len(p)); vs = dom.params.get(p[i].family)
             if vs: p[i] = Prim(p[i].family, rng.choice(vs))
             progs.append(tuple(p))

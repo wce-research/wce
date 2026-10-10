@@ -1,11 +1,11 @@
-"""Banc tiers DIFFICILE : développement + lot SCELLÉ (évalué une seule fois, sans retouche du système).
+"""HARD third-party benchmark: development + SEALED set (evaluated only once, with no adjustment of the system).
 
-Bibliothèque standard seulement (aucun composant de WCE). Mêmes conventions que core.third_party_discourse :
-objets (vérité cachée), capteurs, historique des locuteurs, tours ("dit" / "capteur" / "demande").
-Les attendus sont ceux d'un lecteur compétent ET prudent : une réponse n'est attendue que si elle est légitime.
+Standard library only (no WCE component). Same conventions as core.third_party_discourse:
+objects (hidden truth), sensors, speaker history, turns ("dit" / "capteur" / "demande").
+The expected answers are those of a competent AND cautious reader: an answer is expected only if it is legitimate.
 
-Catégories : vocabulaire non vu, expressions nouvelles, ambiguïté lexicale, sources trompeuses, élimination,
-connaissance partielle, présupposition fausse, temporalité, longue chaîne de référence, polysémie.
+Categories: unseen vocabulary, new expressions, lexical ambiguity, misleading sources, elimination,
+partial knowledge, false presupposition, temporality, long reference chain, polysemy.
 """
 from __future__ import annotations
 
@@ -22,7 +22,7 @@ def S(id, cat, objets, capteurs, tours, historique=None):
 def O(sorte, teinte, lieu): return {"sorte": sorte, "teinte": teinte, "lieu": lieu}
 
 
-# ================================================================ lot de développement (mise au point autorisée)
+# ================================================================ development set (tuning allowed)
 
 def dev_set():
     X = []
@@ -57,7 +57,7 @@ def dev_set():
 
 
 def dev_generated(n=60, seed=17):
-    """Variantes générées (conventions propres à ce module) : élimination, source trompeuse, chaînes."""
+    """Generated variants (conventions specific to this module): elimination, misleading source, chains."""
     rng = random.Random(seed)
     sortes = [("cube", False), ("balle", True), ("livre", False), ("clé", True)]
     teintes = {("rouge", False): "rouge", ("bleu", False): "bleu", ("vert", False): "vert", ("jaune", False): "jaune",
@@ -91,7 +91,7 @@ def dev_generated(n=60, seed=17):
     return out
 
 
-# ================================================================ lot SCELLÉ (écrit avant toute évaluation ; ne pas modifier)
+# ================================================================ SEALED set (written before any evaluation; do not modify)
 
 def sealed_set():
     X = []
@@ -173,7 +173,7 @@ def sealed_hash():
     return hashlib.sha256(json.dumps(sealed_set(), ensure_ascii=False, sort_keys=True).encode()).hexdigest()
 
 
-SEALED_SHA256 = "82490dcd725b0fc9fbbe5d52a2fb5afe6b9323941606632507b80a92979e6d67"   # empreinte du lot scellé (figée à sa création)
+SEALED_SHA256 = "82490dcd725b0fc9fbbe5d52a2fb5afe6b9323941606632507b80a92979e6d67"   # fingerprint of the sealed set (frozen at its creation)
 
 
 def n_questions(bench): return sum(1 for s in bench for t in s["tours"] if t[0] == "demande")

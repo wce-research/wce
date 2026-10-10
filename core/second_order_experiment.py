@@ -1,10 +1,10 @@
-"""H2 — le second ordre attrape-t-il des mises à jour dangereuses que le premier ordre laisse passer ?
+"""H2 — does the second order catch dangerous updates that the first order lets through?
 
-Un module partagé sert la compétence A (protégée par son certificat génératif) ; on l'adapte à B EN PLACE.
-Mises à jour candidates : pas de B projetés hors des directions sensibles de A (J_A·Δθ ≈ 0, premier ordre), à
-plusieurs amplitudes. Pour chacune : violation RÉELLE (marges de A retournées sur des sondes fraîches > 2 %) vs
-prédictions (1er ordre ; 2nd ordre par dérivée seconde directionnelle ; ellipsoïde δᵀQδ ≤ 1).
-Adaptation comparée : projection 1er ordre (pas complet) / contrôle d'amplitude au 2nd ordre / croissance (nouveau module).
+A shared module serves skill A (protected by its generative certificate); it is adapted to B IN PLACE.
+Candidate updates: steps for B projected out of the sensitive directions of A (J_A·Δθ ≈ 0, first order), at
+several amplitudes. For each one: REAL violation (margins of A flipped on fresh probes > 2 %) vs
+predictions (1st order; 2nd order by directional second derivative; ellipsoid δᵀQδ ≤ 1).
+Adaptation compared: 1st-order projection (full step) / amplitude control at 2nd order / growth (new module).
 """
 from __future__ import annotations
 
@@ -52,7 +52,7 @@ def run(seed=0, n_probe=96):
         p2 = float(((predicted_margins(p, P, yP, d, order=2) <= 0) & (m0 > 0)).float().mean()) > 0.02
         rows.append({"scale": a, "true_violation": true_v, "first_order_flags": p1, "second_order_flags": p2, "ellipsoid_flags": not E.contains(d),
                      "J_delta_rel": float((V.T @ d).norm() / d.norm().clamp_min(1e-12)), "actual_flip_rate": round(actual_flips(p, Pfresh, yF, d), 4)})
-    # adaptation : premier ordre plein / second ordre contrôlé / croissance
+    # adaptation: full first order / controlled second order / growth
     accA = lambda w: float((mlp(w, clean_inputs(A.test_set(seed + 5)[0])).argmax(1) == A.test_set(seed + 5)[2]).float().mean())
     accB = lambda w: float((mlp(w, clean_inputs(B.test_set(seed + 6)[0])).argmax(1) == B.test_set(seed + 6)[2]).float().mean())
     t0 = time.time(); alpha, _ = safe_step(p, P, yP, base, max_flip=0.0, order=2); t_second = time.time() - t0

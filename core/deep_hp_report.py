@@ -1,7 +1,7 @@
-"""Rapports du sous-jalon High-Precision Primitive Estimation (dev uniquement ; jamais le lot scellé).
+"""Reports of the High-Precision Primitive Estimation sub-milestone (dev only; never the sealed set).
 
-  aggregate : agrège les runs AWS `deephp` → results/deep_high_precision_summary.json
-  report    : imprime les tableaux
+  aggregate : aggregates the AWS `deephp` runs → results/deep_high_precision_summary.json
+  report    : prints the tables
 """
 from __future__ import annotations
 
@@ -38,8 +38,8 @@ def _paired(rows, a, b, keys):
 
 
 def tolerances(se):
-    """Règle pré-enregistrée : plus grande perturbation dont la récupération finale ≥ 0,99 garde 80 % du niveau sans
-    perturbation (lignes dont la base est fonctionnelle : niveau sans perturbation = 1)."""
+    """Preregistered rule: largest perturbation whose final recovery ≥ 0.99 keeps 80% of the level without
+    perturbation (rows whose base is functional: level without perturbation = 1)."""
     out = {}
     for kind, fam in sorted({(r["kind"], r["family"]) for r in se}):
         x = [r for r in se if r["kind"] == kind and r["family"] == fam and r["base_functional"]]; curve = {}
@@ -52,7 +52,7 @@ def tolerances(se):
 
 def summarize(rows, bad=0):
     S = {"n_rows": len(rows), "units_in_error": bad}
-    # ---- chaînes
+    # ---- chains
     S["chain"] = {}; S["paired"] = {}; S["set_scaling"] = {}
     for exp, regs in (("chain", ("primary", "standard", "rich", "dense")), ("ood", ("hard",))):
         for reg in regs:
@@ -70,7 +70,7 @@ def summarize(rows, bad=0):
                     x = [r for r in ch if r["arm"] == a and r["depth"] == d]; at = [t for r in x for t in r.get("atoms", [])]; hp = [t for r in x for t in r.get("atoms_hp", [])]; rc = _mean(t["pool"] for t in at)
                     S["set_scaling"][f"{reg}/{a}/n{d}"] = {"n": len(x), "atom_recall": rc, "atom_rel10": _mean(t["rel_pool"] <= 0.10 for t in hp), "atom_rel05": _mean(t["rel_pool"] <= 0.05 for t in hp), "all_present": _mean(r["pool_all_functional"] for r in x), "all_rel10": _mean(r.get("pool_all_rel10") for r in x),
                                                          "independent_model": round(rc ** d, 4) if rc is not None else None, "kept_all": _mean(r["kept_all_functional"] for r in x), "accord": _mean(r["accord"] for r in x), "functional": _mean(r["functional"] for r in x)}
-    # ---- par type, par visibilité, erreurs de paramètres (régimes primaires et dense)
+    # ---- by type, by visibility, parameter errors (primary regimes and dense)
     S["by_type"] = {}; S["by_visibility"] = {}; S["param_errors"] = {}
     for reg in ("primary", "dense"):
         ch = [r for r in rows if r["experiment"] == "chain" and (r["regime"] in PRIMARY_REGIMES if reg == "primary" else r["regime"] == reg)]
@@ -83,7 +83,7 @@ def summarize(rows, bad=0):
             for t, h in at:
                 for f, v in h["errors"].items(): pe[f"{t['type']}/{f}"].append(v)
             S["param_errors"][f"{reg}/{a}"] = {k: {"n": len(v), "median": round(sorted(v)[len(v) // 2], 4), "mean": _mean(v)} for k, v in sorted(pe.items())}
-    # ---- carte de sensibilité, tolérances, part des atomes dans la tolérance
+    # ---- sensitivity map, tolerances, share of atoms within tolerance
     se = [r for r in rows if r["experiment"] == "sens"]; S["sensitivity"] = tolerances(se); S["sens_base"] = {"n": len(se), "base_functional": _mean(r["base_functional"] for r in se)}; S["within_tolerance"] = {}
     tol = {k: v["tolerance"] for k, v in S["sensitivity"].items()}
     for reg in ("primary", "dense"):
@@ -93,7 +93,7 @@ def summarize(rows, bad=0):
             if not hp: continue
             ok = [bool(h["errors"]) and all(tol.get(f"{h['type']}/{f}") is not None and v <= tol[f"{h['type']}/{f}"] for f, v in h["errors"].items()) for h in hp]
             S["within_tolerance"][f"{reg}/{a}"] = {"n": len(hp), "all": _mean(ok), **{k: _mean(o for o, h in zip(ok, hp) if h["type"] == k) for k in sorted({h["type"] for h in hp})}}
-    # ---- banc par primitive
+    # ---- bench per primitive
     si = [r for r in rows if r["experiment"] == "single"]; S["single"] = {}; S["single_paired"] = {}; S["identifiability"] = {}
     cut = lambda r: {"n": len(r), "top1_rel10": _mean(x["rel_top1"] <= 0.10 for x in r), "top1_rel05": _mean(x["rel_top1"] <= 0.05 for x in r), "top3_rel10": _mean(x["rel_top3"] <= 0.10 for x in r), "top5_rel10": _mean(x["rel_top5"] <= 0.10 for x in r), "catastrophic": _mean(x["rel_top1"] > 0.25 for x in r), "rel_median": round(sorted(x["rel_top1"] for x in r)[len(r) // 2], 4) if r else None, "obs_error": _mean(x["obs_error"] for x in r), "seconds": _mean(x["seconds"] for x in r)}
     arms = sorted({r["arm"] for r in si})
@@ -127,7 +127,7 @@ def summarize(rows, bad=0):
             for f, v in r["uncertainty"].items(): un[f].append(v)
         S["identifiability"][f"{kd}/uncertainty"] = {f: _mean(v) for f, v in un.items()}
         for cls in sorted({r["identifiability"] for r in x}): S["identifiability"][f"{kd}/{cls}"] = {"n": sum(r["identifiability"] == cls for r in x), "curves_rel10": _mean(r["rel_top1"] <= 0.10 for r in x if r["identifiability"] == cls)}
-    # ---- naissance
+    # ---- birth
     bi = [r for r in rows if r["experiment"] == "birth"]; S["birth"] = {}; S["birth_paired"] = {}; comp = [r for r in bi if r["arm"] == "complete"]
     S["birth"]["complete"] = {"n": len(comp), "false_birth": _mean(r["false_birth"] for r in comp), "proposed_birth": _mean(r["proposed_birth"] for r in comp)}
     BK = ("born", "committed", "found_rel10", "found_free", "found_old_measure", "same_type", "functional", "accord", "before_functional", "before_accord", "seconds", "evaluations")
@@ -152,22 +152,22 @@ def summarize(rows, bad=0):
 
 
 def aggregate():
-    rows, bad = load_rows(); S = summarize(rows, bad); json.dump(S, open(SUMMARY, "w"), indent=1); print("lignes", len(rows), "unités en erreur", bad); return S
+    rows, bad = load_rows(); S = summarize(rows, bad); json.dump(S, open(SUMMARY, "w"), indent=1); print("rows", len(rows), "units in error", bad); return S
 
 
 def show(S):
     ci = lambda v: {x: (y["diff"], y["ci95"]) if y else None for x, y in v.items()}; cut = lambda v, ks: {k: v.get(k) for k in ks if v.get(k) is not None}
-    print("lignes", S["n_rows"], "unités en erreur", S["units_in_error"])
-    print("\nCHAÎNES"); [print(k.ljust(28), cut(v, ("n", "accord", "functional", "functional_097", "candidate_097", "pool_recall_functional", "pool_rel10", "pool_rel05", "pool_all_functional", "pool_all_rel10", "kept_all_functional", "pool_param_error", "hypotheses", "seconds"))) for k, v in S["chain"].items()]
-    print("\nAPPARIÉES"); [print(k.ljust(34), ci({a: b for a, b in v.items() if a in ("accord", "functional", "candidate_097", "pool_recall_functional", "pool_rel10", "pool_all_functional", "seconds")})) for k, v in S["paired"].items()]
-    print("\nÉCHELLE"); [print(k.ljust(22), v) for k, v in S["set_scaling"].items() if k.split("/")[1] in ("A", "B", "C")]
-    print("\nPAR TYPE"); [print(k.ljust(16), v) for k, v in S["by_type"].items()]; print("\nPAR VISIBILITÉ"); [print(k.ljust(16), v) for k, v in S["by_visibility"].items()]; print("\nERREURS DE PARAMÈTRES"); [print(k.ljust(16), v) for k, v in S["param_errors"].items()]
-    print("\nSENSIBILITÉ", S["sens_base"]); [print(k.ljust(24), v["tolerance"], {d: (c["atom_rel"], c["functional"], c["accord"]) for d, c in v["curve"].items()}) for k, v in S["sensitivity"].items()]; print("dans la tolérance", S["within_tolerance"])
-    print("\nBANC PAR PRIMITIVE"); [print(k.ljust(40), v) for k, v in S["single"].items() if k.count("/") == 1]; print(); [print(k.ljust(40), ci(v)) for k, v in S["single_paired"].items()]
-    print("\npar type × densité (sans masque)"); [print(k.ljust(44), cut(v, ("n", "top1_rel10", "top5_rel10", "catastrophic"))) for k, v in S["single"].items() if "/nomask/" in k and k.split("/")[-1] in ("gradient", "flat", "curves", "direct", "refined", "truth_refined")]
-    print("\npar type × masque"); [print(k.ljust(44), cut(v, ("n", "top1_rel10", "top5_rel10", "catastrophic"))) for k, v in S["single"].items() if "/mask:" in k and k.split("/")[-1] in ("gradient", "flat", "curves", "direct", "given_center", "given_orientation", "given_size", "truth_refined")]
-    print("\nIDENTIFIABILITÉ"); [print(k.ljust(30), v) for k, v in S["identifiability"].items()]
-    print("\nNAISSANCE"); [print(k.ljust(34), v) for k, v in S["birth"].items()]; [print(k.ljust(34), ci(v)) for k, v in S["birth_paired"].items()]
+    print("rows", S["n_rows"], "units in error", S["units_in_error"])
+    print("\nCHAINS"); [print(k.ljust(28), cut(v, ("n", "accord", "functional", "functional_097", "candidate_097", "pool_recall_functional", "pool_rel10", "pool_rel05", "pool_all_functional", "pool_all_rel10", "kept_all_functional", "pool_param_error", "hypotheses", "seconds"))) for k, v in S["chain"].items()]
+    print("\nPAIRED"); [print(k.ljust(34), ci({a: b for a, b in v.items() if a in ("accord", "functional", "candidate_097", "pool_recall_functional", "pool_rel10", "pool_all_functional", "seconds")})) for k, v in S["paired"].items()]
+    print("\nSCALING"); [print(k.ljust(22), v) for k, v in S["set_scaling"].items() if k.split("/")[1] in ("A", "B", "C")]
+    print("\nBY TYPE"); [print(k.ljust(16), v) for k, v in S["by_type"].items()]; print("\nBY VISIBILITY"); [print(k.ljust(16), v) for k, v in S["by_visibility"].items()]; print("\nPARAMETER ERRORS"); [print(k.ljust(16), v) for k, v in S["param_errors"].items()]
+    print("\nSENSITIVITY", S["sens_base"]); [print(k.ljust(24), v["tolerance"], {d: (c["atom_rel"], c["functional"], c["accord"]) for d, c in v["curve"].items()}) for k, v in S["sensitivity"].items()]; print("within tolerance", S["within_tolerance"])
+    print("\nBENCH PER PRIMITIVE"); [print(k.ljust(40), v) for k, v in S["single"].items() if k.count("/") == 1]; print(); [print(k.ljust(40), ci(v)) for k, v in S["single_paired"].items()]
+    print("\nby type × density (no mask)"); [print(k.ljust(44), cut(v, ("n", "top1_rel10", "top5_rel10", "catastrophic"))) for k, v in S["single"].items() if "/nomask/" in k and k.split("/")[-1] in ("gradient", "flat", "curves", "direct", "refined", "truth_refined")]
+    print("\nby type × mask"); [print(k.ljust(44), cut(v, ("n", "top1_rel10", "top5_rel10", "catastrophic"))) for k, v in S["single"].items() if "/mask:" in k and k.split("/")[-1] in ("gradient", "flat", "curves", "direct", "given_center", "given_orientation", "given_size", "truth_refined")]
+    print("\nIDENTIFIABILITY"); [print(k.ljust(30), v) for k, v in S["identifiability"].items()]
+    print("\nBIRTH"); [print(k.ljust(34), v) for k, v in S["birth"].items()]; [print(k.ljust(34), ci(v)) for k, v in S["birth_paired"].items()]
 
 
 def report(): show(json.load(open(SUMMARY)))

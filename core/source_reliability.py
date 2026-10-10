@@ -1,13 +1,13 @@
-"""Modèle de fiabilité des sources : bayésien, hiérarchique, prudent, évolutif, conditionné au domaine.
+"""Source reliability model: Bayesian, hierarchical, cautious, evolving, domain-conditioned.
 
-    global prior Beta(a0, b0)  →  prior du type (capteur / document / locuteur / base)  →  posterior de la source
-    r_s | données ~ Beta(α_type + correct_s, β_type + incorrect_s)          (UNKNOWN n'est ni correct ni incorrect)
+    global prior Beta(a0, b0)  →  type prior (sensor / document / speaker / database)  →  source posterior
+    r_s | data ~ Beta(α_type + correct_s, β_type + incorrect_s)          (UNKNOWN is neither correct nor incorrect)
 
-Les a priori de type sont estimés par Bayes empirique (méthode des moments, analytique, sans MCMC) sur des graines
-d'entraînement / calibration, jamais sur le test. Fiabilité effective (poids d'une preuve) : moyenne, borne basse
-crédible, ou moyenne ajustée au risque. Oubli exponentiel (γ) pour une fiabilité qui dérive ; r(source, type de clé)
-rétréci vers r(source). Groupes de dépendance : des sources qui se recopient ne comptent qu'une fois.
-Compatible avec l'interface SourceReliability (estimate / update / table / stats) utilisée par EvidenceGraph.
+The type priors are estimated by empirical Bayes (method of moments, analytical, without MCMC) on training /
+calibration seeds, never on the test. Effective reliability (weight of a piece of evidence): mean, credible lower
+bound, or risk-adjusted mean. Exponential forgetting (γ) for a reliability that drifts; r(source, key type)
+shrunk towards r(source). Dependency groups: sources that copy one another count only once.
+Compatible with the SourceReliability interface (estimate / update / table / stats) used by EvidenceGraph.
 """
 from __future__ import annotations
 
@@ -22,7 +22,7 @@ _GRID = torch.linspace(1e-4, 1 - 1e-4, 4001)
 
 
 def beta_quantiles(a, b, qs=(0.05, 0.95)):
-    """Quantiles d'une Beta(a, b) par CDF numérique vectorisée (sans scipy)."""
+    """Quantiles of a Beta(a, b) by vectorised numerical CDF (without scipy)."""
     a = torch.as_tensor(float(a)); b = torch.as_tensor(float(b))
     logpdf = (a - 1) * torch.log(_GRID) + (b - 1) * torch.log1p(-_GRID)
     pdf = torch.exp(logpdf - logpdf.max())
@@ -31,7 +31,7 @@ def beta_quantiles(a, b, qs=(0.05, 0.95)):
 
 
 def source_type(name: str) -> str:
-    """Métadonnée PUBLIQUE : la nature de la source (pas sa fiabilité)."""
+    """PUBLIC metadata: the nature of the source (not its reliability)."""
     base = name.split("|")[0]
     for prefix, t in (("sensor", "sensor"), ("document", "document"), ("speaker", "speaker"), ("inventory", "database"),
                       ("capteur", "sensor"), ("witness", "speaker"), ("copier", "document")):
@@ -82,13 +82,13 @@ class SourceReliabilityModel:
         self.mode, self.level, self.risk_lambda = mode, level, risk_lambda
         self.discount, self.domain_shrinkage, self.domain, self.cap = discount, domain_shrinkage, domain, cap
         self.records: Dict[str, SourceRecord] = {}
-        self.groups: Dict[str, str] = {}                # source -> groupe de dépendance
-        self.selection: Dict[str, Tuple[float, float]] = {}   # source -> (P(analysée | vraie), P(analysée | fausse))
+        self.groups: Dict[str, str] = {}                # source -> dependency group
+        self.selection: Dict[str, Tuple[float, float]] = {}   # source -> (P(parsed | true), P(parsed | false))
         self.time = 0
         self._cache = {}
         self.online = False
         self.conflict_detection = True
-        self.conflict_threshold = 0.6          # seuil de CRÉDIBILITÉ pour déclarer un conflit (séparé de la pondération)
+        self.conflict_threshold = 0.6          # CREDIBILITY threshold to declare a conflict (separate from the weighting)
 
     # ---- structure --------------------------------------------------------------------------
     def record(self, s) -> SourceRecord:
@@ -99,12 +99,12 @@ class SourceReliabilityModel:
         return self.records[s]
 
     @property
-    def stats(self):                                       # compatibilité : {source: [α, β]}
+    def stats(self):                                       # compatibility: {source: [α, β]}
         return _StatsView(self)
 
-    # ---- apprentissage ------------------------------------------------------------------------
+    # ---- learning ------------------------------------------------------------------------
     def observe(self, s, outcome: Optional[bool], key_type=None, weight=1.0, t=None):
-        """outcome : True (correct), False (incorrect), None (inconnu : ni l'un ni l'autre)."""
+        """outcome: True (correct), False (incorrect), None (unknown: neither one nor the other)."""
         r = self.record(s); r.seen += 1; self._cache.clear()
         if t is not None and t > self.time and self.discount < 1.0:
             f = self.discount ** (t - self.time)
@@ -120,12 +120,12 @@ class SourceReliabilityModel:
         r.calibration_state = "estimated"
 
     def update(self, source, agree):
-        """Compatibilité SourceReliability : mise à jour EN LIGNE par consensus, désactivée par défaut (le consensus des
-        autres sources est un signal biaisé ; l'historique étiqueté fait foi). self-correction : observe() explicite."""
+        """SourceReliability compatibility: ONLINE update by consensus, disabled by default (the consensus of the
+        other sources is a biased signal; the labelled history is authoritative). self-correction: explicit observe()."""
         if self.online: self.observe(source, bool(agree))
 
     def fit_empirical_bayes(self, strength_cap=40.0):
-        """A priori de type par méthode des moments sur les posteriors des sources du type (analytique, sans MCMC)."""
+        """Type priors by the method of moments on the posteriors of the sources of the type (analytical, without MCMC)."""
         by_type = defaultdict(list)
         for r in self.records.values():
             n = r.correct + r.incorrect
@@ -135,7 +135,7 @@ class SourceReliabilityModel:
             m = sum(ms) / len(ms)
             v = sum((x - m) ** 2 for x in ms) / max(1, len(ms) - 1) if len(ms) > 1 else 0.0
             v = max(v, 1e-3)
-            k = min(max(m * (1 - m) / v - 1, 2.0), strength_cap)             # force de l'a priori (bornée)
+            k = min(max(m * (1 - m) / v - 1, 2.0), strength_cap)             # strength of the prior (bounded)
             out[t] = (m * k, (1 - m) * k)
         self.type_priors.update(out)
         for r in self.records.values():
@@ -144,13 +144,13 @@ class SourceReliabilityModel:
         self._cache.clear()
         return out
 
-    # ---- fiabilité effective -----------------------------------------------------------------------
+    # ---- effective reliability -----------------------------------------------------------------------
     def posterior(self, s, key_type=None):
         r = self.record(s)
         a, b = r.alpha, r.beta
         if self.domain and key_type is not None and key_type in r.by_key:
             c, i = r.by_key[key_type]
-            k = self.domain_shrinkage                                         # rétrécissement vers r(source)
+            k = self.domain_shrinkage                                         # shrinkage towards r(source)
             m = a / (a + b)
             a, b = m * k + c, (1 - m) * k + i
         return a, b
@@ -166,17 +166,17 @@ class SourceReliabilityModel:
         else:
             sd = math.sqrt(a * b / ((a + b) ** 2 * (a + b + 1))); v = m - self.risk_lambda * sd
         s_sel = self.selection.get(s.split("|")[0])
-        if s_sel is not None:                                                 # correction de sélection (canal analysé)
+        if s_sel is not None:                                                 # selection correction (parsed channel)
             pt, pf = s_sel
             if pt > 0 and pf > 0: v = v * pt / (v * pt + (1 - v) * pf)
         v = min(max(v, 0.01), self.cap)
         self._cache[key] = v
         return v
 
-    def estimate(self, s): return self.effective(s)             # interface EvidenceGraph
+    def estimate(self, s): return self.effective(s)             # EvidenceGraph interface
 
     def conflict_credibility(self, s):
-        """Une source est-elle assez crédible pour constituer un conflit ? Moyenne a posteriori (pas la borne basse)."""
+        """Is a source credible enough to constitute a conflict? Posterior mean (not the lower bound)."""
         return self.effective(s, mode="mean")
 
     def estimate_for(self, s, key_type): return self.effective(s, key_type)
@@ -185,9 +185,9 @@ class SourceReliabilityModel:
 
     def table(self): return {s: round(self.effective(s), 3) for s in sorted(self.records)}
 
-    # ---- dérive ------------------------------------------------------------------------------------
+    # ---- drift ------------------------------------------------------------------------------------
     def drift(self, s, window=20, z=2.0):
-        """Taux d'erreur récent vs long terme (test z sur proportions) : dérive détectée ?"""
+        """Recent vs long-term error rate (z-test on proportions): drift detected?"""
         h = self.record(s).history
         if len(h) < 2 * window: return False, 0.0
         recent = [ok for _, ok in h[-window:]]; past = [ok for _, ok in h[:-window]]
@@ -198,18 +198,18 @@ class SourceReliabilityModel:
         if stat > z: self.record(s).calibration_state = "drifting"
         return stat > z, round(stat, 3)
 
-    # ---- dépendances ----------------------------------------------------------------------------------
+    # ---- dependencies ----------------------------------------------------------------------------------
     def group_of(self, s): return self.groups.get(s.split("|")[0], s.split("|")[0])
 
     def detect_dependencies(self, vote_sets, min_shared=5, threshold=0.5):
-        """Deux sources qui partagent leurs ERREURS bien plus que le hasard sont regroupées (recopie).
-        vote_sets : liste de ({source: valeur}, valeur de référence)."""
+        """Two sources that share their ERRORS far more than chance are grouped (copying).
+        vote_sets: list of ({source: value}, reference value)."""
         both_wrong, wrong_a, wrong_b, shared = Counter(), Counter(), Counter(), Counter()
         for votes, ref in vote_sets:
             srcs = sorted(votes)
             for i, a in enumerate(srcs):
                 for b in srcs[i + 1:]:
-                    shared[(a, b)] += 1                                   # taux d'erreur mesurés sur les clés PARTAGÉES
+                    shared[(a, b)] += 1                                   # error rates measured on the SHARED keys
                     wrong_a[(a, b)] += votes[a] != ref; wrong_b[(a, b)] += votes[b] != ref
                     if votes[a] != ref and votes[b] != ref and votes[a] == votes[b]: both_wrong[(a, b)] += 1
         for (a, b), n in shared.items():
@@ -222,7 +222,7 @@ class SourceReliabilityModel:
 
 
 class _StatsView(dict):
-    """Vue {source: [α, β]} pour la compatibilité (écriture : fixe un a priori informatif pour la source)."""
+    """View {source: [α, β]} for compatibility (writing: sets an informative prior for the source)."""
 
     def __init__(self, model): super().__init__(); self.m = model
 
@@ -238,10 +238,10 @@ class _StatsView(dict):
     def __iter__(self): return iter(self.m.records)
 
 
-# ================================================================ apprentissage depuis des mondes étiquetés
+# ================================================================ learning from labelled worlds
 
 def selection_rates(parse_records):
-    """P(analysée | vraie), P(analysée | fausse) par source ; parse_records : (source, correcte, analysée)."""
+    """P(parsed | true), P(parsed | false) per source; parse_records: (source, correct, parsed)."""
     c = defaultdict(Counter)
     for s, ok, parsed in parse_records:
         c[s][("T" if ok else "F", parsed)] += 1
@@ -253,7 +253,7 @@ def selection_rates(parse_records):
 
 
 def mnar_audit(emissions):
-    """emissions : (source, correcte|None, analysée). Table par source et biais induit sur la fiabilité mesurée."""
+    """emissions: (source, correct|None, parsed). Table per source and bias induced on the measured reliability."""
     t = defaultdict(Counter)
     for s, ok, parsed in emissions:
         c = t[s]; c["emitted"] += 1; c["parsed" if parsed else "unparsed"] += 1

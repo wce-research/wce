@@ -35,20 +35,20 @@ def _legacy_wall_to_collider_and_material(
     entity_properties: dict
 ) -> tuple[VerticalPlaneCollider, Material] | None:
     """
-    Adaptateur legacy : convertit une entité mur au format ancien
-    en VerticalPlaneCollider + Material.
+    Legacy adapter: converts a wall entity in the old format
+    into VerticalPlaneCollider + Material.
     
-    Formats supportés:
-    1. Avec side :
-           orientation="vertical", x: position, side: "left"|"right", restitution: (optionnel)
+    Supported formats:
+    1. With side:
+           orientation="vertical", x: position, side: "left"|"right", restitution: (optional)
        
-    2. Sans side (compatibilité avec les tests existants) :
-           orientation="vertical", x: position, restitution: (optionnel)
-       Dans ce cas, la direction est déduite de la position :
-       - x >= 0 → mur droit (normal_x=-1.0)
-       - x < 0 → mur gauche (normal_x=+1.0)
+    2. Without side (compatibility with the existing tests):
+           orientation="vertical", x: position, restitution: (optional)
+       In this case, the direction is deduced from the position:
+       - x >= 0 → right wall (normal_x=-1.0)
+       - x < 0 → left wall (normal_x=+1.0)
     
-    Retourne None si l'entité ne correspond pas au format legacy.
+    Returns None if the entity does not match the legacy format.
     """
     if entity_properties.get("orientation") != "vertical":
         return None
@@ -59,15 +59,15 @@ def _legacy_wall_to_collider_and_material(
     material = Material(restitution=restitution)
     
     if side in ("left", "right"):
-        # Format avec side explicite
+        # Format with explicit side
         if side == "left":
             collider = VerticalPlaneCollider(x=wall_x, normal_x=+1.0)
         else:  # side == "right"
             collider = VerticalPlaneCollider(x=wall_x, normal_x=-1.0)
     else:
-        # Format sans side : déduire la direction de la position x
-        # x >= 0 → mur droit (bloque x > wall_x)
-        # x < 0 → mur gauche (bloque x < wall_x)
+        # Format without side: deduce the direction from the x position
+        # x >= 0 → right wall (blocks x > wall_x)
+        # x < 0 → left wall (blocks x < wall_x)
         if wall_x >= 0:
             collider = VerticalPlaneCollider(x=wall_x, normal_x=-1.0)
         else:
@@ -178,12 +178,12 @@ class GroundCollision:
 @dataclass
 class WallCollision:
     """
-    Collision avec des murs verticaux.
+    Collision with vertical walls.
     
-    Les murs peuvent être définis de deux manières (par ordre de priorité) :
+    Walls can be defined in two ways (in order of priority):
     
-    1. (Moderne) Comme entités avec VerticalPlaneCollider + Material dans leurs propriétés
-       Exemple :
+    1. (Modern) As entities with VerticalPlaneCollider + Material in their properties
+       Example:
            Entity(
                name="mur_droit",
                kind="wall",
@@ -193,25 +193,25 @@ class WallCollision:
                }
            )
        
-       Format legacy (avec side) aussi supporté via adaptateur automatique :
+       Legacy format (with side) also supported through an automatic adapter:
            Entity(
                name="mur_droit",
                kind="wall", 
                properties={"x": 5.0, "orientation": "vertical", "side": "right", "restitution": 0.0}
            )
     
-    2. (Legacy) Via les paramètres min_x/max_x du constructeur pour rétrocompatibilité
+    2. (Legacy) Through the min_x/max_x parameters of the constructor for backward compatibility
     
-    Applique une restitution sur vx en cas de collision.
-    La collision ne modifie que x et vx.
-    y, vy, et les relations de support restent inchangés.
+    Applies a restitution on vx in case of collision.
+    The collision only modifies x and vx.
+    y, vy, and the support relations remain unchanged.
     
-    Ajoute une relation "touching" temporaire lors du contact.
+    Adds a temporary "touching" relation upon contact.
     
-    Architecture :
-        - VerticalPlaneCollider : géométrie (x, normal_x)
-        - Material : propriétés physiques (restitution)
-        - _legacy_wall_to_collider_and_material : adaptateur pour l'ancien format
+    Architecture:
+        - VerticalPlaneCollider: geometry (x, normal_x)
+        - Material: physical properties (restitution)
+        - _legacy_wall_to_collider_and_material: adapter for the old format
     """
     min_x: float = -float("inf")
     max_x: float = float("inf")
@@ -222,18 +222,18 @@ class WallCollision:
         world,
         transformation: Transformation,
     ) -> Transformation:
-        # D'abord, essayer de découvrir les (collider, material) depuis le World
+        # First, try to discover the (collider, material) from the World
         wall_components = self._get_wall_colliders_and_materials_from_world(world)
         
         if wall_components:
-            # Utiliser les composants découverts dans le World (collider + material)
-            # Cela inclut à la fois le format moderne (collider + material explicites)
-            # et le format legacy (side, orientation, etc.) via l'adaptateur
+            # Use the components discovered in the World (collider + material)
+            # This includes both the modern format (explicit collider + material)
+            # and the legacy format (side, orientation, etc.) through the adapter
             return self._resolve_with_colliders_and_materials(
                 world, transformation, wall_components
             )
         else:
-            # Rétrocompatibilité : utiliser min_x/max_x de l'instance
+            # Backward compatibility: use min_x/max_x of the instance
             return self._resolve_with_bounds(
                 world, transformation, self.min_x, self.max_x, self.restitution
             )
@@ -242,46 +242,46 @@ class WallCollision:
         self, world
     ) -> list[tuple[str, VerticalPlaneCollider, Material]]:
         """
-        Découvre les (collider, material) de mur verticaux depuis les entités du World.
-        Retourne une liste de (entity_name, collider, material).
+        Discovers the vertical wall (collider, material) from the entities of the World.
+        Returns a list of (entity_name, collider, material).
         
-        Les colliders sont découverts dans l'ordre de priorité suivant :
-        1. Entités avec "collider" PlaneCollider et optionnellement "material" (moderne)
-        2. Entités avec "collider" VerticalPlaneCollider et optionnellement "material" (moderne)
-        3. Entités legacy avec kind="wall", orientation="vertical", side, etc.
+        The colliders are discovered in the following order of priority:
+        1. Entities with a PlaneCollider "collider" and optionally a "material" (modern)
+        2. Entities with a VerticalPlaneCollider "collider" and optionally a "material" (modern)
+        3. Legacy entities with kind="wall", orientation="vertical", side, etc.
         
-        Note : PlaneCollider est converti en VerticalPlaneCollider pour compatibilité
-        avec la méthode de résolution existante.
+        Note: PlaneCollider is converted into VerticalPlaneCollider for compatibility
+        with the existing resolution method.
         """
         wall_components: list[tuple[str, VerticalPlaneCollider, Material]] = []
         
         for entity in world.entities.values():
-            # Chemin moderne : collider explicite dans les propriétés
+            # Modern path: explicit collider in the properties
             collider = entity.properties.get("collider")
             
-            # Priorité 1 : PlaneCollider (géométrie moderne)
+            # Priority 1: PlaneCollider (modern geometry)
             if collider is not None and isinstance(collider, PlaneCollider):
-                # Material peut être fourni séparément
+                # Material can be provided separately
                 material = entity.properties.get("material")
                 if material is None or not isinstance(material, Material):
                     material = DEFAULT_MATERIAL
-                # Convertir PlaneCollider en VerticalPlaneCollider pour la résolution
-                # Pour l'instant, nous ne supportons que les plans verticaux via PlaneCollider
+                # Convert PlaneCollider into VerticalPlaneCollider for the resolution
+                # For now, we only support vertical planes through PlaneCollider
                 vpc = self._plane_collider_to_vertical_plane(collider, entity.name)
                 if vpc is not None:
                     wall_components.append((entity.name, vpc, material))
                 continue
             
-            # Priorité 2 : VerticalPlaneCollider (géométrie moderne explicite)
+            # Priority 2: VerticalPlaneCollider (explicit modern geometry)
             if collider is not None and isinstance(collider, VerticalPlaneCollider):
-                # Material peut être fourni séparément
+                # Material can be provided separately
                 material = entity.properties.get("material")
                 if material is None or not isinstance(material, Material):
                     material = DEFAULT_MATERIAL
                 wall_components.append((entity.name, collider, material))
                 continue
             
-            # Chemin legacy : conversion depuis le format side
+            # Legacy path: conversion from the side format
             if entity.kind == "wall" and entity.properties.get("orientation") == "vertical":
                 legacy_result = _legacy_wall_to_collider_and_material(entity.properties)
                 if legacy_result is not None:
@@ -319,7 +319,7 @@ class WallCollision:
         collision = False
 
         for entity_name, x_change in proposed_x.items():
-            # Vérifier si la position proposée dépasse ou atteint les limites
+            # Check whether the proposed position exceeds or reaches the limits
             if x_change.after >= max_x:
                 collision = True
 
@@ -332,11 +332,11 @@ class WallCollision:
                     after=max_x,
                 )
 
-                # Gérer le rebond sur vx (seulement si on se déplaçait vers le mur)
+                # Handle the bounce on vx (only if we were moving towards the wall)
                 vx_change = proposed_vx.get(entity_name)
                 if vx_change is not None:
                     if vx_change.after > 0:
-                        # Rebond vers la gauche
+                        # Bounce to the left
                         new_vx = -vx_change.after * restitution
                         replacements[
                             (entity_name, "vx")
@@ -347,15 +347,15 @@ class WallCollision:
                             after=new_vx,
                         )
                 else:
-                    # vx n'a pas changé dans cette transformation, mais on a quand même une collision
-                    # On doit inverser vx si la balle se déplaçait vers le mur
-                    # On utilise la valeur actuelle de vx dans l'entité
+                    # vx did not change in this transformation, but we still have a collision
+                    # We must invert vx if the ball was moving towards the wall
+                    # We use the current value of vx in the entity
                     entity = world.entities.get(entity_name)
                     if entity is not None and "vx" in entity.properties:
                         current_vx = float(entity.properties["vx"])
                         if current_vx > 0:
                             new_vx = -current_vx * restitution
-                            # Normaliser -0.0 à 0.0
+                            # Normalise -0.0 to 0.0
                             if new_vx == 0.0:
                                 new_vx = 0.0
                             replacements[
@@ -379,11 +379,11 @@ class WallCollision:
                     after=min_x,
                 )
 
-                # Gérer le rebond sur vx
+                # Handle the bounce on vx
                 vx_change = proposed_vx.get(entity_name)
                 if vx_change is not None:
                     if vx_change.after < 0:
-                        # Rebond vers la droite
+                        # Bounce to the right
                         new_vx = -vx_change.after * restitution
                         replacements[
                             (entity_name, "vx")
@@ -394,13 +394,13 @@ class WallCollision:
                             after=new_vx,
                         )
                 else:
-                    # vx n'a pas changé dans cette transformation
+                    # vx did not change in this transformation
                     entity = world.entities.get(entity_name)
                     if entity is not None and "vx" in entity.properties:
                         current_vx = float(entity.properties["vx"])
                         if current_vx < 0:
                             new_vx = -current_vx * restitution
-                            # Normaliser -0.0 à 0.0
+                            # Normalise -0.0 to 0.0
                             if new_vx == 0.0:
                                 new_vx = 0.0
                             replacements[
@@ -424,8 +424,8 @@ class WallCollision:
                 replacements.get(key, change)
             )
 
-        # Ajouter les nouveaux changements créés par la collision
-        # (comme vx qui n'était pas dans la transformation originale)
+        # Add the new changes created by the collision
+        # (such as vx which was not in the original transformation)
         for key, replacement_change in replacements.items():
             if key not in [(c.entity, c.property) for c in changes]:
                 resolved.append(replacement_change)
@@ -451,14 +451,14 @@ class WallCollision:
         wall_components: list[tuple[str, VerticalPlaneCollider, Material]],
     ) -> Transformation:
         """
-        Résout les collisions en utilisant une liste de (collider, material).
+        Resolves the collisions using a list of (collider, material).
         
-        Pour chaque entité avec une position x proposée, vérifie chaque composant.
-        Si une collision est détectée, corrige la position et la vitesse,
-        et ajoute une relation "touching" avec le nom du mur.
+        For each entity with a proposed x position, checks each component.
+        If a collision is detected, corrects the position and the velocity,
+        and adds a "touching" relation with the name of the wall.
         
-        Le collider définit la géométrie (position, normale).
-        Le material définit le comportement physique (restitution).
+        The collider defines the geometry (position, normal).
+        The material defines the physical behaviour (restitution).
         """
         changes = list(transformation.changes)
         relation_changes = list(transformation.relation_changes)
@@ -486,11 +486,11 @@ class WallCollision:
             
             for wall_name, collider, material in wall_components:
                 if collider.is_right_facing:
-                    # Mur droit : bloque x > collider.x
-                    # Collision si :
-                    # 1. La balle traverse de gauche à droite (current_x <= collider.x et new_x > collider.x)
-                    # 2. La balle est déjà à droite et se déplace vers la droite (current_x > collider.x et new_x > current_x)
-                    # 3. La balle est déjà à droite (même si elle ne bouge pas, on la ramène)
+                    # Right wall: blocks x > collider.x
+                    # Collision if:
+                    # 1. The ball crosses from left to right (current_x <= collider.x and new_x > collider.x)
+                    # 2. The ball is already on the right and is moving to the right (current_x > collider.x and new_x > current_x)
+                    # 3. The ball is already on the right (even if it does not move, we bring it back)
                     if (new_x > collider.x and current_x <= collider.x) or \
                        (current_x > collider.x):
                         collision_occurred = True
@@ -503,8 +503,8 @@ class WallCollision:
                             after=collider.x,
                         )
                         
-                        # Appliquer restitution seulement si la balle se déplaçait vers le mur
-                        # (current_x <= collider.x et new_x > collider.x)
+                        # Apply restitution only if the ball was moving towards the wall
+                        # (current_x <= collider.x and new_x > collider.x)
                         moving_toward_wall = (current_x <= collider.x)
                         self._apply_restitution(
                             world, replacements, proposed_vx, entity_name,
@@ -512,11 +512,11 @@ class WallCollision:
                         ) if moving_toward_wall else None
                     
                 elif collider.is_left_facing:
-                    # Mur gauche : bloque x < collider.x
-                    # Collision si :
-                    # 1. La balle traverse de droite à gauche (current_x >= collider.x et new_x < collider.x)
-                    # 2. La balle est déjà à gauche et se déplace vers la gauche (current_x < collider.x et new_x < current_x)
-                    # 3. La balle est déjà à gauche (même si elle ne bouge pas, on la ramène)
+                    # Left wall: blocks x < collider.x
+                    # Collision if:
+                    # 1. The ball crosses from right to left (current_x >= collider.x and new_x < collider.x)
+                    # 2. The ball is already on the left and is moving to the left (current_x < collider.x and new_x < current_x)
+                    # 3. The ball is already on the left (even if it does not move, we bring it back)
                     if (new_x < collider.x and current_x >= collider.x) or \
                        (current_x < collider.x):
                         collision_occurred = True
@@ -529,7 +529,7 @@ class WallCollision:
                             after=collider.x,
                         )
                         
-                        # Appliquer restitution seulement si la balle se déplaçait vers le mur
+                        # Apply restitution only if the ball was moving towards the wall
                         moving_toward_wall = (current_x >= collider.x)
                         self._apply_restitution(
                             world, replacements, proposed_vx, entity_name,
@@ -547,7 +547,7 @@ class WallCollision:
                 resolved.append(replacement_change)
         
         for entity_name, wall_name in touching_pairs:
-            # Vérifier si la relation existe déjà pour éviter les doublons
+            # Check whether the relation already exists to avoid duplicates
             relation_exists = any(
                 r.subject == entity_name and r.predicate == "touching" and r.object == wall_name
                 for r in world.relations
@@ -576,90 +576,90 @@ class WallCollision:
         self, plane_collider: PlaneCollider, entity_name: str
     ) -> VerticalPlaneCollider | None:
         """
-        Convertit un PlaneCollider en VerticalPlaneCollider si c'est un plan vertical.
+        Converts a PlaneCollider into a VerticalPlaneCollider if it is a vertical plane.
         
-        Un plan est vertical si sa normale dans le monde est approximativement (±1, 0).
-        Retourne None si le plan n'est pas vertical.
+        A plane is vertical if its normal in the world is approximately (±1, 0).
+        Returns None if the plane is not vertical.
         """
-        # Calculer la normale dans le repère monde
+        # Compute the normal in the world frame
         nx, ny = plane_collider.world_normal()
         
-        # Vérifier si le plan est vertical (normale principalement horizontale)
-        # Un plan vertical a |ny| ≈ 0 et |nx| ≈ 1
-        if abs(ny) > 0.001:  # Pas exactement horizontal
+        # Check whether the plane is vertical (mostly horizontal normal)
+        # A vertical plane has |ny| ≈ 0 and |nx| ≈ 1
+        if abs(ny) > 0.001:  # Not exactly horizontal
             return None
         
-        # Le plan est vertical. Déterminer la position x et la normale_x.
-        # La normale monde nx devrait être proche de ±1.
-        # Le signe de nx détermine la direction.
+        # The plane is vertical. Determine the x position and the normal_x.
+        # The world normal nx should be close to ±1.
+        # The sign of nx determines the direction.
         
-        # Trouver la position du plan le long de l'axe x.
-        # Le plan passe par un point dans son repère local transformé.
-        # Dans le repère local, le plan est à offset le long de la normale.
-        # Mais pour un plan vertical simple, nous pouvons utiliser la position du transform.
+        # Find the position of the plane along the x axis.
+        # The plane passes through a point in its transformed local frame.
+        # In the local frame, the plane is at offset along the normal.
+        # But for a simple vertical plane, we can use the position of the transform.
         
-        # Pour un PlaneCollider avec transform=translation(tx, ty), le plan est à :
+        # For a PlaneCollider with transform=translation(tx, ty), the plane is at:
         #   normal_local . (x_local, y_local) = offset
-        # Dans le monde : normal_world . (x_world - origin_world, y_world - origin_world) = offset
+        # In the world: normal_world . (x_world - origin_world, y_world - origin_world) = offset
         # 
-        # Si le transform est translation(tx, ty) + rotation(theta) + ...
-        # L'origine monde est à (tx, ty).
+        # If the transform is translation(tx, ty) + rotation(theta) + ...
+        # The world origin is at (tx, ty).
         # 
-        # Pour une normale locale (nx_local, ny_local) = (1, 0) ou (-1, 0) :
-        #   Dans le monde : nx_world = cos(theta) * nx_local - sin(theta) * ny_local
+        # For a local normal (nx_local, ny_local) = (1, 0) or (-1, 0):
+        #   In the world: nx_world = cos(theta) * nx_local - sin(theta) * ny_local
         #                 ny_world = sin(theta) * nx_local + cos(theta) * ny_local
         # 
-        # Si le plan est vertical dans le monde, ny_world ≈ 0, donc :
+        # If the plane is vertical in the world, ny_world ≈ 0, so:
         #   sin(theta) * nx_local + cos(theta) * ny_local ≈ 0
         # 
-        # Pour une normale locale (1, 0) : sin(theta) ≈ 0, donc theta ≈ 0 ou pi
-        # Pour une normale locale (-1, 0) : -sin(theta) ≈ 0, même condition
+        # For a local normal (1, 0): sin(theta) ≈ 0, so theta ≈ 0 or pi
+        # For a local normal (-1, 0): -sin(theta) ≈ 0, same condition
         # 
-        # Si theta ≈ 0 : nx_world ≈ 1, ny_world ≈ 0
-        # Si theta ≈ pi : nx_world ≈ -1, ny_world ≈ 0
+        # If theta ≈ 0: nx_world ≈ 1, ny_world ≈ 0
+        # If theta ≈ pi: nx_world ≈ -1, ny_world ≈ 0
         
-        # La position x du plan dans le monde dépend du transform.
-        # Pour un transform simple de translation : x = tx
-        # Pour un transform avec rotation : il faut calculer où le plan se trouve.
+        # The x position of the plane in the world depends on the transform.
+        # For a simple translation transform: x = tx
+        # For a transform with rotation: we must compute where the plane lies.
         
-        # Calculer un point sur le plan dans le repère local.
-        # Le plan est à distance offset de l'origine locale, dans la direction de la normale.
-        # Un point sur le plan en local : (offset * nx_local, offset * ny_local)
-        # Dans le monde : ce point est transformé.
+        # Compute a point on the plane in the local frame.
+        # The plane is at distance offset from the local origin, in the direction of the normal.
+        # A point on the plane in local coordinates: (offset * nx_local, offset * ny_local)
+        # In the world: this point is transformed.
         
         transform = plane_collider.transform or Transform2D.identity()
         
-        # Point sur le plan dans le repère local (si offset = 0, c'est l'origine locale)
-        # Pour offset = 0, le plan passe par l'origine locale.
-        # Donc dans le monde, le plan passe par transform(0, 0) = (tx, ty)
-        # Mais attendez, ce n'est valable que si offset = 0.
+        # Point on the plane in the local frame (if offset = 0, it is the local origin)
+        # For offset = 0, the plane passes through the local origin.
+        # So in the world, the plane passes through transform(0, 0) = (tx, ty)
+        # But wait, this only holds if offset = 0.
         
-        # Calculer la position du plan dans le monde.
-        # Le plan est défini par : normal_local . (x_local, y_local) = offset
-        # Dans le monde : normal_world . (p_world - origin_world) = offset
-        # où origin_world = transform(0, 0)
+        # Compute the position of the plane in the world.
+        # The plane is defined by: normal_local . (x_local, y_local) = offset
+        # In the world: normal_world . (p_world - origin_world) = offset
+        # where origin_world = transform(0, 0)
         
-        # Calculer l'origine dans le monde
+        # Compute the origin in the world
         origin_world_x, origin_world_y = transform.transform_point(0, 0)
         
-        # Le plan dans le monde : nx * (x - origin_world_x) + ny * (y - origin_world_y) = offset
-        # Pour un plan vertical : ny ≈ 0, donc : nx * (x - origin_world_x) = offset
-        # Donc : x = origin_world_x + offset / nx
+        # The plane in the world: nx * (x - origin_world_x) + ny * (y - origin_world_y) = offset
+        # For a vertical plane: ny ≈ 0, so: nx * (x - origin_world_x) = offset
+        # So: x = origin_world_x + offset / nx
         
-        # Mais nx devrait être ±1 (la normale est unitaire), et offset est généralement 0.
+        # But nx should be ±1 (the normal is a unit vector), and offset is generally 0.
         x_position = origin_world_x + plane_collider.offset * nx
         
-        # Déterminer normal_x pour VerticalPlaneCollider
-        # Si nx ≈ +1 : le côté interdit est x > x_position (mur gauche)
-        # Si nx ≈ -1 : le côté interdit est x < x_position (mur droit)
+        # Determine normal_x for VerticalPlaneCollider
+        # If nx ≈ +1: the forbidden side is x > x_position (left wall)
+        # If nx ≈ -1: the forbidden side is x < x_position (right wall)
         # 
-        # Mais dans VerticalPlaneCollider :
-        #   normal_x = +1 → bloque x < x (mur gauche)
-        #   normal_x = -1 → bloque x > x (mur droit)
+        # But in VerticalPlaneCollider:
+        #   normal_x = +1 → blocks x < x (left wall)
+        #   normal_x = -1 → blocks x > x (right wall)
         # 
-        # Donc :
-        #   Si nx ≈ -1 : normal_x = -1 (mur droit)
-        #   Si nx ≈ +1 : normal_x = +1 (mur gauche)
+        # So:
+        #   If nx ≈ -1: normal_x = -1 (right wall)
+        #   If nx ≈ +1: normal_x = +1 (left wall)
         
         normal_x = -1.0 if nx > 0 else 1.0
         
@@ -674,7 +674,7 @@ class WallCollision:
         restitution: float,
         is_moving_right: bool,
     ) -> None:
-        """Applique la restitution à vx si l'entité se déplaçait vers le mur."""
+        """Applies the restitution to vx if the entity was moving towards the wall."""
         vx_change = proposed_vx.get(entity_name)
         if vx_change is not None:
             if (vx_change.after > 0 and is_moving_right) or \

@@ -1,6 +1,6 @@
-"""Rapport du sous-jalon Validated Optimizer (dev, vrais atomes fournis ; jamais le lot scellé).
-  aggregate : runs AWS `deepvo` (bras) et `deepopt` (optimiseur) → results/deep_validated_summary.json
-  report    : tableaux
+"""Report of the Validated Optimizer sub-milestone (dev, true atoms provided; never the sealed set).
+  aggregate : AWS runs `deepvo` (arms) and `deepopt` (optimizer) → results/deep_validated_summary.json
+  report    : tables
 """
 from __future__ import annotations
 
@@ -25,7 +25,7 @@ def _t(df):
 
 
 def paired(diffs):
-    """Différence appariée : moyenne, IC 95 % (Student), taille d'effet (d de Cohen apparié), parts améliorées / dégradées / inchangées."""
+    """Paired difference: mean, 95% CI (Student), effect size (paired Cohen's d), shares improved / degraded / unchanged."""
     n = len(diffs)
     if n == 0: return {}
     m = sum(diffs) / n; sd = math.sqrt(sum((d - m) ** 2 for d in diffs) / (n - 1)) if n > 1 else 0.0; h = _t(n - 1) * sd / math.sqrt(n) if n > 1 else 0.0
@@ -104,34 +104,34 @@ def aggregate():
             S["optimizer"][st] = opt_block(orow, st)
             for reg in ("standard", "rich"): S["optimizer"][f"{st}/{reg}"] = {k: v for k, v in opt_block([r for r in orow if r["regime"] == reg], st).items() if k in ("n", "noop", "configs", "default")}
             for d in sorted({r["depth"] for r in orow}): S["optimizer"][f"{st}/d{d}"] = {k: v for k, v in opt_block([r for r in orow if r["depth"] == d], st).items() if k in ("n", "noop", "configs", "default")}
-    json.dump(S, open(os.path.join(OUT, "deep_validated_summary.json"), "w"), indent=1); print("lignes bras", len(rows), "erreurs", bad, "| tâches optimiseur", len(orow), "erreurs", obad); return S
+    json.dump(S, open(os.path.join(OUT, "deep_validated_summary.json"), "w"), indent=1); print("arm rows", len(rows), "errors", bad, "| optimizer tasks", len(orow), "errors", obad); return S
 
 
 def report():
     S = json.load(open(os.path.join(OUT, "deep_validated_summary.json"))); A = S["arms"]
     for ts in ("diagnostic", "new"):
-        print(f"\n===== BRAS — tâches {ts}")
+        print(f"\n===== ARMS — tasks {ts}")
         for k, v in A[ts].items():
             b = v["B"]
             if not b: continue
             print(f"{k.ljust(14)} n={b['n']:3d} A {b['A']['thresholds']} acc {b['A']['accord']} | B {b['B']['thresholds']} acc {b['B']['accord']}")
-            print(" " * 14, "Δ0,99", b["diff_recovery_0.99"]["mean"], b["diff_recovery_0.99"]["ci95"], "d", b["diff_recovery_0.99"]["effect_size"], "| Δaccord", b["diff_accord"]["mean"], b["diff_accord"]["ci95"], "d", b["diff_accord"]["effect_size"],
-                  "| amél/dégr/inch", b["diff_accord"]["improved"], b["diff_accord"]["degraded"], b["diff_accord"]["unchanged"], "| Δvrais", b["diff_likelihood"]["mean"])
+            print(" " * 14, "Δ0.99", b["diff_recovery_0.99"]["mean"], b["diff_recovery_0.99"]["ci95"], "d", b["diff_recovery_0.99"]["effect_size"], "| Δagreement", b["diff_accord"]["mean"], b["diff_accord"]["ci95"], "d", b["diff_accord"]["effect_size"],
+                  "| impr/degr/unch", b["diff_accord"]["improved"], b["diff_accord"]["degraded"], b["diff_accord"]["unchanged"], "| Δlik", b["diff_likelihood"]["mean"])
         b = A[ts]["all"]["B"]; c = A[ts]["all"]["C"]
-        print("table 0,99 (A,B)", b["recovery_099_table"], "| pires dégradations", b["worst_degradations"]); print("détail A", b["A"]); print("détail B", b["B"])
-        print("seuils Δ", {t: (b[f'diff_recovery_{t}']["mean"], b[f'diff_recovery_{t}']["ci95"]) for t in ("0.9", "0.95", "0.97", "0.99")})
-        print("bras C (critère de substitution)", c["C"]["thresholds"], "acc", c["C"]["accord"], "Δ0,99", c["diff_recovery_0.99"]["mean"], c["diff_recovery_0.99"]["ci95"], "commits/rollbacks", c["C"]["commits"], c["C"]["rollbacks"])
-    print("\ncritère pré-défini", A.get("criterion"))
+        print("table 0.99 (A,B)", b["recovery_099_table"], "| worst degradations", b["worst_degradations"]); print("detail A", b["A"]); print("detail B", b["B"])
+        print("thresholds Δ", {t: (b[f'diff_recovery_{t}']["mean"], b[f'diff_recovery_{t}']["ci95"]) for t in ("0.9", "0.95", "0.97", "0.99")})
+        print("arm C (surrogate criterion)", c["C"]["thresholds"], "acc", c["C"]["accord"], "Δ0.99", c["diff_recovery_0.99"]["mean"], c["diff_recovery_0.99"]["ci95"], "commits/rollbacks", c["C"]["commits"], c["C"]["rollbacks"])
+    print("\npredefined criterion", A.get("criterion"))
     O = S["optimizer"]
     for st in ("true_parameters", "top_candidate"):
         if st not in O: continue
-        o = O[st]; print(f"\n===== OPTIMISEUR — départ : {st} (n={o['n']})"); print("sans optimiser", o["noop"], "≥0,99", o["noop_ge_099"])
+        o = O[st]; print(f"\n===== OPTIMIZER — start: {st} (n={o['n']})"); print("without optimizing", o["noop"], "≥0.99", o["noop_ge_099"])
         for c, v in o["configs"].items(): print(c.ljust(22), {k: v[k] for k in ("accord", "ge_099", "errors", "accord_degraded", "surrogate_improved", "profiled_improved", "surrogate_up_profiled_down", "surrogate_up_accord_down", "max_shift")})
-        print("meilleur état rencontré (défaut)", {k: o["configs"]["default"][k] for k in ("best_profiled_accord", "best_profiled_ge_099", "best_profiled_step", "best_profiled_is_initial", "best_surrogate_accord", "best_surrogate_ge_099")})
-        print("défaut", o["default"]); print("trajectoire", [(t["step"], t["k"], t["accord"], t["errors"], t["surrogate_loglik"], t["profiled_loglik"], t["grad_norm"], t["max_shift"]) for t in o["trajectory"]])
-        print("géométrie", o["geometry"]); print("ajusteurs", o["fitters"]); print("float32", o["float32_vs_float64"])
+        print("best state encountered (default)", {k: o["configs"]["default"][k] for k in ("best_profiled_accord", "best_profiled_ge_099", "best_profiled_step", "best_profiled_is_initial", "best_surrogate_accord", "best_surrogate_ge_099")})
+        print("default", o["default"]); print("trajectory", [(t["step"], t["k"], t["accord"], t["errors"], t["surrogate_loglik"], t["profiled_loglik"], t["grad_norm"], t["max_shift"]) for t in o["trajectory"]])
+        print("geometry", o["geometry"]); print("fitters", o["fitters"]); print("float32", o["float32_vs_float64"])
         for sub in ("standard", "rich", "d2", "d3", "d4", "d5"):
-            x = O[f"{st}/{sub}"]; print(sub.ljust(10), "noop", x["noop"]["accord"], "défaut", x["configs"]["default"]["accord"], x["configs"]["default"]["ge_099"], "sur↑prof↓", x["configs"]["default"]["surrogate_up_profiled_down"], "corr", x["default"]["corr_surrogate_accord"], "mono", x["configs"]["monotone_k24"]["accord"], x["configs"]["monotone_k24"]["ge_099"])
+            x = O[f"{st}/{sub}"]; print(sub.ljust(10), "noop", x["noop"]["accord"], "default", x["configs"]["default"]["accord"], x["configs"]["default"]["ge_099"], "sur↑prof↓", x["configs"]["default"]["surrogate_up_profiled_down"], "corr", x["default"]["corr_surrogate_accord"], "mono", x["configs"]["monotone_k24"]["accord"], x["configs"]["monotone_k24"]["ge_099"])
 
 
 if __name__ == "__main__":

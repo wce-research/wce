@@ -1,15 +1,15 @@
-"""Agent unifié pour l'environnement indépendant : une seule fonction d'identité (ingestion ET questions),
-calibrée par la fiabilité des sources, preuves pondérées par l'identité, propagation réversible.
+"""Unified agent for the independent environment: a single identity function (ingestion AND questions),
+calibrated by source reliability, evidence weighted by identity, reversible propagation.
 
-    P(o | description d, contexte) = (1 − ε) · [ g · p_joint(o) + (1 − g) / n ]
-p_joint : marginale des correspondances injectives descriptions -> objets (vectorisée, DiscourseAgent) ;
-g : probabilité que la description soit authentique — à l'ingestion, fiabilité de la source qui parle ;
-    à la question, 1 − Π(1 − r_s) sur les sources qui ont employé cette description (aucune -> pas d'identité) ;
-n : nombre d'objets du type ; ε : a priori de présupposition fausse.
-Seuils : observation (0,67 par défaut) < question (0,95) ; ajustables sur la partition de CALIBRATION.
+    P(o | description d, context) = (1 − ε) · [ g · p_joint(o) + (1 − g) / n ]
+p_joint: marginal of the injective matchings descriptions -> objects (vectorised, DiscourseAgent);
+g: probability that the description is genuine — at ingestion, reliability of the speaking source;
+    at question time, 1 − Π(1 − r_s) over the sources that used this description (none -> no identity);
+n: number of objects of the type; ε: prior of false presupposition.
+Thresholds: observation (0.67 by default) < question (0.95); adjustable on the CALIBRATION split.
 
-Propagation : une description « le cube rouge » rattachée à o devient une preuve ("color", o) = rouge de la même
-source, de poids P (la preuve dépend de l'identité). Si l'identité change après recalcul, la preuve est retirée.
+Propagation: a description « le cube rouge » attached to o becomes evidence ("color", o) = rouge from the same
+source, with weight P (the evidence depends on the identity). If the identity changes after recomputation, the evidence is retracted.
 """
 from __future__ import annotations
 
@@ -30,16 +30,16 @@ class UnifiedConfig(DiscourseConfig):
     propagate_descriptions: bool = True
     rollback: bool = True
     source_calibrated: bool = True
-    calibrate: bool = False               # seuils + calibrateur ajustés sur la partition de calibration
-    query_identity: bool = True           # coréférence au moment des questions (même fonction, seuil strict)
-    identity_mode: str = "l2"             # l2 (jointe probabiliste, ancien) | l1 (élimination explicite seulement) | none
-    l1_min_premise: float = 0.95          # prémisses d'élimination : couleurs établies FACT (postérieure calibrée)
-    l1_min_source: float = 0.8            # fiabilité effective minimale de la source qui décrit (ingestion)
-    l1_min_attestation: float = 0.9       # question : couleur présupposée attestée (combinaison des sources) ≥ 0,9
+    calibrate: bool = False               # thresholds + calibrator fitted on the calibration split
+    query_identity: bool = True           # coreference at question time (same function, strict threshold)
+    identity_mode: str = "l2"             # l2 (probabilistic joint, old) | l1 (explicit elimination only) | none
+    l1_min_premise: float = 0.95          # elimination premises: colours established as FACT (calibrated posterior)
+    l1_min_source: float = 0.8            # minimum effective reliability of the describing source (ingestion)
+    l1_min_attestation: float = 0.9       # question: presupposed colour attested (combination of the sources) ≥ 0.9
 
 
 class UnifiedAgent(DiscourseAgent):
-    duplicate_prior = 0.25            # un objet non décrit peut partager une couleur décrite (doublons fréquents)
+    duplicate_prior = 0.25            # an undescribed object may share a described colour (frequent duplicates)
 
     def __init__(self, config: UnifiedConfig = None, seed=0):
         super().__init__(config or UnifiedConfig(), seed)
@@ -47,22 +47,22 @@ class UnifiedAgent(DiscourseAgent):
         self._cur_weight = 1.0
         self._cur_identity = None
         self._cur_rule = None
-        self.dependencies = []           # (clé, preuve, (type, couleur, objet)) : preuves qui dépendent d'une identité
-        self.identity_points = []        # (P, contexte, type, couleur, objet) pour la calibration / l'évaluation
+        self.dependencies = []           # (key, evidence, (type, colour, object)): evidence that depends on an identity
+        self.identity_points = []        # (P, context, type, colour, object) for calibration / evaluation
         self.rollbacks = 0
         self.calibrator = None
         self.calibration = {}
-        self.rule_of = {}                # id(preuve) -> EliminateCandidates (règle explicite, auditée)
+        self.rule_of = {}                # id(evidence) -> EliminateCandidates (explicit rule, audited)
         self.rules = []
 
     def warm_up_sources(self, train_worlds):
-        """Fiabilités estimées sur les preuves DIRECTES seulement : aucune preuve dépendant d'une identité inférée."""
+        """Reliabilities estimated on DIRECT evidence only: no evidence depending on an inferred identity."""
         saved = self.calibration
         self.calibration = {**saved, "observation_threshold": 1.01, "query_threshold": 1.01}
         try: return super().warm_up_sources(train_worlds)
         finally: self.calibration = saved; self.identity_log.clear(); self.identity_points.clear()
 
-    # ---- identité unique -----------------------------------------------------------------
+    # ---- single identity ----------------------------------------------------------------
     def identity_prob(self, typ, color, context, source=None):
         if self.cfg.identity_mode == "none": return None, 0.0
         if self.cfg.identity_mode == "l1": return self._l1_identity(typ, color, context, source)
@@ -83,8 +83,8 @@ class UnifiedAgent(DiscourseAgent):
         return o, P
 
     def _l1_identity(self, typ, color, context, source=None):
-        """Identité SEULEMENT par élimination explicite sur prémisses calibrées (niveau ≤ L1) ; aucune correspondance
-        probabiliste (L2). À l'ingestion, la source qui décrit doit être suffisamment fiable."""
+        """Identity ONLY by explicit elimination on calibrated premises (level ≤ L1); no probabilistic
+        matching (L2). At ingestion, the describing source must be sufficiently reliable."""
         rule = self.explicit_elimination(typ, color, min_posterior=self.cfg.l1_min_premise)
         if not rule.conclusive or rule.level > 1: return None, 0.0
         g = 1.0
@@ -93,8 +93,8 @@ class UnifiedAgent(DiscourseAgent):
             g = self.reliability.estimate(source.split("|")[0])
             if g < self.cfg.l1_min_source: return None, 0.0
         else:
-            # question : la présupposition (couleur du candidat restant) doit être ATTESTÉE par les observations ;
-            # sinon une question à présupposition fausse (« le ballon vert » inexistant) serait « résolue »
+            # question: the presupposition (colour of the remaining candidate) must be ATTESTED by the observations;
+            # otherwise a question with a false presupposition (a non-existent « le ballon vert ») would be "resolved"
             from core.independent_agent import BELIEF, FACT
             b = self.belief.color(rule.remaining)
             if not (b.status in (FACT, BELIEF) and b.value == color):
@@ -137,7 +137,7 @@ class UnifiedAgent(DiscourseAgent):
         return out
 
     def _propagate(self):
-        """Description -> entité probable -> propriété rattachée (même source, poids = P(identité))."""
+        """Description -> probable entity -> attached property (same source, weight = P(identity))."""
         g = self.belief.graph
         for typ, colors in self._desc_sources.items():
             for color, srcs in colors.items():
@@ -153,7 +153,7 @@ class UnifiedAgent(DiscourseAgent):
                     self.dependencies.append((("color", o), ev, (typ, color, o)))
 
     def _revise(self):
-        """Recalcul avec toutes les preuves : une preuve dont l'identité ne tient plus est retirée (retour arrière)."""
+        """Recomputation with all the evidence: evidence whose identity no longer holds is retracted (backtracking)."""
         g = self.belief.graph
         for _ in range(2):
             self.solve_identity()
@@ -167,8 +167,8 @@ class UnifiedAgent(DiscourseAgent):
             if not removed: break
 
     def explicit_elimination(self, typ, color, min_posterior=0.0):
-        """Élimination explicite : candidats du type, exclus = couleur ÉTABLIE différente ; conclusion si un seul reste.
-        Prémisses : croyances FACT/BELIEF (≥ min_posterior) qui ne dépendent PAS elles-mêmes d'une identité inférée."""
+        """Explicit elimination: candidates of the type, excluded = different ESTABLISHED colour; conclusion if only one remains.
+        Premises: FACT/BELIEF beliefs (≥ min_posterior) that do NOT themselves depend on an inferred identity."""
         from core.independent_agent import BELIEF, FACT
         from core.knowledge_boundary import eliminate
         cands = self.belief.objects_of(typ)
@@ -183,7 +183,7 @@ class UnifiedAgent(DiscourseAgent):
         self.rules.append(rule)
         return rule
 
-    # ---- résolution : même fonction, seuil selon le contexte -------------------------------
+    # ---- resolution: same function, threshold by context ----------------------------------
     def resolve(self, np, belief=None, discourse=None, strict=True):
         objs, unknown = GroundedAgent.resolve(self, np, belief, discourse, strict)
         self._cur_identity = None
@@ -196,7 +196,7 @@ class UnifiedAgent(DiscourseAgent):
         source = getattr(self, "_cur_source", None)
         o, P = self.identity_prob(np.type, np.color, context, source)
         if o is None or P < self.threshold(context): return objs, unknown
-        if strict and (objs and o not in objs): return objs, unknown          # jamais contre une croyance établie
+        if strict and (objs and o not in objs): return objs, unknown          # never against an established belief
         self.identity_points.append((P, context, np.type, np.color, o))
         self.identity_log.append((context, np.type, np.color, o, round(P, 3)))
         if not strict:
@@ -217,26 +217,26 @@ class UnifiedAgent(DiscourseAgent):
             if self._last_query_rule is not None: ans.features["identity_rule"] = self._last_query_rule
         return ans
 
-    # ---- calibration sur les partitions CALIBRATION + VALIDATION (réponses de référence ; jamais le test) ----
+    # ---- calibration on the CALIBRATION + VALIDATION splits (reference answers; never the test) ----
     GRID = {"observation_threshold": (0.8, 0.9, 0.97, 1.01), "query_threshold": (0.97, 1.01)}
     COSTS = {"wrong": 20.0, "abstain": 1.0}
 
     def calibrate(self, worlds, extra_worlds=()):
-        """Seuils = argmin du risque attendu (mauvaise réponse assurée 20, abstention 1) sur des mondes hors test ;
-        + courbe de fiabilité des engagements d'identité (vérité disponible sur ces mondes)."""
+        """Thresholds = argmin of the expected risk (confident wrong answer 20, abstention 1) on non-test worlds;
+        + reliability curve of the identity commitments (truth available on these worlds)."""
         if not self.cfg.calibrate: return {}
         worlds = list(worlds) + list(extra_worlds)
         import copy
         saved = copy.deepcopy({k: v for k, v in self.__dict__.items() if k not in ("calibration", "calibrator")})
         try: return self._calibrate(worlds)
-        finally:                                          # la calibration ne règle QUE des seuils : aucun apprentissage conservé
+        finally:                                          # calibration sets ONLY thresholds: no learning is kept
             keep = (self.calibration, self.calibrator)
             self.__dict__.update(saved); self.calibration, self.calibrator = keep
 
     def _calibrate(self, worlds):
         from core.independent_agent import ABSTAIN
         best, table = None, []
-        # du plus prudent au moins prudent : une option risquée ne l'emporte que si son risque est STRICTEMENT moindre
+        # from the most cautious to the least cautious: a risky option wins only if its risk is STRICTLY lower
         for ot in sorted(self.GRID["observation_threshold"], reverse=True):
             for qt in sorted(self.GRID["query_threshold"], reverse=True):
                 self.calibration = {"observation_threshold": ot, "query_threshold": qt}
@@ -258,7 +258,7 @@ class UnifiedAgent(DiscourseAgent):
 
 
 def identity_accuracy(agent, worlds):
-    """Évaluation : exactitude des engagements d'identité (couleur vraie de l'objet choisi = couleur décrite)."""
+    """Evaluation: accuracy of the identity commitments (true colour of the chosen object = described colour)."""
     pts = []
     for x in worlds:
         agent.new_world(); n0 = len(agent.identity_points); agent.ingest(x["observations"])
@@ -268,7 +268,7 @@ def identity_accuracy(agent, worlds):
 
 
 def belief_accuracy(agent, worlds):
-    """Évaluation : croyances FACT/BELIEF comparées à la vérité du monde."""
+    """Evaluation: FACT/BELIEF beliefs compared with the truth of the world."""
     from core.independent_agent import BELIEF, FACT
     pts = []
     for x in worlds:

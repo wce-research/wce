@@ -1,11 +1,11 @@
 """
-Transformations 2D pour WCE.
+2D transformations for WCE.
 
-Conventions :
-- Rotation : radians, sens anti-horaire (standard mathématique)
-- Point : (x, y)
-- Vecteur : (vx, vy) - inchangé par la translation
-- Normale : vecteur unitaire, transformé différemment avec scale non-uniforme
+Conventions:
+- Rotation: radians, counter-clockwise (mathematical standard)
+- Point: (x, y)
+- Vector: (vx, vy) - unchanged by translation
+- Normal: unit vector, transformed differently with non-uniform scale
 """
 
 from dataclasses import dataclass, field
@@ -16,21 +16,21 @@ from typing import Tuple
 @dataclass(frozen=True)
 class Transform2D:
     """
-    Transformation 2D affine : translation + rotation + scale.
+    Affine 2D transformation: translation + rotation + scale.
     
-    Représente :
+    Represents:
         p_world = R(θ) * S(sx, sy) * p_local + translation
         
-    Pour un point local (x, y) :
+    For a local point (x, y):
         x_world = tx + sx * (cos(θ) * x - sin(θ) * y)
         y_world = ty + sy * (sin(θ) * x + cos(θ) * y)
     
-    Attributs :
-        tx : translation en x
-        ty : translation en y
-        rotation : angle en radians (0 = aucune rotation)
-        scale_x : facteur d'échelle en x (1.0 = taille normale)
-        scale_y : facteur d'échelle en y (1.0 = taille normale)
+    Attributes:
+        tx: translation in x
+        ty: translation in y
+        rotation: angle in radians (0 = no rotation)
+        scale_x: scale factor in x (1.0 = normal size)
+        scale_y: scale factor in y (1.0 = normal size)
     """
     tx: float = 0.0
     ty: float = 0.0
@@ -40,8 +40,8 @@ class Transform2D:
     
     def transform_point(self, x: float, y: float) -> Tuple[float, float]:
         """
-        Transforme un POINT du repère local vers le repère monde.
-        Un point est affecté par la translation.
+        Transforms a POINT from the local frame to the world frame.
+        A point is affected by the translation.
         """
         c = cos(self.rotation)
         s = sin(self.rotation)
@@ -59,8 +59,8 @@ class Transform2D:
     
     def transform_vector(self, vx: float, vy: float) -> Tuple[float, float]:
         """
-        Transforme un VECTEUR du repère local vers le repère monde.
-        Un vecteur N'EST PAS affecté par la translation.
+        Transforms a VECTOR from the local frame to the world frame.
+        A vector IS NOT affected by the translation.
         """
         c = cos(self.rotation)
         s = sin(self.rotation)
@@ -75,10 +75,10 @@ class Transform2D:
     
     def transform_normal(self, nx: float, ny: float) -> Tuple[float, float]:
         """
-        Transforme une NORMALE du repère local vers le repère monde.
+        Transforms a NORMAL from the local frame to the world frame.
         
-        Pour une normale, la transformation correcte utilise l'inverse transposée
-        de la matrice de transformation.
+        For a normal, the correct transformation uses the inverse transpose
+        of the transformation matrix.
         """
         c = cos(self.rotation)
         s = sin(self.rotation)
@@ -98,7 +98,7 @@ class Transform2D:
     
     def inverse(self) -> "Transform2D":
         """
-        Retourne la transformation inverse.
+        Returns the inverse transformation.
         T^-1(p_world) = p_local
         """
         inv_rotation = -self.rotation
@@ -125,7 +125,7 @@ class Transform2D:
     
     def compose(self, other: "Transform2D") -> "Transform2D":
         """
-        Compose deux transformations : T_final = self * other.
+        Composes two transformations: T_final = self * other.
         T_final(p) = self(other(p))
         """
         final_rotation = self.rotation + other.rotation
@@ -155,22 +155,22 @@ class Transform2D:
     
     @classmethod
     def translation(cls, tx: float, ty: float) -> "Transform2D":
-        """Crée une transformation de translation pure."""
+        """Creates a pure translation transformation."""
         return cls(tx=tx, ty=ty, rotation=0.0, scale_x=1.0, scale_y=1.0)
     
     @classmethod
     def rotation(cls, angle_radians: float) -> "Transform2D":
-        """Crée une transformation de rotation pure."""
+        """Creates a pure rotation transformation."""
         return cls(tx=0.0, ty=0.0, rotation=angle_radians, scale_x=1.0, scale_y=1.0)
     
     @classmethod
     def scale(cls, sx: float, sy: float = None) -> "Transform2D":
-        """Crée une transformation d'échelle pure."""
+        """Creates a pure scale transformation."""
         if sy is None:
             sy = sx
         return cls(tx=0.0, ty=0.0, rotation=0.0, scale_x=sx, scale_y=sy)
     
     @classmethod
     def identity(cls) -> "Transform2D":
-        """Transformation identité."""
+        """Identity transformation."""
         return cls(tx=0.0, ty=0.0, rotation=0.0, scale_x=1.0, scale_y=1.0)

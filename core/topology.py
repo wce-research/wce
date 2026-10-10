@@ -1,16 +1,16 @@
 """
-Topologie pour WCE.
+Topology for WCE.
 
-Ce module fournit des abstractions légères pour représenter les invariants topologiques
-des formes géométriques.
+This module provides lightweight abstractions to represent the topological invariants
+of geometric shapes.
 
-La topologie se concentre sur les propriétés qui sont préservées par les déformations
-continues, comme :
-- Le nombre de composantes connexes
-- Le nombre de trous
-- Les composantes de frontière
+Topology focuses on the properties that are preserved by continuous
+deformations, such as:
+- The number of connected components
+- The number of holes
+- The boundary components
 
-Cci est distinct de la géométrie, qui traite des positions et distances exactes.
+This is distinct from geometry, which deals with exact positions and distances.
 """
 
 from dataclasses import dataclass, field
@@ -19,7 +19,7 @@ from typing import Optional
 
 
 class TopologyState(Enum):
-    """Niveau de connaissance de la topologie attachée à une entité."""
+    """Level of knowledge of the topology attached to an entity."""
     KNOWN = "known"
     PRESERVED = "preserved"
     UNKNOWN = "unknown"
@@ -28,21 +28,21 @@ class TopologyState(Enum):
 @dataclass(frozen=True)
 class TopologySignature:
     """
-    Signature topologique d'une forme ou d'un ensemble de formes.
+    Topological signature of a shape or of a set of shapes.
     
-    Une signature topologique capture les propriétés fondamentales qui sont
-    invariantes par déformation continue.
+    A topological signature captures the fundamental properties that are
+    invariant under continuous deformation.
     
-    Attributs :
-        connected_components : Nombre de composantes connexes distinctes
-        holes : Nombre de trous (composantes de vide enfermées)
-        boundary_components : Nombre de composantes de frontière séparées
+    Attributes:
+        connected_components: Number of distinct connected components
+        holes: Number of holes (enclosed void components)
+        boundary_components: Number of separate boundary components
     
-    Exemples :
-        - Un segment : connected_components=1, holes=0, boundary_components=1
-        - Un disque : connected_components=1, holes=0, boundary_components=1
-        - Un anneau : connected_components=1, holes=1, boundary_components=2
-        - Deux objets disjoints : connected_components=2, holes=0, boundary_components=2
+    Examples:
+        - A segment: connected_components=1, holes=0, boundary_components=1
+        - A disc: connected_components=1, holes=0, boundary_components=1
+        - A ring: connected_components=1, holes=1, boundary_components=2
+        - Two disjoint objects: connected_components=2, holes=0, boundary_components=2
     """
     connected_components: int = 1
     holes: int = 0
@@ -50,59 +50,59 @@ class TopologySignature:
     
     def __post_init__(self):
         if self.connected_components < 0:
-            raise ValueError(f"connected_components doit être >= 0, pas {self.connected_components}")
+            raise ValueError(f"connected_components must be >= 0, not {self.connected_components}")
         if self.holes < 0:
-            raise ValueError(f"holes doit être >= 0, pas {self.holes}")
+            raise ValueError(f"holes must be >= 0, not {self.holes}")
         if self.boundary_components < 0:
-            raise ValueError(f"boundary_components doit être >= 0, pas {self.boundary_components}")
-        # Un objet avec des trous doit avoir au moins une composante connexe
+            raise ValueError(f"boundary_components must be >= 0, not {self.boundary_components}")
+        # An object with holes must have at least one connected component
         if self.holes > 0 and self.connected_components < 1:
-            raise ValueError("Un objet avec des trous doit avoir au moins une composante connexe")
+            raise ValueError("An object with holes must have at least one connected component")
     
     def is_solid(self) -> bool:
-        """Indique si la forme est solide (sans trous)."""
+        """Indicates whether the shape is solid (without holes)."""
         return self.holes == 0
     
     def is_simple(self) -> bool:
-        """Indique si la forme est topologiquement simple (une composante, sans trous)."""
+        """Indicates whether the shape is topologically simple (one component, without holes)."""
         return self.connected_components == 1 and self.holes == 0
     
     def is_connected(self) -> bool:
-        """Indique si la forme est connexe (une seule composante)."""
+        """Indicates whether the shape is connected (a single component)."""
         return self.connected_components == 1
 
 
-# Signatures topologiques pour les formes de base
+# Topological signatures for the basic shapes
 
-# Segment : une dimension, connecté, sans trous, une frontière
+# Segment: one dimension, connected, without holes, one boundary
 SEGMENT_TOPOLOGY = TopologySignature(connected_components=1, holes=0, boundary_components=1)
 
-# Disque (cercle 2D) : connecté, sans trous, une frontière (le cercle)
+# Disc (2D circle): connected, without holes, one boundary (the circle)
 DISK_TOPOLOGY = TopologySignature(connected_components=1, holes=0, boundary_components=1)
 
-# Cercle (la frontière seulement) : même que segment (1D)
+# Circle (the boundary only): same as segment (1D)
 CIRCLE_TOPOLOGY = SEGMENT_TOPOLOGY
 
-# Anneau (disque avec trou) : connecté, un trou, deux frontières
+# Ring (disc with a hole): connected, one hole, two boundaries
 RING_TOPOLOGY = TopologySignature(connected_components=1, holes=1, boundary_components=2)
 
-# Deux objets disjoints
+# Two disjoint objects
 DISJOINT_TWO_TOPOLOGY = TopologySignature(connected_components=2, holes=0, boundary_components=2)
 
-# Point : zero dimension, mais nous le traitons comme une composante connexe
+# Point: zero dimension, but we treat it as a connected component
 POINT_TOPOLOGY = TopologySignature(connected_components=1, holes=0, boundary_components=0)
 
 
-# Signatures pour compositions
+# Signatures for compositions
 
 def combine_topologies(*signatures: TopologySignature) -> TopologySignature:
     """
-    Combine plusieurs signatures topologiques (union disjointe).
+    Combines several topological signatures (disjoint union).
     
-    Pour une union disjointe d'objets :
-        - Les composantes connexes s'additionnent
-        - Les trous s'additionnent
-        - Les composantes de frontière s'additionnent
+    For a disjoint union of objects:
+        - The connected components add up
+        - The holes add up
+        - The boundary components add up
     """
     total_cc = sum(s.connected_components for s in signatures)
     total_holes = sum(s.holes for s in signatures)
@@ -115,18 +115,18 @@ def combine_topologies(*signatures: TopologySignature) -> TopologySignature:
     )
 
 
-# Transformation de la topologie
+# Transformation of the topology
 
 @dataclass(frozen=True)
 class TopologyPreservation:
     """
-    Indique quelles propriétés topologiques sont préservées par une transformation.
+    Indicates which topological properties are preserved by a transformation.
     
-    Attributs :
-        preserves_connected_components : La transformation ne change pas le nombre de composantes connexes
-        preserves_holes : La transformation ne change pas le nombre de trous
-        preserves_boundary : La transformation ne change pas la structure de la frontière
-        preserves_orientation : La transformation préserve l'orientation locale
+    Attributes:
+        preserves_connected_components: The transformation does not change the number of connected components
+        preserves_holes: The transformation does not change the number of holes
+        preserves_boundary: The transformation does not change the structure of the boundary
+        preserves_orientation: The transformation preserves the local orientation
     """
     preserves_connected_components: bool = True
     preserves_holes: bool = True
@@ -135,7 +135,7 @@ class TopologyPreservation:
     
     @classmethod
     def full(cls) -> "TopologyPreservation":
-        """Toutes les propriétés sont préservées (ex: translation, rotation)."""
+        """All properties are preserved (e.g. translation, rotation)."""
         return cls(
             preserves_connected_components=True,
             preserves_holes=True,
@@ -145,17 +145,17 @@ class TopologyPreservation:
     
     @classmethod
     def continuous(cls) -> "TopologyPreservation":
-        """Déformation continue (ex: étirement) : préserve la connectivité mais peut changer les trous."""
+        """Continuous deformation (e.g. stretching): preserves connectivity but may change the holes."""
         return cls(
             preserves_connected_components=True,
-            preserves_holes=True,  # Une déformation continue ne crée pas de trous
-            preserves_boundary=False,  # Peut changer la structure de la frontière
+            preserves_holes=True,  # A continuous deformation does not create holes
+            preserves_boundary=False,  # May change the structure of the boundary
             preserves_orientation=True,
         )
     
     @classmethod
     def cutting(cls) -> "TopologyPreservation":
-        """Découpe : peut changer la connectivité et créer de nouvelles frontières."""
+        """Cutting: may change connectivity and create new boundaries."""
         return cls(
             preserves_connected_components=False,
             preserves_holes=False,
@@ -165,7 +165,7 @@ class TopologyPreservation:
     
     @classmethod
     def reflection(cls) -> "TopologyPreservation":
-        """Réflexion : préserve la topologie mais inverse l'orientation."""
+        """Reflection: preserves the topology but reverses the orientation."""
         return cls(
             preserves_connected_components=True,
             preserves_holes=True,
@@ -175,29 +175,29 @@ class TopologyPreservation:
     
     @classmethod
     def identity(cls) -> "TopologyPreservation":
-        """Transformation identité : tout est préservé."""
+        """Identity transformation: everything is preserved."""
         return cls.full()
 
 
-# Fonctions pour obtenir la préservation topologique de différentes transformations
+# Functions to obtain the topological preservation of different transformations
 
 def get_topology_preservation_translation() -> TopologyPreservation:
-    """La translation préserve toutes les propriétés topologiques."""
+    """Translation preserves all topological properties."""
     return TopologyPreservation.full()
 
 
 def get_topology_preservation_rotation() -> TopologyPreservation:
-    """La rotation préserve toutes les propriétés topologiques."""
+    """Rotation preserves all topological properties."""
     return TopologyPreservation.full()
 
 
 def get_topology_preservation_uniform_scale(sx: float, sy: float) -> TopologyPreservation:
-    """Le scale uniforme préserve la topologie sauf éventuellement l'orientation."""
+    """Uniform scale preserves the topology except possibly the orientation."""
     if sx < 0 and sy < 0:
-        # Scale négatif dans les deux directions : préserve l'orientation
+        # Negative scale in both directions: preserves the orientation
         return TopologyPreservation.full()
     elif sx < 0 or sy < 0:
-        # Scale négatif dans une seule direction : inverse l'orientation
+        # Negative scale in a single direction: reverses the orientation
         return TopologyPreservation(
             preserves_connected_components=True,
             preserves_holes=True,
@@ -209,14 +209,14 @@ def get_topology_preservation_uniform_scale(sx: float, sy: float) -> TopologyPre
 
 
 def get_topology_preservation_shear() -> TopologyPreservation:
-    """Le cisaillement est une déformation continue."""
+    """Shear is a continuous deformation."""
     return TopologyPreservation.continuous()
 
 
 def get_topology_preservation_general_scale(sx: float, sy: float) -> TopologyPreservation:
-    """Le scale non-uniforme peut changer l'orientation."""
+    """Non-uniform scale may change the orientation."""
     if sx * sy < 0:
-        # Scale négatif dans des directions opposées : peut inverser l'orientation
+        # Negative scale in opposite directions: may reverse the orientation
         return TopologyPreservation(
             preserves_connected_components=True,
             preserves_holes=True,

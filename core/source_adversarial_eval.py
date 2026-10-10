@@ -1,4 +1,4 @@
-"""Évaluation des modèles de fiabilité sur le banc adversarial des sources (adaptateur : connaît les deux côtés)."""
+"""Evaluation of the reliability models on the adversarial bench for sources (adapter: knows both sides)."""
 from __future__ import annotations
 
 from collections import Counter, defaultdict
@@ -64,7 +64,7 @@ def evaluate(model_name, episodes):
                          "exact": got == q["expected"], "false_confident": committed and got != q["expected"]})
         truth = {q["key"]: q["truth"] for q in ep["questions"]}
         for c in ep["claims"]:
-            if hasattr(m, "posterior"):                               # calibration : moyenne a posteriori (la borne basse pondère)
+            if hasattr(m, "posterior"):                               # calibration: posterior mean (the lower bound does the weighting)
                 a_, b_ = m.posterior(c["source"], c["kind"]); est = a_ / (a_ + b_)
             else: est = m.estimate(c["source"])
             rel_pts.append((est, c["value"] == truth[c["key"]]))
@@ -105,7 +105,7 @@ def evaluate(model_name, episodes):
 
 
 def heldout_episodes():
-    """Épisodes NEUFS (graines jamais vues) pour mesurer les conflits après correction (le lot scellé a déjà servi)."""
+    """FRESH episodes (seeds never seen) to measure conflicts after the fix (the sealed set has already been used)."""
     from core.source_adversarial import episode
     return [episode(95000 + i) for i in range(6)]
 

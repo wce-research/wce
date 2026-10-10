@@ -1,12 +1,12 @@
-"""Monde CONTINU, bruité, dérivant, NON énumérable : x ∈ R^16 (+ indice de contexte continu ∈ R^8, sans task_id).
+"""CONTINUOUS, noisy, drifting, NON-enumerable world: x ∈ R^16 (+ continuous context cue ∈ R^8, no task_id).
 
-Familles de règles (paramétrées, compactes) : séparation (demi-espace), boule (containment), secteur angulaire
-(orientation), distance relative entre deux points 2D, boîte, projection comparée, changement de référentiel
-(rotation puis seuil), compositions (and / or / xor), et une famille « nouveau domaine » (frontière sinusoïdale)
-absente de la bibliothèque d'hypothèses du système.
-Bruits : gaussien, lourd (Student), valeurs manquantes (NaN), outliers, corruption partielle de dimensions.
-Dérive : un paramètre de la règle (seuil, angle, rayon) se déplace PROGRESSIVEMENT sur plusieurs régimes
-(même contexte) ; récurrences ; nouveautés ; nouveaux domaines.
+Rule families (parameterised, compact): separation (half-space), ball (containment), angular sector
+(orientation), relative distance between two 2D points, box, compared projection, change of reference frame
+(rotation then threshold), compositions (and / or / xor), and a "new domain" family (sinusoidal boundary)
+absent from the system's hypothesis library.
+Noises: Gaussian, heavy (Student), missing values (NaN), outliers, partial corruption of dimensions.
+Drift: one parameter of the rule (threshold, angle, radius) moves PROGRESSIVELY over several regimes
+(same context); recurrences; novelties; new domains.
 """
 from __future__ import annotations
 
@@ -23,7 +23,7 @@ NOVEL_FAMILIES = ("sine",)
 OPS = ("and", "or", "xor")
 
 
-# ================================================================ règles
+# ================================================================ rules
 
 @dataclass(frozen=True)
 class Rule:
@@ -78,7 +78,7 @@ def _unit(rng, d=D):
 
 
 def random_rule(rng: random.Random, family=None, mu=None):
-    """Règle d'une famille, seuil calé pour un équilibre ≈ 50 % sous la distribution d'entrée du régime."""
+    """Rule of one family, threshold set for a ≈ 50 % balance under the input distribution of the regime."""
     f = family or rng.choice(FAMILIES); mu = mu if mu is not None else torch.zeros(D)
     g = torch.Generator().manual_seed(rng.randrange(10 ** 9)); Xs = mu + torch.randn(4000, D, generator=g)
     if f == "halfspace":
@@ -103,7 +103,7 @@ def random_rule(rng: random.Random, family=None, mu=None):
 
 
 def drift_rule(r: Rule, step: float):
-    """Dérive PROGRESSIVE : le paramètre de seuil / angle / rayon se déplace de `step`."""
+    """PROGRESSIVE drift: the threshold / angle / radius parameter moves by `step`."""
     f, p = r.family, list(r.params)
     if f in ("halfspace", "projection"): p[-1] = p[-1] + step
     elif f == "ball": p[2] = max(0.2, p[2] + step)
@@ -116,7 +116,7 @@ def drift_rule(r: Rule, step: float):
     return Rule(f, tuple(p))
 
 
-# ================================================================ bruit
+# ================================================================ noise
 
 NOISES = ("clean", "gaussian", "heavy", "missing", "outliers", "corruption")
 
@@ -124,7 +124,7 @@ NOISES = ("clean", "gaussian", "heavy", "missing", "outliers", "corruption")
 def apply_noise(X, kind, g: torch.Generator, level=1.0):
     X = X.clone()
     if kind == "gaussian": X = X + 0.15 * level * torch.randn(X.shape, generator=g)
-    elif kind == "heavy":                                            # Student-t à 2 degrés de liberté (queues lourdes)
+    elif kind == "heavy":                                            # Student-t with 2 degrees of freedom (heavy tails)
         z = torch.randn(X.shape, generator=g); c = (torch.randn(X.shape, generator=g) ** 2 + torch.randn(X.shape, generator=g) ** 2) / 2
         X = X + 0.1 * level * z / c.sqrt().clamp_min(1e-3)
     elif kind == "missing": X[torch.rand(X.shape, generator=g) < 0.1 * level] = float("nan")
@@ -135,18 +135,18 @@ def apply_noise(X, kind, g: torch.Generator, level=1.0):
     return X
 
 
-# ================================================================ régimes et flux
+# ================================================================ regimes and streams
 
 @dataclass
 class Regime:
     name: str
     rule: Rule
-    mu: torch.Tensor                 # centre de la distribution d'entrée (région)
+    mu: torch.Tensor                 # centre of the input distribution (region)
     scale: float
-    cue: torch.Tensor                # prototype d'indice (caché)
+    cue: torch.Tensor                # cue prototype (hidden)
     kind: str                        # new | recurrence | composition | drift | new_domain | noise_shift
     noise: str = "clean"
-    context_id: int = 0              # vérité terrain du contexte (ÉVALUATION seulement)
+    context_id: int = 0              # ground truth of the context (EVALUATION only)
     version: int = 0
 
     def sample(self, n, g: torch.Generator, noisy=True):
@@ -165,12 +165,12 @@ def _cue(rng, used, min_dist=2.5):
     for _ in range(2000):
         c = torch.tensor([rng.gauss(0, 1.5) for _ in range(D_CUE)])
         if all(float((c - u).norm()) >= min_dist for u in used): return c
-    raise RuntimeError("indice")
+    raise RuntimeError("cue")
 
 
 def stream(seed=0, n=100, p_recur=0.15, p_comp=0.15, p_drift=0.25, p_novel=0.05, p_noise=0.3, hold_out=("sine",), families=None):
-    """Flux de n régimes : nouveautés, récurrences (même indice, même règle), compositions, DÉRIVES progressives
-    (même indice, paramètre décalé), nouveaux domaines (famille hors bibliothèque), bruit variable."""
+    """Stream of n regimes: novelties, recurrences (same cue, same rule), compositions, progressive DRIFTS
+    (same cue, shifted parameter), new domains (family outside the library), variable noise."""
     rng = random.Random(seed); regs: List[Regime] = []; cues = []; contexts = {}
     while len(regs) < n:
         u = rng.random(); live = [r for r in regs]
@@ -199,7 +199,7 @@ def stream(seed=0, n=100, p_recur=0.15, p_comp=0.15, p_drift=0.25, p_novel=0.05,
 
 
 def superseded(regs: List[Regime]):
-    """Indices de régimes dont la règle a été remplacée ensuite (même contexte, dérive) : non comptés en rétention."""
+    """Indices of regimes whose rule was later replaced (same context, drift): not counted in retention."""
     last = {}
     for i, r in enumerate(regs): last[r.context_id] = i
     return {i for i, r in enumerate(regs) if last[r.context_id] != i and regs[last[r.context_id]].rule != r.rule}

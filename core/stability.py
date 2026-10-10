@@ -1,9 +1,9 @@
-"""Stabilité EMPIRIQUE des invariants sous perturbation.
+"""EMPIRICAL stability of invariants under perturbation.
 
-KAM-inspired stability : un invariant est « persistant » dans une région si une forte fraction de petites
-perturbations le conserve. C'est une notion statistique et empirique : AUCUN système hamiltonien, aucun tore
-invariant, aucune condition diophantienne n'est construit ni revendiqué. De même, une « résonance » ici est une
-INTERACTION NON ADDITIVE entre perturbations (StructuralResonanceCandidate), pas une résonance KAM physique.
+KAM-inspired stability: an invariant is "persistent" in a region if a large fraction of small
+perturbations preserves it. It is a statistical and empirical notion: NO Hamiltonian system, no invariant
+torus, no Diophantine condition is constructed or claimed. Likewise, a "resonance" here is a
+NON-ADDITIVE INTERACTION between perturbations (StructuralResonanceCandidate), not a physical KAM resonance.
 """
 from __future__ import annotations
 
@@ -19,11 +19,11 @@ from core.model_state import PARAM_NAMES, ModelState
 from core.perturbation import Perturbation, unit_direction
 
 
-# ================================================================ persistance d'un invariant
+# ================================================================ persistence of an invariant
 
 @dataclass
 class InvariantPersistence:
-    """Probabilité de survie d'un invariant sous des perturbations aléatoires d'amplitude donnée (+ IC de Wilson)."""
+    """Survival probability of an invariant under random perturbations of a given amplitude (+ Wilson CI)."""
     invariant: str
     magnitude: float
     survived: int
@@ -41,14 +41,14 @@ class InvariantPersistence:
 
 
 def persistence(holds: Callable[[float, int], bool], magnitude, trials=32, name="I"):
-    """holds(magnitude, seed) -> l'invariant tient-il sous la perturbation tirée avec cette graine ?"""
+    """holds(magnitude, seed) -> does the invariant hold under the perturbation drawn with this seed?"""
     ok = sum(bool(holds(magnitude, s)) for s in range(trials))
     return InvariantPersistence(name, magnitude, ok, trials)
 
 
 @dataclass
 class StableRegion:
-    """Région (amplitudes ≤ radius) où la survie de l'invariant reste ≥ threshold (empiriquement)."""
+    """Region (amplitudes ≤ radius) where the survival of the invariant stays ≥ threshold (empirically)."""
     invariant: str
     radius: float
     threshold: float
@@ -58,8 +58,8 @@ class StableRegion:
 
 
 def stability_radius(holds, threshold=0.9, lo=0.0, hi=1.0, trials=32, iters=8, grid=None, name="I"):
-    """r_I = amplitude maximale telle que P(invariant conservé) ≥ seuil. Balayage géométrique puis bissection
-    (suppose une survie à peu près décroissante ; la courbe complète est conservée pour vérification)."""
+    """r_I = maximum amplitude such that P(invariant preserved) ≥ threshold. Geometric sweep then bisection
+    (assumes a roughly decreasing survival; the full curve is kept for verification)."""
     grid = grid or [hi * 2 ** -k for k in range(10, -1, -1)]
     curve = [persistence(holds, m, trials, name) for m in grid]
     good = [c.magnitude for c in curve if c.probability >= threshold]
@@ -75,10 +75,10 @@ def stability_radius(holds, threshold=0.9, lo=0.0, hi=1.0, trials=32, iters=8, g
     return StableRegion(name, a, threshold, curve)
 
 
-# ================================================================ modèle neuronal : perturbations de poids
+# ================================================================ neural model: weight perturbations
 
 def perturbed_model(model: ModelState, modules: Sequence[str], magnitude, seed, keys=PARAM_NAMES):
-    """Bruit RELATIF : W + magnitude·||W||·u (u direction unitaire aléatoire), sur les modules désignés."""
+    """RELATIVE noise: W + magnitude·||W||·u (u random unit direction), on the designated modules."""
     m = copy.deepcopy(model)
     for j, mod in enumerate(modules):
         for i, k in enumerate(keys):
@@ -88,23 +88,23 @@ def perturbed_model(model: ModelState, modules: Sequence[str], magnitude, seed, 
 
 
 def accuracy_invariant(model, x, y, modules, floor):
-    """Invariant « exactitude de l'ancienne tâche ≥ floor » sous perturbation des modules donnés."""
+    """Invariant "accuracy of the old task ≥ floor" under perturbation of the given modules."""
     def holds(mag, seed): return perturbed_model(model, modules, mag, seed).accuracy(x, y) >= floor
     return holds
 
 
 def stability_map(model, x, y, floor, modules=("enc", "expert_a", "head"), grid=(0.01, 0.02, 0.05, 0.1, 0.2, 0.4), trials=16):
-    """Carte : (région de paramètres = module) × amplitude → probabilité de survie de l'invariant."""
+    """Map: (parameter region = module) × amplitude → survival probability of the invariant."""
     return {mod: {m: persistence(accuracy_invariant(model, x, y, (mod,), floor), m, trials, mod).probability for m in grid}
             for mod in modules}
 
 
-# ================================================================ interactions non additives (« résonances » structurelles)
+# ================================================================ non-additive interactions (structural "resonances")
 
 @dataclass
 class StructuralResonanceCandidate:
-    """Couple / triple de perturbations dont l'effet conjoint s'écarte fortement de la somme des effets seuls.
-    (Nom : analogie ; ce n'est pas une résonance KAM physique.)"""
+    """Pair / triple of perturbations whose joint effect deviates strongly from the sum of the individual effects.
+    (Name: analogy; it is not a physical KAM resonance.)"""
     components: Tuple[str, ...]
     interaction: float
     joint: float
@@ -115,13 +115,13 @@ class StructuralResonanceCandidate:
 
 
 def interaction(response: Callable[[Tuple[str, ...]], float], combo: Tuple[str, ...]):
-    """interaction = response(δ1+…+δk) − Σ response(δi) (effet de second ordre et plus)."""
+    """interaction = response(δ1+…+δk) − Σ response(δi) (effect of second order and above)."""
     singles = tuple(response((c,)) for c in combo); joint = response(combo)
     return StructuralResonanceCandidate(combo, joint - sum(singles), joint, singles)
 
 
 class PerturbationInteractionGraph:
-    """Nœuds : composants / transformations ; arêtes : force d'interaction. Couples et triples dangereux."""
+    """Nodes: components / transformations; edges: interaction strength. Dangerous pairs and triples."""
 
     def __init__(self, components: Sequence[str], response: Callable[[Tuple[str, ...]], float], triples=True):
         self.components = list(components); self.response = response
@@ -139,7 +139,7 @@ class PerturbationInteractionGraph:
             for t in itertools.combinations(self.components, 3):
                 j = cached(t); pair_sum = sum(self.edges[p].interaction for p in itertools.combinations(t, 2))
                 s = tuple(self.singles[c] for c in t)
-                self.triples[t] = StructuralResonanceCandidate(t, j - sum(s) - pair_sum, j, s)   # interaction d'ordre 3 pure
+                self.triples[t] = StructuralResonanceCandidate(t, j - sum(s) - pair_sum, j, s)   # pure order-3 interaction
 
     def dangerous(self, threshold=0.1, relative=0.25):
         out = [e for e in list(self.edges.values()) + list(self.triples.values())
@@ -147,11 +147,11 @@ class PerturbationInteractionGraph:
         return sorted(out, key=lambda e: -abs(e.interaction))
 
 
-# ================================================================ transitions de type bifurcation
+# ================================================================ bifurcation-like transitions
 
 @dataclass
 class TransitionBoundary:
-    """Seuil où une quantité discrète change (routage, branche, invariant) ou chute brusquement (performance)."""
+    """Threshold where a discrete quantity changes (routing, branch, invariant) or drops abruptly (performance)."""
     quantity: str
     threshold: float
     before: object
@@ -160,7 +160,7 @@ class TransitionBoundary:
 
 
 def detect_transitions(param_values: Sequence[float], observe: Callable[[float], Dict[str, object]], jump=0.15, refine=6):
-    """Balaye un paramètre ; détecte changements discrets et chutes ≥ jump ; affine chaque seuil par bissection."""
+    """Sweeps a parameter; detects discrete changes and drops ≥ jump; refines each threshold by bisection."""
     obs = [observe(v) for v in param_values]; out = []
     for i in range(1, len(param_values)):
         for q in obs[i]:
@@ -178,7 +178,7 @@ def detect_transitions(param_values: Sequence[float], observe: Callable[[float],
 
 
 def routing_transition_observer(model, x, y, src="expert_b", tgt="head"):
-    """Force d'un routage parasite croissante : décision dominante, chemin de calcul, exactitude."""
+    """Increasing strength of a parasitic routing: dominant decision, computation path, accuracy."""
     from core.perturbation import Perturbation
     def observe(s):
         m = Perturbation("routing", (src, tgt), s).apply(model)
@@ -187,11 +187,11 @@ def routing_transition_observer(model, x, y, src="expert_b", tgt="head"):
     return observe
 
 
-# ================================================================ Fourier : quels invariants sont stables dans quelle base
+# ================================================================ Fourier: which invariants are stable in which basis
 
 def fourier_sensitivity(n=128, trials=40, eps=0.05, seed=0):
-    """Perturbation localisée en TEMPS (impulsion) vs localisée en FRÉQUENCE (une raie) ; invariants :
-    fréquence dominante, ensemble des raies, enveloppe locale (fenêtre), énergie (Parseval). Taux de survie."""
+    """Perturbation localised in TIME (impulse) vs localised in FREQUENCY (one line); invariants:
+    dominant frequency, set of lines, local envelope (window), energy (Parseval). Survival rate."""
     from core.measurement import BasisTransform
     from core.measurement_experiments import make_signal, spectral_reasoning
     import random
@@ -200,9 +200,9 @@ def fourier_sensitivity(n=128, trials=40, eps=0.05, seed=0):
     for t in range(trials):
         x, truth, dom = make_signal(rng, n); s0, d0 = spectral_reasoning(x, bt)
         amp = eps * float(x.norm())
-        dt = torch.zeros(n, dtype=x.dtype); dt[rng.randrange(n)] = amp                       # impulsion temporelle
+        dt = torch.zeros(n, dtype=x.dtype); dt[rng.randrange(n)] = amp                       # time impulse
         f = rng.randrange(1, n // 2); tt = torch.arange(n, dtype=x.dtype)
-        df = amp * math.sqrt(2.0 / n) * torch.cos(2 * math.pi * f * tt / n + rng.random() * 6.28)   # une raie
+        df = amp * math.sqrt(2.0 / n) * torch.cos(2 * math.pi * f * tt / n + rng.random() * 6.28)   # one line
         w = slice(0, 16)
         for key, d in (("time_perturbation", dt), ("frequency_perturbation", df)):
             y = x + d; s1, d1 = spectral_reasoning(y, bt)
@@ -214,11 +214,11 @@ def fourier_sensitivity(n=128, trials=40, eps=0.05, seed=0):
     return res
 
 
-# ================================================================ référentiels : invariants vrais vs coordonnées
+# ================================================================ reference frames: true invariants vs coordinates
 
 def frame_perturbation(trials=100, seed=0, eps=0.3):
-    """Perturbe le référentiel (rotation + translation aléatoires) : distance et angle doivent rester stables,
-    les coordonnées non (ce ne sont pas des invariants)."""
+    """Perturbs the reference frame (random rotation + translation): distance and angle must stay stable,
+    the coordinates not (they are not invariants)."""
     from core.measurement import FramedValue, ReferenceFrame, distance
     g = torch.Generator().manual_seed(seed); out = {"distance": 0, "angle": 0, "coordinates": 0}
     for _ in range(trials):
@@ -233,12 +233,12 @@ def frame_perturbation(trials=100, seed=0, eps=0.3):
     return {k: v / trials for k, v in out.items()}
 
 
-# ================================================================ algèbre : perturbation d'une chaîne de transformations
+# ================================================================ algebra: perturbation of a chain of transformations
 
 def algebra_chain_perturbation(trials=200, seed=0, chain_len=4):
-    """Chaîne de transformations admissibles ; on remplace un maillon au hasard par une transformation du catalogue.
-    Prédiction par le stabilisateur (le maillon est-il dans Stabilizer(solution_set)?) vs vérité (ensemble des
-    solutions recalculé). Retourne exactitude de la prédiction et taux de bris."""
+    """Chain of admissible transformations; one link is replaced at random by a transformation from the catalogue.
+    Prediction by the stabiliser (is the link in Stabilizer(solution_set)?) vs truth (recomputed solution
+    set). Returns the accuracy of the prediction and the break rate."""
     import random
     from core.invariant_algebra import ALG_INVARIANTS, algebra_samples, algebra_transformations, build_index, solution_set
     rng = random.Random(seed); ix = build_index("algebra"); stab = ix.stabilizer("solution_set")
@@ -250,7 +250,7 @@ def algebra_chain_perturbation(trials=200, seed=0, chain_len=4):
         i = rng.randrange(chain_len); repl = rng.choice(G); chain[i] = repl
         pred = all(t.name in stab for t in chain) if all(t.name in byname for t in chain) else None
         known = repl.name in {t.name for t in ix.transformations}
-        if not known:                                   # transformation hors index (paramètre jamais vu)
+        if not known:                                   # transformation outside the index (parameter never seen)
             ood += 1; pred = _generalize(repl.name, stab)
         y = eq
         for t in chain: y = t(y)
@@ -260,8 +260,8 @@ def algebra_chain_perturbation(trials=200, seed=0, chain_len=4):
 
 
 def _generalize(name, stab):
-    """Généralisation par FAMILLE de transformation (nom sans paramètre) : admissible si la famille l'est et que le
-    paramètre n'est pas 0 (seule exception apprise : MultiplyBothSides(0))."""
+    """Generalisation by transformation FAMILY (name without parameter): admissible if the family is and the
+    parameter is not 0 (only learned exception: MultiplyBothSides(0))."""
     fam = name.split("(")[0]; arg = name[len(fam):]
     fam_ok = any(t.split("(")[0] == fam for t in stab.transformations)
     return fam_ok and arg not in ("(0)", "(x)")

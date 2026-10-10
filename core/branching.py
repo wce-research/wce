@@ -1,8 +1,8 @@
-"""Branches à état partagé : BaseModelState + BranchDelta, copy-on-write au niveau tenseur.
+"""Shared-state branches: BaseModelState + BranchDelta, copy-on-write at the tensor level.
 
-Une branche partage les tenseurs de la base tant qu'ils ne sont pas réassignés.
-Toutes les specs du modèle remplacent les tenseurs (jamais de mutation en place),
-donc la première écriture produit naturellement une copie locale.
+A branch shares the tensors of the base as long as they are not reassigned.
+All the specs of the model replace the tensors (never an in-place mutation),
+so the first write naturally produces a local copy.
 """
 from __future__ import annotations
 
@@ -16,18 +16,18 @@ from core.transform_graph import TransformGraph, TransformNode
 
 def _shallow_module(module):
     clone = copy.copy(module)
-    clone.slow = dict(module.slow)          # nouveau dict, mêmes tenseurs
+    clone.slow = dict(module.slow)          # new dict, same tensors
     return clone
 
 
 def shared_branch(base: ModelState) -> ModelState:
-    """Crée une vue branchée : seuls les conteneurs sont neufs, les tenseurs sont partagés."""
+    """Creates a branched view: only the containers are new, the tensors are shared."""
     branch = ModelState.__new__(ModelState)
     branch.input_dim = base.input_dim
     branch.modules = {name: _shallow_module(m) for name, m in base.modules.items()}
     branch.fast_parameters = {m: dict(d) for m, d in base.fast_parameters.items()}
     branch.connectivity = {k: copy.copy(c) for k, c in base.connectivity.items()}
-    branch.snapshots = dict(base.snapshots)                    # snapshots immuables : partagés
+    branch.snapshots = dict(base.snapshots)                    # immutable snapshots: shared
     branch.metadata = {k: (dict(v) if isinstance(v, dict) else v) for k, v in base.metadata.items()}
     branch.counters = dict(base.counters)
     branch.transform_graph = TransformGraph(TransformNode(base.transform_graph.current.name,
@@ -47,7 +47,7 @@ def _bytes(t): return t.numel() * t.element_size()
 
 
 def branch_memory(branch: ModelState, base: ModelState):
-    """Mémoire logique : octets propres à la branche vs octets d'une copie complète."""
+    """Logical memory: bytes owned by the branch vs bytes of a full copy."""
     shared_ptrs = {t.data_ptr() for t in _tensors(base)}
     total = owned = 0
     seen = set()
@@ -61,7 +61,7 @@ def branch_memory(branch: ModelState, base: ModelState):
 
 
 def delta_summary(branch: ModelState, base: ModelState):
-    """BranchDelta explicite : ce qui diffère réellement de la base."""
+    """Explicit BranchDelta: what actually differs from the base."""
     changed = {}
     for name, module in branch.modules.items():
         if name not in base.modules: changed[name] = "new_module"; continue
@@ -76,7 +76,7 @@ def delta_summary(branch: ModelState, base: ModelState):
 
 
 def adopt(base: ModelState, branch: ModelState):
-    """La branche sélectionnée devient l'état actif ; l'historique est rejoué dans le graphe de base."""
+    """The selected branch becomes the active state; the history is replayed in the base graph."""
     path = []
     node = branch.transform_graph.current
     while node.parent is not None: path.append(node); node = node.parent
@@ -98,13 +98,13 @@ def tensors_close(a: ModelState, b: ModelState, tolerance=1e-6):
                for n in a.modules for k in a.modules[n].slow)
 
 
-# ================================================================ snapshots incrémentaux
+# ================================================================ incremental snapshots
 
 class IncrementalSnapshot:
-    """Snapshot = références aux tenseurs (copy-on-write : jamais mutés en place).
+    """Snapshot = references to the tensors (copy-on-write: never mutated in place).
 
-    Seuls les tenseurs absents du snapshot parent comptent comme mémoire propre :
-    base snapshot + delta snapshots, sans copie complète par tâche.
+    Only the tensors absent from the parent snapshot count as owned memory:
+    base snapshot + delta snapshots, without a full copy per task.
     """
 
     def __init__(self, name, state: ModelState, parent: 'IncrementalSnapshot' = None):

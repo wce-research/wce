@@ -1,13 +1,13 @@
-"""Extensions de l'environnement indépendant (toujours SANS aucun import WCE).
+"""Extensions of the independent environment (still WITHOUT any WCE import).
 
-- troisième domaine : inventaire (objets rangés dans des listes nommées) ;
-- polysémie réelle : « range » = poser (physique) / affecter à une liste (inventaire) ;
-- construction verbale « contient » (rôles inversés) ;
-- phrases à 2-3 clauses (conjonctions, commandes enchaînées) ;
-- préfixe « re- » (repose, replace) pour la composition lexicale ;
-- synonymes tenus à l'écart PRÉSENTS dans les observations textuelles (jamais dans les légendes),
-  donc apprenables par ancrage — et seulement par ancrage ;
-- graines séparées : monde, langue, partitions.
+- third domain: inventory (objects stored in named lists);
+- real polysemy: "range" = place (physical) / assign to a list (inventory);
+- verbal construction "contient" (inverted roles);
+- sentences with 2-3 clauses (conjunctions, chained commands);
+- prefix "re-" (repose, replace) for lexical composition;
+- held-out synonyms PRESENT in the textual observations (never in the captions),
+  hence learnable by grounding — and only by grounding;
+- separate seeds: world, language, splits.
 """
 from __future__ import annotations
 
@@ -28,11 +28,11 @@ EXT_HELD_OUT = set(HELD_OUT_FORMS) | {"bouquin"}
 INVENTORY_DB = Source("inventory_db", 0.97, 0.6, "structured")
 SOURCE_BY_NAME.setdefault("inventory_db", INVENTORY_DB)
 TEXT_SOURCES = tuple(s for s in SOURCES if s.modality == "text")
-GOLD_MEANING = {w: f"type:{k}" for k, forms in EXT_LEX.items() for w, _ in forms}     # évaluation seulement
+GOLD_MEANING = {w: f"type:{k}" for k, forms in EXT_LEX.items() for w, _ in forms}     # evaluation only
 
 
 class ExtWorld(WorldTruth):
-    """Monde physique + inventaire. Les objets d'inventaire ne sont pas physiques."""
+    """Physical world + inventory. Inventory objects are not physical."""
 
     @property
     def movables(self): return [o for o, v in self.objects.items() if o not in SUPPORT_HEIGHT and v.kind not in ITEM_KINDS + ("list",)]
@@ -89,12 +89,12 @@ class ExtLanguageGenerator(LanguageGenerator):
             subj, _ = self.np(world, key[1]); tgt, _ = self.np(world, value[1])
             self.meanings["contient"] = "rel:in"
             verb = "contenait" if key[2] == 0 else "contient"
-            return f"{tgt} {verb} {subj}"                               # rôles inversés : cible en tête
+            return f"{tgt} {verb} {subj}"                               # inverted roles: target first
         return super().describe(world, key, value)
 
 
 def emit_observations_ext(world: ExtWorld, seed=0, lang_seed=None) -> List[Observation]:
-    """Observations physiques + inventaire ; les textes peuvent contenir des synonymes jamais légendés."""
+    """Physical observations + inventory; the texts may contain never-captioned synonyms."""
     lang_seed = seed if lang_seed is None else lang_seed
     rng = random.Random(seed * 7919 + world.seed)
     gen = ExtLanguageGenerator(seed=lang_seed * 31 + world.seed, allow_held_out=True)
@@ -124,11 +124,11 @@ def emit_observations_ext(world: ExtWorld, seed=0, lang_seed=None) -> List[Obser
     return obs
 
 
-# ================================================================ légendes étendues
+# ================================================================ extended captions
 
 def captions_ext(n, seed=0, inventory=True, polysemy=True):
-    """Légendes physiques + inventaire + « range » dans ses deux sens + « contient »."""
-    if not inventory and not polysemy: return captions(n, seed=seed)       # rien d'étendu à produire
+    """Physical captions + inventory + "range" in its two senses + "contient"."""
+    if not inventory and not polysemy: return captions(n, seed=seed)       # nothing extended to produce
     base = captions(int(n * 0.6), seed=seed)
     rng = random.Random(seed + 4242)
     out = list(base)
@@ -159,7 +159,7 @@ def captions_ext(n, seed=0, inventory=True, polysemy=True):
     return out
 
 
-# ================================================================ benchmark étendu
+# ================================================================ extended benchmark
 
 def _gold_claim(world, obs, key, claimed):
     v = knowable(world, obs, key)
@@ -194,10 +194,10 @@ def extended_items(world: ExtWorld, observations, seed=0) -> List[Item]:
             if s != "ok": return s
         return gold
 
-    def gm(gold, *objs):                  # métadonnées pour le réétiquetage (attendu avant filtrage + références)
+    def gm(gold, *objs):                  # metadata for relabelling (expected answer before gating + references)
         return {"ungated": gold, "refs": tuple(objs)}
 
-    # ---- inventaire (troisième domaine) et transfert de « X est dans Y »
+    # ---- inventory (third domain) and transfer of "X est dans Y"
     for o in world.items:
         v = knowable(world, observations, ("loc", o, "now"))
         subj, _ = gen.np(world, o)
@@ -209,7 +209,7 @@ def extended_items(world: ExtWorld, observations, seed=0) -> List[Item]:
         target = rng.choice(world.lists)
         add(f"range {subj} dans {gen.np(world, target)[0]}", gate(_effect([(o, "in", target)]), o), "command", "polysemy",
             domain="inventory", sense="act:assign", clauses=1, item_ref=True, **gm(_effect([(o, "in", target)]), o))
-    # ---- polysémie côté physique
+    # ---- polysemy on the physical side
     box = next((b for b in world.movables if world.objects[b].kind == "box"), None)
     phys = [m for m in world.movables if m != box]
     if phys:
@@ -217,12 +217,12 @@ def extended_items(world: ExtWorld, observations, seed=0) -> List[Item]:
         rel, tgt = ("in", box) if box else ("on", "shelf")
         add(f"range {gen.np(world, p)[0]} {gen._join(gen.rel(rel), gen.np(world, tgt)[0])}", gate(_effect([(p, rel, tgt)]), p, tgt),
             "command", "polysemy", domain="physical", sense="act:place", clauses=1, **gm(_effect([(p, rel, tgt)]), p, tgt))
-        # composition lexicale : préfixe re-
+        # lexical composition: re- prefix
         verb = rng.choice(["repose", "replace"])
         gen.meanings[verb] = "act:place"
         add(f"{verb} {gen.np(world, p)[0]} sur la table", gate(_effect([(p, "on", "table")]), p), "command", "composition",
             domain="physical", clauses=1, **gm(_effect([(p, "on", "table")]), p))
-    # ---- phrases longues : 2 et 3 clauses
+    # ---- long sentences: 2 and 3 clauses
     objs = world.movables
     if len(objs) >= 3:
         parts, golds, refs = [], [], []
@@ -245,7 +245,7 @@ def extended_items(world: ExtWorld, observations, seed=0) -> List[Item]:
 
 
 def build_dataset_ext(n_worlds=20, world_seed=0, lang_seed=None, obs_seed=None):
-    """Graines séparées : mondes (world_seed), langue des observations (lang_seed), bruit (obs_seed)."""
+    """Separate seeds: worlds (world_seed), language of the observations (lang_seed), noise (obs_seed)."""
     lang_seed = world_seed + 100 if lang_seed is None else lang_seed
     obs_seed = world_seed if obs_seed is None else obs_seed
     data = []
@@ -260,7 +260,7 @@ def build_dataset_ext(n_worlds=20, world_seed=0, lang_seed=None, obs_seed=None):
 
 
 def split_worlds(data, seed=0, fractions=(0.4, 0.15, 0.15)):
-    """Partition aléatoire (graine) des mondes : train / calibration / validation / test."""
+    """Random split (seed) of the worlds: train / calibration / validation / test."""
     idx = list(range(len(data))); random.Random(seed).shuffle(idx)
     n = len(idx); a = int(fractions[0] * n); b = a + int(fractions[1] * n); c = b + int(fractions[2] * n)
     parts = {"train": idx[:a], "calibration": idx[a:b], "validation": idx[b:c], "test": idx[c:]}

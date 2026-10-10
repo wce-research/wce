@@ -1,4 +1,4 @@
-"""Benchmark de référence : résolution d'entités à travers le discours, métriques, apprentissage actif, distillation."""
+"""Reference benchmark: entity resolution across discourse, metrics, active learning, distillation."""
 from __future__ import annotations
 
 import math
@@ -22,7 +22,7 @@ _LEXICON_CACHE = {}
 
 
 def lexicon_agent(seed=0):
-    """Lexique appris (légendes physiques, inventaire, famille) — aucune connaissance des épisodes."""
+    """Learned lexicon (physical captions, inventory, family) — no knowledge of the episodes."""
     if seed not in _LEXICON_CACHE:
         a = GroundedAgent(GroundedConfig()); a.learn_captions(captions_ext(500, seed=seed + 1) + family_captions(150, seed=seed))
         _LEXICON_CACHE[seed] = a
@@ -30,7 +30,7 @@ def lexicon_agent(seed=0):
 
 
 def _align(turn_mentions, gold):
-    """Aligne les mentions de l'agent sur les mentions de référence (ordre + mot tête)."""
+    """Aligns the agent's mentions with the reference mentions (order + head word)."""
     out, used = [], set()
     for g in gold:
         m = next((x for x in turn_mentions if x.id not in used and (x.head == g["head"] or x.head.rstrip("s") == g["head"])), None)
@@ -67,7 +67,7 @@ def run_episode(episode, lex, clarify=True, active_entity=False, student=None):
         r["final"] = res.mention_resolution(r["mention"]) if r["mention"] else AMBIGUOUS
         r["category"], r["domain"] = episode.category, episode.domain
         if active_entity and r["gold"] == AMBIGUOUS and r["intended"] and r["final"] not in SPECIAL:
-            r["gold"] = r["intended"]           # l'information obtenue a rendu l'entité visée identifiable : on juge contre elle
+            r["gold"] = r["intended"]           # the information obtained made the intended entity identifiable: we judge against it
     return rows, res, sim
 
 
@@ -131,7 +131,7 @@ def long_discourse(lengths=(5, 10, 20, 50), n=12, seed=0):
     return out
 
 
-# ================================================================ distillation du résolveur
+# ================================================================ resolver distillation
 
 FEATURES = ("type_match", "attr_match", "attr_unknown", "relation_ok", "recency", "focus", "gender_match", "definite", "indefinite", "other")
 
@@ -147,8 +147,8 @@ def _features(res, mm, e):
 
 
 def distill_resolver(seed=0, n_per_category=10):
-    """Enseignant : résolveur WCE (contraintes jointes). Élève : petit classement de candidats.
-    L'élève propose le meilleur candidat ; WCE vérifie ses contraintes (1 contrôle) ; en cas d'échec, l'enseignant reprend."""
+    """Teacher: WCE resolver (joint constraints). Student: small candidate ranker.
+    The student proposes the best candidate; WCE verifies its constraints (1 check); on failure, the teacher takes over."""
     lex = lexicon_agent(seed)
     train_eps = reference_benchmark(n_per_category, seed + 50)
     test_eps = reference_benchmark(n_per_category, seed + 60)
@@ -187,10 +187,10 @@ def distill_resolver(seed=0, n_per_category=10):
             "student_parameters": sum(p.numel() for p in net.parameters())}
 
 
-# ================================================================ apprentissage actif lexical
+# ================================================================ lexical active learning
 
 def _verdicts(agent, toks, ob, word):
-    """Verdicts de l'ancrage (sens -> soutenu/réfuté/neutre) pour une observation, sans mise à jour de la mémoire."""
+    """Grounding verdicts (meaning -> supported/refuted/neutral) for one observation, without updating the memory."""
     i = toks.index(word)
     from core.independent_agent import token_class as tc
     cands = sorted({m for m in agent.lex.lexicon().values() if tc(m) in ("N", "C", "R")})
@@ -203,7 +203,7 @@ def _verdicts(agent, toks, ob, word):
 
 
 def observation_pool(seed=0, n_worlds=30, words=("brique", "caisse", "boule", "rayon", "plancher", "bouquin")):
-    """Observations textuelles contenant les mots cibles, avec leurs verdicts pré-calculés (monde ingéré sans ces textes)."""
+    """Textual observations containing the target words, with their precomputed verdicts (world ingested without these texts)."""
     from core.grounded_benchmark import seed_data
     data, splits, caps = seed_data(seed, n_worlds)
     agent = GroundedAgent(GroundedConfig()); agent.learn_captions(caps); agent.warm_up_sources(splits["train"][:4])
@@ -218,7 +218,7 @@ def observation_pool(seed=0, n_worlds=30, words=("brique", "caisse", "boule", "r
                 if w in toks:
                     v, weight = _verdicts(agent, toks, o, w)
                     pool.append({"word": w, "world": wi, "source": o.source, "verdicts": v, "weight": weight, "text": o.text,
-                                 "types": {f"type:{k}" for k in agent.belief.inventory.values()}})      # public avant observation
+                                 "types": {f"type:{k}" for k in agent.belief.inventory.values()}})      # public before observation
     return pool, agent
 
 
@@ -239,7 +239,7 @@ def _entropy(scores):
 
 
 def active_vs_passive(seed=0, budget=12, pool=None):
-    """Expositions nécessaires pour ancrer chaque mot : flux passif (ordre d'arrivée) vs sélection active (gain d'information)."""
+    """Exposures needed to ground each word: passive stream (arrival order) vs active selection (information gain)."""
     from core.independent_world_ext import GOLD_MEANING
     pool, agent = pool or observation_pool(seed)
     out = {}
@@ -272,7 +272,7 @@ def active_vs_passive(seed=0, budget=12, pool=None):
 
 
 def active_entity_learning(seed=0, n_per_category=14):
-    """Désambiguïsation par demandes d'information choisies au gain d'information vs aucune demande."""
+    """Disambiguation by information requests chosen by information gain vs no request."""
     base, _ = run_benchmark(n_per_category, seed, clarify=False, active_entity=False)
     active, _ = run_benchmark(n_per_category, seed, clarify=False, active_entity=True)
     return {"passive": {k: base[k] for k in ("accuracy", "coverage", "false_identity_commitment", "questions_asked")},

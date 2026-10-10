@@ -1,12 +1,12 @@
 """
-Déformations pour WCE.
+Deformations for WCE.
 
-Ce module fournit des abstractions pour représenter les déformations géométriques
-qui transforment les formes tout en préservant (ou modifiant de manière contrôlée)
-leurs propriétés topologiques.
+This module provides abstractions to represent the geometric deformations
+that transform shapes while preserving (or modifying in a controlled way)
+their topological properties.
 
-Une déformation est une transformation qui peut être appliquée à une géométrie
-ou à un ensemble de points.
+A deformation is a transformation that can be applied to a geometry
+or to a set of points.
 """
 
 from abc import ABC, abstractmethod
@@ -20,69 +20,69 @@ from core.topology import TopologyPreservation, TopologySignature
 @dataclass(frozen=True)
 class Deformation(ABC):
     """
-    Abstraction de base pour une déformation géométrique.
+    Base abstraction for a geometric deformation.
     
-    Une déformation est une transformation paramétrique qui peut être appliquée
-    à une forme géométrique.
+    A deformation is a parametric transformation that can be applied
+    to a geometric shape.
     """
     
     @abstractmethod
     def get_transform(self) -> Transform2D:
         """
-        Retourne la transformation associée à cette déformation.
+        Returns the transformation associated with this deformation.
         
-        Cette transformation peut être appliquée aux points pour obtenir
-        la forme déformée.
+        This transformation can be applied to the points to obtain
+        the deformed shape.
         """
         pass
     
     @abstractmethod
     def apply_to_point(self, x: float, y: float) -> tuple[float, float]:
         """
-        Applique la déformation à un point.
+        Applies the deformation to a point.
         
-        C'est équivalent à get_transform().transform_point(x, y), mais peut être
-        surchargé pour des déformations plus complexes.
+        This is equivalent to get_transform().transform_point(x, y), but can be
+        overridden for more complex deformations.
         """
         pass
     
     @property
     @abstractmethod
     def name(self) -> str:
-        """Nom de la déformation."""
+        """Name of the deformation."""
         pass
     
     @property
     @abstractmethod
     def topology_preservation(self) -> TopologyPreservation:
-        """Quelles propriétés topologiques sont préservées par cette déformation."""
+        """Which topological properties are preserved by this deformation."""
         pass
     
     def applies_to_geometry(self, topology: TopologySignature) -> bool:
         """
-        Indique si cette déformation peut être appliquée à une géométrie avec
-        une signature topologique donnée.
+        Indicates whether this deformation can be applied to a geometry with
+        a given topological signature.
         
-        Par défaut, les déformations qui préservent la connectivité peuvent être
-        appliquées à n'importe quelle géométrie.
+        By default, deformations that preserve connectivity can be
+        applied to any geometry.
         """
         if not self.topology_preservation.preserves_connected_components:
-            # Si la déformation ne préserve pas les composantes connexes,
-            # elle peut créer des discontinuités, donc il faut être prudent
-            return True  # Par défaut, on autorise
+            # If the deformation does not preserve the connected components,
+            # it can create discontinuities, so caution is required
+            return True  # By default, we allow it
         return True
 
 
 @dataclass(frozen=True)
 class StretchDeformation(Deformation):
     """
-    Déformation d'étirement (scale non-uniforme).
+    Stretch deformation (non-uniform scale).
     
-    Étire la forme différemment dans les directions x et y.
+    Stretches the shape differently in the x and y directions.
     
-    Attributs :
-        stretch_x : Facteur d'étirement dans la direction x (1.0 = pas d'étirement)
-        stretch_y : Facteur d'étirement dans la direction y (1.0 = pas d'étirement)
+    Attributes:
+        stretch_x: Stretch factor in the x direction (1.0 = no stretch)
+        stretch_y: Stretch factor in the y direction (1.0 = no stretch)
     """
     stretch_x: float = 1.0
     stretch_y: float = 1.0
@@ -93,11 +93,11 @@ class StretchDeformation(Deformation):
     
     @property
     def topology_preservation(self) -> TopologyPreservation:
-        """Calcule la préservation topologique en fonction des étirements."""
-        # Le stretch préserve la connectivité et les trous
-        # mais peut inverser l'orientation si les étirements sont négatifs
+        """Computes the topological preservation as a function of the stretches."""
+        # The stretch preserves connectivity and holes
+        # but can reverse the orientation if the stretches are negative
         if self.stretch_x * self.stretch_y < 0:
-            # Étirements opposés : inverse l'orientation
+            # Opposite stretches: reverses the orientation
             return TopologyPreservation(
                 preserves_connected_components=True,
                 preserves_holes=True,
@@ -105,15 +105,15 @@ class StretchDeformation(Deformation):
                 preserves_orientation=False,
             )
         else:
-            # Étirements dans la même direction : préserve l'orientation
+            # Stretches in the same direction: preserves the orientation
             return TopologyPreservation.full()
     
     def get_transform(self) -> Transform2D:
-        """Retourne la transformation de scale."""
+        """Returns the scale transformation."""
         return Transform2D.scale(self.stretch_x, self.stretch_y)
     
     def apply_to_point(self, x: float, y: float) -> tuple[float, float]:
-        """Applique l'étirement à un point."""
+        """Applies the stretch to a point."""
         return (x * self.stretch_x, y * self.stretch_y)
 
 
@@ -123,7 +123,7 @@ class StretchDeformation(Deformation):
 @dataclass(frozen=True)
 class IdentityDeformation(Deformation):
     """
-    Déformation identité (ne change rien).
+    Identity deformation (changes nothing).
     """
     
     @property
@@ -141,14 +141,14 @@ class IdentityDeformation(Deformation):
         return (x, y)
 
 
-# Déformations composites
+# Composite deformations
 
 def compose_deformations(*deformations: Deformation) -> Deformation:
     """
-    Combine plusieurs déformations en une seule.
+    Combines several deformations into a single one.
     
-    L'ordre d'application est : première déformation, puis deuxième, etc.
-    (compose_deformations(d1, d2, d3) applique d1, puis d2, puis d3)
+    The order of application is: first deformation, then second, etc.
+    (compose_deformations(d1, d2, d3) applies d1, then d2, then d3)
     """
     if not deformations:
         return IdentityDeformation()
@@ -156,16 +156,16 @@ def compose_deformations(*deformations: Deformation) -> Deformation:
     if len(deformations) == 1:
         return deformations[0]
     
-    # Pour les déformations simples, nous pouvons créer une StretchDeformation
-    # ou ShearDeformation combinée
-    # Pour l'instant, nous créons une CompositeDeformation
+    # For simple deformations, we can create a combined StretchDeformation
+    # or ShearDeformation
+    # For now, we create a CompositeDeformation
     return CompositeDeformation(deformations)
 
 
 @dataclass(frozen=True)
 class CompositeDeformation(Deformation):
     """
-    Déformation composite (combinaison de plusieurs déformations).
+    Composite deformation (combination of several deformations).
     """
     components: tuple[Deformation, ...] = ()
     
@@ -176,14 +176,14 @@ class CompositeDeformation(Deformation):
     @property
     def topology_preservation(self) -> TopologyPreservation:
         """
-        La préservation topologique est l'intersection des préservations
-        de toutes les composantes.
+        The topological preservation is the intersection of the preservations
+        of all the components.
         """
-        # Commencer avec tout préservé
+        # Start with everything preserved
         result = TopologyPreservation.full()
         
         for d in self.components:
-            # Combiner : un attribut n'est préservé que si toutes les composantes le préservent
+            # Combine: an attribute is preserved only if all the components preserve it
             result = TopologyPreservation(
                 preserves_connected_components=(
                     result.preserves_connected_components and d.topology_preservation.preserves_connected_components
@@ -202,23 +202,23 @@ class CompositeDeformation(Deformation):
         return result
     
     def get_transform(self) -> Transform2D:
-        """Retourne la transformation composée."""
+        """Returns the composed transformation."""
         result = Transform2D.identity()
         for d in reversed(self.components):
-            # Composer dans l'ordre : première déformation appliquée en premier
-            # Donc nous devons composer dans l'ordre inverse
+            # Compose in order: first deformation applied first
+            # So we must compose in reverse order
             result = result.compose(d.get_transform())
         return result
     
     def apply_to_point(self, x: float, y: float) -> tuple[float, float]:
-        """Applique toutes les déformations dans l'ordre."""
+        """Applies all the deformations in order."""
         result_x, result_y = x, y
         for d in self.components:
             result_x, result_y = d.apply_to_point(result_x, result_y)
         return (result_x, result_y)
 
 
-# Déformations de base pré-définies
+# Predefined basic deformations
 
 STRETCH_X2 = StretchDeformation(stretch_x=2.0, stretch_y=1.0)
 STRETCH_Y2 = StretchDeformation(stretch_x=1.0, stretch_y=2.0)
@@ -226,23 +226,23 @@ STRETCH_X05_Y2 = StretchDeformation(stretch_x=0.5, stretch_y=2.0)
 IDENTITY_DEFORMATION = IdentityDeformation()
 
 
-# Exemples de déformations qui changent la géométrie
+# Examples of deformations that change the geometry
 
 def circle_to_ellipse(stretch_x: float, stretch_y: float) -> StretchDeformation:
     """
-    Crée une déformation qui transforme un cercle en une ellipse.
+    Creates a deformation that transforms a circle into an ellipse.
     
-    Un cercle a une topologie simple (disque : connected_components=1, holes=0).
-    Une ellipse a la même topologie.
+    A circle has a simple topology (disc: connected_components=1, holes=0).
+    An ellipse has the same topology.
     """
     return StretchDeformation(stretch_x=stretch_x, stretch_y=stretch_y)
 
 
 def square_to_rectangle(width: float, height: float) -> StretchDeformation:
     """
-    Crée une déformation qui transforme un carré en un rectangle.
+    Creates a deformation that transforms a square into a rectangle.
     
-    Les deux ont la même topologie.
+    Both have the same topology.
     """
-    # Supposons que le carré a une taille de 1x1
+    # Assume the square has a size of 1x1
     return StretchDeformation(stretch_x=width, stretch_y=height)

@@ -1,12 +1,12 @@
-"""Banc TEMPOREL indépendant (bibliothèque standard seulement ; aucun composant de WCE).
+"""Independent TEMPORAL bench (standard library only; no WCE component).
 
-Épisodes : entités avec position (rapide), hauteur (liée aux supports, peut « monter » sans changer de relation
-nominale), propriétaire (lent), couleur (statique). Trajectoires vraies sur T pas : événements observés, événements
-NON observés, faux événements rapportés, rapports RETARDÉS (événement au temps t, rapporté plus tard), vieux
-témoignages, sources contradictoires au même instant, plusieurs événements.
-Questions : présent, passé, « avant de tomber », « encore sur la table ? ».
-Référence : filtre / lisseur IDÉAL codé ici en Python pur, avec les VRAIS taux et les VRAIES fiabilités ;
-attendu = valeur vraie si P ≥ 0,9 ; « ? » sinon ; « conflit » si deux sources crédibles se contredisent au même instant.
+Episodes: entities with position (fast), height (tied to the supports, can "rise" without changing nominal
+relation), owner (slow), colour (static). True trajectories over T steps: observed events, UNOBSERVED
+events, false reported events, DELAYED reports (event at time t, reported later), old
+testimonies, contradictory sources at the same instant, several events.
+Questions: present, past, "before falling", "still on the table?".
+Reference: IDEAL filter / smoother coded here in pure Python, with the TRUE rates and the TRUE reliabilities;
+expected = true value if P ≥ 0.9; "?" otherwise; "conflit" if two credible sources contradict each other at the same instant.
 """
 from __future__ import annotations
 
@@ -44,7 +44,7 @@ def episode(seed, T=30, n_entities=3):
         for kind in ("loc", "owner", "color"):
             traj[kind], ev = _trajectory(rng, kind, T)
             traj[kind + "_events"] = ev
-        # hauteur : déterminée par le support, mais peut « monter » (+0,5) sans changer de relation nominale
+        # height: determined by the support, but can "rise" (+0.5) without changing nominal relation
         h, hev = [], []
         bump = 0.0
         for t in range(T + 1):
@@ -59,23 +59,23 @@ def episode(seed, T=30, n_entities=3):
                     if rng.random() >= rate: continue
                     truth = traj[kind][t]
                     v = truth if rng.random() < r else rng.choice([x for x in DOMAINS[kind] if x != truth])
-                    delay = rng.choice([0, 0, 0, 2, 5]) if s in ("doc", "witness") else 0       # rapport retardé
+                    delay = rng.choice([0, 0, 0, 2, 5]) if s in ("doc", "witness") else 0       # delayed report
                     reports.append({"entity": e, "key": kind, "t": t, "value": v, "source": s, "kind": "observation",
                                     "ingested_at": min(T, t + delay)})
         for kind in ("loc", "owner"):
             for t, v in traj[kind + "_events"]:
                 for s, r in EVENT_SOURCES.items():
-                    if rng.random() >= 0.35: continue                                           # beaucoup d'événements NON observés
+                    if rng.random() >= 0.35: continue                                           # many UNOBSERVED events
                     tgt = v if rng.random() < r else rng.choice([x for x in DOMAINS[kind] if x != v])
                     reports.append({"entity": e, "key": kind, "t": t, "value": tgt, "source": s, "kind": "event",
                                     "ingested_at": min(T, t + rng.choice([0, 0, 3]))})
-            for _ in range(rng.randint(0, 2)):                                                 # faux événements (sources faibles)
+            for _ in range(rng.randint(0, 2)):                                                 # false events (weak sources)
                 t = rng.randint(1, T)
                 reports.append({"entity": e, "key": kind, "t": t, "value": rng.choice(DOMAINS[kind]), "source": "gossip",
                                 "kind": "event", "ingested_at": t})
-        # conflit contrôlé au même instant entre deux sources crédibles
+        # controlled conflict at the same instant between two credible sources
         tc = rng.randint(5, T - 5); truth = traj["loc"][tc]; other = rng.choice([x for x in PLACES if x != truth])
-        right, wrong = rng.sample(["camera", "doc"], 2)                                         # la source fautive est tirée
+        right, wrong = rng.sample(["camera", "doc"], 2)                                         # the faulty source is drawn at random
         reports.append({"entity": e, "key": "loc", "t": tc, "value": truth, "source": right, "kind": "observation", "ingested_at": tc})
         reports.append({"entity": e, "key": "loc", "t": tc, "value": other, "source": wrong, "kind": "observation", "ingested_at": tc})
         ents[e]["conflict_t"] = tc
@@ -92,12 +92,12 @@ def episode(seed, T=30, n_entities=3):
         questions.append({"entity": e, "key": "loc", "type": "past", "t": traj["conflict_t"], "truth": traj["loc"][traj["conflict_t"]]})
     ep = {"seed": seed, "T": T, "reports": reports, "questions": questions,
           "train_trajectories": [(k, ents[e][k]) for e in ents for k in ("loc", "height", "owner", "color")],
-          "truth": {e: {k: ents[e][k] for k in ("loc", "height", "owner", "color")} for e in ents}}     # entraînement / score seulement
+          "truth": {e: {k: ents[e][k] for k in ("loc", "height", "owner", "color")} for e in ents}}     # training / scoring only
     for q in questions: q["expected"] = _ideal_expected(ep, q)
     return ep
 
 
-# ================================================================ référence idéale (Python pur, vrais paramètres)
+# ================================================================ ideal reference (pure Python, true parameters)
 
 def _ideal_post(ep, entity, key, T_upto, smooth_at=None):
     dom = DOMAINS[key]; K = len(dom); lam = TRUE_HAZARD[key] if key != "height" else 0.1
@@ -135,8 +135,8 @@ BUMP_TOGGLE = 0.03
 
 
 def _ideal_height(ep, entity, T_upto, smooth_at=None):
-    """Hauteur IDÉALE : filtre exact sur l'état joint (position × surélévation) ; la hauteur est une fonction de cet
-    état (règle publique du monde), observée par les rapports de hauteur ; la position par ses propres rapports."""
+    """IDEAL height: exact filter on the joint state (position × elevation); the height is a function of this
+    state (public rule of the world), observed through the height reports; the position through its own reports."""
     states = [(l, b) for l in PLACES for b in (0, 1)]; S = len(states)
     hval = [min(HEIGHTS[l] + 0.5 * b, 2.5) for l, b in states]
     p_stay = math.exp(-TRUE_HAZARD["loc"]); K = len(PLACES)
@@ -161,7 +161,7 @@ def _ideal_height(ep, entity, T_upto, smooth_at=None):
                 pb = (1 - BUMP_TOGGLE) if b == b2 else BUMP_TOGGLE
                 M[i][j] = pl * pb
         return M
-    prior0 = [(1.0 / K if b == 0 else 0.0) for l, b in states]                  # vrai processus : sans surélévation à t = 0
+    prior0 = [(1.0 / K if b == 0 else 0.0) for l, b in states]                  # true process: without elevation at t = 0
     f = []; a = [p0 * x for p0, x in zip(prior0, lik(0))]; z = sum(a) or 1e-30; f.append([x / z for x in a])
     for t in range(1, T_upto + 1):
         M = trans(t); prev = f[-1]; L = lik(t)
@@ -209,4 +209,4 @@ def sealed_hash():
     return hashlib.sha256(json.dumps(sealed_episodes(), sort_keys=True, default=str).encode()).hexdigest()
 
 
-SEALED_SHA256 = "b5fb2ed3c671167d99a016d7efdeee184ef64d7725dd1b43fa53746ad571d62b"   # empreinte du lot scellé (figée à sa création, jamais évalué avant)
+SEALED_SHA256 = "b5fb2ed3c671167d99a016d7efdeee184ef64d7725dd1b43fa53746ad571d62b"   # fingerprint of the sealed set (frozen at its creation, never evaluated before)

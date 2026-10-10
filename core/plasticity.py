@@ -1,7 +1,7 @@
-"""Plasticité gouvernée : contrôleur explicite, configurations candidates, boucle d'apprentissage.
+"""Governed plasticity: explicit controller, candidate configurations, learning loop.
 
-Rien ici n'est quantique : ConfigurationAmplitude est une représentation classique
-de plusieurs configurations candidates pondérées, avant sélection ("collapse").
+Nothing here is quantum: ConfigurationAmplitude is a classical representation
+of several weighted candidate configurations, before selection ("collapse").
 """
 from __future__ import annotations
 
@@ -19,7 +19,7 @@ from core.model_state import (
 from core.reasoning import Condition, Goal, TruthValue
 
 
-# ---------------------------------------------------------------- tâches
+# ---------------------------------------------------------------- tasks
 
 def all_inputs(dim=10):
     idx = torch.arange(2 ** dim)
@@ -27,12 +27,12 @@ def all_inputs(dim=10):
 
 
 def task_a_labels(x):
-    """A : (b0 xor b1) or b2."""
+    """A: (b0 xor b1) or b2."""
     return (((x[:, 0] != x[:, 1]) | (x[:, 2] == 1))).long()
 
 
 def task_b_labels(x):
-    """B : majorité(b5..b9) xor b3 — dépend d'autres bits, en conflit avec A."""
+    """B: majority(b5..b9) xor b3 — depends on other bits, in conflict with A."""
     return ((x[:, 5:10].sum(dim=1) >= 3).long() ^ x[:, 3].long())
 
 
@@ -43,7 +43,7 @@ def task_split(labeler, dim=10, seed=0, train_fraction=0.7):
     return x[perm[:cut]], y[perm[:cut]], x[perm[cut:]], y[perm[cut:]]
 
 
-# ---------------------------------------------------------------- contexte
+# ---------------------------------------------------------------- context
 
 @dataclass(frozen=True)
 class ContextExists(Condition):
@@ -55,7 +55,7 @@ class ContextExists(Condition):
 
 @dataclass(frozen=True)
 class LoadContext(ModelTransformationSpec):
-    """Routage contextuel : active set + connectivité + fast weights ; slow weights intacts."""
+    """Contextual routing: active set + connectivity + fast weights; slow weights intact."""
     name: str = "load_context"
     context: str = ""
     invertible: bool = False
@@ -75,7 +75,7 @@ class LoadContext(ModelTransformationSpec):
 
 
 def save_context(model, name):
-    """Mémorise une configuration de routage (pas une modification du modèle)."""
+    """Stores a routing configuration (not a modification of the model)."""
     model.metadata.setdefault("contexts", {})[name] = {
         "active": set(model.active_modules), "connectivity": copy.deepcopy(model.connectivity),
         "fast": {m: {k: v.clone() for k, v in d.items()} for m, d in model.fast_parameters.items()}}
@@ -85,7 +85,7 @@ def save_context(model, name):
 # ---------------------------------------------------------------- construction
 
 def build_base_model(input_dim=10, width=24, seed=0):
-    """enc -> expert_a -> head actifs ; expert_b dormant (non connecté)."""
+    """enc -> expert_a -> head active; expert_b dormant (not connected)."""
     model = ModelState(input_dim, max_capacity=256)
     for spec in (
         AddModule(module="enc", input_dim=input_dim, output_dim=width, hidden=48, specialization="shared", seed=seed),
@@ -103,17 +103,17 @@ def build_base_model(input_dim=10, width=24, seed=0):
 
 
 def pretrain(model, x, y, steps=300, lr=0.02, seed=0):
-    """Apprentissage initial global (le seul non local, explicitement déclaré)."""
+    """Global initial training (the only non-local one, explicitly declared)."""
     return model.apply(AdaptWeights(name="pretrain", modules=tuple(sorted(model.active_modules)),
                                     inputs=x, targets=y, steps=steps, lr=lr, fast=False, local=False,
                                     seed=seed, provenance="initial_training"))
 
 
-# ---------------------------------------------------------------- hypothèses
+# ---------------------------------------------------------------- hypotheses
 
 @dataclass
 class ConfigurationAmplitude:
-    """Configuration candidate pondérée (représentation classique, 'quantum-inspired')."""
+    """Weighted candidate configuration (classical representation, 'quantum-inspired')."""
     label: str
     state: ModelState
     weight: float = 1.0
@@ -127,10 +127,10 @@ class ConfigurationAmplitude:
 
 
 class ModelHypothesisSet:
-    """Ensemble pondéré de configurations candidates (calcul classique, pas quantique).
+    """Weighted set of candidate configurations (classical computation, not quantum).
 
-    shared=True : chaque branche = base partagée + delta copy-on-write (core.branching).
-    shared=False : copie complète (mode historique, conservé pour vérification).
+    shared=True: each branch = shared base + copy-on-write delta (core.branching).
+    shared=False: full copy (historical mode, kept for verification).
     """
 
     def __init__(self, base: ModelState, shared=True):
@@ -159,13 +159,13 @@ class ModelHypothesisSet:
         return self.normalize()
 
     def reweight(self, evidence: Dict[str, float]):
-        """Multiplie chaque poids par une évidence positive puis renormalise (règle de Bayes)."""
+        """Multiplies each weight by a positive evidence then renormalizes (Bayes' rule)."""
         for b in self.valid(): b.weight *= max(evidence.get(b.label, 0.0), 0.0)
         return self._renormalize()
 
     def interfere(self, other: Dict[str, float]):
-        """Combinaison abstraite de deux distributions (produit normalisé).
-        Nom inspiré du quantique ; c'est une simple opération classique sur des poids positifs."""
+        """Abstract combination of two distributions (normalized product).
+        Quantum-inspired name; it is a plain classical operation on positive weights."""
         return self.reweight(other)
 
     def _renormalize(self):
@@ -182,7 +182,7 @@ class ModelHypothesisSet:
 
     @staticmethod
     def compatible(a: ConfigurationAmplitude, b: ConfigurationAmplitude, weight_tolerance=0.05, score_tolerance=0.02):
-        """Fusion permise seulement si structure, routes, activations, deltas et scores concordent."""
+        """Merge allowed only if structure, routes, activations, deltas and scores agree."""
         reasons = []
         sa, sb = a.state, b.state
         if sorted(sa.modules) != sorted(sb.modules): reasons.append("modules différents")
@@ -202,7 +202,7 @@ class ModelHypothesisSet:
 
     def merge_branches(self, a, b, label="merged", **tolerances):
         ok, reasons = self.compatible(a, b, **tolerances)
-        if not ok: raise ValueError("fusion refusée : " + ", ".join(reasons))
+        if not ok: raise ValueError("merge refused: " + ", ".join(reasons))
         merged = self.merge(a, b, label)
         merged.score = max(a.score or 0.0, b.score or 0.0)
         for x in (a, b): x.status = "merged"
@@ -219,9 +219,9 @@ class ModelHypothesisSet:
     def distribution(self): return {b.label: round(b.weight, 3) for b in self.branches}
 
     def select(self, keep="archive"):
-        """'Collapse' déterministe : la branche de plus haut score devient active."""
+        """Deterministic 'collapse': the highest-scoring branch becomes active."""
         candidates = self.valid()
-        if not candidates: raise ValueError("aucune configuration valide")
+        if not candidates: raise ValueError("no valid configuration")
         best = max(candidates, key=lambda b: (b.score, -b.state.active_parameters()))
         best.status = "selected"
         for b in self.branches:
@@ -232,15 +232,15 @@ class ModelHypothesisSet:
         return best
 
     def merge(self, a: ConfigurationAmplitude, b: ConfigurationAmplitude, label="merged"):
-        """Moyenne pondérée des slow weights de deux branches structurellement identiques."""
-        if sorted(a.state.modules) != sorted(b.state.modules): raise ValueError("structures incompatibles")
+        """Weighted average of the slow weights of two structurally identical branches."""
+        if sorted(a.state.modules) != sorted(b.state.modules): raise ValueError("incompatible structures")
         from core.branching import shared_branch
         merged = shared_branch(a.state) if self.shared else copy.deepcopy(a.state)
         total = (a.weight + b.weight) or 1.0
         for name, module in merged.modules.items():
             other = b.state.modules[name]
             for k in PARAM_NAMES:
-                if module.slow[k].shape != other.slow[k].shape: raise ValueError(f"formes incompatibles: {name}.{k}")
+                if module.slow[k].shape != other.slow[k].shape: raise ValueError(f"incompatible shapes: {name}.{k}")
                 module.slow[k] = (a.weight * module.slow[k] + b.weight * other.slow[k]) / total
         amp = ConfigurationAmplitude(label, merged, a.weight + b.weight)
         self.branches.append(amp)
@@ -253,7 +253,7 @@ class ModelHypothesisSet:
         return self
 
 
-# ---------------------------------------------------------------- contrôleur
+# ---------------------------------------------------------------- controller
 
 @dataclass
 class CandidatePlan:
@@ -264,7 +264,7 @@ class CandidatePlan:
 
 
 class PlasticityController:
-    """Contrôleur explicite (non neuronal) : faiblesse -> transformations candidates."""
+    """Explicit (non-neural) controller: weakness -> candidate transformations."""
 
     def __init__(self, threshold=0.85, interference_penalty=0.5, complexity_penalty=0.1,
                  prune_tolerance=0.02):
@@ -273,13 +273,13 @@ class PlasticityController:
         self.complexity_penalty = complexity_penalty
         self.prune_tolerance = prune_tolerance
 
-    # entrées : représentation, état, contexte WCE, but, signal de performance
+    # inputs: representation, state, WCE context, goal, performance signal
     def detect_weakness(self, model, goal: Goal, performance: float):
         threshold = getattr(goal.condition, "right", self.threshold) if goal and goal.condition else self.threshold
         return performance < threshold
 
     def region_for(self, model, domain):
-        """Région de plasticité : modules spécialisés pour le domaine de l'entrée."""
+        """Plasticity region: modules specialized for the domain of the input."""
         return tuple(sorted(n for n, m in model.modules.items() if m.specialization == domain))
 
     def protected_modules(self, model, domain):
@@ -322,15 +322,15 @@ class PlasticityController:
         return score
 
     def consolidate(self, model, domain):
-        """Seules les régions propres au domaine sont figées en slow weights."""
+        """Only the regions specific to the domain are frozen into slow weights."""
         exclusive = tuple(m for m in model.fast_parameters if m not in self.protected_modules(model, domain))
         if exclusive: model.apply(CommitFastWeights(modules=exclusive))
         return exclusive
 
     def prune(self, model, domain, x_val, y_val, x_train=None, y_train=None, step=8, recovery_steps=100):
-        """Réduit les modules du domaine tant que la précision reste dans la tolérance.
+        """Shrinks the modules of the domain as long as the accuracy stays within the tolerance.
 
-        Chaque essai = PruneUnits + court réajustement local (slow weights du seul module élagué).
+        Each trial = PruneUnits + short local readjustment (slow weights of the pruned module only).
         """
         pruned = {}
         for module in self.region_for(model, domain):
@@ -351,9 +351,9 @@ class PlasticityController:
                 pruned[module] = (before, model.modules[module].hidden)
         return pruned
 
-    # ---- coopération avec l'apprentissage structurel ------------------
+    # ---- cooperation with structural learning ------------------
     def decide_for_skill(self, strategy, detector_accuracy=None, reliability_threshold=0.8):
-        """Une Skill WCE apprise -> faut-il un changement neuronal ?"""
+        """A learned WCE Skill -> is a neural change needed?"""
         reliable = strategy.reliability >= reliability_threshold
         if detector_accuracy is None or detector_accuracy >= 0.9:
             return ("no_neural_change" if reliable else "fast_weights",
@@ -363,7 +363,7 @@ class PlasticityController:
         return "add_module", "motif non détecté : module spécialisé nécessaire"
 
 
-# ---------------------------------------------------------------- boucle
+# ---------------------------------------------------------------- loop
 
 @dataclass
 class LoopReport:
@@ -430,10 +430,10 @@ def run_learning_loop(model, domain, x_train, y_train, x_val, y_val, controller=
     return report
 
 
-# ---------------------------------------------------------------- mémoire
+# ---------------------------------------------------------------- memory
 
 class MemorySystem:
-    """Cinq niveaux de mémoire, chacun avec sa propre API."""
+    """Five levels of memory, each with its own API."""
 
     def __init__(self, model, strategy_library=None, experiences=None, world=None):
         from core.planner import StrategyLibrary

@@ -1,12 +1,12 @@
-"""Instrumentation exécutée SUR AWS : profilage du vrai point chaud et micro-benchmark contrôlé.
+"""Instrumentation executed ON AWS: profiling of the real hot spot and controlled micro-benchmark.
 
-* `profile` : une sous-unité par méthode, sur UNE tâche du banc principal (graine 0), sous cProfile, avec plafond de
-  temps. Sortie : temps par fonction du projet (phases), fonctions les plus coûteuses, répartition du temps propre
-  (interpréteur Python / noyaux Torch / couche Python de Torch / E-S et sérialisation / autre).
-* `bench`   : même charge sur chaque type d'instance : (A) séquentiel 1 thread, (B) séquentiel avec autant de threads
-  Torch que de vCPU, (C) autant de processus que de vCPU en parallèle. Temps de calcul pur, CPU moyen/pic, mémoire,
-  efficacité parallèle.
-Ces unités mesurent du TEMPS ; leurs résultats scientifiques ne sont pas utilisés.
+* `profile`: one sub-unit per method, on ONE task of the main bench (seed 0), under cProfile, with a time
+  cap. Output: time per project function (phases), most expensive functions, breakdown of self time
+  (Python interpreter / Torch kernels / Torch Python layer / I/O and serialisation / other).
+* `bench`  : same workload on each instance type: (A) sequential 1 thread, (B) sequential with as many Torch
+  threads as vCPUs, (C) as many processes as vCPUs in parallel. Pure compute time, mean/peak CPU, memory,
+  parallel efficiency.
+These units measure TIME; their scientific results are not used.
 """
 import cProfile
 import json
@@ -19,7 +19,7 @@ import time
 
 PROFILE_SEED = 0
 PROFILE_CAP_S = int(os.environ.get("WCE_PROFILE_CAP_S", "900"))
-BENCH_WORKLOAD = (("main", 0, "t1_robust_posterior"), ("main", 0, "t1_robust_active_efa"))   # petite sous-unité représentative (profondeur 2, bruit 8 %)
+BENCH_WORKLOAD = (("main", 0, "t1_robust_posterior"), ("main", 0, "t1_robust_active_efa"))   # small representative sub-unit (depth 2, noise 8 %)
 BENCH_CAP_S = int(os.environ.get("WCE_BENCH_CAP_S", "1500"))
 
 
@@ -31,9 +31,9 @@ def _alarm(sig, frm): raise _Cap()
 
 
 def category(filename, func):
-    """Classe une entrée de profil selon l'endroit où le temps PROPRE est passé."""
+    """Classifies a profile entry according to where the SELF time is spent."""
     f = filename.replace("\\", "/")
-    if f == "~":                                                       # fonction native (C/C++)
+    if f == "~":                                                       # native function (C/C++)
         if "torch" in func or "Tensor" in func or "_C." in func: return "torch_noyaux_natifs"
         if any(k in func for k in ("posix", "_io.", "json", "pickle", "write", "read", "fsync")): return "es_serialisation"
         return "python_natifs_divers"
@@ -57,7 +57,7 @@ def summarize(pr, top=18):
 
 
 def profile_sub(task_k, method, cap=None):
-    """Profile UNE sous-unité (tâche k, méthode) du banc principal. Le plafond interrompt le calcul, pas la mesure."""
+    """Profiles ONE sub-unit (task k, method) of the main bench. The cap interrupts the computation, not the measurement."""
     from core.robust_experiments import MAIN_SPECS, run_subunit
     cap = PROFILE_CAP_S if cap is None else cap; pr = cProfile.Profile(); t0 = time.time(); timed_out = False
     old = signal.signal(signal.SIGALRM, _alarm); signal.alarm(cap)
@@ -76,7 +76,7 @@ def profile_subunits(key):
 
 
 def _workload():
-    """La charge de référence, séquentiellement. Renvoie (temps mur, temps CPU du processus)."""
+    """The reference workload, sequentially. Returns (wall time, process CPU time)."""
     from core.robust_experiments import run_subunit
     t0 = time.time(); c0 = time.process_time()
     for kind, key, sid in BENCH_WORKLOAD: run_subunit(kind, key, sid)
@@ -84,7 +84,7 @@ def _workload():
 
 
 def _phase(name, threads, copies):
-    """Lance `copies` processus indépendants exécutant la charge avec `threads` threads Torch ; mesure CPU machine et mémoire."""
+    """Launches `copies` independent processes running the workload with `threads` Torch threads; measures machine CPU and memory."""
     from wce_aws.sm_entry import CpuSampler
     env = dict(os.environ, WCE_TORCH_THREADS=str(threads), OMP_NUM_THREADS=str(threads), MKL_NUM_THREADS=str(threads))
     s = CpuSampler(1.0); s.start(); t0 = time.time()
@@ -106,7 +106,7 @@ def bench_sub():
     b = B["compute_s_per_copy"][0] if B["compute_s_per_copy"] else None
     return [{"vcpus": n, "instance_type": os.environ.get("WCE_INSTANCE", "unknown"), "workload": [list(w) for w in BENCH_WORKLOAD], "phases": [A, B, C],
              "compute_s_1proc_1thread": a, "thread_speedup": round(a / b, 2) if a and b else None,
-             "process_parallel_efficiency": round(a / c, 2) if a and c else None,                    # 1,0 = n processus aussi rapides chacun qu'un seul
+             "process_parallel_efficiency": round(a / c, 2) if a and c else None,                    # 1.0 = n processes each as fast as a single one
              "throughput_workloads_per_hour": round(3600 * n / c, 1) if c else None, "throughput_1proc_per_hour": round(3600 / a, 1) if a else None,
              "cpu_model": _cpu_model()}]
 

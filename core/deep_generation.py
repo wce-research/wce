@@ -1,19 +1,19 @@
-"""Génération compositionnelle FACTORISÉE de candidats profonds (sous-jalon Deep Candidate Generation).
+"""FACTORIZED compositional generation of deep candidates (Deep Candidate Generation sub-milestone).
 
-Constat du diagnostic : l'espace des structures croît comme 8·108·2 600·80 000·2,8 M·10⁸ (profondeurs 1 à 6) alors que
-la recherche par ajustements en génère ≈ 150 ; et les opérateurs « un atome à la fois » ne construisent que des chaînes.
+Finding of the diagnostic: the space of structures grows as 8·108·2,600·80,000·2.8 M·10⁸ (depths 1 to 6) whereas
+fit-based search generates ≈ 150 of them; and the "one atom at a time" operators only build chains.
 
-Idée : séparer la GÉOMÉTRIE de la LOGIQUE.
-  1. Géométrie — dans une composition and / or / xor, tout morceau de frontière appartient à la frontière d'UN atome.
-     Les frontières atomiques (droites, cercles) se lisent donc localement, sans connaître la composition : points de
-     frontière → consensus robuste (type RANSAC) → primitives géométriques → littéraux (régions typées).
-  2. Logique — une fois les littéraux fixés, une structure est une formule booléenne sur leurs SIGNATURES (valeurs sur
-     les points observés). Les compositions se construisent de bas en haut par tables de signatures (dédoublonnées),
-     les exigences descendent sous forme de TROUS typés (cible + masque des points qui comptent), et la rencontre se
-     fait sur la signature commune, par un produit bilinéaire qui évalue toutes les paires d'un coup. Aucun ajustement
-     par gradient n'est nécessaire avant d'avoir choisi les quelques candidats à polir.
+Idea: separate GEOMETRY from LOGIC.
+  1. Geometry — in an and / or / xor composition, every piece of boundary belongs to the boundary of ONE atom.
+     The atomic boundaries (lines, circles) can therefore be read locally, without knowing the composition: boundary
+     points → robust consensus (RANSAC-like) → geometric primitives → literals (typed regions).
+  2. Logic — once the literals are fixed, a structure is a Boolean formula over their SIGNATURES (values on
+     the observed points). Compositions are built bottom-up through signature tables (deduplicated),
+     the requirements descend as typed HOLES (target + mask of the points that matter), and the meeting takes
+     place on the common signature, through a bilinear product that evaluates all pairs at once. No gradient
+     fit is needed before having chosen the few candidates to polish.
 
-Ce module n'importe aucun module de monde et ne reçoit jamais la vérité.
+This module imports no world module and never receives the truth.
 """
 from __future__ import annotations
 
@@ -30,18 +30,18 @@ from core.deep_structure import COMBINATORS, algebraic_form, n_atoms, normalize
 F32 = torch.float32
 OPS = COMBINATORS                                   # ("and", "or", "xor")
 
-# ---- types structurels légers ----------------------------------------------------------------------------------------
-# Field   : fonction scalaire de l'espace (dot, norm, angle)
-# Region  : prédicat sur l'espace (un Field seuillé, éventuellement transporté) — c'est le type des littéraux
+# ---- lightweight structural types ------------------------------------------------------------------------------------
+# Field   : scalar function of space (dot, norm, angle)
+# Region  : predicate on space (a thresholded Field, possibly transported) — this is the type of the literals
 # Logic   : Region × Region → Region (and, or, xor)
-# Transform : Region → Region (translate) ; ne s'applique qu'à un Field centré (norm, angle), jamais à dot
+# Transform : Region → Region (translate); applies only to a centered Field (norm, angle), never to dot
 TYPES = ("Field", "Region", "Logic", "Transform")
 TYPE_RULES = {"pred": ("Field", "Region"), "translate": ("Region", "Region"), "not": ("Region", "Region"), "and": ("Region×Region", "Region"), "or": ("Region×Region", "Region"), "xor": ("Region×Region", "Region")}
 
 
 def well_typed(n: BNode) -> bool:
-    """Règles de typage : un combinateur prend deux Régions ; translate ne transporte qu'un champ centré (norm, angle)
-    ou sa négation ; not porte sur une Région atomique ; pas de translate∘translate ni de not∘not."""
+    """Typing rules: a combinator takes two Regions; translate only transports a centered field (norm, angle)
+    or its negation; not applies to an atomic Region; no translate∘translate nor not∘not."""
     if n.kind == "pred": return n.feat in ("dot", "norm", "angle") and n.op in ("le", "ge", "in") and not n.children
     if n.kind in OPS: return len(n.children) == 2 and all(well_typed(c) for c in n.children)
     if n.kind == "translate":
@@ -50,12 +50,12 @@ def well_typed(n: BNode) -> bool:
     return False
 
 
-# ================================================================ 1. géométrie : frontières atomiques
+# ================================================================ 1. geometry: atomic boundaries
 
 def boundary_points(X, y, k=6):
-    """Points de frontière : milieux des paires de voisins d'étiquettes (débruitées par vote local) opposées."""
-    X = X.to(F32); n = len(X); D = torch.cdist(X, X); nb = D.topk(min(k + 1, n), largest=False).indices                    # [n, k+1] (soi compris)
-    yh = (y.to(F32)[nb].mean(1) >= 0.5)                                                                                    # vote local
+    """Boundary points: midpoints of the pairs of neighbors with opposite labels (denoised by local vote)."""
+    X = X.to(F32); n = len(X); D = torch.cdist(X, X); nb = D.topk(min(k + 1, n), largest=False).indices                    # [n, k+1] (self included)
+    yh = (y.to(F32)[nb].mean(1) >= 0.5)                                                                                    # local vote
     opp = yh[nb] != yh[:, None]; d = torch.where(opp, D.gather(1, nb), torch.full_like(D.gather(1, nb), float("inf")))
     j = d.argmin(1); has = torch.isfinite(d.min(1).values); i = torch.arange(n)[has]; jj = nb[i, j[has]]
     pairs = torch.stack([torch.minimum(i, jj), torch.maximum(i, jj)], 1).unique(dim=0)
@@ -83,7 +83,7 @@ def _refine_line(P):
 
 
 def _refine_circle(P):
-    """Ajustement algébrique (Kåsa) : x² + y² = 2ax + 2by + c."""
+    """Algebraic fit (Kåsa): x² + y² = 2ax + 2by + c."""
     A = torch.cat([2 * P, torch.ones(len(P), 1)], 1); sol = torch.linalg.lstsq(A, (P ** 2).sum(1, keepdim=True)).solution.flatten()
     ctr = sol[:2]; r = math.sqrt(max(1e-6, float(sol[2] + ctr @ ctr))); return ctr, r
 
@@ -91,13 +91,13 @@ def _refine_circle(P):
 @dataclass
 class GeoPrimitive:
     kind: str                       # "line" | "circle"
-    params: tuple                   # line : (angle, offset) ; circle : (cx, cy, r)
+    params: tuple                   # line: (angle, offset); circle: (cx, cy, r)
     inliers: int
-    support: torch.Tensor           # points de frontière expliqués
+    support: torch.Tensor           # boundary points explained
 
 
 def _sep_line(P, Q, M, nrm, b, delta):
-    """Une paire de frontière soutient une droite si ses deux points sont de part et d'autre ET son milieu en est proche."""
+    """A boundary pair supports a line if its two points lie on either side of it AND its midpoint is close to it."""
     return (((P @ nrm.T - b) * (Q @ nrm.T - b)) < 0) & ((M @ nrm.T - b).abs() < delta)
 
 
@@ -106,9 +106,9 @@ def _sep_circle(P, Q, M, ctr, r, delta):
 
 
 def detect_primitives(boundary, max_prims=10, min_inliers=6, delta=0.22, n_hyp=1500, seed=0) -> List[GeoPrimitive]:
-    """Consensus robuste séquentiel : la meilleure droite ou le meilleur cercle au sens du nombre de PAIRES de
-    frontière qu'il SÉPARE (contrainte explicite : une frontière atomique passe entre deux points d'étiquettes
-    opposées), raffiné par moindres carrés, retiré, et ainsi de suite."""
+    """Sequential robust consensus: the best line or the best circle in terms of the number of boundary
+    PAIRS it SEPARATES (explicit constraint: an atomic boundary passes between two points of opposite
+    labels), refined by least squares, removed, and so on."""
     B, P, Q = (t.to(F32) for t in boundary); g = torch.Generator().manual_seed(seed); out: List[GeoPrimitive] = []; alive = torch.ones(len(B), dtype=torch.bool)
     while len(out) < max_prims and int(alive.sum()) >= min_inliers:
         R, Pa, Qa = B[alive], P[alive], Q[alive]
@@ -118,7 +118,7 @@ def detect_primitives(boundary, max_prims=10, min_inliers=6, delta=0.22, n_hyp=1
             cnt = _sep_line(Pa, Qa, R, ln, lb[None], delta).sum(0); i = int(cnt.argmax()); best = ("line", i, int(cnt[i]))
         if len(cc):
             cnt = _sep_circle(Pa, Qa, R, cc, cr[None], delta).sum(0); i = int(cnt.argmax())
-            if best is None or int(cnt[i]) > best[2] + 1: best = ("circle", i, int(cnt[i]))                              # à égalité, la droite (plus simple)
+            if best is None or int(cnt[i]) > best[2] + 1: best = ("circle", i, int(cnt[i]))                              # on a tie, the line (simpler)
         if best is None or best[2] < min_inliers: break
         if best[0] == "line":
             nrm, b = ln[best[1]][None], lb[best[1]].reshape(1, 1); inl = _sep_line(Pa, Qa, R, nrm, b, delta)[:, 0]
@@ -138,9 +138,9 @@ def detect_primitives(boundary, max_prims=10, min_inliers=6, delta=0.22, n_hyp=1
 
 
 def discover_atoms_by_separation(atom_skeletons: Sequence[BNode], X, y, rounds=3, n_init=4, steps=50, keep_per_round=4, seed=0, counter=None, min_pairs=4.0):
-    """Découverte d'atomes par COUVERTURE SÉQUENTIELLE des paires de frontière : à chaque tour, tous les types d'atomes
-    sont ajustés (en lot) pour séparer les paires encore inexpliquées ; les meilleurs atomes distincts sont gardés et
-    les paires qu'ils séparent sont dépondérées. Renvoie (atomes ajustés, statistiques)."""
+    """Atom discovery by SEQUENTIAL COVERING of the boundary pairs: at each round, all atom types
+    are fitted (in batch) to separate the pairs still unexplained; the best distinct atoms are kept and
+    the pairs they separate are down-weighted. Returns (fitted atoms, statistics)."""
     from core.boundary_program import _inits
     from core.deep_fit import DT, separation_fit
     M, P, Q = boundary_points(X, y); stats = {"pairs": len(M), "rounds": 0, "atoms": 0, "covered": 0.0}
@@ -150,7 +150,7 @@ def discover_atoms_by_separation(atom_skeletons: Sequence[BNode], X, y, rounds=3
         cands = []
         for a in atom_skeletons:
             inits = torch.stack([v.to(DT) for v in _inits(a, Xf, yl, n_init, g)])
-            c = M[torch.multinomial(w.float().clamp_min(1e-6), n_init, replacement=True, generator=g)]                    # centres amorcés sur des points de frontière encore inexpliqués
+            c = M[torch.multinomial(w.float().clamp_min(1e-6), n_init, replacement=True, generator=g)]                    # centers seeded on boundary points still unexplained
             if a.kind == "translate": inits[:, :2] = c.to(DT) + 0.6 * torch.randn(n_init, 2, generator=g, dtype=DT)
             th, sep = separation_fit(a, P, Q, w, inits, steps=steps, counter=counter)
             cands += [(float(sep[k]), a.with_params(th[k].tolist())) for k in range(n_init)]
@@ -158,7 +158,7 @@ def discover_atoms_by_separation(atom_skeletons: Sequence[BNode], X, y, rounds=3
         for score, prog in cands:
             if kept >= keep_per_round or score < min_pairs: break
             s = (predict(prog, P) != predict(prog, Q))
-            if float((w * s.to(DT)).sum()) < min_pairs: continue                                                          # déjà couvert par un atome gardé à ce tour
+            if float((w * s.to(DT)).sum()) < min_pairs: continue                                                          # already covered by an atom kept in this round
             out.append(prog); w = torch.where(s, w * 0.2, w); kept += 1
         stats["rounds"] = rnd + 1
         if kept == 0: break
@@ -166,11 +166,11 @@ def discover_atoms_by_separation(atom_skeletons: Sequence[BNode], X, y, rounds=3
     return out, stats
 
 
-# ================================================================ littéraux (régions typées) issus des primitives
+# ================================================================ literals (typed regions) derived from the primitives
 
 @dataclass
 class Literal:
-    program: BNode                  # atome de la grammaire, paramètres géométriques
+    program: BNode                  # grammar atom, geometric parameters
     source: str                     # "half" | "disc" | "antidisc" | "band" | "notband" | "ring" | "sector" | "notsector"
     support: int
 
@@ -180,28 +180,28 @@ def _T(c, ch): return BNode("translate", params=(float(c[0]), float(c[1])), chil
 
 
 def literals_from(prims: Sequence[GeoPrimitive], macros=True, max_sectors=4) -> List[Literal]:
-    """Littéraux = atomes de la grammaire. Base minimale : demi-plans (deux orientations) et disques (+ complément).
-    Macros (atomes redondants de la grammaire, reconnus par CONTRAINTES explicites) : bande = deux droites parallèles ;
-    anneau = deux cercles concentriques ; secteur = deux demi-droites issues d'un même point."""
+    """Literals = atoms of the grammar. Minimal basis: half-planes (two orientations) and discs (+ complement).
+    Macros (redundant atoms of the grammar, recognized by explicit CONSTRAINTS): band = two parallel lines;
+    ring = two concentric circles; sector = two rays issuing from the same point."""
     L: List[Literal] = []; lines = [p for p in prims if p.kind == "line"]; circles = [p for p in prims if p.kind == "circle"]
     for p in lines:
         a, b = p.params; L.append(Literal(BNode("pred", "dot", "le", (a, b)), "half", p.inliers)); L.append(Literal(BNode("pred", "dot", "le", (_wrap(a + math.pi), -b)), "half", p.inliers))
     for p in circles:
         cx, cy, r = p.params; L.append(Literal(_T((cx, cy), BNode("pred", "norm", "le", (r,))), "disc", p.inliers)); L.append(Literal(_T((cx, cy), BNode("pred", "norm", "ge", (r,))), "antidisc", p.inliers))
     if not macros: return L
-    for i, p in enumerate(lines):                                       # bande : contrainte de parallélisme
+    for i, p in enumerate(lines):                                       # band: parallelism constraint
         for q in lines[i + 1:]:
             a1, b1 = p.params; a2, b2 = q.params; da = _wrap(a1 - a2)
             if abs(da) > math.pi / 2: a2, b2 = _wrap(a2 + math.pi), -b2; da = _wrap(a1 - a2)
             if abs(da) < 0.2 and 0.3 < abs(b1 - b2) < 2.4:
                 lo, hi = sorted((b1, b2)); band = BNode("pred", "dot", "in", (a1, lo, hi)); s = min(p.inliers, q.inliers)
                 L.append(Literal(band, "band", s)); L.append(Literal(BNode("not", children=(band,)), "notband", s))
-    for i, p in enumerate(circles):                                     # anneau : contrainte de concentricité
+    for i, p in enumerate(circles):                                     # ring: concentricity constraint
         for q in circles[i + 1:]:
             c1, c2 = torch.tensor(p.params[:2]), torch.tensor(q.params[:2]); r1, r2 = sorted((p.params[2], q.params[2]))
             if float((c1 - c2).norm()) < 0.3 and r2 - r1 > 0.3: L.append(Literal(_T(((c1 + c2) / 2).tolist(), BNode("pred", "norm", "in", (r1, r2))), "ring", min(p.inliers, q.inliers)))
     sect = []
-    for i, p in enumerate(lines):                                       # secteur : deux demi-droites de même origine, chacune soutenue d'un seul côté
+    for i, p in enumerate(lines):                                       # sector: two rays with the same origin, each supported on one side only
         for q in lines[i + 1:]:
             a1, b1 = p.params; a2, b2 = q.params; det = math.cos(a1) * math.sin(a2) - math.sin(a1) * math.cos(a2)
             if abs(det) < 0.25: continue
@@ -219,18 +219,18 @@ def literals_from(prims: Sequence[GeoPrimitive], macros=True, max_sectors=4) -> 
     return L
 
 
-# ================================================================ 2. logique : tables de signatures, trous typés, rencontre
+# ================================================================ 2. logic: signature tables, typed holes, meeting
 
 @dataclass
 class Table:
-    """Niveau j : structures à j littéraux, dédoublonnées par SIGNATURE (valeurs sur les points observés).
-    `alts` conserve des formes alternatives de même signature (ne pas fusionner trop tôt des structures différentes)."""
+    """Level j: structures with j literals, deduplicated by SIGNATURE (values on the observed points).
+    `alts` keeps alternative forms with the same signature (do not merge different structures too early)."""
     sig: torch.Tensor                       # [N, n] float32 0/1
-    params: torch.Tensor                    # [N] nombre de paramètres
-    trees: List[tuple]                      # arbre de chaque entrée : ("lit", i) | (op, gauche, droite)
+    params: torch.Tensor                    # [N] number of parameters
+    trees: List[tuple]                      # tree of each entry: ("lit", i) | (op, left, right)
     alts: Dict[int, List[tuple]] = field(default_factory=dict)
-    merged: int = 0                         # structures fusionnées par signature identique
-    degenerate: int = 0                     # compositions dégénérées écartées (interface incompatible)
+    merged: int = 0                         # structures merged by identical signature
+    degenerate: int = 0                     # degenerate compositions discarded (incompatible interface)
 
     def __len__(self): return len(self.trees)
 
@@ -239,13 +239,13 @@ def _combine(op, a, b): return a * b if op == "and" else a + b - a * b if op == 
 
 
 def _dedup(sig, params, trees, known: Sequence[torch.Tensor] = (), keep_alts=2):
-    """Dédoublonnage par signature (et élimination des constantes et des signatures déjà connues à un niveau
-    inférieur : une composition qui ne change rien n'est pas une nouvelle structure)."""
+    """Deduplication by signature (and elimination of the constants and of the signatures already known at a lower
+    level: a composition that changes nothing is not a new structure)."""
     n = sig.shape[1]; w = torch.arange(1, n + 1, dtype=torch.float64); r = torch.Generator().manual_seed(12345); w2 = torch.rand(n, generator=r, dtype=torch.float64)
     h = (sig.double() @ w) * 1e3 + (sig.double() @ w2); s = sig.sum(1); const = (s == 0) | (s == n)
     kh = torch.cat([(k.double() @ w) * 1e3 + (k.double() @ w2) for k in known]) if len(known) else torch.zeros(0, dtype=torch.float64)
     seen: Dict[float, int] = {float(v): -1 for v in kh.tolist()}; keep = []; alts: Dict[int, List[tuple]] = {}; merged = 0; deg = int(const.sum())
-    order = torch.argsort(params, stable=True).tolist()                                # la description la plus courte représente la signature
+    order = torch.argsort(params, stable=True).tolist()                                # the shortest description represents the signature
     for i in order:
         if bool(const[i]): continue
         v = float(h[i]); j = seen.get(v)
@@ -259,7 +259,7 @@ def _dedup(sig, params, trees, known: Sequence[torch.Tensor] = (), keep_alts=2):
 
 
 def build_tables(lit_sig, lit_params, max_level3=40000) -> Tuple[List[Table], dict]:
-    """Tables montantes S1, S2, S3 (toutes les compositions, dédoublonnées par signature)."""
+    """Bottom-up tables S1, S2, S3 (all compositions, deduplicated by signature)."""
     L = len(lit_sig); S1 = _dedup(lit_sig, lit_params, [("lit", i) for i in range(L)]); stats = {"literals": L, "S1": len(S1), "attempted": 0}
     tabs = [S1]
     for lvl in (2, 3):
@@ -274,25 +274,25 @@ def build_tables(lit_sig, lit_params, max_level3=40000) -> Tuple[List[Table], di
 
 
 def pair_errors(A_sig, B_sig, y, w):
-    """Rencontre sur la signature commune : erreur pondérée de op(a, b) contre la cible, pour TOUTES les paires (a, b)
-    et les trois combinateurs, par un seul produit matriciel. Renvoie E [3, |A|, |B|] dans l'ordre (and, or, xor)."""
+    """Meeting on the common signature: weighted error of op(a, b) against the target, for ALL pairs (a, b)
+    and the three combinators, through a single matrix product. Returns E [3, |A|, |B|] in the order (and, or, xor)."""
     v = w * (1 - 2 * y); c0 = float((w * y).sum()); M = (A_sig * v) @ B_sig.T; a = (A_sig @ v)[:, None]; b = (B_sig @ v)[None, :]
     return torch.stack([c0 + M, c0 + a + b - M, c0 + a + b - 2 * M])
 
 
 @dataclass
 class Hole:
-    """Trou typé d'un programme partiel : ce que la sous-structure manquante DOIT faire."""
-    type: str                       # toujours "Region" dans cette grammaire
-    target: torch.Tensor            # comportement requis sur les points observés
-    care: torch.Tensor              # poids : 0 = point indifférent pour ce trou
+    """Typed hole of a partial program: what the missing substructure MUST do."""
+    type: str                       # always "Region" in this grammar
+    target: torch.Tensor            # required behavior on the observed points
+    care: torch.Tensor              # weight: 0 = point irrelevant for this hole
     depth_left: int
-    unavoidable: float              # erreurs qu'aucun remplissage ne peut corriger (borne inférieure)
+    unavoidable: float              # errors that no filling can correct (lower bound)
 
 
 @dataclass
 class PartialStructure:
-    """Programme partiel `op(known, ?X)` : une partie connue et un trou typé."""
+    """Partial program `op(known, ?X)`: a known part and a typed hole."""
     op: str
     known: tuple
     hole: Hole
@@ -301,21 +301,21 @@ class PartialStructure:
 
 
 def make_hole(op: str, known_sig, y, w, depth_left) -> Hole:
-    """Exigence descendante : pour que op(known, ?X) = y, que doit valoir ?X et où cela compte-t-il ?"""
+    """Top-down requirement: for op(known, ?X) = y, what must ?X be and where does it matter?"""
     if op == "xor": return Hole("Region", (y - known_sig).abs(), w, depth_left, 0.0)
     if op == "or": return Hole("Region", y, w * (1 - known_sig), depth_left, float((w * known_sig * (1 - y)).sum()))
     return Hole("Region", y, w * known_sig, depth_left, float((w * (1 - known_sig) * y).sum()))
 
 
 def _evidence(err, n, params, atoms):
-    """Même forme que l'évidence approchée existante (bruit profilé, pénalité de paramètres et de taille) — utilisée
-    ici comme crible AVANT ajustement ; le classement final reste celui du système."""
+    """Same form as the existing approximate evidence (profiled noise, parameter and size penalty) — used
+    here as a sieve BEFORE fitting; the final ranking remains that of the system."""
     eps = ((err + 0.5) / (n + 1.0)).clamp(1e-3, 0.49); ll = err * eps.log() + (n - err) * (1 - eps).log()
     return ll - 0.5 * params * math.log(max(1.0, n)) - (2 * atoms - 1) * 3.0 * math.log(2)
 
 
 def _top_pairs(E, pa, pb, n, atoms, top, chunk_rows=None):
-    """Meilleures paires (score d'évidence) d'un tenseur d'erreurs [3, A, B] → [(score, erreur, op, i, j)]."""
+    """Best pairs (evidence score) of an error tensor [3, A, B] → [(score, error, op, i, j)]."""
     ev = _evidence(E, n, (pa[:, None] + pb[None, :])[None], atoms); k = min(top, ev.numel()); v, idx = ev.flatten().topk(k)
     A, B = E.shape[1], E.shape[2]; out = []
     for s, f in zip(v.tolist(), idx.tolist()):
@@ -324,7 +324,7 @@ def _top_pairs(E, pa, pb, n, atoms, top, chunk_rows=None):
 
 
 class SignatureSynthesizer:
-    """Synthèse de structures sur signatures : bas-en-haut (tables), haut-en-bas (trous), rencontre (produit bilinéaire)."""
+    """Synthesis of structures on signatures: bottom-up (tables), top-down (holes), meeting (bilinear product)."""
 
     def __init__(self, lit_sig, lit_params, y, max_depth=6, top=6, hole_beam=8, time_budget=None):
         self.y = y.to(F32); self.n = float(len(y)); self.w = torch.ones(len(y), dtype=F32); self.max_depth, self.top, self.hole_beam = max_depth, top, hole_beam
@@ -334,7 +334,7 @@ class SignatureSynthesizer:
     def _late(self): return self.time_budget is not None and time.time() - self.t0 > self.time_budget
 
     def _meet(self, A: Table, B: Table, y, w, atoms, top, chunk=4000):
-        """Toutes les compositions op(a ∈ A, b ∈ B) contre (cible, masque) : les `top` meilleures."""
+        """All the compositions op(a ∈ A, b ∈ B) against (target, mask): the `top` best."""
         best = []
         for s in range(0, len(A), chunk):
             E = pair_errors(A.sig[s:s + chunk], B.sig, y, w); self.stats["pairs_scored"] += E.numel()
@@ -342,8 +342,8 @@ class SignatureSynthesizer:
         best.sort(key=lambda z: -z[0]); return best[:top]
 
     def solve(self, y, w, depth, top):
-        """Meilleures structures à exactement `depth` littéraux pour (cible, masque). Profondeur ≤ 4 : rencontre exacte
-        de tables. Profondeur 5–6 : rencontre de tables + programmes partiels à trou, élagués par borne inférieure."""
+        """Best structures with exactly `depth` literals for (target, mask). Depth ≤ 4: exact meeting
+        of tables. Depth 5–6: meeting of tables + partial programs with a hole, pruned by lower bound."""
         n = float(w.sum())
         if depth == 1:
             e = (w * (self.S1.sig - y).abs()).sum(1); ev = _evidence(e, n, self.S1.params, 1); k = min(top, len(e)); v, i = ev.topk(k)
@@ -354,9 +354,9 @@ class SignatureSynthesizer:
         out = []
         if depth == 5: out += self._meet(self.S3, self.S2, y, w, 5, top)
         if depth == 6 and not self._late():
-            e = (w * (self.S3.sig - y).abs()).sum(1); idx = e.topk(min(3000, len(e)), largest=False).indices                    # crible : compatibilité observationnelle
+            e = (w * (self.S3.sig - y).abs()).sum(1); idx = e.topk(min(3000, len(e)), largest=False).indices                    # sieve: observational compatibility
             sub = Table(self.S3.sig[idx], self.S3.params[idx], [self.S3.trees[i] for i in idx.tolist()]); self.stats["cap_S3xS3"] = len(self.S3) - len(sub); out += self._meet(sub, sub, y, w, 6, top)
-        # programmes partiels op(known, ?X) : known ∈ S1 (et S2 à la profondeur 6), trou de profondeur restante
+        # partial programs op(known, ?X): known ∈ S1 (and S2 at depth 6), hole of remaining depth
         for K, kd in ((self.S1, 1), (self.S2, 2)):
             if depth - kd < 4 or (kd == 2 and depth < 6): continue
             partials = []
@@ -372,7 +372,7 @@ class SignatureSynthesizer:
         out.sort(key=lambda z: -z[0]); return out[:top]
 
     def candidates(self):
-        """Candidats par profondeur (les `top` meilleurs de chaque profondeur) + formes alternatives de même signature."""
+        """Candidates by depth (the `top` best of each depth) + alternative forms with the same signature."""
         out = []
         for d in range(1, self.max_depth + 1):
             if self._late(): self.stats["time_stopped_at_depth"] = d; break
@@ -381,9 +381,9 @@ class SignatureSynthesizer:
 
 
 def select_literals(sig, max_literals=14, near=0.03):
-    """Borne le nombre de littéraux AVANT toute composition : quasi-doublons écartés (désaccord < `near`), puis
-    sélection gloutonne du plus éloigné (diversité de signature). Ne regarde jamais la cible : un atome masqué par un
-    XOR n'est pas corrélé à la cible et serait éliminé par un critère d'accord."""
+    """Bounds the number of literals BEFORE any composition: near-duplicates discarded (disagreement < `near`), then
+    greedy selection of the farthest (signature diversity). Never looks at the target: an atom masked by a
+    XOR is not correlated with the target and would be eliminated by an agreement criterion."""
     n = len(sig); D = torch.cdist(sig, sig, p=1) / sig.shape[1]; keep = [0]; mind = D[0].clone()
     while len(keep) < min(max_literals, n):
         i = int(mind.argmax())
@@ -397,19 +397,19 @@ def tree_to_program(tree, literals: Sequence[Literal]) -> BNode:
     return BNode(tree[0], children=(tree_to_program(tree[1], literals), tree_to_program(tree[2], literals)))
 
 
-# ================================================================ générateur complet
+# ================================================================ complete generator
 
 @dataclass
 class Generation:
-    programs: List[BNode]                    # candidats (structure + paramètres géométriques), prêts à être polis
+    programs: List[BNode]                    # candidates (structure + geometric parameters), ready to be polished
     info: List[dict]
     stats: dict
     literals: List[Literal]
 
 
 def generate_candidates(X, y, max_depth=6, top=6, seed=0, macros=True, typed=True, time_budget=40.0, max_prims=10, extra_literals: Sequence[BNode] = (), geometry=True, max_literals=14) -> Generation:
-    """Génération factorisée : littéraux (géométrie des frontières et / ou atomes fournis, par exemple ajustés par
-    gradient) → synthèse sur signatures → candidats."""
+    """Factorized generation: literals (boundary geometry and / or supplied atoms, for example fitted by
+    gradient) → synthesis on signatures → candidates."""
     t0 = time.time(); B = boundary_points(X, y) if geometry else (torch.zeros(0, 2),) * 3; t1 = time.time()
     prims = detect_primitives(B, max_prims=max_prims, seed=seed) if len(B[0]) >= 6 else []; t2 = time.time()
     lits = literals_from(prims, macros=macros) + [Literal(p, "fitted", 0) for p in extra_literals]; raw = len(lits)

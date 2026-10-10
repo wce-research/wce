@@ -1,8 +1,8 @@
 """
-Transformations exécutables pour WCE.
+Executable transformations for WCE.
 
-Ce module fournit la représentation concrète des transformations qui modifient
-l'état du World, avec un lien vers leur spécification conceptuelle (TransformationSpec).
+This module provides the concrete representation of the transformations that modify
+the state of the World, with a link to their conceptual specification (TransformationSpec).
 """
 
 from dataclasses import dataclass, field
@@ -15,20 +15,20 @@ if TYPE_CHECKING:
 
 
 class TransformationSource(Enum):
-    """Source/provenance d'une transformation."""
-    ACTION = "action"         # Produite par une Action (Lift, Push, etc.)
-    LAW = "law"               # Produite par une Law (Gravity, ForceDynamics, etc.)
-    INTERACTION = "interaction"  # Produite par une Interaction (collision, support, etc.)
-    USER = "user"             # Commande directe utilisateur
-    SYSTEM = "system"         # Transformation système interne
+    """Source/provenance of a transformation."""
+    ACTION = "action"         # Produced by an Action (Lift, Push, etc.)
+    LAW = "law"               # Produced by a Law (Gravity, ForceDynamics, etc.)
+    INTERACTION = "interaction"  # Produced by an Interaction (collision, support, etc.)
+    USER = "user"             # Direct user command
+    SYSTEM = "system"         # Internal system transformation
     MACRO = "macro"           # MacroTransformation
     COMPOSITE = "composite"   # CompositeTransformation
-    RULE = "rule"             # Règle symbolique / logique
+    RULE = "rule"             # Symbolic / logical rule
 
 
 @dataclass(frozen=True)
 class Change:
-    """Changement d'une propriété d'entité."""
+    """Change of an entity property."""
     entity: str
     property: str
     before: Any
@@ -37,7 +37,7 @@ class Change:
 
 @dataclass(frozen=True)
 class RelationChange:
-    """Changement d'une relation entre entités."""
+    """Change of a relation between entities."""
     action: str  # "add" or "remove"
     subject: str
     predicate: str
@@ -47,26 +47,26 @@ class RelationChange:
 @dataclass
 class Transformation:
     """
-    Transformation exécutable sur un World.
+    Executable transformation on a World.
     
-    C'est la représentation concrète qui modifie réellement l'état du monde.
-    Elle peut être liée à une TransformationSpec pour la sémantique.
+    This is the concrete representation that actually modifies the state of the world.
+    It can be linked to a TransformationSpec for the semantics.
     """
     name: str
     changes: list[Change] = field(default_factory=list)
     relation_changes: list[RelationChange] = field(default_factory=list)
     
-    # Lien vers la spécification conceptuelle
+    # Link to the conceptual specification
     spec: Optional['TransformationSpec'] = None
     source: TransformationSource = TransformationSource.SYSTEM
     
-    # Métadonnées pour le graphe
+    # Metadata for the graph
     timestamp: Optional[float] = None
     domain: Optional[str] = None
     invariants: Optional['InvariantSet'] = None
     
     def with_spec(self, spec: 'TransformationSpec', source: TransformationSource = None) -> 'Transformation':
-        """Associe cette transformation à une TransformationSpec."""
+        """Associates this transformation with a TransformationSpec."""
         return Transformation(
             name=self.name or spec.name,
             changes=self.changes,
@@ -79,7 +79,7 @@ class Transformation:
         )
     
     def with_source(self, source: TransformationSource) -> 'Transformation':
-        """Définit la source de cette transformation."""
+        """Sets the source of this transformation."""
         return Transformation(
             name=self.name,
             changes=self.changes,
@@ -93,7 +93,7 @@ class Transformation:
     
     @property
     def is_empty(self) -> bool:
-        """Vérifie si la transformation ne fait rien."""
+        """Checks whether the transformation does nothing."""
         return not self.changes and not self.relation_changes
     
     def __repr__(self) -> str:
@@ -103,12 +103,12 @@ class Transformation:
 
 def apply(world, transformation: Transformation):
     """
-    Applique une transformation à un World avec validation et rollback.
+    Applies a transformation to a World with validation and rollback.
     
-    Cette fonction enregistre aussi la transformation dans le TransformGraph du World
-    si disponible.
+    This function also records the transformation in the TransformGraph of the World
+    if available.
     """
-    # Définir le timestamp si non spécifié
+    # Set the timestamp if not specified
     before_snapshot = world.get_state_snapshot() if hasattr(world, 'get_state_snapshot') else None
     if transformation.timestamp is None:
         transformation = Transformation(
@@ -122,7 +122,7 @@ def apply(world, transformation: Transformation):
             invariants=transformation.invariants,
         )
     
-    # Déterminer le domaine et les invariants si non spécifiés
+    # Determine the domain and the invariants if not specified
     if transformation.domain is None:
         if transformation.spec is not None:
             from core.transformations import TransformationDomain
@@ -161,11 +161,11 @@ def apply(world, transformation: Transformation):
             invariants=transformation.spec.preserves,
         )
     
-    # 1. Vérifier toutes les propriétés avant toute mutation.
+    # 1. Check all properties before any mutation.
     for change in transformation.changes:
         if change.entity not in world.entities:
             raise ValueError(
-                f"Entité inconnue : {change.entity!r}"
+                f"Unknown entity: {change.entity!r}"
             )
 
         entity = world.entities[change.entity]
@@ -173,12 +173,12 @@ def apply(world, transformation: Transformation):
 
         if current != change.before:
             raise ValueError(
-                f"Transformation '{transformation.name}' impossible : "
-                f"{change.entity}.{change.property} vaut {current!r}, "
-                f"attendu {change.before!r}"
+                f"Transformation '{transformation.name}' impossible: "
+                f"{change.entity}.{change.property} is {current!r}, "
+                f"expected {change.before!r}"
             )
 
-    # 2. Vérifier les changements relationnels.
+    # 2. Check the relational changes.
     for change in transformation.relation_changes:
         from core.world import Relation
         relation = Relation(
@@ -191,26 +191,26 @@ def apply(world, transformation: Transformation):
 
         if change.action == "add" and exists:
             raise ValueError(
-                f"Relation déjà présente : {relation}"
+                f"Relation already present: {relation}"
             )
 
         if change.action == "remove" and not exists:
             raise ValueError(
-                f"Relation absente : {relation}"
+                f"Relation absent: {relation}"
             )
 
         if change.action not in {"add", "remove"}:
             raise ValueError(
-                f"Action relationnelle inconnue : {change.action}"
+                f"Unknown relational action: {change.action}"
             )
 
-    # 3. Appliquer temporairement les changements de propriétés.
+    # 3. Temporarily apply the property changes.
     for change in transformation.changes:
         world.entities[change.entity].properties[
             change.property
         ] = change.after
 
-    # 4. Appliquer temporairement les relations.
+    # 4. Temporarily apply the relations.
     applied_relations = []
 
     for change in transformation.relation_changes:
@@ -229,7 +229,7 @@ def apply(world, transformation: Transformation):
 
         applied_relations.append((change, relation))
 
-    # 5. Vérifier les contraintes.
+    # 5. Check the constraints.
     errors = world.validate()
 
     if errors:
@@ -241,22 +241,22 @@ def apply(world, transformation: Transformation):
             elif change.action == "remove":
                 world.relations.append(relation)
 
-        # rollback propriétés
+        # rollback properties
         for change in reversed(transformation.changes):
             world.entities[change.entity].properties[
                 change.property
             ] = change.before
 
         raise ValueError(
-            "Transformation refusée : "
+            "Transformation refused: "
             + "; ".join(errors)
         )
 
-    # 6. Enregistrer dans l'historique du World
+    # 6. Record in the history of the World
     world.record(transformation)
 
-    # Une topologie connue reste explicite pour les homéomorphismes déclarés ;
-    # sinon elle est invalidée sans prétendre la recalculer.
+    # A known topology remains explicit for the declared homeomorphisms;
+    # otherwise it is invalidated without claiming to recompute it.
     from core.topology import TopologyState
     topology_preserved = bool(transformation.invariants and transformation.invariants.preserves_topology)
     touched = {change.entity for change in transformation.changes}
@@ -268,12 +268,12 @@ def apply(world, transformation: Transformation):
         if entity.topology is not None:
             entity.topology_state = TopologyState.PRESERVED if topology_preserved else TopologyState.UNKNOWN
     
-    # 7. Enregistrer dans le TransformGraph si disponible
+    # 7. Record in the TransformGraph if available
     if hasattr(world, 'transform_graph') and world.transform_graph is not None:
         from core.transformations import DeclarativeTransformationSpec
         from core.invariants import InvariantSet
         from core.transform_graph import TransformRecord
-        # Utiliser la spec si disponible, sinon créer une representation minimale
+        # Use the spec if available, otherwise create a minimal representation
         spec_to_record = transformation.spec if transformation.spec else DeclarativeTransformationSpec(
             name=transformation.name,
             domain=transformation.domain or "world",

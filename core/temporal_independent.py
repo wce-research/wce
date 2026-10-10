@@ -1,8 +1,8 @@
-"""Modèle temporel branché dans l'environnement indépendant : position au début (t = 0) et maintenant (t = 1),
-événements entre les deux (observés ou NON observés), taux de changement appris sur les mondes d'entraînement.
+"""Temporal model plugged into the independent environment: position at the start (t = 0) and now (t = 1),
+events between the two (observed or UNOBSERVED), rate of change learned on the training worlds.
 
-La croyance BeliefState.loc(o, temps) devient : filtre de Markov caché (présent) / lissage (passé) sur les preuves
-déjà résolues du graphe de preuves ; une position au début ne répond plus automatiquement au présent.
+The belief BeliefState.loc(o, time) becomes: hidden Markov filter (present) / smoothing (past) on the evidence
+already resolved from the evidence graph; a position at the start no longer automatically answers for the present.
 """
 from __future__ import annotations
 
@@ -16,7 +16,7 @@ LOC_DOMAIN = 12
 
 
 def learn_change_rate(train_worlds):
-    """P(position au début ≠ position maintenant) sur les mondes d'ENTRAÎNEMENT (vérité), lissée (Beta(1, 1))."""
+    """P(position at the start ≠ position now) on the TRAINING worlds (truth), smoothed (Beta(1, 1))."""
     ch = n = 0
     for x in train_worlds:
         w = x["world"]
@@ -26,7 +26,7 @@ def learn_change_rate(train_worlds):
 
 
 def temporal_loc(graph, rel, o, p_change, time="now"):
-    """BeliefEntry temporelle pour la position de o (présent : filtré ; début : lissé)."""
+    """Temporal BeliefEntry for the position of o (present: filtered; start: smoothed)."""
     votes0 = graph.votes(("loc", o, 0)); votes1 = graph.votes(("loc", o, "now")); evs = graph.votes(("event", o))
     values = list(dict.fromkeys([e.value for e in votes0.values()] + [e.value for e in votes1.values()] + [e.value for e in evs.values()]))
     if not values: return BeliefEntry(("loc", o, time), None, 0.0, UNKNOWN)
@@ -52,7 +52,7 @@ def temporal_loc(graph, rel, o, p_change, time="now"):
 
 
 def install_temporal(agent, p_change):
-    """Remplace BeliefState.loc de chaque nouveau monde par la croyance temporelle."""
+    """Replaces BeliefState.loc of each new world with the temporal belief."""
     original_new_world = agent.new_world
 
     def new_world():
@@ -65,7 +65,7 @@ def install_temporal(agent, p_change):
 
 
 def loc_belief_points(agent, worlds):
-    """(postérieure, exacte) pour la position présente et passée (une ingestion par monde)."""
+    """(posterior, exact) for the present and past position (one ingestion per world)."""
     pts = defaultdict(list)
     for x in worlds:
         w = x["world"]

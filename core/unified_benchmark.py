@@ -1,5 +1,5 @@
-"""Expériences multi-graines de l'état unifié (environnement indépendant) : 5 systèmes, conversion du succès,
-budget d'erreurs, courbes de calibration (identité, lexique, croyance, réponse finale), taille du cœur.
+"""Multi-seed experiments on the unified state (independent environment): 5 systems, success conversion,
+error budget, calibration curves (identity, lexicon, belief, final answer), core size.
 """
 from __future__ import annotations
 
@@ -20,7 +20,7 @@ BUDGET = ("lexical", "grammar", "reference", "source_reliability", "belief_propa
 
 
 def error_class(row):
-    """Classe d'erreur (faux confiant ou abstention inutile), à partir de la trace de la réponse."""
+    """Error class (false confident or unnecessary abstention), from the trace of the answer."""
     a = row["answer"]
     reason = getattr(a, "abstain_reason", None)
     if row["category"] == "temporal": return "temporal"
@@ -93,7 +93,7 @@ def run_seed(seed, systems=FIVE, n_worlds=20):
 
 
 def success_conversion(rows_new, rows_base, parse_new=None, parse_base=None):
-    """Références supplémentaires résolues -> combien de bonnes réponses en plus, combien de faux confiants en plus."""
+    """Additional references resolved -> how many more correct answers, how many more false confidents."""
     gained = sum(1 for a, b in zip(rows_new, rows_base) if a["correct"] and not b["correct"])
     lost = sum(1 for a, b in zip(rows_new, rows_base) if b["correct"] and not a["correct"])
     new_fc = sum(1 for a, b in zip(rows_new, rows_base) if a["false_confident"] and not b["false_confident"])

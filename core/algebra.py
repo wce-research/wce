@@ -1,4 +1,4 @@
-"""Petit noyau symbolique utilisant la Transformation Algebra commune de WCE."""
+"""Small symbolic core using the common Transformation Algebra of WCE."""
 from dataclasses import dataclass
 from typing import Any, Mapping
 
@@ -108,7 +108,7 @@ def simplify(expr):
         if isinstance(left, Number) and isinstance(right, Number): return Number(left.value * right.value)
         return Multiply(left, right)
     if isinstance(expr, Divide):
-        if right == Number(0): raise ZeroDivisionError("division symbolique par zéro")
+        if right == Number(0): raise ZeroDivisionError("symbolic division by zero")
         if left == Number(0): return Number(0)
         if right == Number(1): return left
         if isinstance(left, Number) and isinstance(right, Number): return Number(left.value / right.value)
@@ -169,7 +169,7 @@ class _BothSides(AlgebraTransformation):
     def value(self): return self.parameters["value"]
 
     def transform(self, expression):
-        if not isinstance(expression, Equation): raise TypeError("une transformation des deux membres exige une Equation")
+        if not isinstance(expression, Equation): raise TypeError("a transformation of both sides requires an Equation")
         return Equation(self.operation(expression.left, self.value), self.operation(expression.right, self.value))
 
     def get_inverse(self): return self.inverse_type(self.value)
@@ -191,7 +191,7 @@ class DivideBothSides(_BothSides):
     operation = Divide
     def __init__(self, value):
         value = as_expression(value)
-        if value == Number(0): raise ZeroDivisionError("DivideBothSides(0) est interdite")
+        if value == Number(0): raise ZeroDivisionError("DivideBothSides(0) is forbidden")
         super().__init__(value)
         from core.reasoning import IsNonZero
         object.__setattr__(self, "preconditions", (IsNonZero(value),))
@@ -218,7 +218,7 @@ class Substitute(AlgebraTransformation):
 
 
 class AssumeSolution(AlgebraTransformation):
-    """Règle explicite servant à représenter une branche/hypothèse."""
+    """Explicit rule used to represent a branch/hypothesis."""
     def __init__(self, equation, label="hypothesis"):
         self._init(label, {"equation": equation}, invertible=False,
                    preserves=InvariantSet({Invariant.EQUALITY, Invariant.DOMAIN}))
@@ -226,7 +226,7 @@ class AssumeSolution(AlgebraTransformation):
 
 
 class MathState(World):
-    """World spécialisé minimal : l'expression est une propriété d'entité normale."""
+    """Minimal specialised World: the expression is a normal entity property."""
     def __init__(self, expression, assumptions=None):
         super().__init__()
         self.assumptions = dict(assumptions or {})
@@ -271,8 +271,8 @@ class MathState(World):
 
 
 def solve_linear_equation_macro(coefficient, constant):
-    """Macro réutilisable pour ax+b=c, avec a non nul."""
-    if coefficient == 0: raise ValueError("le coefficient linéaire doit être non nul")
+    """Reusable macro for ax+b=c, with a non-zero."""
+    if coefficient == 0: raise ValueError("the linear coefficient must be non-zero")
     steps = (SubtractBothSides(constant), Simplify(), DivideBothSides(coefficient), Simplify())
     return MacroTransformation(name="solve_linear_equation", steps=steps,
                                domain=TransformationDomain.ALGEBRA,

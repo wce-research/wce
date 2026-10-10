@@ -1,5 +1,5 @@
-"""Banc épistémique : attendus d'origine ET attendus de l'IdealAgent, droit d'affirmer, lexique calibré, audit,
-attribution des erreurs, conversion du succès, alignement de la connaissabilité, front de Pareto coût / sûreté.
+"""Epistemic benchmark: original expected answers AND IdealAgent expected answers, entitlement to assert, calibrated lexicon, audit,
+error attribution, success conversion, knowability alignment, cost / safety Pareto front.
 """
 from __future__ import annotations
 
@@ -21,16 +21,16 @@ from core.lexical_calibration import (
 )
 from core.unified import calibration_report
 
-CAL_SEEDS = tuple(range(100, 112))          # graines de CALIBRATION du lexique (jamais les graines de test)
+CAL_SEEDS = tuple(range(100, 112))          # lexicon CALIBRATION seeds (never the test seeds)
 POSTERIOR_PATH = os.path.join("results", "lexical_posterior.pt")
 COMMITTED = lambda o: o not in ABSTAIN
 
 
-# ================================================================ posterior lexical (ajusté hors test)
+# ================================================================ lexical posterior (fitted outside the test set)
 
 def lexical_examples(seed, system="no_elimination", snapshots=False):
-    """Hypothèses lexicales avec leur sens correct. snapshots=True : un instantané après CHAQUE monde ingéré
-    (couvre le régime « peu de preuves », sinon absent de la calibration)."""
+    """Lexical hypotheses with their correct meaning. snapshots=True: one snapshot after EACH ingested world
+    (covers the "little evidence" regime, otherwise absent from the calibration)."""
     data, splits, caps = seed_data(seed)
     a = SYSTEMS[system](); a.learn_captions(caps); a.warm_up_sources(splits["train"])
     ex = []
@@ -51,7 +51,7 @@ def train_lexical_posterior(seeds=CAL_SEEDS, cache=True):
     return m
 
 
-# ================================================================ systèmes
+# ================================================================ systems
 
 def make_system(name, posterior=None):
     from core.unified_agent import UnifiedAgent, UnifiedConfig
@@ -77,7 +77,7 @@ def lexical_p(agent, cal):
     return lambda w, m: cal.meaning(agent, w)[1]
 
 
-# ================================================================ évaluation
+# ================================================================ evaluation
 
 def evaluate(agent, worlds, labels, cal=None, policy=None):
     ce = ClaimEntitlement(policy)
@@ -113,7 +113,7 @@ def score(rows, out="out", gold="orig"):
 
 
 def knowability_alignment(rows):
-    """L'agent dit « j'ai le droit d'affirmer » vs l'agent idéal dit « connaissable »."""
+    """The agent says "I am entitled to assert" vs the ideal agent says "knowable"."""
     tp = sum(r["decision"] == ASSERTED and COMMITTED(r["ideal"]) for r in rows)
     fp = sum(r["decision"] == ASSERTED and not COMMITTED(r["ideal"]) for r in rows)
     fn = sum(r["decision"] != ASSERTED and COMMITTED(r["ideal"]) for r in rows)
@@ -125,14 +125,14 @@ def knowability_alignment(rows):
     return {"precision": p, "recall": rcl, "f1": 2 * p * rcl / max(1e-9, p + rcl), "by_entitlement": cond}
 
 
-# ================================================================ audit de connaissabilité
+# ================================================================ knowability audit
 
 AUDIT = ("oracle_too_strict", "logical_elimination", "hidden_information", "real_ambiguity", "bad_propagation",
          "bad_lexical_hypothesis", "temporal_error")
 
 
 def audit(rows):
-    """Réponses engagées avec identité correcte mais attendu d'origine non engagé (ou faux) : pourquoi ?"""
+    """Committed answers with correct identity but original expected answer not committed (or wrong): why?"""
     c = Counter()
     for r in rows:
         if not COMMITTED(r["raw"]) or r["raw"] == r["orig"]: continue
@@ -147,14 +147,14 @@ def audit(rows):
     return {k: c.get(k, 0) for k in AUDIT}
 
 
-# ================================================================ attribution des erreurs
+# ================================================================ error attribution
 
 CAUSES = ("LEXICAL", "REFERENCE", "EVIDENCE", "SOURCE", "TEMPORAL", "GRAMMAR", "PLANNER", "KNOWABILITY_REFERENCE",
           "UNSUPPORTED_INFERENCE")
 
 
 def attribute(r, gold="ideal"):
-    """(cause principale, causes secondaires) d'une erreur finale (faux confiant ou abstention inutile)."""
+    """(primary cause, secondary causes) of a final error (false confident or needless abstention)."""
     causes = []
     if r["out"] == r["ideal"] and r["out"] != r["orig"] and gold == "orig": causes.append("KNOWABILITY_REFERENCE")
     if r["category"] == "temporal": causes.append("TEMPORAL")
@@ -180,10 +180,10 @@ def error_attribution(rows, gold="ideal"):
     return {k: round(prim.get(k, 0) / n, 4) for k in CAUSES}, {k: round(sec.get(k, 0) / n, 4) for k in CAUSES}
 
 
-# ================================================================ conversion du succès (revisitée)
+# ================================================================ success conversion (revisited)
 
 def conversion(rows_new, rows_base):
-    """Références supplémentaires résolues (réponse brute engagée ici, pas dans la base) -> devenir."""
+    """Additional references resolved (raw answer committed here, not in the baseline) -> outcome."""
     c = Counter()
     for a, b in zip(rows_new, rows_base):
         if not (COMMITTED(a["raw"]) and not COMMITTED(b["raw"])): continue
@@ -194,14 +194,14 @@ def conversion(rows_new, rows_base):
     return dict(c)
 
 
-# ================================================================ front de Pareto coût / sûreté
+# ================================================================ cost / safety Pareto front
 
 def pareto(rows, gold="orig", wrong=(2, 5, 10, 20, 50, 100), abstain=(0.5, 1, 2), allow_l2=(False, True)):
-    """Rejoue la décision d'affirmer pour chaque matrice de coût (vectorisé) : succès / faux confiants / abstention."""
+    """Replays the decision to assert for each cost matrix (vectorised): success / false confident / abstention."""
     q = torch.tensor([r["q"] for r in rows]); lvl = torch.tensor([r["level"] for r in rows])
     raw_commit = torch.tensor([COMMITTED(r["raw"]) for r in rows])
     raw_ok = torch.tensor([r["raw"] == r[gold] for r in rows])
-    gold_unknown = torch.tensor([r[gold] == "UNKNOWN" for r in rows])           # une retenue (UNKNOWN) est juste ici
+    gold_unknown = torch.tensor([r[gold] == "UNKNOWN" for r in rows])           # a withholding (UNKNOWN) is correct here
     pts = []
     for W in wrong:
         for A in abstain:
@@ -219,7 +219,7 @@ def pareto(rows, gold="orig", wrong=(2, 5, 10, 20, 50, 100), abstain=(0.5, 1, 2)
 
 
 def lexical_coverage(agent, cal=None):
-    """Formes jamais légendées apprises avec le BON sens (lexique calibré si attaché, sinon statut natif)."""
+    """Never-captioned forms learned with the RIGHT meaning (calibrated lexicon if attached, otherwise native status)."""
     from core.grounded_benchmark import LEARNABLE
     ok = wrong = 0
     for w in LEARNABLE:
@@ -230,7 +230,7 @@ def lexical_coverage(agent, cal=None):
     return ok / len(LEARNABLE), wrong
 
 
-# ================================================================ multi-graines
+# ================================================================ multi-seed
 
 def run_seed(seed, systems=SYSTEMS_E, posterior=None, n_worlds=20):
     posterior = posterior or train_lexical_posterior()
@@ -295,10 +295,10 @@ def multi_seed(seeds=range(8), systems=SYSTEMS_E, log=print):
 
 
 def curves(all_rows):
-    """Courbes confiance -> exactitude : croyance, droit d'affirmer, réponse finale (par système)."""
+    """Confidence -> accuracy curves: belief, entitlement to assert, final answer (per system)."""
     out = {}
     for n, rows in all_rows.items():
-        # réponses À VALEUR fondées sur une croyance (les rejets structurels et les commandes n'ont pas de postérieure)
+        # VALUE-BEARING answers grounded in a belief (structural rejections and commands have no posterior)
         committed = [r for r in rows if COMMITTED(r["raw"]) and r["intent"] != "command" and r["p_belief"] > 0
                      and r["raw"] not in ("REJECT", "INVALID_PREMISE", "UNKNOWN_CAUSE", "NONE")]
         out[n] = {"belief": calibration_report([r["p_belief"] for r in committed], [r["raw"] == r["ideal"] for r in committed]),

@@ -1,4 +1,4 @@
-"""Apprentissage structurel explicite : expérience -> stratégie paramétrée."""
+"""Explicit structural learning: experience -> parameterised strategy."""
 from __future__ import annotations
 
 from dataclasses import dataclass, fields, is_dataclass
@@ -21,7 +21,7 @@ class PatternVariable:
 
 
 def match_structure(pattern, value, bindings=None):
-    """Unification structurelle récursive, sans quantificateurs ni termes logiques."""
+    """Recursive structural unification, without quantifiers or logical terms."""
     bindings = dict(bindings or {})
     if isinstance(pattern, PatternVariable):
         if pattern.name in bindings and bindings[pattern.name] != value: return None
@@ -179,8 +179,8 @@ class ParameterizedMacroTransformation(TransformationSpec):
                                        description=f"instantiated {self.name} with {bindings}")
         return MacroTransformation(name=self.name, steps=steps, domain=self.domain,
                                    description=f"instantiated {self.name} with {bindings}")
-    def apply(self, obj, *args, **kwargs): raise TypeError("une macro paramétrée doit d'abord être instanciée")
-    def compile(self, state): raise TypeError("appelez match() puis instantiate()")
+    def apply(self, obj, *args, **kwargs): raise TypeError("a parameterised macro must first be instantiated")
+    def compile(self, state): raise TypeError("call match() then instantiate()")
     def record_success(self):
         object.__setattr__(self, "usage_count", self.usage_count + 1); object.__setattr__(self, "success_count", self.success_count + 1)
     def record_failure(self, state=None):
@@ -224,7 +224,7 @@ def normalize_linear_expression(expression):
 
 
 def generalize_linear_experience(experience):
-    """Généralisation contrôlée de ax+b=c, sans induction de programme."""
+    """Controlled generalisation of ax+b=c, without program induction."""
     from core.algebra import Add, DivideBothSides, Equation, Multiply, Simplify, SubtractBothSides
     a, x, b, c = (PatternVariable(name) for name in ("a", "x", "b", "c"))
     pattern = ProblemPattern(Equation(Add(Multiply(a, x), b), c))
@@ -237,7 +237,7 @@ def generalize_linear_experience(experience):
         domain=TransformationDomain.ALGEBRA,
     )
     matched = strategy.match(experience.initial_state, experience.goal)
-    if matched is None: raise ValueError("l'expérience n'est pas une équation linéaire ax+b=c")
+    if matched is None: raise ValueError("the experience is not a linear equation ax+b=c")
     experience.bindings.update(matched.bindings)
     return strategy
 
@@ -251,7 +251,7 @@ def consolidate(strategy, experiences):
 
 
 def lift_step(entity, height):
-    """Template physique : produit une spec d'Action, pas un moteur parallèle."""
+    """Physical template: produces an Action spec, not a parallel engine."""
     from core.action import LiftAction
     from core.transformations import DeclarativeTransformationSpec
     from core.invariants import Invariant, InvariantSet

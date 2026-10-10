@@ -1,7 +1,7 @@
 """
-Collisions géométriques générales pour WCE.
+General geometric collisions for WCE.
 
-Ce module fournit des interactions de collision basées sur la géométrie
+This module provides collision interactions based on the geometry
 PlaneCollider + Transform2D.
 """
 
@@ -29,22 +29,22 @@ from physics.colliders import (
 @dataclass
 class PlaneCollision:
     """
-    Collision avec des plans 2D arbitraires définis par PlaneCollider.
+    Collision with arbitrary 2D planes defined by PlaneCollider.
     
-    Cette interaction détecte et résout les collisions entre des entités mobiles
-    et des plans statiques définis dans le World via des entités avec un PlaneCollider.
+    This interaction detects and resolves collisions between moving entities
+    and static planes defined in the World through entities with a PlaneCollider.
     
-    Un plan peut être :
-        - Vertical (mur)
-        - Horizontal (sol)
-        - Incliné (plan à un angle)
+    A plane can be:
+        - Vertical (wall)
+        - Horizontal (ground)
+        - Inclined (plane at an angle)
     
-    La résolution applique :
-        - Correction de la position pour rester du côté autorisé du plan
-        - Application de la restitution à la composante normale de la vitesse
+    The resolution applies:
+        - Correction of the position to stay on the allowed side of the plane
+        - Application of the restitution to the normal component of the velocity
     
-    Note : Cette interaction ne gère pour l'instant que les plans statiques.
-    Les plans mobiles ne sont pas supportés.
+    Note: This interaction only handles static planes for now.
+    Moving planes are not supported.
     """
     
     restitution: float = 0.0
@@ -56,12 +56,12 @@ class PlaneCollision:
         transformation: Transformation,
     ) -> Transformation:
         """
-        Résout les collisions avec tous les plans du World.
+        Resolves the collisions with all the planes of the World.
         
-        Pour chaque entité avec un PlaneCollider dans le World, vérifie si
-        d'autres entités traversent le plan et corrige leur position/vitesse.
+        For each entity with a PlaneCollider in the World, checks whether
+        other entities cross the plane and corrects their position/velocity.
         """
-        # Découvrir tous les plans dans le World
+        # Discover all the planes in the World
         planes: list[tuple[str, Entity, PlaneCollider, Material]] = []
         
         for entity_name, entity in world.entities.items():
@@ -78,13 +78,13 @@ class PlaneCollision:
         changes = list(transformation.changes)
         relation_changes = list(transformation.relation_changes)
         
-        # Extraire les positions et vitesses proposées
+        # Extract the proposed positions and velocities
         proposed_positions = {}  # entity_name -> (x, y)
         proposed_velocities = {}  # entity_name -> (vx, vy)
         current_positions = {}   # entity_name -> (x, y) from world
         current_velocities = {}  # entity_name -> (vx, vy) from world
         
-        # D'abord, collecter les informations actuelles du monde
+        # First, collect the current information from the world
         for entity_name, entity in world.entities.items():
             if "x" in entity.properties:
                 current_positions[entity_name] = (
@@ -97,7 +97,7 @@ class PlaneCollision:
                     float(entity.properties.get("vy", 0.0)),
                 )
         
-        # Collecter les changements proposés
+        # Collect the proposed changes
         for change in changes:
             if change.property == "x":
                 if change.entity not in proposed_positions:
@@ -128,8 +128,8 @@ class PlaneCollision:
                     change.after,
                 )
         
-        # Pour les entités qui n'ont pas de changements de position/vitesse,
-        # utiliser les valeurs actuelles
+        # For the entities that have no position/velocity changes,
+        # use the current values
         for entity_name in current_positions:
             if entity_name not in proposed_positions:
                 proposed_positions[entity_name] = current_positions[entity_name]
@@ -140,34 +140,34 @@ class PlaneCollision:
         collision_occurred = False
         touching_pairs: set[tuple[str, str]] = set()
         
-        # Pour chaque entité mobile et chaque plan
+        # For each moving entity and each plane
         for entity_name, (new_x, new_y) in proposed_positions.items():
             for plane_name, plane_entity, plane_collider, material in planes:
                 if entity_name == plane_name:
-                    continue  # Une entité ne peut pas collider avec elle-même
+                    continue  # An entity cannot collide with itself
                 
-                # Calculer la distance signée
+                # Compute the signed distance
                 signed_dist = plane_collider.signed_distance(new_x, new_y)
                 
-                # Obtenir la position actuelle
+                # Get the current position
                 current_x, current_y = current_positions.get(entity_name, (new_x, new_y))
                 current_dist = plane_collider.signed_distance(current_x, current_y)
                 
-                # Si on traverse du côté autorisé vers le côté interdit
+                # If we cross from the allowed side to the forbidden side
                 if current_dist <= 0 and signed_dist > 0:
                     collision_occurred = True
                     touching_pairs.add((entity_name, plane_name))
                     
-                    # Projeter sur le plan
+                    # Project onto the plane
                     world_normal = plane_collider.world_normal()
                     nx, ny = world_normal
                     
-                    # Corriger la position : se placer sur le plan
-                    # Le plan est défini par : nx * (x - x0) + ny * (y - y0) = offset
-                    # où (x0, y0) est un point sur le plan dans le monde
-                    # Pour simplifier, utiliser la distance signée
-                    # La position corrigée est : (new_x, new_y) - signed_dist * (nx, ny)
-                    # Mais signed_dist > 0, donc on soustrait
+                    # Correct the position: place it on the plane
+                    # The plane is defined by: nx * (x - x0) + ny * (y - y0) = offset
+                    # where (x0, y0) is a point on the plane in the world
+                    # To simplify, use the signed distance
+                    # The corrected position is: (new_x, new_y) - signed_dist * (nx, ny)
+                    # But signed_dist > 0, so we subtract
                     corrected_x = new_x - signed_dist * nx
                     corrected_y = new_y - signed_dist * ny
                     
@@ -184,17 +184,17 @@ class PlaneCollision:
                         after=corrected_y,
                     )
                     
-                    # Appliquer la restitution à la vitesse normale
-                    # La composante normale de la vitesse
+                    # Apply the restitution to the normal velocity
+                    # The normal component of the velocity
                     vx, vy = proposed_velocities.get(entity_name, (0.0, 0.0))
                     normal_velocity = vx * nx + vy * ny
                     
-                    if normal_velocity > 0:  # Se déplace vers le côté interdit
-                        # Composante tangentielle (inchangée par la collision)
+                    if normal_velocity > 0:  # Moving towards the forbidden side
+                        # Tangential component (unchanged by the collision)
                         tangent_x = vx - normal_velocity * nx
                         tangent_y = vy - normal_velocity * ny
                         
-                        # Composante normale après collision (avec restitution)
+                        # Normal component after collision (with restitution)
                         normal_velocity_after = -normal_velocity * material.restitution
                         
                         vx_after = tangent_x + normal_velocity_after * nx
@@ -213,18 +213,18 @@ class PlaneCollision:
                             after=vy_after,
                         )
         
-        # Construire la liste des changements résolus
+        # Build the list of resolved changes
         resolved = []
         for change in changes:
             key = (change.entity, change.property)
             resolved.append(replacements.get(key, change))
         
-        # Ajouter les nouveaux changements (vx, vy qui n'étaient pas dans la transformation originale)
+        # Add the new changes (vx, vy that were not in the original transformation)
         for key, replacement_change in replacements.items():
             if key not in [(c.entity, c.property) for c in changes]:
                 resolved.append(replacement_change)
         
-        # Ajouter les relations "touching"
+        # Add the "touching" relations
         for entity_name, plane_name in touching_pairs:
             relation_exists = any(
                 r.subject == entity_name and r.predicate == "touching" and r.object == plane_name

@@ -1,4 +1,4 @@
-"""Expériences du jalon « Active Structural Discovery » (une graine = un appel ; parallélisées par graine)."""
+"""Experiments of the "Active Structural Discovery" milestone (one seed = one call; parallelised per seed)."""
 from __future__ import annotations
 
 import copy
@@ -70,11 +70,11 @@ def main_job(seed, noise=0.05):
     return {"rows": rows, "policy_keys": len(policy.tot), "search_macros": policy.macros.most_common(5)}
 
 
-# ================================================================ H2 : politiques de requête et espace des versions
+# ================================================================ H2: query policies and version space
 
 def query_policy_job(seed, noise=0.05, n_q=BUDGET):
-    """Ensemble de candidats FIGÉ (recherche passive profondeur 2, 12 meilleurs) → requêtes selon chaque politique
-    → entropie structurelle et taille de l'espace des versions après chaque requête (aucun réajustement)."""
+    """FROZEN candidate set (passive search at depth 2, 12 best) → queries according to each policy
+    → structural entropy and size of the version space after each query (no refitting)."""
     rows = []
     for k, inst in enumerate(balanced_instances(HELD_OUT + DEPTH_FAMILIES, seed + 3100, 1)):
         g0 = torch.Generator().manual_seed(seed * 77 + k); X, y = noisy_task(inst, N, g0, noise); Xt, yt, Xv, yv = split(X, y)
@@ -94,7 +94,7 @@ def query_policy_job(seed, noise=0.05, n_q=BUDGET):
     return rows
 
 
-# ================================================================ H3 / H7 : familles fonctionnelles, orbites, réutilisation
+# ================================================================ H3 / H7: functional families, orbits, reuse
 
 def discovered_programs(families, seed, per, policy, noise=0.05):
     out = []
@@ -129,7 +129,7 @@ def family_job(seed, noise=0.05):
         res[mode] = {"promoted": len(fams), "recovered": sorted(hits), "recall": len(hits & set(HELD_OUT)) / len(HELD_OUT), "false_promotions": false,
                      "representations_per_family": round(sum(len({str(r.skeleton()) for r in f.representations}) for f in fams) / max(1, len(fams)), 2),
                      "compression": round(len(P) / max(1, len(fams)), 2)}
-    # H7 : réutilisation sur représentations TRANSFORMÉES
+    # H7: reuse on TRANSFORMED representations
     lib_progs = discovered_programs(TRAIN + VALIDATION, seed + 3400, 2, policy, noise)
     lib = {"canonical": induce_orbit_families([p for _, p in lib_progs], min_support=1, canonical=True),
            "raw": induce_orbit_families([p for _, p in lib_progs], min_support=1, canonical=False)}
@@ -144,11 +144,11 @@ def family_job(seed, noise=0.05):
     return res
 
 
-# ================================================================ H4 / Y : ancres de vérité sensibles au bruit
+# ================================================================ H4 / Y: noise-aware truth anchors
 
 def candidate_rules(inst, X, y, noise, seed):
-    """Règles CORRECTES (exactitude complète ≥ 0,97) et FAUSSES mais auto-cohérentes (< 0,93) : sous-région,
-    petit échantillon, étiquettes biaisées."""
+    """CORRECT rules (full accuracy ≥ 0.97) and WRONG but self-consistent rules (< 0.93): sub-region,
+    small sample, biased labels."""
     F = full_region(3000, torch.Generator().manual_seed(seed)); out = []
     def search(Xs, ys):
         Xt, yt, Xv, yv = split(Xs, ys); return BoundaryProgramSearch(max_depth=2, seed=seed).run(Xt, yt, Xv, yv)
@@ -173,7 +173,7 @@ def anchor_job(seed, noise=0.08):
     return rows
 
 
-# ================================================================ H5 : stabilité sous bruit
+# ================================================================ H5: stability under noise
 
 def stability_job(seed):
     rows = []
@@ -190,7 +190,7 @@ def stability_job(seed):
     return rows
 
 
-# ================================================================ H9 : résidu à porte
+# ================================================================ H9: gated residual
 
 def residual_job(seed, noise=0.05):
     rows = []
@@ -205,7 +205,7 @@ def residual_job(seed, noise=0.05):
     return rows
 
 
-# ================================================================ H10 : budget de capacité strict
+# ================================================================ H10: strict capacity budget
 
 BUDGET_FLOATS = 400
 
@@ -216,16 +216,16 @@ def capacity_job(seed, noise=0.05):
     for k, inst in enumerate(insts):
         g = torch.Generator().manual_seed(seed * 23 + k); X, y = noisy_task(inst, 200, g, noise); data.append((inst, X, y, g))
     out = {}
-    # (a) experts seuls
+    # (a) experts only
     used = 0; kept = []; rejected = 0
     for inst, X, y, g in data:
         if used + 82 > BUDGET_FLOATS: rejected += 1; continue
         e = train_mlp(X[:150], y[:150], h=16, steps=600, seed=seed); used += 82; kept.append((inst, lambda Q, e=e: mlp_logits(e, Q).argmax(1), 82))
     out["experts_only"] = _cap_summary(kept, rejected, used, {})
-    # (b) système complet : programme accepté (stabilité + OOD vérifiée par ancres) > résidu à porte > tête sur base partagée ; élagage par valeur
+    # (b) full system: accepted program (stability + OOD verified by anchors) > gated residual > head on a shared base; pruning by value
     used = 0; kept = []; rejected = 0; ops = Counter(); base_paid = False; H = 16; W = None
     for t, (inst, X, y, g) in enumerate(data):
-        Xh, yh = X[150:], y[150:]; X, y = X[:150], y[:150]                          # validation propre à la compétence (valeur)
+        Xh, yh = X[150:], y[150:]; X, y = X[:150], y[:150]                          # validation specific to the skill (value)
         Xt, yt, Xv, yv = split(X, y); s = BoundaryProgramSearch(max_depth=2, seed=seed).run(Xt, yt, Xv, yv); p = s.best
         cand = None
         if p is not None:
@@ -243,10 +243,10 @@ def capacity_job(seed, noise=0.05):
             hd = {k2: v.detach() for k2, v in hd.items()}; cost = 2 * H + 2 + (0 if base_paid else 3 * H); base_paid = True
             cand = ("shared_head", cost, lambda Q, hd=hd: (feat(Q) @ hd["w"].T + hd["b"]).argmax(1)); ops["shared_head"] += 1
         val = float((cand[2](Xh) == yh).float().mean())
-        if val < 0.85: rejected += 1; ops["rejected_low_value"] += 1; continue                  # pas d'acquisition d'une compétence inutile
+        if val < 0.85: rejected += 1; ops["rejected_low_value"] += 1; continue                  # no acquisition of a useless skill
         while used + cand[1] > BUDGET_FLOATS and kept:
             low = min(range(len(kept)), key=lambda i: kept[i][3])
-            if kept[low][3] < val - 0.05: used -= kept[low][2]; kept.pop(low); ops["pruned"] += 1     # remplacer une capacité de MOINDRE valeur
+            if kept[low][3] < val - 0.05: used -= kept[low][2]; kept.pop(low); ops["pruned"] += 1     # replace a capacity of LOWER value
             else: break
         if used + cand[1] > BUDGET_FLOATS: rejected += 1; ops["rejected_budget"] += 1; continue
         kept.append((inst, cand[2], cand[1], val)); used += cand[1]
@@ -261,7 +261,7 @@ def _cap_summary(kept, rejected, used, ops):
             "mean_acc": round(sum(accs) / max(1, len(accs)), 4), "operations": dict(ops)}
 
 
-# ================================================================ identifiabilité, confusion adversariale
+# ================================================================ identifiability, adversarial confusion
 
 def identifiability_job(seed, noise=0.05):
     rows = []
@@ -277,7 +277,7 @@ def identifiability_job(seed, noise=0.05):
     return rows
 
 
-# ================================================================ inter-domaines : expériences actives
+# ================================================================ cross-domain: active experiments
 
 def cross_domain_job(seed, tasks=6):
     from core.program_induction_core import DOMAINS, domain_inputs, enumerate_programs, random_target, run
@@ -308,7 +308,7 @@ def _entropy(c):
     n = sum(c.values()); return -sum(v / n * math.log(v / n) for v in c.values())
 
 
-# ================================================================ balayage du bruit
+# ================================================================ noise sweep
 
 def noise_sweep_job(seed):
     rows = []; policy = train_policy(train_tasks(seed + 800, 0.05), eps=0.05, seed=seed)

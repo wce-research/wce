@@ -1,9 +1,9 @@
-"""Rapports du sous-jalon End-to-End Composition with Discovered Atoms (dev uniquement ; jamais le lot scellé).
+"""Reports of the sub-milestone End-to-End Composition with Discovered Atoms (dev only; never the sealed set).
 
-  tune      : configuration de la chaîne C sur les clés de MISE AU POINT (990–994) → results/deep_configs/e2e.json
-  smoke     : démonstration locale courte (clé 999)
-  aggregate : agrège les runs AWS `deepee` → results/deep_end_to_end_summary.json
-  report    : imprime les tableaux
+  tune      : configuration of chain C on the TUNING keys (990–994) → results/deep_configs/e2e.json
+  smoke     : short local demonstration (key 999)
+  aggregate : aggregates the AWS runs `deepee` → results/deep_end_to_end_summary.json
+  report    : prints the tables
 """
 from __future__ import annotations
 
@@ -53,17 +53,17 @@ def summarize(rows, bad=0):
 
 
 def aggregate():
-    rows, bad = load_rows(); S = summarize(rows, bad); json.dump(S, open(SUMMARY, "w"), indent=1); print("lignes", len(rows), "unités en erreur", bad); return S
+    rows, bad = load_rows(); S = summarize(rows, bad); json.dump(S, open(SUMMARY, "w"), indent=1); print("rows", len(rows), "units in error", bad); return S
 
 
 def show(S):
     ci = lambda v: {x: (y["diff"], y["ci95"]) if y else None for x, y in v.items()}; cut = lambda v, ks: {k: v.get(k) for k in ks if v.get(k) is not None}
-    print("\nCHAÎNES"); [print(k.ljust(20), cut(v, ("n", "accord", "accord_out", "functional", "functional_097", "candidate_097", "exact", "class_equal", "literals", "kept", "false_used", "atom_recall", "atom_recall_literals", "atom_recall_kept", "generated_099", "top20_099", "prefit_accord", "fit_committed", "classes", "seconds"))) for k, v in S["chain"].items()]
-    print("\nappariées"); [print(k.ljust(30), ci(v)) for k, v in S["chain_paired"].items()]; print("\ncauses (chaîne C)", S["causes"]); print("décisions en classe", S["labels_in_class"]); print("décision → résultat", S["label_vs_outcome"])
+    print("\nCHAINS"); [print(k.ljust(20), cut(v, ("n", "accord", "accord_out", "functional", "functional_097", "candidate_097", "exact", "class_equal", "literals", "kept", "false_used", "atom_recall", "atom_recall_literals", "atom_recall_kept", "generated_099", "top20_099", "prefit_accord", "fit_committed", "classes", "seconds"))) for k, v in S["chain"].items()]
+    print("\npaired"); [print(k.ljust(30), ci(v)) for k, v in S["chain_paired"].items()]; print("\ncauses (chain C)", S["causes"]); print("in-class decisions", S["labels_in_class"]); print("decision → outcome", S["label_vs_outcome"])
     print("\nSOURCES"); [print(k.ljust(24), cut(v, ("n", "accord", "functional", "functional_097", "literals", "kept", "atom_recall_literals", "atom_recall_kept", "false_kept", "generated_099", "seconds"))) for k, v in S["source"].items() if k.startswith(("all/", "d4-6/"))]; [print(k.ljust(36), ci(v)) for k, v in S["source_paired"].items()]
-    print("\nRÉDUCTION ET PASSAGE À L'ÉCHELLE"); [print(k.ljust(24), cut(v, ("n", "accord", "functional", "functional_097", "kept", "atom_recall_literals", "atom_recall_kept", "classes", "considered", "seconds"))) for k, v in S["reduce"].items() if k.startswith(("all/", "d4-6/"))]; [print(k.ljust(36), ci(v)) for k, v in S["reduce_paired"].items()]
-    print("\nCAS CONTRÔLÉS"); [print(k.ljust(22), cut(v, ("n", "accord", "accord_out", "functional", "functional_097", "kept", "false_kept", "false_used"))) for k, v in S["robust"].items() if k.startswith(("all/", "d4-6/"))]; print("décisions", S["robust_labels"])
-    print("\nFRONTIÈRE DE CLASSE"); [print(k.ljust(20), v) for k, v in S["boundary"].items()]; print(S["boundary_all"])
+    print("\nREDUCTION AND SCALING"); [print(k.ljust(24), cut(v, ("n", "accord", "functional", "functional_097", "kept", "atom_recall_literals", "atom_recall_kept", "classes", "considered", "seconds"))) for k, v in S["reduce"].items() if k.startswith(("all/", "d4-6/"))]; [print(k.ljust(36), ci(v)) for k, v in S["reduce_paired"].items()]
+    print("\nCONTROLLED CASES"); [print(k.ljust(22), cut(v, ("n", "accord", "accord_out", "functional", "functional_097", "kept", "false_kept", "false_used"))) for k, v in S["robust"].items() if k.startswith(("all/", "d4-6/"))]; print("decisions", S["robust_labels"])
+    print("\nCLASS BOUNDARY"); [print(k.ljust(20), v) for k, v in S["boundary"].items()]; print(S["boundary_all"])
 
 
 def report(): show(json.load(open(SUMMARY)))
@@ -75,8 +75,8 @@ def _tasks(keys, regimes=("standard", "rich")):
 
 
 def tune():
-    """Configuration de la chaîne C sur les clés de mise au point 990–994 (60 tâches). Critère fixé d'avance : accord
-    final moyen. La découverte est faite une fois par tâche, puis réutilisée pour toutes les configurations."""
+    """Configuration of chain C on the tuning keys 990–994 (60 tasks). Criterion fixed in advance: mean
+    final agreement. The discovery is done once per task, then reused for all the configurations."""
     import itertools
     from core.deep_e2e import DEFAULTS, discover, run_chain
     from core.deep_e2e_exp import _acc, _regions
@@ -85,7 +85,7 @@ def tune():
         cfg = {**DEFAULTS, "min_gain": mg, "fit": fit, "selector": sel}; acc = [_acc(run_chain(t.X, t.y, 0, cfg, disc[tid][3]).program, reg[tid]) for tid, _, _, t in T]
         res.append({"min_gain": mg, "fit": fit, "selector": sel, "accord": _mean(a["accord"] for a in acc), "functional_097": _mean(a["functional_097"] for a in acc), "accord_d4_6": _mean(a["accord"] for a, (_, d, _, _) in zip(acc, T) if d >= 4)}); print(res[-1], flush=True)
     best = max(res, key=lambda r: r["accord"]); cfg = {"min_gain": best["min_gain"], "fit": best["fit"], "selector": best["selector"]}
-    json.dump({"config": cfg, "selected_on": f"{len(T)} tâches de mise au point (clés 990–994)", "criterion": "accord final moyen", "grid": res}, open(CONFIG, "w"), indent=1, ensure_ascii=False); print("RETENU", cfg, best)
+    json.dump({"config": cfg, "selected_on": f"{len(T)} tuning tasks (keys 990–994)", "criterion": "mean final agreement", "grid": res}, open(CONFIG, "w"), indent=1, ensure_ascii=False); print("SELECTED", cfg, best)
 
 
 def smoke():

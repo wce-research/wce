@@ -1,17 +1,17 @@
-"""Proposeur NEURONAL COMPACT de primitives (≈ 24 000 paramètres).
+"""COMPACT NEURAL proposer of primitives (≈ 24,000 parameters).
 
-Discipline :
-  * il ne prédit ni la structure complète ni les étiquettes du monde ; il propose seulement des COMPOSANTES DE FRONTIÈRE
-    en base minimale (cercles : centre + rayon ; droites : pied de la perpendiculaire + direction) ;
-  * ses sorties sont des paramètres d'atomes explicites, converties en primitives candidates ;
-  * la validation reste structurelle, côté WCE (core.deep_primitives.PrimitiveValidation) ;
-  * pas de gros réseau : 4 convolutions 3×3 sur une grille 24×24, têtes 1×1.
+Discipline:
+  * it predicts neither the complete structure nor the labels of the world; it only proposes BOUNDARY COMPONENTS
+    in the minimal basis (circles: center + radius; lines: foot of the perpendicular + direction);
+  * its outputs are explicit atom parameters, converted into candidate primitives;
+  * validation remains structural, on the WCE side (core.deep_primitives.PrimitiveValidation);
+  * no big network: 4 convolutions of size 3×3 on a 24×24 grid, 1×1 heads.
 
-Entrée : observations rastérisées (points positifs, points négatifs, zone observée). Sortie par cellule : présence d'un
-centre de cercle (+ décalage, rayon) et d'une ancre de droite (+ décalage, cos, sin de la normale).
+Input: rasterized observations (positive points, negative points, observed zone). Output per cell: presence of a
+circle center (+ offset, radius) and of a line anchor (+ offset, cos, sin of the normal).
 
-L'inférence (`NeuralProposer.propose`) n'utilise que les observations. L'entraînement (`train`) utilise la vérité de
-scènes d'ENTRAÎNEMENT de la partition dev (jamais validation, test ni lot scellé).
+Inference (`NeuralProposer.propose`) uses only the observations. Training (`train`) uses the truth of
+TRAINING scenes of the dev split (never validation, test or the sealed set).
 """
 from __future__ import annotations
 
@@ -32,13 +32,13 @@ from core.deep_structure import skel_key
 GRID = 24
 LO, HI = -3.0, 3.0
 CELL = (HI - LO) / GRID
-OBS_LIMIT = 1.2                      # limite de la zone observée (information d'acquisition, pas de vérité)
+OBS_LIMIT = 1.2                      # limit of the observed zone (acquisition information, not truth)
 R_SCALE = 2.0
 WEIGHTS = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "results", "deep_configs")
 
 
 class ProposerNet(nn.Module):
-    """Réseau convolutif compact. Sortie [B, 9, G, G] : cercle (présence, dx, dy, rayon) + droite (présence, dx, dy, cos, sin)."""
+    """Compact convolutional network. Output [B, 9, G, G]: circle (presence, dx, dy, radius) + line (presence, dx, dy, cos, sin)."""
 
     def __init__(self, width=32):
         super().__init__()
@@ -50,7 +50,7 @@ class ProposerNet(nn.Module):
     def n_params(self): return sum(p.numel() for p in self.parameters())
 
     def flops(self):
-        """Proxy : multiplications-additions d'un passage (convolutions seulement)."""
+        """Proxy: multiply-adds of one pass (convolutions only)."""
         f = 0
         for m in self.modules():
             if isinstance(m, nn.Conv2d): f += m.in_channels * m.out_channels * m.kernel_size[0] * m.kernel_size[1] * GRID * GRID
@@ -58,7 +58,7 @@ class ProposerNet(nn.Module):
 
 
 def rasterize(X, y):
-    """Observations → tenseur [3, G, G] : densité de positifs, densité de négatifs, masque de zone observée."""
+    """Observations → tensor [3, G, G]: density of positives, density of negatives, observed-zone mask."""
     ij = ((X.float() - LO) / CELL).long().clamp(0, GRID - 1); idx = ij[:, 1] * GRID + ij[:, 0]; pos = torch.zeros(GRID * GRID).index_add_(0, idx, (y == 1).float()); neg = torch.zeros(GRID * GRID).index_add_(0, idx, (y == 0).float())
     s = (pos.sum() + neg.sum()) / (GRID * GRID) + 1e-6; xs = LO + (torch.arange(GRID) + 0.5) * CELL; mask = (xs[None, :] <= OBS_LIMIT).float().expand(GRID, GRID)
     return torch.stack([(pos / s).view(GRID, GRID), (neg / s).view(GRID, GRID), mask])
@@ -69,7 +69,7 @@ def _cell(px, py):
 
 
 def targets(components: Sequence[tuple]):
-    """Composantes vraies d'une scène d'ENTRAÎNEMENT → cibles [9, G, G] + masque de régression [2, G, G]."""
+    """True components of a TRAINING scene → targets [9, G, G] + regression mask [2, G, G]."""
     T = torch.zeros(9, GRID, GRID); M = torch.zeros(2, GRID, GRID)
     for c in components:
         if c[0] == "circle":
@@ -78,7 +78,7 @@ def targets(components: Sequence[tuple]):
         else:
             if c[0] == "ray": a = c[3] + math.pi / 2; b = math.cos(a) * c[1] + math.sin(a) * c[2]
             else: a, b = c[1], c[2]
-            if b < 0: a, b = a + math.pi, -b                                          # normale orientée vers l'extérieur de l'origine : ancre = b·n
+            if b < 0: a, b = a + math.pi, -b                                          # normal oriented away from the origin: anchor = b·n
             px, py = b * math.cos(a), b * math.sin(a)
             if not (LO <= px <= HI and LO <= py <= HI): continue
             i, j, dx, dy = _cell(px, py); T[4, j, i] = 1; T[5, j, i], T[6, j, i], T[7, j, i], T[8, j, i] = dx, dy, math.cos(a), math.sin(a); M[1, j, i] = 1
@@ -92,7 +92,7 @@ def loss_fn(out, T, M, pos_weight=40.0):
 
 
 def train(scenes: Sequence[tuple], epochs=30, batch=64, lr=2e-3, seed=0, width=32):
-    """Entraîne le proposeur sur des scènes (X, y, composantes vraies). Renvoie (réseau, journal)."""
+    """Trains the proposer on scenes (X, y, true components). Returns (network, log)."""
     torch.manual_seed(seed); net = ProposerNet(width); X = torch.stack([rasterize(x, y) for x, y, _ in scenes]); TM = [targets(c) for _, _, c in scenes]; T = torch.stack([t for t, _ in TM]); M = torch.stack([m for _, m in TM])
     opt = torch.optim.Adam(net.parameters(), lr=lr); g = torch.Generator().manual_seed(seed); t0 = time.time(); log = []
     for ep in range(epochs):
@@ -104,8 +104,8 @@ def train(scenes: Sequence[tuple], epochs=30, batch=64, lr=2e-3, seed=0, width=3
 
 
 def decode(out, top=6, min_prob=0.15):
-    """Sortie du réseau [9, G, G] → composantes proposées [('circle', cx, cy, r, p) | ('line', angle, offset, p)], avec
-    suppression des voisins immédiats (un maximum local par composante)."""
+    """Network output [9, G, G] → proposed components [('circle', cx, cy, r, p) | ('line', angle, offset, p)], with
+    suppression of immediate neighbors (one local maximum per component)."""
     comps = []
     for ch, kind in ((0, "circle"), (4, "line")):
         p = torch.sigmoid(out[ch]); loc = (p == Fn.max_pool2d(p[None, None], 3, 1, 1)[0, 0]) & (p >= min_prob); idx = loc.nonzero(); sc = p[loc]
@@ -131,8 +131,8 @@ def load(name: str = "full") -> Optional[ProposerNet]:
 
 
 class NeuralProposer(PrimitiveProposal):
-    """Proposeur neuronal : observations → composantes de frontière → atomes candidats (base minimale + macros
-    reconnues par contraintes). Il n'émet que des PROPOSITIONS ; rien n'est retenu sans validation WCE."""
+    """Neural proposer: observations → boundary components → candidate atoms (minimal basis + macros
+    recognized by constraints). It only emits PROPOSALS; nothing is retained without WCE validation."""
     name = "neural"
 
     def __init__(self, net: Optional[ProposerNet] = None, basis_name="rich", top=6, variant="full"):

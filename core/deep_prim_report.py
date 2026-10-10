@@ -1,8 +1,8 @@
-"""Rapports du sous-jalon Primitive Discovery (dev uniquement ; jamais le lot scellé).
+"""Reports of the Primitive Discovery sub-milestone (dev only; never the sealed set).
 
-  install   : installe les poids du proposeur neuronal entraîné sur AWS → results/deep_configs/
-  aggregate : agrège les runs AWS `deepprim` → results/deep_primitive_summary.json
-  report    : imprime les tableaux
+  install   : installs the weights of the neural proposer trained on AWS → results/deep_configs/
+  aggregate : aggregates the AWS runs `deepprim` → results/deep_primitive_summary.json
+  report    : prints the tables
 """
 from __future__ import annotations
 
@@ -27,7 +27,7 @@ def install():
         if r["status"] != "ok": continue
         row = r["result"][0]; meta = {k: v for k, v in row.items() if k != "state"}; json.dump({"state": row["state"], "info": meta}, open(os.path.join(OUT, "deep_configs", f"neural_proposer_{row['variant']}.json"), "w")); info[row["variant"]] = meta
     json.dump(info, open(os.path.join(OUT, "deep_neural_training.json"), "w"), indent=1)
-    for v, m in info.items(): print(v, {k: m[k] for k in ("n_params", "flops_per_forward", "memory_bytes", "scenes", "epochs", "seconds", "data_seconds")}, "perte", m["loss"][0], "→", m["loss"][-1])
+    for v, m in info.items(): print(v, {k: m[k] for k in ("n_params", "flops_per_forward", "memory_bytes", "scenes", "epochs", "seconds", "data_seconds")}, "loss", m["loss"][0], "→", m["loss"][-1])
     return info
 
 
@@ -80,32 +80,32 @@ def aggregate():
                                           "primitive_equivalence~final_full": _corr([float(r.get("primitive_equivalence") or 0) for r in x], [float(r["final_full"]) for r in x]),
                                           "component_recall~final_full": _corr([float(r.get("component_recall") or 0) for r in x], [float(r["final_full"]) for r in x]),
                                           "candidate_functional~final_functional": _corr([float(r["candidate_functional"]) for r in x], [float(r["final_functional"]) for r in x])}
-    # bibliothèque de primitives (familles, naissances, retraits) à partir des primitives VALIDÉES des scènes atomiques
+    # library of primitives (families, births, retirements) from the VALIDATED primitives of the atomic scenes
     from core.boundary_program import BNode
     from core.deep_primitives import PrimitiveLibrary
     lib = PrimitiveLibrary()
     for i, r in enumerate(r for r in at if r["method"] == "hybrid"): lib.observe(f"s{i}", [BNode.from_dict(f["program"]) for f in r["found"] if f["z"] >= 5.0])
     lib.update(); S["library"] = {"usage": lib.usage, "priors": lib.priors(), "families": [f.render() + f" ×{f.support}" for f in lib.families], "births": [vars(b) for b in lib.births()], "retire_candidates": lib.retire()}
-    json.dump(S, open(os.path.join(OUT, "deep_primitive_summary.json"), "w"), indent=1); print("lignes", len(rows), "unités en erreur", bad); return S
+    json.dump(S, open(os.path.join(OUT, "deep_primitive_summary.json"), "w"), indent=1); print("rows", len(rows), "units in error", bad); return S
 
 
 def report():
     S = json.load(open(os.path.join(OUT, "deep_primitive_summary.json")))
-    print("\nBANC ATOMIQUE (toutes catégories)"); print("méthode".ljust(16) + " ".join(k[:10].rjust(11) for k in ("exact", "functional", "equivalence", "component_recall", "precision", "param_error", "classes", "proposals", "fit_equivalents", "seconds", "compactness")))
+    print("\nATOMIC BENCH (all categories)"); print("method".ljust(16) + " ".join(k[:10].rjust(11) for k in ("exact", "functional", "equivalence", "component_recall", "precision", "param_error", "classes", "proposals", "fit_equivalents", "seconds", "compactness")))
     for m, v in S["atomic"].items(): print(m.ljust(16) + " ".join((f"{v[k]:.2f}" if v[k] is not None else "—").rjust(11) for k in ("exact", "functional", "equivalence", "component_recall", "precision", "param_error", "classes", "proposals", "fit_equivalents", "seconds", "compactness")))
-    print("\néquivalence par classe d'identifiabilité (identifiable / partiel / non) et effectifs")
+    print("\nequivalence by identifiability class (identifiable / partial / not) and counts")
     for m, v in S["atomic"].items(): print(m.ljust(16), v["equivalence_identifiable"], v["equivalence_partial"], v["equivalence_not_identifiable"], "|", v["n_identifiable"], v["n_partial"], v["n_not_identifiable"])
-    print("\npar catégorie (équivalence / composantes / précision)")
+    print("\nby category (equivalence / components / precision)")
     for k, v in S["atomic_by_category"].items():
         if k.split("/")[1] in ("gradient", "geometric", "hybrid", "neural", "neural_hybrid"): print(k.ljust(28), v["equivalence"], v["component_recall"], v["precision"])
-    print("\npar type d'atome"); [print(k.ljust(28), v) for k, v in S["by_type"].items()]
-    print("\nhors distribution (scènes à deux atomes)"); print("référence nominale", S["ood_reference_two"]); [print(k.ljust(28), v) for k, v in S["ood"].items()]
-    print("\nmesures actives"); [print(k.ljust(28), v) for k, v in S["active"].items()]
-    print("\nCHAÎNE : primitives → candidats → récupération")
+    print("\nby atom type"); [print(k.ljust(28), v) for k, v in S["by_type"].items()]
+    print("\nout of distribution (two-atom scenes)"); print("nominal reference", S["ood_reference_two"]); [print(k.ljust(28), v) for k, v in S["ood"].items()]
+    print("\nactive measurements"); [print(k.ljust(28), v) for k, v in S["active"].items()]
+    print("\nCHAIN: primitives → candidates → recovery")
     for k, v in S["chain"].items(): print(k.ljust(34), {x: v[x] for x in ("n", "primitive_equivalence", "component_recall", "candidate_form", "candidate_functional", "final_functional", "final_full", "discovered_true_composition")})
     print("\ntransitions"); [print(k.ljust(16), v) for k, v in S["chain_transitions"].items()]
-    print("\ncorrélations"); [print(k.ljust(16), v) for k, v in S["chain_correlations"].items()]
-    print("\nbibliothèque"); print(json.dumps(S["library"], indent=1, ensure_ascii=False)[:2500])
+    print("\ncorrelations"); [print(k.ljust(16), v) for k, v in S["chain_correlations"].items()]
+    print("\nlibrary"); print(json.dumps(S["library"], indent=1, ensure_ascii=False)[:2500])
 
 
 if __name__ == "__main__":

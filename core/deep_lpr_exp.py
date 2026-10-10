@@ -1,13 +1,13 @@
-"""Expériences du sous-jalon Latent Primitive Recovery — module d'ÉVALUATION (dev uniquement ; il voit la vérité pour
-MESURER ; jamais le lot scellé).
+"""Experiments of the Latent Primitive Recovery sub-milestone — EVALUATION module (dev only; it sees the truth in order to
+MEASURE; never the sealed set).
 
-  chain    : A atomes du pipeline gelé, B flat_scene_k3, C LatentPrimitiveSetRecovery — tous dans le MÊME aval fort ;
-             récupération de l'ENSEMBLE des vraies primitives, précision des paramètres, aval
-  sens     : erreur de paramètre → récupération de la composition, par type de primitive et par famille de paramètres
-  fp       : vrais atomes + 1 / 3 / 5 / 10 faux ; défaut de l'ancienne réduction
-  complete : signal de complétude ; recherche d'une primitive manquante par le résidu ; hors-classe (exploratoire)
+  chain    : A atoms of the frozen pipeline, B flat_scene_k3, C LatentPrimitiveSetRecovery — all in the SAME strong downstream;
+             recovery of the SET of true primitives, parameter accuracy, downstream
+  sens     : parameter error → recovery of the composition, per primitive type and per parameter family
+  fp       : true atoms + 1 / 3 / 5 / 10 false ones; defect of the old reduction
+  complete : completeness signal; search for a missing primitive through the residual; out-of-class (exploratory)
 
-Tâches : clés 1000–1031 de `down_task`, profondeurs 1 à 6 (jamais utilisées ; mise au point : clés 1090–1099).
+Tasks: keys 1000–1031 of `down_task`, depths 1 to 6 (never used; tuning: keys 1090–1099).
 """
 from __future__ import annotations
 
@@ -59,10 +59,10 @@ def _acc(prog: Optional[BNode], regions) -> dict:
     (F, lF), _, (O, lO) = regions; a = float((predict(prog, F) == lF).float().mean()); return {"accord": a, "accord_out": float((predict(prog, O) == lO).float().mean()), "functional": a >= GOOD, "functional_097": a >= 0.97}
 
 
-# ================================================================ récupération de l'ENSEMBLE des vraies primitives
+# ================================================================ recovery of the SET of true primitives
 
 def atom_visibility(task) -> List[float]:
-    """Part de la frontière de chaque vrai atome (dans la zone observée) qui est VISIBLE dans la vraie composition."""
+    """Share of the boundary of each true atom (in the observed zone) that is VISIBLE in the true composition."""
     from core.deep_partial import leaf_paths, render, visible_mask
     from core.deep_partial_exp import BOX
     tr = task.world.truth; out = []
@@ -72,17 +72,17 @@ def atom_visibility(task) -> List[float]:
 
 
 def set_recovery(programs: Sequence[BNode], task) -> dict:
-    """Trois niveaux d'équivalence, par vrai atome puis pour l'ENSEMBLE :
-      exact       toutes les frontières de l'atome dans la tolérance de paramètres (équivalence de paramètres)
-      functional  accord fonctionnel ≥ 0,95 sur la région observée, quel que soit le paramétrage
-      strict      accord fonctionnel ≥ 0,99
-    `all_*` : toutes les vraies primitives présentes ; `most_*` : au plus une absente."""
+    """Three levels of equivalence, per true atom then for the SET:
+      exact       all the boundaries of the atom within the parameter tolerance (parameter equivalence)
+      functional  functional agreement ≥ 0.95 on the observed region, whatever the parameterization
+      strict      functional agreement ≥ 0.99
+    `all_*`: all the true primitives present; `most_*`: at most one absent."""
     from core.deep_partial_exp import _probe, functional, param_errors, recovered
     from core.deep_reachability import leaves
     tl = leaves(task.world.truth); P = _probe(); progs = [p.children[0] if p.kind == "not" else p for p in programs]; rows = []
     for a in tl:
         fs = [functional(a, p, P) for p in progs]; bf = max(fs, default=0.0); ex = any(atom_name_eq(a, p) and recovered(a, p) for p in progs); same = [(f, p) for f, p in zip(fs, progs) if atom_name_eq(a, p) and f >= 0.95]; best = max(same, key=lambda z: z[0])[1] if same else None
-        e = param_errors(a, best) if best is not None else {}                     # l'erreur de paramètre n'a de sens qu'entre primitives de MÊME type
+        e = param_errors(a, best) if best is not None else {}                     # the parameter error is meaningful only between primitives of the SAME type
         rows.append({"type": _name(a), "exact": ex, "functional": bf >= 0.95, "strict": bf >= 0.99, "best": bf, "param_error": (sum(e.values()) / len(e)) if e else None, "errors": e})
     n = len(tl); out = {"n_true": n, "atoms": rows}
     for k in ("exact", "functional", "strict"):
@@ -99,7 +99,7 @@ def atom_name_eq(a, p): return _name(a).replace("not_", "") == _name(p).replace(
 
 
 def _row(task, name, rec, regions, t0, extra=None) -> dict:
-    """Ligne commune : aval + récupération de l'ensemble (vivier, ensemble retenu, union des trois meilleurs ensembles)."""
+    """Common row: downstream + recovery of the set (pool, retained set, union of the three best sets)."""
     H = rec.hypotheses; allp = [h.program for h in H] + [a for h in H for a in h.alternatives]; kept = rec.chosen.programs if rec.chosen else []; top3 = [h.program for h in rec.sets.union(3)] if rec.sets else []
     sp, sk, s3 = set_recovery(allp, task), set_recovery(kept, task), set_recovery(top3, task); vis = atom_visibility(task); row = {"experiment": "chain", "arm": name, **_acc(rec.program, regions)}
     for tag, s in (("pool", sp), ("kept", sk), ("top3", s3)):
@@ -115,7 +115,7 @@ def _row(task, name, rec, regions, t0, extra=None) -> dict:
 
 
 def frozen_run(task, seed=0):
-    """Pipeline gelé complet, une seule exécution : son programme final (historique) et ses atomes (source A)."""
+    """Full frozen pipeline, a single execution: its final program (historical) and its atoms (source A)."""
     from core.deep_reachability import leaves
     from core.deep_search import DeepSearch
     out = DeepSearch("factorized", budget=150.0, seed=seed, max_depth=6).run(FitData.build(task.X, task.y, 0.10)); hs = sorted(out.all.values(), key=lambda h: -h.evidence); seen = set(); L = []
@@ -126,8 +126,8 @@ def frozen_run(task, seed=0):
 
 
 def chain_rows(task, seed=0) -> List[dict]:
-    """Les trois chaînes primaires (même aval fort), le bras secondaire pré-enregistré, les variantes de C, et les deux
-    chaînes historiques complètes."""
+    """The three primary chains (same strong downstream), the preregistered secondary arm, the variants of C, and the two
+    full historical chains."""
     from core.deep_fragments import flat_types, literals
     from core.deep_partial import observe
     from core.deep_search import DeepSearch
@@ -141,10 +141,10 @@ def chain_rows(task, seed=0) -> List[dict]:
     return rows
 
 
-# ================================================================ sensibilité : erreur de paramètre → récupération
+# ================================================================ sensitivity: parameter error → recovery
 
 def _family_index(a: BNode) -> dict:
-    """Positions des paramètres d'un atome, par famille."""
+    """Positions of the parameters of an atom, per family."""
     from core.deep_structure import _leaf
     l = _leaf(a); off = 2 if a.kind == "translate" else 0; out = {"center": list(range(off))}
     if l.feat == "norm": out["radius"] = [off + i for i in range(len(l.params))]
@@ -154,7 +154,7 @@ def _family_index(a: BNode) -> dict:
 
 
 def jitter(atoms: Sequence[BNode], sigma: float, rng: random.Random, kind: Optional[str] = None, family: Optional[str] = None) -> List[BNode]:
-    """Bruit gaussien sur les paramètres des atomes du type `kind` (tous types si None), limité à la famille `family`."""
+    """Gaussian noise on the parameters of the atoms of type `kind` (all types if None), restricted to the family `family`."""
     out = []
     for a in atoms:
         v = list(a.param_vector()); fi = _family_index(a); idx = [i for f, ii in fi.items() for i in ii if family is None or f == family] if (kind is None or _name(a).replace("not_", "") == kind) else []
@@ -164,8 +164,8 @@ def jitter(atoms: Sequence[BNode], sigma: float, rng: random.Random, kind: Optio
 
 
 def sens_rows(task, seed=0) -> List[dict]:
-    """Vrais atomes, dont une partie est bruitée ; composition exhaustive sur classes, sélection par erreurs, aucun
-    ajustement. Isole la sensibilité de la COMPOSITION à l'erreur de paramètre."""
+    """True atoms, part of which are noised; exhaustive composition over classes, selection by errors, no
+    fitting. Isolates the sensitivity of COMPOSITION to parameter error."""
     from core.deep_reachability import leaves
     tl = leaves(task.world.truth); regions = _regions(task); kinds = sorted({_name(a).replace("not_", "") for a in tl}); out = []
     def run(atoms): R = compose(atoms, task.X, task.y, "errors", complements=False); return _acc(to_program(R.selected.tree, R.units), regions)
@@ -179,7 +179,7 @@ def sens_rows(task, seed=0) -> List[dict]:
     return out
 
 
-# ================================================================ tolérance aux faux atomes, défaut de l'ancienne réduction
+# ================================================================ tolerance to false atoms, defect of the old reduction
 
 def fp_rows(task, seed=0) -> List[dict]:
     from core.deep_reachability import leaves
@@ -188,18 +188,18 @@ def fp_rows(task, seed=0) -> List[dict]:
     for n in FALSE_COUNTS:
         disc = [(a, 1.0, "true") for a in tl] + [(a, 1.0, "false") for a in fakes[:n]]; random.Random(seed + n).shuffle(disc); rec = strong_downstream(disc, task.X, task.y, {"fit": "none"}); s = set_recovery(rec.chosen.programs if rec.chosen else [], task)
         out.append({"experiment": "fp", "arm": f"plus{n}", "engine": "sets", **_acc(rec.program, regions), "kept": rec.stats["kept"], "kept_recall": s["recall_strict"], "all_kept": s["all_strict"], "false_kept": rec.stats["kept"] - sum(a["strict"] for a in s["atoms"]), "n_true": len(tl)})
-        if n == 0:                                                               # ancienne réduction (sous-jalon précédent) sur les mêmes vrais atomes : diagnostic du défaut
+        if n == 0:                                                               # old reduction (previous sub-milestone) on the same true atoms: diagnosis of the defect
             H = hypotheses_from(disc, task.X); kept, _ = reduce(H, task.y, "greedy_floor", 6, 1.0); atoms = [h.program for h in kept]; R = compose(atoms, task.X, task.y, "bic") if atoms else None; so = set_recovery(atoms, task)
             out.append({"experiment": "fp", "arm": "plus0", "engine": "old_reduction", **_acc(to_program(R.selected.tree, R.units) if R else None, regions), "kept": len(atoms), "kept_recall": so["recall_strict"], "all_kept": so["all_strict"], "false_kept": 0, "n_true": len(tl)})
             U = utilities(H, task.y); out[-1]["conditional_only"] = sum(u.conditional_only for u in U); out[-2]["conditional_only"] = out[-1]["conditional_only"]
     return out
 
 
-# ================================================================ complétude, primitive manquante, hors-classe
+# ================================================================ completeness, missing primitive, out-of-class
 
 def complete_rows(task, seed=0) -> List[dict]:
-    """Contrôlé : vrais atomes complets, puis un atome retiré. Signal de complétude ; la recherche par le résidu
-    retrouve-t-elle l'atome retiré ?"""
+    """Controlled: complete true atoms, then one atom removed. Completeness signal; does the search through the residual
+    recover the removed atom?"""
     from core.deep_partial_exp import _probe, functional
     from core.deep_reachability import leaves
     tl = leaves(task.world.truth); regions = _regions(task); out = []; P = _probe()
@@ -216,7 +216,7 @@ def ooc_row(task, kind: str, seed=0) -> dict:
     r = recover(task.X, task.y, seed); regions = _regions(task); return {"experiment": "ooc", "arm": kind, "state": r.state, "excess": r.completeness.excess if r.completeness else None, "gap": r.completeness.gap if r.completeness else None, "accord": _acc(r.program, regions)["accord"], "iterations": r.stats.get("iterations")}
 
 
-# ================================================================ sous-unités AWS
+# ================================================================ AWS sub-units
 
 def subunits(key):
     from core.deep_experiments import _row as wrap

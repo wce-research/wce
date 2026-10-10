@@ -1,7 +1,7 @@
-"""Benchmark multi-graines de la compréhension ancrée : moyennes, écarts-types, IC95, comparaisons appariées.
+"""Multi-seed benchmark of grounded understanding: means, standard deviations, CI95, paired comparisons.
 
-Chaque graine change : les mondes, la langue des observations, le bruit, les légendes, la partition,
-et l'initialisation neuronale. Le test d'une graine n'est jamais utilisé pour régler quoi que ce soit.
+Each seed changes: the worlds, the language of the observations, the noise, the captions, the split,
+and the neural initialisation. The test set of a seed is never used to tune anything.
 """
 from __future__ import annotations
 
@@ -51,7 +51,7 @@ T975 = {1: 12.706, 2: 4.303, 3: 3.182, 4: 2.776, 5: 2.571, 6: 2.447, 7: 2.365, 8
 LEARNABLE = sorted(EXT_HELD_OUT - {"mets"})
 
 
-# ================================================================ une graine
+# ================================================================ one seed
 
 def seed_data(seed, n_worlds=20, n_captions=500):
     data = build_dataset_ext(n_worlds, world_seed=seed, lang_seed=seed + 100, obs_seed=seed)
@@ -83,8 +83,8 @@ def evaluate_agent(agent, test_worlds):
 
 
 def _mark_resolvable(agent, world, start):
-    """Évaluation seulement : la référence principale était-elle résoluble avec les croyances de l'agent ?
-    (type unique, ou couleurs des autres objets du même type établies et différentes)."""
+    """Evaluation only: was the main reference resolvable with the agent's beliefs?
+    (unique type, or colours of the other objects of the same type established and different)."""
     for p in agent.parse_log[start:]:
         oid = p["key"][1] if p["key"][0] != "event" else p["value"].patient
         kind = agent.belief.inventory.get(oid)
@@ -102,7 +102,7 @@ def parse_coverage_resolvable(parse_log):
 
 
 def parse_coverage(parse_log):
-    """Proposition principale correctement extraite (évaluation : comparée à ce que la source affirmait)."""
+    """Main proposition correctly extracted (evaluation: compared with what the source asserted)."""
     if not parse_log: return 0.0
     good = 0
     for p in parse_log:
@@ -114,7 +114,7 @@ def parse_coverage(parse_log):
 
 
 def lexical_coverage(agent):
-    """Formes jamais légendées, apprises depuis les observations (BELIEF ou mieux) avec le BON sens."""
+    """Never-captioned forms, learned from the observations (BELIEF or better) with the RIGHT meaning."""
     if not hasattr(agent, "lexmem"): return 0.0, 0
     correct = wrong = 0
     for w in LEARNABLE:
@@ -158,14 +158,14 @@ def run_seed(seed, systems=None, n_worlds=20, n_captions=500):
         agent = SYSTEMS[name]()
         agent.seed = seed
         agent.learn_captions(caps); agent.warm_up_sources(splits["train"])
-        if hasattr(agent, "calibrate"): agent.calibrate(splits["calibration"], splits["validation"])      # jamais le test
+        if hasattr(agent, "calibrate"): agent.calibrate(splits["calibration"], splits["validation"])      # never the test set
         rows, parse = evaluate_agent(agent, splits["test"])
         out[name] = metrics(rows, parse, agent, held)
         raw[name] = {"rows": rows, "parse": parse, "agent": agent}
     return out, raw
 
 
-# ================================================================ statistiques
+# ================================================================ statistics
 
 def summarize_values(values):
     values = [v for v in values if v is not None]
@@ -177,7 +177,7 @@ def summarize_values(values):
 
 
 def paired(values_a, values_b):
-    """Différence appariée par graine (a - b) : moyenne, IC95 (t), nombre de graines où a > b."""
+    """Paired difference per seed (a - b): mean, CI95 (t), number of seeds where a > b."""
     diffs = [a - b for a, b in zip(values_a, values_b) if a is not None and b is not None]
     s = summarize_values(diffs)
     if s: s["seeds_positive"] = sum(d > 0 for d in diffs); s["seeds_negative"] = sum(d < 0 for d in diffs)
@@ -185,7 +185,7 @@ def paired(values_a, values_b):
 
 
 def bootstrap_item_difference(rows_a, rows_b, field, iterations=1000, seed=0):
-    """Différence de proportions au niveau des items (mêmes items, systèmes différents), IC95 bootstrap."""
+    """Difference of proportions at the item level (same items, different systems), bootstrap CI95."""
     rng = random.Random(seed)
     pairs = [(float(a[field]), float(b[field])) for a, b in zip(rows_a, rows_b)]
     n = len(pairs)
@@ -233,7 +233,7 @@ def multi_seed(seeds=(0, 1, 2, 3, 4, 5, 6, 7), systems=None, n_worlds=20):
             "seconds": round(time.time() - t0, 1)}
 
 
-# ================================================================ analyses sur les sorties multi-graines
+# ================================================================ analyses on the multi-seed outputs
 
 def abstention_breakdown(raws, system="grounded_full"):
     table = defaultdict(Counter)
@@ -287,7 +287,7 @@ def lexical_lifecycle(agent, words=None):
     return out
 
 
-# ================================================================ courbes
+# ================================================================ curves
 
 def coverage_growth(seed=0, sizes=(50, 100, 200, 400, 800), n_worlds=20):
     data, splits, _ = seed_data(seed, n_worlds)
@@ -304,7 +304,7 @@ def coverage_growth(seed=0, sizes=(50, 100, 200, 400, 800), n_worlds=20):
 
 
 def budget_curve(seed=0, budgets=(1, 2, 20, 99), n_worlds=20):
-    """Budget de vérification (hypothèses par requête) vs succès vs faux confiants vs coût."""
+    """Verification budget (hypotheses per query) vs success vs false confident vs cost."""
     data, splits, caps = seed_data(seed, n_worlds)
     held = captions_ext(200, seed=seed + 900)
     out = {}
@@ -319,7 +319,7 @@ def budget_curve(seed=0, budgets=(1, 2, 20, 99), n_worlds=20):
 
 
 def structural_distillation(seed=0, n_worlds=20):
-    """Hypothèses de rôles explorées : perceptron exhaustif (enseignant) vs élève distillé + vérification WCE."""
+    """Role hypotheses explored: exhaustive perceptron (teacher) vs distilled student + WCE verification."""
     data, splits, caps = seed_data(seed, n_worlds)
     held = captions_ext(300, seed=seed + 900)
     out = {}
@@ -331,7 +331,7 @@ def structural_distillation(seed=0, n_worlds=20):
         nps = sum(1 for c in held if c["structure"]["kind"] != "sequence")
         out[label] = {"role_accuracy": acc["roles"], "hypotheses_explored_per_sentence": round(explored / max(1, nps), 2),
                       "student_parameters": agent.grammar.student.parameter_count if agent.grammar.student else 0}
-    # désambiguïsation des sens (élève = table de contexte apprise ; enseignant = choix structurel)
+    # sense disambiguation (student = learned context table; teacher = structural choice)
     return out
 
 
@@ -342,37 +342,37 @@ def domain_report(raws, system="grounded_full"): return by_group(raws, system, "
 
 
 def domain_transfer(seed=0):
-    """La même construction (« X est dans Y », « range X dans Y ») transfère-t-elle à l'inventaire ?
-    Rôles sur des légendes d'inventaire, grammaire apprise SANS aucune légende d'inventaire vs avec."""
+    """Does the same construction ("X est dans Y", "range X dans Y") transfer to the inventory?
+    Roles on inventory captions, grammar learned WITHOUT any inventory caption vs with."""
     held = [c for c in captions_ext(400, seed=seed + 950) if c["structure"].get("target", {}).get("type") == "list"]
     from core.independent_world import captions as physical_captions
     physical_only = GroundedAgent(GroundedConfig()).learn_captions(physical_captions(500, seed=seed + 1))
     mixed = GroundedAgent(GroundedConfig()).learn_captions(captions_ext(500, seed=seed + 1))
     def role_acc_on(agent):
-        # les mots d'inventaire sont inconnus du premier agent : on ne mesure que la structure (positions des rôles)
+        # the inventory words are unknown to the first agent: only the structure is measured (role positions)
         ok = n = 0
         for c in held:
             toks = tokenize(c["text"]); s = c["structure"]
             nps = agent.grammar.chunks(toks)
             if len(nps) < 2:
-                # sans lexique d'inventaire, on reconstruit les syntagmes par position (déterminant + nom)
+                # without an inventory lexicon, the phrases are reconstructed by position (determiner + noun)
                 continue
             roles = agent.grammar.assign(toks, nps, s["kind"] if s["kind"] != "event" else "command")
             want = ["target", "subject"] if " contient " in f" {c['text']} " else ["subject", "target"]
             if s["kind"] == "event": want = ["patient", "target"]
             n += 1; ok += [roles.get(i) for i in range(2)] == want
         return round(ok / max(1, n), 3), n
-    physical_only.grammar.lex = mixed.lex       # lexique ancré fourni ; les POIDS de rôles restent appris sur le physique
+    physical_only.grammar.lex = mixed.lex       # grounded lexicon provided; the role WEIGHTS remain learned on the physical domain
     return {"inventory_captions": len(held), "grammar_trained_on_physical_only": role_acc_on(physical_only),
             "grammar_trained_on_mixed": role_acc_on(mixed),
             "note": "grammaire physique + lexique d'inventaire ancré : mesure du transfert des poids de rôles seuls"}
 
 
-# ================================================================ échelle lexicale
+# ================================================================ lexical scale
 
 def lexical_scale(sizes=(100, 250, 500, 1000, 2000), exposures=(2, 5, 10, 20), seed=0):
-    """Acquisition trans-situationnelle de synonymes artificiels : chaque exposition présente le vrai sens
-    parmi des distracteurs ; source de fiabilité variable. Taux d'acquisition (BELIEF+) et erreurs."""
+    """Cross-situational acquisition of artificial synonyms: each exposure presents the true meaning
+    among distractors; source of variable reliability. Acquisition rate (BELIEF+) and errors."""
     from core.independent_benchmark import lexicon_growth
     rng = random.Random(seed)
     out = {}
@@ -387,7 +387,7 @@ def lexical_scale(sizes=(100, 250, 500, 1000, 2000), exposures=(2, 5, 10, 20), s
                 for e in range(k):
                     distract = rng.sample(meanings, 2)
                     cands = set(distract) | {truth[w]}
-                    weight = rng.choice([0.9, 0.7, 0.1])       # capteur fiable / document / locuteur peu fiable
+                    weight = rng.choice([0.9, 0.7, 0.1])       # reliable sensor / document / unreliable speaker
                     results = {c: "support" for c in cands}
                     mem.observe(w, results, f"src{rng.randint(0, 3)}", weight, f"e{e}")
             learned = {w: mem.meaning(w) for w in words}
@@ -399,10 +399,10 @@ def lexical_scale(sizes=(100, 250, 500, 1000, 2000), exposures=(2, 5, 10, 20), s
     return {"cross_situational": out, "neural_vs_structural": growth}
 
 
-# ================================================================ géométrie tenue à l'écart
+# ================================================================ geometry held out
 
 def geometry_holdout(seeds=(0, 1, 2, 3, 4, 5, 6, 7), n_worlds=20):
-    """Observables enregistrés à chaque graine ; analyse sur l'échantillon poolé. N'influence aucune décision."""
+    """Observables recorded at each seed; analysis on the pooled sample. Influences no decision."""
     from core.independent_benchmark import Setup, calibrate_geometry, oov_words, word_cases
     from core.independent_agent import IndependentAgent, AgentConfig
     from core.trajectory import auroc
