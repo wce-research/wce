@@ -1,3 +1,18 @@
+# APP_ROOT is the directory that contains this Makefile, wherever the repository is cloned and whatever its
+# name. Every target runs from APP_ROOT: `make -f /any/path/Makefile <target>` or `make -C <clone> <target>`
+# behave exactly like `make <target>` typed inside the clone. No path of any machine is written here.
+APP_ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
+export APP_ROOT
+
+ifneq ($(abspath $(CURDIR)),$(APP_ROOT))
+# invoked from another directory: re-run the same goals from APP_ROOT
+.PHONY: $(or $(MAKECMDGOALS),help)
+$(firstword $(or $(MAKECMDGOALS),help)):
+	@$(MAKE) --no-print-directory -C "$(APP_ROOT)" $(MAKECMDGOALS)
+$(wordlist 2,999,$(MAKECMDGOALS)):
+	@:
+else
+
 PYTHON := python3
 
 .DEFAULT_GOAL := help
@@ -7,16 +22,16 @@ PYTHON := python3
 help:
 	@echo "WCE — World Configuration Engine"
 	@echo ""
-	@echo "Commandes disponibles :"
-	@echo "  make test        Exécute tous les tests"
-	@echo "  make test-world  Teste le modèle du monde"
-	@echo "  make check       Vérifie la syntaxe Python"
-	@echo "  make clean       Supprime les fichiers temporaires"
-	@echo "  make docker-up   Construit et démarre le site sur le Dell"
-	@echo "  make docker-down Arrête le site"
-	@echo "  make docker-build Reconstruit l'image"
-	@echo "  make docker-logs Suit les journaux"
-	@echo "  make docker-dev  Démarre avec synchronisation des changements"
+	@echo "Available commands:"
+	@echo "  make test        Runs all the tests"
+	@echo "  make test-world  Tests the world model"
+	@echo "  make check       Checks the Python syntax"
+	@echo "  make clean       Removes temporary files"
+	@echo "  make docker-up   Builds and starts the site on the Dell"
+	@echo "  make docker-down Stops the site"
+	@echo "  make docker-build Rebuilds the image"
+	@echo "  make docker-logs Follows the logs"
+	@echo "  make docker-dev  Starts with change synchronisation"
 
 .PHONY: docker-up docker-down docker-build docker-logs docker-ps docker-dev backend-inventory
 
@@ -49,12 +64,12 @@ test-world:
 
 check:
 	$(PYTHON) -m compileall -q core physics language logic app tests
-	@echo "Syntaxe OK"
+	@echo "Syntax OK"
 
 clean:
 	find . -type d -name '__pycache__' -prune -exec rm -rf {} +
 	find . -type f -name '*.pyc' -delete
-	@echo "Nettoyage terminé"
+	@echo "Cleanup done"
 
 .PHONY: test-transformation
 
@@ -110,21 +125,21 @@ inspect-tests:
 .PHONY: inspect-wall-legacy
 
 inspect-wall-legacy:
-	@echo "=== Usages de 'side' dans le code ==="
+	@echo "=== Uses of 'side' in the code ==="
 	@grep -rn '"side"' --include="*.py" . | grep -v __pycache__ | grep -v ".pyc"
 	@echo ""
-	@echo "=== Moteur moderne (physics/interactions.py) ==="
+	@echo "=== Modern engine (physics/interactions.py) ==="
 	@grep -n '"side"' physics/interactions.py
 	@echo ""
-	@echo "=== Adaptateur legacy : 1 usage (ligne 42 dans _legacy_wall_to_collider_and_material) ==="
+	@echo "=== Legacy adapter: 1 use (line 42 in _legacy_wall_to_collider_and_material) ==="
 	@grep -n 'side = entity_properties.get' physics/interactions.py
 	@echo ""
-	@echo "=== Documentation / exemple : 1 usage ==="
+	@echo "=== Documentation / example: 1 use ==="
 	@grep -n '"side": "right"' physics/interactions.py | head -1
 	@echo ""
-	@echo "=== Tests legacy + tests de compatibilité ==="
+	@echo "=== Legacy tests + compatibility tests ==="
 	@grep -n '"side"' tests/test_wce.py | wc -l
-	@echo "usages dans tests/test_wce.py"
+	@echo "uses in tests/test_wce.py"
 
 .PHONY: demo-geometry
 
@@ -276,7 +291,7 @@ demo-active-learning:
 test-discourse:
 	$(PYTHON) -m unittest tests.test_discourse -v
 
-# ---- algèbre de mesure et d'observation
+# ---- measurement and observation algebra
 .PHONY: demo-measurement-algebra demo-representation-basis demo-scientific-agent test-measurement measurement-multiseed measurement-sealed-eval
 demo-measurement-algebra:
 	$(PYTHON) scripts/demo_measurement_algebra.py
@@ -296,7 +311,7 @@ measurement-multiseed:
 measurement-sealed-eval:
 	$(PYTHON) scripts/measurement_sealed_eval.py
 
-# ---- perturbation, sensibilité et stabilité des invariants
+# ---- perturbation, sensitivity and stability of invariants
 .PHONY: demo-perturbation-stability demo-invariant-duality demo-safe-plasticity demo-generalized-credit test-perturbation perturbation-multiseed measurement-value-multiseed perturbation-sealed-eval
 demo-perturbation-stability:
 	$(PYTHON) scripts/demo_perturbation_stability.py
@@ -322,7 +337,7 @@ measurement-value-multiseed:
 perturbation-sealed-eval:
 	$(PYTHON) scripts/perturbation_sealed_eval.py
 
-# ---- plasticité compositionnelle
+# ---- compositional plasticity
 .PHONY: demo-compositional-plasticity demo-learned-stabilizer demo-no-replay-learning demo-active-credit test-compositional compositional-multiseed compositional-sealed-eval
 demo-compositional-plasticity:
 	$(PYTHON) scripts/demo_compositional_plasticity.py
@@ -345,7 +360,7 @@ compositional-multiseed:
 compositional-sealed-eval:
 	$(PYTHON) scripts/compositional_sealed_eval.py
 
-# ---- certificats génératifs, second ordre, monde continu
+# ---- generative certificates, second order, continuous world
 .PHONY: demo-generative-certificate demo-second-order-stability demo-capacity-pressure demo-skill-regeneration demo-law-discovery test-generative continuum-multiseed continuum-aggregate continuum-sealed-eval continuum-scaling
 demo-generative-certificate:
 	$(PYTHON) scripts/demo_generative_certificate.py
@@ -379,7 +394,7 @@ continuum-scaling: continuum-aggregate
 continuum-sealed-eval:
 	$(PYTHON) scripts/continuum_sealed_eval.py
 
-# ---- induction de programmes de frontière
+# ---- boundary program induction
 .PHONY: demo-boundary-induction demo-family-induction demo-active-program-discovery demo-truth-anchored-certificate demo-neural-crystallization test-boundary boundary-multiseed boundary-scaling boundary-sealed-eval
 demo-boundary-induction:
 	$(PYTHON) scripts/demo_boundary_induction.py
@@ -409,7 +424,7 @@ boundary-scaling: boundary-multiseed
 boundary-sealed-eval:
 	$(PYTHON) scripts/boundary_sealed_eval.py
 
-# ---- découverte structurelle active
+# ---- active structural discovery
 .PHONY: demo-active-structural-discovery demo-functional-equivalence demo-noise-aware-truth demo-depth-guided-search demo-functional-family-induction demo-hard-capacity test-active active-calibrate active-structure-multiseed active-structure-ablation active-structure-noise-sweep active-structure-scaling active-structure-sealed-eval
 demo-active-structural-discovery:
 	$(PYTHON) scripts/demo_active_structural_discovery.py
@@ -452,7 +467,7 @@ active-structure-scaling:
 active-structure-sealed-eval:
 	$(PYTHON) scripts/active_sealed_eval.py
 
-# ---- AWS (SageMaker Processing, eu-north-1, profil wce-runner) — reconstruction robuste
+# ---- AWS (SageMaker Processing, eu-north-1, profile wce-runner) — robust reconstruction
 AWS_PROFILE ?= wce-runner
 AWSPY = AWS_PROFILE=$(AWS_PROFILE) $(PYTHON) -m wce_aws.orchestrate
 SEEDS16 = 0-15
@@ -494,7 +509,7 @@ aws-run-aux:
 	for k in hard repeat family capacity identifiability; do $(AWSPY) submit --kind $$k --keys $(KEYS) --shards $(AWS_SHARDS) --instance $(AWS_INSTANCE) || exit 1; done
 
 aws-sealed-eval:
-	$(PYTHON) -c "from core.robust_world import sealed_hash, SEALED_SHA256; assert sealed_hash() == SEALED_SHA256, 'lot scellé modifié'"
+	$(PYTHON) -c "from core.robust_world import sealed_hash, SEALED_SHA256; assert sealed_hash() == SEALED_SHA256, 'sealed set modified'"
 	$(AWSPY) submit --kind sealed --keys 0-23 --shards $(AWS_SHARDS) --instance $(AWS_INSTANCE)
 
 robust-aggregate:
@@ -528,17 +543,17 @@ aws-whoami:
 aws-check-guardrails:
 	$(AWSPY) check-guardrails
 
-# lecture seule : quotas et historique des demandes Service Quotas (ne soumet et ne modifie rien)
+# read-only: quotas and history of Service Quotas requests (submits and modifies nothing)
 .PHONY: aws-quotas aws-ec2-probe
 aws-quotas:
 	$(AWSPY) quotas
 
-# sans création : disponibilité et autorisation (dry-run) des types candidats au banc d'instances
+# no creation: availability and authorisation (dry-run) of the candidate types for the instance benchmark
 aws-ec2-probe:
 	$(AWSPY) ec2-probe
 
-# banc d'instances : même workload (clé de mise au point 1090 du sous-jalon High-Precision, 42 sous-unités), une instance
-# de 4 vCPU par type ; runs `wce-deepbenchhp-*`, distincts des agrégats scientifiques (`wce-deephp-*`)
+# instance benchmark: same workload (tuning key 1090 of the High-Precision sub-milestone, 42 sub-units), one instance
+# of 4 vCPUs per type; runs `wce-deepbenchhp-*`, distinct from the scientific aggregates (`wce-deephp-*`)
 BENCH_INSTANCE ?= c6i.xlarge
 .PHONY: aws-bench-instance aws-bench-report
 aws-bench-instance:
@@ -565,14 +580,14 @@ aws-progress:
 aws-resume:
 	$(AWSPY) resume --run $(RUN)
 
-# instrumentation (temps, pas de résultat scientifique) : profilage d'une tâche du banc principal, micro-benchmark par type d'instance
+# instrumentation (timing, no scientific result): profiling of one task of the main benchmark, micro-benchmark per instance type
 aws-profile:
 	$(AWSPY) submit --kind profile --keys $(or $(TASK),1) --shards 1 --instance $(AWS_INSTANCE) --max-runtime 7200
 
 aws-bench:
 	$(AWSPY) submit --kind bench --keys 0 --shards 1 --instance $(AWS_INSTANCE) --max-runtime 7200
 
-# tout sauf le banc principal et le lot scellé, en UN run (les instances restent pleines sans intervention)
+# everything except the main benchmark and the sealed set, in ONE run (the instances stay full without intervention)
 REST_SPEC = noise:$(SEEDS16);hard:$(SEEDS16);repeat:$(SEEDS16);family:$(SEEDS16);capacity:$(SEEDS16);identifiability:$(SEEDS16);calibration:$(SEEDS16);caltrain:0-5
 aws-run-rest:
 	$(AWSPY) submit --kind "$(REST_SPEC)" --shards $(AWS_SHARDS) --instance $(AWS_INSTANCE) --max-runtime 28800
@@ -580,16 +595,16 @@ aws-run-rest:
 aws-run-caltrain:
 	$(AWSPY) submit --kind caltrain --keys 0-5 --shards $(AWS_SHARDS) --instance $(AWS_INSTANCE)
 
-# ---- jalon Deep Compositional Structure Discovery & Model-Class Boundary
+# ---- milestone Deep Compositional Structure Discovery & Model-Class Boundary
 .PHONY: deep-check deep-test
 deep-check:
 	$(PYTHON) -m compileall -q core/deep_world.py core/deep_structure.py core/deep_fit.py core/deep_search.py core/deep_equivalence.py core/deep_boundary.py core/deep_experiments.py tests/test_deep.py
-	$(PYTHON) -c "from core.deep_world import sealed_hash, SEALED_SHA256; assert sealed_hash() == SEALED_SHA256, 'lot scellé modifié'; print('lot scellé intact :', SEALED_SHA256[:16])"
+	$(PYTHON) -c "from core.deep_world import sealed_hash, SEALED_SHA256; assert sealed_hash() == SEALED_SHA256, 'sealed set modified'; print('sealed set intact:', SEALED_SHA256[:16])"
 
 deep-test:
 	$(PYTHON) -m unittest tests.test_deep
 
-# Calculs quantitatifs : AWS uniquement (EC2 + SSM explicite, c6i.xlarge, checkpoints S3, reprise, terminaison automatique).
+# Quantitative computations: AWS only (EC2 + explicit SSM, c6i.xlarge, S3 checkpoints, resume, automatic termination).
 DEEP_BACKEND = WCE_BACKEND=ec2
 DEEP_INSTANCE ?= c6i.xlarge
 DEEP_SHARDS ?= 2
@@ -603,7 +618,7 @@ deep-profile:
 deep-run-dev:
 	$(DEEP_BACKEND) $(AWSPY) submit --kind deepdev --keys $(DEEP_DEV_KEYS) --shards $(DEEP_SHARDS) --instance $(DEEP_INSTANCE) --max-runtime 21600
 
-# sous-jalon Deep Candidate Generation (dev uniquement ; jamais le lot scellé)
+# sub-milestone Deep Candidate Generation (dev only; never the sealed set)
 DEEP_GEN_KEYS ?= 0-7
 DEEP_COVER_KEYS ?= 0-5
 .PHONY: deep-cover-aggregate deep-run-cover deep-run-gen deep-reachability deep-coverage deep-fragments deep-gen-aggregate deep-gen-report deep-profile-generation
@@ -634,7 +649,7 @@ deep-gen-aggregate deep-aggregate:
 deep-gen-report:
 	$(PYTHON) -m core.deep_gen_report report
 
-# sous-jalon Primitive Discovery (dev uniquement)
+# sub-milestone Primitive Discovery (dev only)
 DEEP_PRIM_KEYS ?= 0-7
 .PHONY: deep-train-proposer deep-install-proposer deep-run-prim deep-prim-aggregate deep-prim-report
 deep-train-proposer:
@@ -652,7 +667,7 @@ deep-prim-aggregate:
 deep-prim-report:
 	$(PYTHON) -m core.deep_prim_report report
 
-# sous-jalon Downstream Selection Loss (dev, vrais atomes fournis)
+# sub-milestone Downstream Selection Loss (dev, true atoms provided)
 DEEP_DOWN_KEYS ?= 0-15
 .PHONY: deep-run-down deep-down-aggregate deep-down-report
 deep-run-down:
@@ -664,7 +679,7 @@ deep-down-aggregate:
 deep-down-report:
 	$(PYTHON) -m core.deep_down_report report
 
-# sous-jalon Validated Optimizer (dev, vrais atomes fournis)
+# sub-milestone Validated Optimizer (dev, true atoms provided)
 .PHONY: deep-run-arms deep-run-optimizer deep-vo-aggregate deep-vo-report
 deep-run-arms:
 	$(DEEP_BACKEND) $(AWSPY) submit --kind deepvo --keys 0-15,100-115 --shards $(DEEP_SHARDS) --instance $(DEEP_INSTANCE) --max-runtime 10800
@@ -678,7 +693,7 @@ deep-vo-aggregate:
 deep-vo-report:
 	$(PYTHON) -m core.deep_vo_report report
 
-# sous-jalon Objective Alignment & Conditional Optimization (dev)
+# sub-milestone Objective Alignment & Conditional Optimization (dev)
 .PHONY: deep-run-objectives deep-run-residual deep-tune-gate deep-run-e2e deep-obj-aggregate deep-obj-report
 deep-run-objectives:
 	$(DEEP_BACKEND) $(AWSPY) submit --kind deepobj --keys 300-307,200-215 --shards $(DEEP_SHARDS) --instance $(DEEP_INSTANCE) --max-runtime 10800
@@ -698,7 +713,7 @@ deep-obj-aggregate:
 deep-obj-report:
 	$(PYTHON) -m core.deep_obj_report report
 
-# sous-jalon Robust Primitive Discovery (dev uniquement ; amont : proposition → validation → estimation → ensemble)
+# sub-milestone Robust Primitive Discovery (dev only; upstream: proposal → validation → estimation → set)
 DEEP_RP_KEYS ?= 0-15
 DEEP_RP_CHAIN_KEYS ?= 400-415
 .PHONY: deep-rp-test deep-rp-inspect deep-rp-diagnose deep-rp-tune deep-rp-smoke deep-run-rp deep-run-rp-chain deep-rp-aggregate deep-rp-report
@@ -732,7 +747,7 @@ deep-rp-aggregate:
 deep-rp-report:
 	$(PYTHON) -m core.deep_rp_report report
 
-# sous-jalon Partial-Observation Primitive Parameter Inference (dev uniquement)
+# sub-milestone Partial-Observation Primitive Parameter Inference (dev only)
 DEEP_PO_KEYS ?= 0-15,500-515
 .PHONY: deep-po-test deep-po-smoke deep-po-chain-smoke deep-run-po deep-po-aggregate deep-po-report
 deep-po-test:
@@ -753,7 +768,7 @@ deep-po-aggregate:
 deep-po-report:
 	$(PYTHON) -m core.deep_po_report report
 
-# sous-jalon Fragment Attribution & Primitive Type Inference (dev uniquement)
+# sub-milestone Fragment Attribution & Primitive Type Inference (dev only)
 DEEP_FT_KEYS ?= 0-15,600-615
 .PHONY: deep-ft-test deep-ft-smoke deep-ft-chain-smoke deep-run-ft deep-ft-aggregate deep-ft-report
 deep-ft-test:
@@ -774,7 +789,7 @@ deep-ft-aggregate:
 deep-ft-report:
 	$(PYTHON) -m core.deep_ft_report report
 
-# sous-jalon Boundary Ownership & Fragment Attribution (dev uniquement)
+# sub-milestone Boundary Ownership & Fragment Attribution (dev only)
 DEEP_BO_KEYS ?= 0-15,700-731
 .PHONY: deep-bo-test deep-bo-smoke deep-bo-tune deep-bo-chain-smoke deep-run-bo deep-bo-aggregate deep-bo-report
 deep-bo-test:
@@ -798,7 +813,7 @@ deep-bo-aggregate:
 deep-bo-report:
 	$(PYTHON) -m core.deep_bo_report report
 
-# sous-jalon Deep Composition & Final Reconstruction with Oracle Atoms (dev uniquement ; vrais atomes fournis)
+# sub-milestone Deep Composition & Final Reconstruction with Oracle Atoms (dev only; true atoms provided)
 DEEP_DC_KEYS ?= 800-831
 .PHONY: deep-dc-test deep-dc-smoke deep-run-dc deep-dc-aggregate deep-dc-report
 deep-dc-test:
@@ -816,7 +831,7 @@ deep-dc-aggregate:
 deep-dc-report:
 	$(PYTHON) -m core.deep_dc_report report
 
-# sous-jalon End-to-End Composition with Discovered Atoms (dev uniquement ; aucun oracle dans les chaînes principales)
+# sub-milestone End-to-End Composition with Discovered Atoms (dev only; no oracle in the main chains)
 DEEP_EE_KEYS ?= 900-931
 .PHONY: deep-ee-test deep-ee-smoke deep-ee-tune deep-run-ee deep-ee-aggregate deep-ee-report
 deep-ee-test:
@@ -837,7 +852,7 @@ deep-ee-aggregate:
 deep-ee-report:
 	$(PYTHON) -m core.deep_ee_report report
 
-# sous-jalon Latent Primitive Recovery (dev uniquement ; aucun oracle dans les chaînes principales)
+# sub-milestone Latent Primitive Recovery (dev only; no oracle in the main chains)
 DEEP_LP_KEYS ?= 1000-1031
 .PHONY: deep-lp-test deep-lp-tune deep-run-lp deep-lp-aggregate deep-lp-report
 deep-lp-test:
@@ -868,7 +883,7 @@ sealed-verify:
 sealed-test:
 	$(PYTHON) -m unittest tests.test_deep_sealed
 
-# sous-jalon High-Precision Primitive Estimation (dev uniquement ; aucun oracle dans les chaînes principales)
+# sub-milestone High-Precision Primitive Estimation (dev only; no oracle in the main chains)
 DEEP_HP_KEYS ?= 1100-1131
 .PHONY: deep-hp-test deep-run-hp deep-hp-aggregate deep-hp-report
 deep-hp-test:
@@ -897,3 +912,5 @@ deep-fetch:
 
 deep-timing:
 	$(AWSPY) timing
+
+endif
