@@ -1,4 +1,7 @@
 {
+ "status": "RETIRED BEFORE EVALUATION — NEVER CONSUMED",
+ "retired_on": "2026-10-10",
+ "retirement_reason": "This set is generated from seeds written in the source code. Publishing the repository publishes its generator, seeds and answers. It was never evaluated and must never be used for a scientific decision. It is replaced by the sealed set v2 (docs/sealed_sets.md), generated from a private salt.",
  "milestone": "WCE Deep Compositional Structure Discovery & Model-Class Boundary",
  "frozen_on": "2026-10-04",
  "sha256": "d57e9d761d165ef9d86ec7ee5c9c5c7909c4b1622425c2d2379cbdddaf1a6ca2",

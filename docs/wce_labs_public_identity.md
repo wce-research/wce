@@ -27,7 +27,7 @@ Chaque page FR/EN reçoit titre WCE Labs, description prudente, canonical locali
 
 ## Machines et ports
 
-Développement : GEEKOM A6. Exécution : Dell <LOCAL_HOST>, <USER_HOME>/workspace/wce. SSH existant <OPERATOR_PROMPT> avec geekom_to_dell_ed25519 ; aucun changement de clé/configuration.
+Développement : GEEKOM A6. Exécution : Dell <LOCAL_HOST>, ~/workspace/wce. SSH existant <user>@<dell-host> avec geekom_to_dell_ed25519 ; aucun changement de clé/configuration.
 
 L’autorité sur le GEEKOM est ~/workspace/_machine_registry (équivalent effectif du dossier demandé). ports.json projects.wce et la table README réservent déjà web : 3018, binding 127.0.0.1. ./ports check valide le registre. Aucune nouvelle réservation nécessaire. La copie Dell ~/workspace/portfolio-port-governance est historique : ne pas remplacer l’autorité récente par cette copie.
 

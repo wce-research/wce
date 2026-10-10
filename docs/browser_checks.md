@@ -8,9 +8,9 @@ Le script `tests/browser/frontier.cjs` utilise Playwright Core 1.63.0 et Chromiu
 npm install --prefix /tmp/wce-browser --no-audit --no-fund playwright-core@1.63.0
 NODE_PATH=/tmp/wce-browser/node_modules \
 WCE_BASE_URL=http://127.0.0.1:3018 \
-WCE_SSH_TARGET=<OPERATOR_PROMPT> \
-WCE_SSH_IDENTITY=<USER_HOME>/.ssh/geekom_to_dell_ed25519 \
-WCE_CHROMIUM=<USER_HOME>/.cache/ms-playwright/chromium-1228/chrome-linux64/chrome \
+WCE_SSH_TARGET=<user>@<dell-host> \
+WCE_SSH_IDENTITY=~/.ssh/geekom_to_dell_ed25519 \
+WCE_CHROMIUM=~/.cache/ms-playwright/chromium-1228/chrome-linux64/chrome \
 WCE_BROWSER_ARTIFACTS=/tmp/wce-frontier-dell \
 node tests/browser/frontier.cjs
 ```

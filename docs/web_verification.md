@@ -2,7 +2,7 @@
 
 ## Exécution
 
-Stack construite et exécutée uniquement sur le Dell `<LOCAL_HOST>`, dans `<USER_HOME>/workspace/wce`. Service unique `wce-web-1`, sain après build et après `docker compose down` puis `docker compose up -d --wait`.
+Stack construite et exécutée uniquement sur le Dell `<LOCAL_HOST>`, dans `~/workspace/wce`. Service unique `wce-web-1`, sain après build et après `docker compose down` puis `docker compose up -d --wait`.
 
 Port inchangé : `127.0.0.1:3018 → web:8000`, allocation existante `wce/web`. Résolution DNS du service `web` vérifiée dans le réseau Compose. Les outils et la police source de génération des logos sont exclus de l'image ; seuls les exports et la galerie sont livrés.
 

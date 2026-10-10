@@ -855,6 +855,19 @@ deep-lp-aggregate:
 deep-lp-report:
 	$(PYTHON) -m core.deep_lp_report report
 
+# sealed set v2: generated from a PRIVATE salt kept outside the repository (core/deep_sealed.py).
+# sealed-init creates the salt once and prints the two public fingerprints; sealed-verify checks integrity.
+# Neither target runs any method on the sealed tasks.
+.PHONY: sealed-init sealed-verify sealed-test
+sealed-init:
+	$(PYTHON) -m core.deep_sealed init
+
+sealed-verify:
+	$(PYTHON) -m core.deep_sealed verify
+
+sealed-test:
+	$(PYTHON) -m unittest tests.test_deep_sealed
+
 # sous-jalon High-Precision Primitive Estimation (dev uniquement ; aucun oracle dans les chaînes principales)
 DEEP_HP_KEYS ?= 1100-1131
 .PHONY: deep-hp-test deep-run-hp deep-hp-aggregate deep-hp-report

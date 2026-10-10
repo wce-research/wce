@@ -37,7 +37,7 @@ REGIMES = {"rich": (600, 0.02), "standard": (300, 0.05), "hard": (160, 0.10)}   
 NOISE_KINDS = ("iid", "boundary", "grouped_outliers")
 OOC_CATEGORIES = ("primitive_absent", "composition_absent", "relation_absent", "dynamic_incompatible", "distribution_shift", "partial")
 HARD_VALID = ("extreme_noise", "deep", "few_data")
-SPLIT_BASE = {"dev": 1_000_000, "validation": 2_000_000, "sealed": 3_000_000, "test": 4_000_000}
+SPLIT_BASE = {"dev": 1_000_000, "validation": 2_000_000, "sealed": 3_000_000, "test": 4_000_000, "sealed_v2": 0}   # sealed_v2: seeds derived from a private salt (core.deep_sealed)
 UNSEEN_MOD = 4                        # 1 signature globale sur 4 (profondeur ≥ 3) est réservée aux compositions non vues
 
 
@@ -232,6 +232,11 @@ def make_task(seed: int, depth: Optional[int] = None, regime: str = "standard", 
 
 
 # ================================================================ lot scellé (gelé avant tout réglage)
+# RETIRED BEFORE EVALUATION — NEVER CONSUMED. This set is generated from seeds written in this file, so publishing
+# the repository publishes its answers. It was never evaluated and must never be used for a scientific decision. The
+# functions and the fingerprint below are kept for historical integrity only. The live sealed set is generated from
+# a private salt: see core/deep_sealed.py.
+SEALED_STATUS = "RETIRED BEFORE EVALUATION — NEVER CONSUMED"
 
 def sealed_spec():
     """72 tâches : 36 dans la classe (profondeurs 1–6 ; compositions non vues pour d ≥ 3 sur la moitié), 12 difficiles

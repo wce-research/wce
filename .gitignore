@@ -6,3 +6,27 @@ __pycache__/
 results/aws/code_*.tar.gz
 
 dist/
+
+# private material: never commit (sealed-set salt, secrets, local credentials)
+*.salt
+sealed_v2.salt
+.secrets/
+secrets/
+.env.*
+!.env.example
+*.pem
+*.key
+
+# kept locally, not part of the public scientific repository
+docs/identity/wce-identity-study-01.zip
+docs/hub_evolution.md
+
+# operational run artifacts: machine details only, no scientific value (structured results are kept)
+results/aws/**/_log.txt
+results/aws/**/_hb_*.json
+results/aws/**/_progress.json
+results/aws/**/*.spec.json
+results/continuum/log_*.txt
+results/*.log
+!results/active_multiseed.log
+!results/boundary_multiseed.log
