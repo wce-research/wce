@@ -921,7 +921,7 @@ test-inventory:
 	$(PYTHON) tools/build_test_inventory.py
 
 frontend-test:
-	$(PYTHON) -m unittest tests.test_web tests.test_public_identity tests.test_public_source tests.test_science tests.test_wce -q
+	$(RUNTIME_PYTHON) -m unittest tests.test_web tests.test_public_identity tests.test_public_source tests.test_science tests.test_wce tests.test_runtime -q
 
 NODE ?= node
 frontend-browser:
@@ -931,7 +931,7 @@ frontend-science-browser:
 	$(NODE) tests/browser/science.cjs
 
 frontend-serve:
-	$(PYTHON) -m app.web
+	$(RUNTIME_PYTHON) -m app.web
 
 # Local infrastructure review only: disposable loopback Docker benchmark, no cloud calls.
 .PHONY: production-benchmark production-aws-review
@@ -939,5 +939,48 @@ PRODUCTION_BENCHMARK_ARGS ?=
 production-benchmark:
 	$(PYTHON) tools/production_benchmark.py $(PRODUCTION_BENCHMARK_ARGS)
 
-production-aws-review:
-	$(PYTHON) tools/production_aws_review.py
+# Isolated local runtime dependencies; no cloud access or deployment.
+RUNTIME_PYTHON ?= .venv-runtime/bin/python
+RUNTIME_IMAGE ?= wce-web:hardened
+.PHONY: runtime-bootstrap runtime-test runtime-build runtime-browser runtime-lifecycle
+runtime-bootstrap:
+	python3 -m venv .venv-runtime
+	$(RUNTIME_PYTHON) -m pip install --require-hashes -r requirements-web.txt
+runtime-test:
+	$(MAKE) frontend-test
+runtime-build:
+	$(RUNTIME_PYTHON) tools/runtime_build.py
+runtime-browser:
+	WCE_AUDIT_SCOPE=all $(MAKE) frontend-science-browser PYTHON=$(RUNTIME_PYTHON)
+runtime-lifecycle:
+	WCE_RUNTIME_IMAGE=$(RUNTIME_IMAGE) $(RUNTIME_PYTHON) tools/runtime_lifecycle.py
+
+.PHONY: runtime-signal-fixture runtime-benchmark runtime-check runtime-frontier
+runtime-signal-fixture:
+	$(RUNTIME_PYTHON) -m tests.runtime_signal_fixture
+runtime-benchmark:
+	$(MAKE) production-benchmark PYTHON=$(RUNTIME_PYTHON) PRODUCTION_BENCHMARK_ARGS="--image wce-web:hardened --cpus 1 --output /tmp/wce-runtime-benchmark.json"
+runtime-check:
+	$(RUNTIME_PYTHON) -m compileall -q app/server.py app/web.py app/runtime_config.py app/lab_runtime.py tools/runtime_build.py tools/runtime_lifecycle.py tools/runtime_status.py tools/production_benchmark.py
+	$(RUNTIME_PYTHON) -m pip check
+	git diff --check
+runtime-frontier:
+	$(MAKE) frontend-browser
+
+.PHONY: runtime-local runtime-benchmark-quarter
+runtime-local:
+	docker compose up -d --build --wait web
+runtime-benchmark-quarter:
+	$(MAKE) production-benchmark PYTHON=$(RUNTIME_PYTHON) PRODUCTION_BENCHMARK_ARGS="--image wce-web:hardened --cpus 0.25 --output /tmp/wce-runtime-benchmark-quarter.json"
+
+.PHONY: runtime-proxy-browser
+runtime-proxy-browser:
+	$(NODE) tests/browser/runtime.cjs
+
+.PHONY: runtime-status
+runtime-status:
+	$(RUNTIME_PYTHON) tools/runtime_status.py
+
+.PHONY: runtime-evidence
+runtime-evidence:
+	$(RUNTIME_PYTHON) tools/runtime_evidence_check.py

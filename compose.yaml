@@ -4,7 +4,13 @@ services:
     build: .
     image: wce-web:local
     restart: unless-stopped
+    stop_grace_period: 8s
+    mem_limit: 256m
+    cpus: 1.0
+    pids_limit: 64
     environment:
+      WCE_MODE: ${WCE_MODE:-development}
+      WCE_PUBLIC_ORIGIN: ${WCE_PUBLIC_ORIGIN:-}
       WCE_GITHUB_URL: ${WCE_GITHUB_URL:-https://github.com/wce-research}
       PUBLIC_CONTACT_EMAIL: ${PUBLIC_CONTACT_EMAIL:-}
       PUBLIC_WCE_REPO_ENABLED: ${PUBLIC_WCE_REPO_ENABLED:-true}
@@ -21,7 +27,7 @@ services:
     security_opt:
       - no-new-privileges:true
     healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/healthz', timeout=2)"]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/readyz', timeout=2)"]
       interval: 20s
       timeout: 3s
       start_period: 5s

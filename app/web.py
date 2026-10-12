@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import math
 import logging
 import os
 import secrets
@@ -10,7 +11,10 @@ import threading
 import time
 from http import HTTPStatus
 from http.cookies import SimpleCookie
-from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from io import BytesIO
+from email.message import Message
+from app.runtime_config import RuntimeConfig
+from app.lab_runtime import LabSession, BudgetExceeded, TokenBucket
 from pathlib import Path
 from urllib.parse import urlsplit
 
@@ -69,34 +73,99 @@ IDENTITY_FILES["/identity/assets/typeface-license.txt"] = (
 
 MAX_BODY = 4096
 MAX_COMMAND = 500
-SESSION_TTL = 24 * 60 * 60
-MAX_SESSIONS = 100
-_sessions: dict[str, tuple[Session, float]] = {}
-_lock = threading.RLock()
+class Application:
+    def __init__(self, config=None):
+        self.config = config or RuntimeConfig.from_env()
+        self.sessions = {}
+        self.lock = threading.Lock()
+        self.api_slots = threading.BoundedSemaphore(2)
+        self.request_slots = threading.BoundedSemaphore(self.config.threads)
+        self.bucket = TokenBucket(self.config.api_rate,self.config.api_burst)
+        self.ready = True
+
+    def validate_startup(self):
+        self.ready = False
+        required = [STATIC / filename for filename,_ in ASSETS.values()]
+        required += [file for file,_ in RESEARCH.values()]
+        required += [IDENTITY_ROOT / 'index.html']
+        if any(not file.is_file() for file in required):
+            raise RuntimeError('Required public runtime file is missing')
+        render_page('/','en')
+        render_page('/lab','en')
+        self.ready = True
+
+    def session(self, token):
+        now = time.monotonic()
+        with self.lock:
+            expired = [key for key,(session,touched) in self.sessions.items()
+                       if now-touched >= self.config.session_ttl or now-session.created >= self.config.session_lifetime]
+            for key in expired:
+                del self.sessions[key]
+            if token in self.sessions:
+                session,_ = self.sessions[token]
+                self.sessions[token] = (session,now)
+                return token,session,False
+            if len(self.sessions) >= self.config.sessions:
+                raise BudgetExceeded('Laboratory session capacity reached; retry after expiry.')
+            token = secrets.token_urlsafe(32)
+            session = LabSession(self.config)
+            self.sessions[token] = (session,now)
+            return token,session,True
+
+    def __call__(self, environ, start_response):
+        request = Handler(environ,self)
+        acquired = self.request_slots.acquire(blocking=False)
+        try:
+            if not acquired or (not self.ready and request.path not in ('/healthz','/readyz')):
+                request._json(HTTPStatus.SERVICE_UNAVAILABLE, {'error':'Service temporarily unavailable.'})
+            elif self.config.mode == 'production' and request.path not in ('/healthz','/readyz') and request.headers.get('Host') != urlsplit(self.config.public_origin).netloc:
+                request._json(HTTPStatus.BAD_REQUEST, {'error':'Invalid public host.'})
+            elif request.method in ('GET','HEAD'):
+                request.do_GET()
+            elif request.method == 'POST':
+                request.do_POST()
+            else:
+                request._json(HTTPStatus.METHOD_NOT_ALLOWED, {'error':'Method not allowed.'})
+        except Exception:
+            logging.error('Request failed',exc_info=False)
+            request.reset()
+            request._json(HTTPStatus.INTERNAL_SERVER_ERROR, {'error':'Internal server error.'})
+        finally:
+            if acquired:
+                self.request_slots.release()
+        start_response(f'{int(request.status)} {HTTPStatus(request.status).phrase}',request.response_headers)
+        logging.info('HTTP %s %s %s',request.method,request.status,len(request.wfile.getvalue()))
+        return [b'' if request.method == 'HEAD' else request.wfile.getvalue()]
 
 
-def _session(token: str | None) -> tuple[str, Session, bool]:
-    now = time.monotonic()
-    with _lock:
-        if token and token in _sessions:
-            session, touched = _sessions[token]
-            if now - touched < SESSION_TTL:
-                _sessions[token] = (session, now)
-                return token, session, False
-        expired = [key for key, (_, touched) in _sessions.items() if now - touched >= SESSION_TTL]
-        for key in expired:
-            del _sessions[key]
-        if len(_sessions) >= MAX_SESSIONS:
-            oldest = min(_sessions, key=lambda key: _sessions[key][1])
-            del _sessions[oldest]
-        token = secrets.token_urlsafe(32)
-        session = Session()
-        _sessions[token] = (session, now)
-        return token, session, True
+class Handler:
+    def __init__(self, environ, application):
+        self.application = application
+        self.path = environ.get('PATH_INFO','/')
+        self.method = environ.get('REQUEST_METHOD','GET')
+        self.rfile = environ['wsgi.input']
+        self.headers = Message()
+        for key,value in environ.items():
+            if key.startswith('HTTP_'):
+                self.headers[key[5:].replace('_','-')] = value
+        for key in ('CONTENT_TYPE','CONTENT_LENGTH'):
+            if key in environ:
+                self.headers[key.replace('_','-')] = environ[key]
+        self.reset()
 
+    def reset(self):
+        self.status = HTTPStatus.OK
+        self.response_headers = []
+        self.wfile = BytesIO()
 
-class Handler(BaseHTTPRequestHandler):
-    server_version = "WCE/1.0"
+    def send_response(self, status):
+        self.status = status
+
+    def send_header(self, name, value):
+        self.response_headers.append((name,str(value)))
+
+    def end_headers(self):
+        pass
 
     def _send(self, status: HTTPStatus, body: bytes, content_type: str, cookie: str | None = None) -> None:
         self.send_response(status)
@@ -105,9 +174,11 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Cache-Control", "no-store")
         self.send_header("X-Content-Type-Options", "nosniff")
         self.send_header("X-Frame-Options", "DENY")
+        self.send_header("Referrer-Policy", "strict-origin-when-cross-origin")
+        self.send_header("Permissions-Policy", "camera=(), microphone=(), geolocation=()")
         self.send_header("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'")
         if cookie:
-            self.send_header("Set-Cookie", f"wce_session={cookie}; HttpOnly; SameSite=Strict; Path=/")
+            self.send_header("Set-Cookie", f"wce_session={cookie}; HttpOnly; SameSite=Strict; Path=/; Max-Age={self.application.config.session_lifetime}" + ("; Secure" if self.application.config.mode == "production" else ""))
         self.end_headers()
         self.wfile.write(body)
 
@@ -136,6 +207,8 @@ class Handler(BaseHTTPRequestHandler):
             self._send(HTTPStatus.OK, ('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'+urls+'</urlset>').encode(), 'application/xml; charset=utf-8')
         elif path == "/healthz":
             self._json(HTTPStatus.OK, {"status": "ok"})
+        elif path == '/readyz':
+            self._json(HTTPStatus.OK if self.application.ready else HTTPStatus.SERVICE_UNAVAILABLE, {'status':'ready' if self.application.ready else 'draining'})
         elif route in PAGES:
             preference = SimpleCookie()
             try:
@@ -183,8 +256,14 @@ class Handler(BaseHTTPRequestHandler):
             return
         origin = self.headers.get("Origin")
         host = self.headers.get("Host", "")
-        if origin and urlsplit(origin).netloc != host:
+        expected_origin = self.application.config.public_origin
+        if (self.application.config.mode == 'production' and origin != expected_origin) or (origin and not expected_origin and urlsplit(origin).netloc != host):
             self._json(HTTPStatus.FORBIDDEN, {"error": "Origine refusée."})
+            return
+        app = self.application
+        if not app.bucket.take():
+            self.send_header('Retry-After','1')
+            self._json(HTTPStatus.TOO_MANY_REQUESTS, {'error':'Laboratory request budget exceeded; retry shortly.'})
             return
         if self.headers.get("Content-Type", "").split(";", 1)[0].strip().lower() != "application/json":
             self._json(HTTPStatus.UNSUPPORTED_MEDIA_TYPE, {"error": "JSON requis."})
@@ -214,28 +293,46 @@ class Handler(BaseHTTPRequestHandler):
         if isinstance(parsed, AdvanceTimeCommand) and parsed.duration > 60:
             self._json(HTTPStatus.UNPROCESSABLE_ENTITY, {"error": "La durée maximale est de 60 secondes."})
             return
-        token, session, created = _session(self._token())
+        cost = math.ceil(parsed.duration / 10) if isinstance(parsed, AdvanceTimeCommand) else 0
+        if cost and not app.bucket.take(cost):
+            self.send_header('Retry-After','1')
+            self._json(HTTPStatus.TOO_MANY_REQUESTS, {'error':'Laboratory request budget exceeded; retry shortly.'})
+            return
+        if not app.api_slots.acquire(blocking=False):
+            self.send_header('Retry-After','1')
+            self._json(HTTPStatus.SERVICE_UNAVAILABLE, {'error':'Laboratory busy; retry shortly.'})
+            return
+        token = None
+        created = False
         try:
-            with _lock:
+            token,session,created = app.session(self._token())
+            if not session.lock.acquire(blocking=False):
+                self.send_header('Retry-After','1')
+                self._json(HTTPStatus.CONFLICT, {'error':'Session already executing; retry shortly.'})
+                return
+            try:
                 answer = session.execute(command.strip())
-        except ValueError as exc:
-            self._json(HTTPStatus.UNPROCESSABLE_ENTITY, {"error": str(exc)}, token if created else None)
+            finally:
+                session.lock.release()
+        except BudgetExceeded as error:
+            self._json(HTTPStatus.TOO_MANY_REQUESTS, {'error':str(error)},token if created else None)
+            return
+        except ValueError as error:
+            self._json(HTTPStatus.UNPROCESSABLE_ENTITY, {'error':str(error)},token if created else None)
             return
         except Exception:
-            logging.exception("Command execution failed")
-            self._json(HTTPStatus.INTERNAL_SERVER_ERROR, {"error": "Erreur interne."}, token if created else None)
+            logging.error('Command execution failed',exc_info=False)
+            self._json(HTTPStatus.INTERNAL_SERVER_ERROR, {'error':'Internal server error.'},token if created else None)
             return
-        self._json(HTTPStatus.OK, {"answer": answer_in_language(answer,language)}, token if created else None)
+        finally:
+            app.api_slots.release()
+        self._json(HTTPStatus.OK, {'answer':answer_in_language(answer,language), 'runtime':{'history_scope':'bounded recent history; checkpointed causal graph', 'checkpoints':session.checkpoints}},token if created else None)
 
 
-def main() -> None:
-    logging.basicConfig(level=logging.INFO)
-    host = os.environ.get("WCE_HOST", "127.0.0.1")
-    port = int(os.environ.get("WCE_PORT", "8000"))
-    server = ThreadingHTTPServer((host, port), Handler)
-    logging.info("WCE listening on %s:%s", host, server.server_port)
-    server.serve_forever()
+def main():
+    from app.server import serve
+    serve(Application())
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

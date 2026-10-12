@@ -1,0 +1,8 @@
+{
+  "renders": 408,
+  "wcag_aa_scans": 160,
+  "violations": [],
+  "docker_regression_paths": 112,
+  "https_intercepted_proxy_contract": "passed; local-only relay, no certificate",
+  "unit_frontend_runtime_tests": 225
+}

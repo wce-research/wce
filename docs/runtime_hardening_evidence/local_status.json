@@ -1,0 +1,13 @@
+{
+  "loopback_port": 3018,
+  "health": "healthy",
+  "checked_routes": 70,
+  "uid": 999,
+  "memory_limit_mib": 256,
+  "cpu_limit": 1,
+  "pids_limit": 64,
+  "read_only": true,
+  "image_id": "sha256:6dbce6e78c075967ab9c26242dfb1cedf8ba8647e1ffec0371f04cef57ab17b9",
+  "runtime_sources_match_workspace": true,
+  "test_inventory_matches_workspace": true
+}

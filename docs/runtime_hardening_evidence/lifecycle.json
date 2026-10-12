@@ -1,0 +1,34 @@
+[
+  {
+    "image_id": "sha256:6dbce6e78c075967ab9c26242dfb1cedf8ba8647e1ffec0371f04cef57ab17b9",
+    "mode": "development",
+    "signal": "docker stop",
+    "stop_seconds": 1.258,
+    "exit_code": 0,
+    "oom": false,
+    "idle_cpu_samples": [
+      0.12,
+      0.1,
+      38.38
+    ],
+    "hygiene": "application image hygiene passed"
+  },
+  {
+    "image_id": "sha256:6dbce6e78c075967ab9c26242dfb1cedf8ba8647e1ffec0371f04cef57ab17b9",
+    "mode": "production",
+    "signal": "SIGTERM",
+    "stop_seconds": 0.248,
+    "exit_code": 0,
+    "oom": false,
+    "idle_cpu_samples": [
+      0.08,
+      0.14,
+      33.71
+    ],
+    "hygiene": "application image hygiene passed"
+  },
+  {
+    "mode": "invalid production",
+    "exit_code": 1
+  }
+]

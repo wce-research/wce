@@ -1,0 +1,288 @@
+{
+  "time_utc": "2026-10-12T21:12:57.380153+00:00",
+  "commit": "391f41a0362ec691de3779b97a794b0f6a7787ad",
+  "tool_sha256": "1c55c34ceecdff1b882b9532596ecd111ea08b456649023b2b770e8a8873f31d",
+  "source_sha256": {
+    "app/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "app/content.py": "ffd6abf6628a990bfc0cbf8591f40c95492f8a4c95d8bfe64824a60fe9d26228",
+    "app/diagrams.py": "05154126a32f5d18f082f12bec9410c81705a2ecdc16c267617cece854832740",
+    "app/evidence.py": "db806b884a700c2ae8d79552e3454da98db44edef1d57503291b9de830553032",
+    "app/i18n.py": "5a73ca83fd35e3c89023fc95a05f9fff084684ad26c7b3dc523a8cefaae60d2b",
+    "app/lab_runtime.py": "38be8b495b2fef5163c8ec2358e656a3d281a20d5eb11a19e03ea39418a5f7fe",
+    "app/localization.py": "d3b81fdf2440d0cbb5585fe47748338417e9f8dbfd99456fc476246c8a1a8e29",
+    "app/milestone_details.py": "00e171d6b46b04e970830986f4b00bf56e8de6599469d2aa271c8049b1e42848",
+    "app/presentation.py": "6863a369f197e9411b412ad2276ede353beb5cf58daced5b5217846ff7d52216",
+    "app/public_identity.py": "77d86e01e30ddc22b07b2b08583d2c74ab7af8348597b24c2637d2d53a4db5ec",
+    "app/repl.py": "280cfc6df2a5cad5522f05b95571cc47fc5eb6bc258506f28e0a7709991b84cb",
+    "app/research_catalog.py": "589adf8941a2ca4d1d8d0168802ae8e3524048de7f2c0e9b731e62db692789f5",
+    "app/runtime_config.py": "8e928e69d53afad2825b81aebd0e789091c40a4ff7c7ae85cf1e7fc6ce9c3303",
+    "app/science.py": "601534cba2fe31cb1ab1f820f820bc983fa0cbf1544ff9215c9a2630c98cf47d",
+    "app/science_catalog.py": "c22fb7d1e83c5701ef2e79c09c8513ccfd3321b92d7015421b88534af4b47f3a",
+    "app/server.py": "c70fb05da9408fe221e82d5e9ac51c737d637d2ee2d2a57b065219d5a42409ee",
+    "app/session.py": "e1716c17782f35a9919f9929de634ce9ff19eb34847df59d04043145b10e48dc",
+    "app/site.py": "e58e1d979c128a07aa8d675f166bb237290c99c07b8b25d4d81fe9a5c6fc06a8",
+    "app/understanding.py": "b95b5de72b88c1668a4e774d49f617988b802a046a24c231efe35b292b165994",
+    "app/web.py": "4fb9a8fb28657b1e553ef243d4ee91c7e459b64224a0302899fa856c0d09d958"
+  },
+  "image_id": "sha256:4f43b47afd79b548a5a65fd19d118646caaa5482a39b41d9c10cfce43cf3ac69",
+  "image_bytes": 48073013,
+  "cpu_limit": 1.0,
+  "memory_limit_mib": 256,
+  "method": "Closed-loop users without think time, fresh HTTP/1.0 connections; successful and attempted latency separated; not an AWS capacity test",
+  "docker_run_to_ready_seconds": 0.825,
+  "runtime": "3.12.15 999",
+  "idle_samples": [
+    {
+      "CPUPerc": "0.06%",
+      "MemUsage": "18.86MiB / 256MiB",
+      "PIDs": "6"
+    },
+    {
+      "CPUPerc": "0.15%",
+      "MemUsage": "18.86MiB / 256MiB",
+      "PIDs": "6"
+    },
+    {
+      "CPUPerc": "42.81%",
+      "MemUsage": "18.91MiB / 256MiB",
+      "PIDs": "6"
+    }
+  ],
+  "workload": [
+    {
+      "path": "/en/",
+      "command": null
+    },
+    {
+      "path": "/fr/",
+      "command": null
+    },
+    {
+      "path": "/en/research/programme",
+      "command": null
+    },
+    {
+      "path": "/en/research/high-precision",
+      "command": null
+    },
+    {
+      "path": "/en/architecture/research-map",
+      "command": null
+    },
+    {
+      "path": "/styles.css",
+      "command": null
+    },
+    {
+      "path": "/science.js",
+      "command": null
+    },
+    {
+      "path": "/research/deep_high_precision_summary.json",
+      "command": null
+    },
+    {
+      "path": "/healthz",
+      "command": null
+    },
+    {
+      "path": "/api/command",
+      "command": "Where is the ball?"
+    }
+  ],
+  "scenarios": [
+    {
+      "users": 1,
+      "requested_seconds": 6,
+      "elapsed_seconds": 7.909,
+      "requests": 2163,
+      "successes": 2163,
+      "errors": {},
+      "successful_rps": 273.47,
+      "successful_latency_ms": {
+        "p50": 2.081,
+        "p95": 6.339,
+        "p99": 7.821
+      },
+      "all_attempt_latency_ms": {
+        "p50": 2.081,
+        "p95": 6.339,
+        "p99": 7.821
+      },
+      "bytes": 195088854,
+      "docker_samples": [
+        {
+          "CPUPerc": "89.28%",
+          "MemUsage": "29.34MiB / 256MiB",
+          "PIDs": "6"
+        },
+        {
+          "CPUPerc": "89.99%",
+          "MemUsage": "29.5MiB / 256MiB",
+          "PIDs": "6"
+        },
+        {
+          "CPUPerc": "90.62%",
+          "MemUsage": "29.5MiB / 256MiB",
+          "PIDs": "6"
+        },
+        {
+          "CPUPerc": "0.15%",
+          "MemUsage": "29.2MiB / 256MiB",
+          "PIDs": "6"
+        }
+      ]
+    },
+    {
+      "users": 10,
+      "requested_seconds": 6,
+      "elapsed_seconds": 6.055,
+      "requests": 1196,
+      "successes": 1196,
+      "errors": {},
+      "successful_rps": 197.52,
+      "successful_latency_ms": {
+        "p50": 42.891,
+        "p95": 101.717,
+        "p99": 201.651
+      },
+      "all_attempt_latency_ms": {
+        "p50": 42.891,
+        "p95": 101.717,
+        "p99": 201.651
+      },
+      "bytes": 107873286,
+      "docker_samples": [
+        {
+          "CPUPerc": "102.41%",
+          "MemUsage": "30.63MiB / 256MiB",
+          "PIDs": "6"
+        },
+        {
+          "CPUPerc": "101.93%",
+          "MemUsage": "31.81MiB / 256MiB",
+          "PIDs": "6"
+        },
+        {
+          "CPUPerc": "102.82%",
+          "MemUsage": "30.41MiB / 256MiB",
+          "PIDs": "6"
+        }
+      ]
+    },
+    {
+      "users": 50,
+      "requested_seconds": 6,
+      "elapsed_seconds": 7.983,
+      "requests": 1192,
+      "successes": 1192,
+      "errors": {},
+      "successful_rps": 149.31,
+      "successful_latency_ms": {
+        "p50": 244.524,
+        "p95": 363.386,
+        "p99": 1255.876
+      },
+      "all_attempt_latency_ms": {
+        "p50": 244.524,
+        "p95": 363.386,
+        "p99": 1255.876
+      },
+      "bytes": 108581681,
+      "docker_samples": [
+        {
+          "CPUPerc": "102.36%",
+          "MemUsage": "31.9MiB / 256MiB",
+          "PIDs": "6"
+        },
+        {
+          "CPUPerc": "101.76%",
+          "MemUsage": "31.58MiB / 256MiB",
+          "PIDs": "6"
+        },
+        {
+          "CPUPerc": "107.24%",
+          "MemUsage": "41.85MiB / 256MiB",
+          "PIDs": "8"
+        },
+        {
+          "CPUPerc": "39.09%",
+          "MemUsage": "30.92MiB / 256MiB",
+          "PIDs": "6"
+        }
+      ]
+    },
+    {
+      "users": 100,
+      "requested_seconds": 6,
+      "elapsed_seconds": 6.478,
+      "requests": 914,
+      "successes": 861,
+      "errors": {
+        "429": 53
+      },
+      "successful_rps": 132.92,
+      "successful_latency_ms": {
+        "p50": 691.909,
+        "p95": 1003.366,
+        "p99": 1079.78
+      },
+      "all_attempt_latency_ms": {
+        "p50": 693.742,
+        "p95": 999.782,
+        "p99": 1078.727
+      },
+      "bytes": 82386394,
+      "docker_samples": [
+        {
+          "CPUPerc": "101.68%",
+          "MemUsage": "33.56MiB / 256MiB",
+          "PIDs": "6"
+        },
+        {
+          "CPUPerc": "102.31%",
+          "MemUsage": "32.94MiB / 256MiB",
+          "PIDs": "6"
+        },
+        {
+          "CPUPerc": "101.18%",
+          "MemUsage": "32.9MiB / 256MiB",
+          "PIDs": "6"
+        }
+      ]
+    }
+  ],
+  "bounded_history_probe": {
+    "cycles": 10,
+    "commands_per_cycle": 2,
+    "duration_per_cycle": 60,
+    "before": {
+      "CPUPerc": "0.09%",
+      "MemUsage": "32.03MiB / 256MiB",
+      "PIDs": "6"
+    },
+    "after": {
+      "CPUPerc": "0.13%",
+      "MemUsage": "32.04MiB / 256MiB",
+      "PIDs": "6"
+    },
+    "latency_ms": [
+      33.276466998358956,
+      11.716523000359302,
+      11.723409999831347,
+      8.679063997988123,
+      9.71772599950782,
+      9.073419001651928,
+      8.892686000763206,
+      10.085785001137992,
+      10.734323997894535,
+      11.305124000500655
+    ]
+  },
+  "stop_seconds": 0.567,
+  "exit_state": {
+    "ExitCode": 0,
+    "OOMKilled": false,
+    "Error": ""
+  }
+}

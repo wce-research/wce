@@ -75,3 +75,13 @@ dist/
 !docs/hypotheses_deep_compositional_discovery.md
 !docs/architecture_validated_transformation.md
 !docs/sealed_sets.md
+
+# Local hardening tooling and credentials are never part of the build context.
+.venv-runtime/
+.aws/
+.secrets/
+secrets/
+*.pem
+*.key
+tools/
+*.salt

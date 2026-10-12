@@ -2,22 +2,23 @@ import http.client
 import json
 import threading
 import unittest
-from http.server import ThreadingHTTPServer
+from app.server import build_server, close_server
 
-from app.web import Handler
+from app.web import Application
 
 
 class WebTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
-        cls.thread = threading.Thread(target=cls.server.serve_forever, daemon=True)
+        cls.application = Application()
+        cls.server = build_server(cls.application)
+        cls.server.server_port = int(cls.server.effective_port)
+        cls.thread = threading.Thread(target=cls.server.run, daemon=True)
         cls.thread.start()
 
     @classmethod
     def tearDownClass(cls):
-        cls.server.shutdown()
-        cls.server.server_close()
+        close_server(cls.server,cls.application)
         cls.thread.join()
 
     def request(self, method, path, data=None, headers=None):

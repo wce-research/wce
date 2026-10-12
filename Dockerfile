@@ -7,6 +7,8 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 RUN groupadd --system wce && useradd --system --gid wce --home-dir /app wce
+COPY requirements-web.txt ./
+RUN pip install --no-cache-dir --require-hashes -r requirements-web.txt
 COPY --chown=wce:wce app/ app/
 COPY --chown=wce:wce core/ core/
 COPY --chown=wce:wce language/ language/
@@ -52,5 +54,5 @@ USER wce
 
 EXPOSE 8000
 HEALTHCHECK --interval=20s --timeout=3s --start-period=5s --retries=3 \
-  CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/healthz', timeout=2)" || exit 1
+  CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/readyz', timeout=2)" || exit 1
 CMD ["python", "-m", "app.web"]

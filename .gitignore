@@ -30,3 +30,6 @@ results/continuum/log_*.txt
 results/*.log
 !results/active_multiseed.log
 !results/boundary_multiseed.log
+
+# Local production-runtime verification environment.
+.venv-runtime/

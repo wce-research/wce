@@ -1,7 +1,7 @@
 {
   "definition": "Static test_ function declarations; no execution or dynamic-case count",
-  "declared_methods": 4321,
-  "source_sha256": "06a1f5435d83fb8cd56a6999f11ae7498f4e09e3ffb989b17961c0dfa906acb7",
+  "declared_methods": 4344,
+  "source_sha256": "dc583259d25c1bb9c8b471119d080bd504cbeca1a2b6bfb92b9d1e59ff77c3f8",
   "files": [
     {
       "path": "tests/test_active.py",
@@ -219,6 +219,11 @@
       "sha256": "ab509d8e6b72e143cc71f903e720c82acbac8dfc006f04221273adf297e6ad8c"
     },
     {
+      "path": "tests/test_runtime.py",
+      "declared_methods": 23,
+      "sha256": "d729f23b3d8ae6b6b29f31bb890dc4346b6fde865de983022b485f39f439fffc"
+    },
+    {
       "path": "tests/test_science.py",
       "declared_methods": 13,
       "sha256": "00727f0e40e5bc9afbcc1c6a4290070ceb6ac61128c42068d2ed218edb40cfdd"
@@ -261,7 +266,7 @@
     {
       "path": "tests/test_web.py",
       "declared_methods": 17,
-      "sha256": "57588aaf309a471080b4d93ecf2136db9f219f497e7532883c2b9d4914dc7fe1"
+      "sha256": "9039ca427d1397add97ec76841c72ff1df2a7bdc86d12124b40d7c00e86144da"
     },
     {
       "path": "tests/test_world.py",

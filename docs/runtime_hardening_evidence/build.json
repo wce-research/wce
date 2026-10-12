@@ -1,0 +1,7 @@
+{
+  "time_utc": "2026-10-12T21:12:27.448759+00:00",
+  "build_seconds": 32.863,
+  "image_id": "sha256:4f43b47afd79b548a5a65fd19d118646caaa5482a39b41d9c10cfce43cf3ac69",
+  "image_bytes": 48073013,
+  "base_download_included": "only if registry/cache required it; not a guaranteed cold-base benchmark"
+}

@@ -90,13 +90,14 @@ def main():
     image=json.loads(docker('image','inspect',args.image))[0]
     result={'time_utc':datetime.now(timezone.utc).isoformat(),'commit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),
             'tool_sha256':sha256(Path(__file__).read_bytes()).hexdigest(),
+            'source_sha256':{str(path.relative_to(ROOT)):sha256(path.read_bytes()).hexdigest() for path in sorted((ROOT/'app').glob('*.py'))},
             'image_id':image['Id'],'image_bytes':image['Size'],'cpu_limit':args.cpus,'memory_limit_mib':256,
             'method':'Closed-loop users without think time, fresh HTTP/1.0 connections; successful and attempted latency separated; not an AWS capacity test'}
     container=None
     try:
         started=time.perf_counter()
         container=docker('run','-d','--read-only','--cap-drop','ALL','--security-opt','no-new-privileges',
-                         '--memory','256m','--cpus',str(args.cpus),'--pids-limit','256',
+                         '--tmpfs','/tmp:rw,noexec,nosuid,size=16m','--memory','256m','--cpus',str(args.cpus),'--pids-limit','256',
                          '--log-opt','max-size=2m','--log-opt','max-file=1','-p','127.0.0.1::8000',args.image)
         port=int(docker('port',container,'8000/tcp').rsplit(':',1)[1])
         for attempt in range(100):
@@ -108,14 +109,18 @@ def main():
         result['runtime']=docker('exec',container,'python','-c','import platform,os;print(platform.python_version(),os.getuid())')
         result['idle_samples']=[sample(container) for _ in range(3)]
         workload=[('/en/',None),('/fr/',None),('/en/research/programme',None),('/en/research/high-precision',None),('/en/architecture/research-map',None),('/styles.css',None),('/science.js',None),('/research/deep_high_precision_summary.json',None),('/healthz',None),('/api/command','Where is the ball?')]
-        for path,command in workload:assert request(port,path,command)[0]==200,(path,command)
+        warm_cookie=None
+        for path,command in workload:
+            status,_,_,new_cookie=request(port,path,command)
+            assert status==200,(path,command)
+            if new_cookie:warm_cookie=new_cookie.split(';')[0]
         result['workload']=[{'path':p,'command':c} for p,c in workload]
         result['scenarios']=[]
         for users in (1,10,50,100):
             record=measure(container,port,users,args.seconds,workload);result['scenarios'].append(record)
             print('users',users,'rps',record['successful_rps'],'latency',record['successful_latency_ms'],'errors',record['errors'],flush=True)
         result['bounded_history_probe']={'cycles':10,'commands_per_cycle':2,'duration_per_cycle':60,'before':sample(container)}
-        cookie=None;timings=[]
+        cookie=warm_cookie;timings=[]
         for _ in range(10):
             status,_,_,new_cookie=request(port,'/api/command','Lift the ball to 2 metres',cookie)
             assert status==200

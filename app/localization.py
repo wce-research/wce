@@ -29,4 +29,22 @@ def answer_in_language(answer, language):
     return 'Engine response (French): ' + answer
 
 def error_in_language(error, language):
+    if error in RUNTIME_ERRORS:
+        return error if language == 'en' else RUNTIME_ERRORS[error]
+    if error == 'The maximum duration is 60 seconds.':
+        return error if language == 'en' else 'La durée maximale est de 60 secondes.'
     return ERRORS.get(error,'Invalid request or unsupported command. See the laboratory command guide.') if language == 'en' else error
+
+# Runtime boundary messages are authored in English; this is the French translation layer.
+RUNTIME_ERRORS = {
+ 'Service temporarily unavailable.': 'Service temporairement indisponible.',
+ 'Invalid public host.': 'Hôte public invalide.',
+ 'Method not allowed.': 'Méthode non autorisée.',
+ 'Internal server error.': 'Erreur interne du serveur.',
+ 'Laboratory session capacity reached; retry after expiry.': 'Capacité des sessions atteinte ; réessayez après expiration.',
+ 'Laboratory session budget exhausted; start a new browser session or wait for expiry.': 'Budget de la session épuisé ; ouvrez une nouvelle session de navigation ou attendez son expiration.',
+ 'Laboratory request budget exceeded; retry shortly.': 'Budget de requêtes dépassé ; réessayez dans un instant.',
+ 'Laboratory busy; retry shortly.': 'Laboratoire occupé ; réessayez dans un instant.',
+ 'Session already executing; retry shortly.': 'Session déjà en cours d’exécution ; réessayez dans un instant.',
+ 'Numeric parameters must be finite and within ±1000000.': 'Les paramètres numériques doivent être finis et compris entre −1000000 et 1000000.',
+}
