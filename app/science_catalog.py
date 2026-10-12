@@ -31,7 +31,7 @@ MILESTONES = [
  ('objective_alignment', 'deep_objective_summary.json', 'EXPLORATORY / PARTIAL',
   ('Objective alignment', 'Alignement de l’objectif'),
   ('Does a local surrogate preserve the composed function?', 'Un substitut local préserve-t-il la fonction composée ?'),
-  ('Local single-primitive objectives can move away from truth; the joint cell-floor objective is aligned with the function. The full discovery chain is still blocked.', 'Les objectifs locaux peuvent éloigner de la primitive vraie ; l’objectif conjoint cell-floor est aligné avec la fonction. La découverte complète reste bloquée.'),
+  ('None of the six objectives tested is aligned on already-good candidates. A conditional gate protects some candidates, but its gain does not survive primitive discovery. The later High-Precision report studies a different joint objective.', 'Aucun des six objectifs testés n’est aligné sur les candidats déjà corrects. Une porte conditionnelle protège certains candidats, mais son gain ne survit pas à la découverte. Le rapport High-Precision ultérieur étudie un autre objectif conjoint.'),
   ('Improve atom estimates under composition and occlusion.', 'Améliorer les estimations sous composition et occlusion.')),
  ('robust_primitive_discovery', 'deep_robust_primitive_summary.json', 'PRIMITIVE DISCOVERY IMPROVED BUT INSUFFICIENT',
   ('Robust primitive discovery', 'Découverte robuste des primitives'),

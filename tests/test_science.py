@@ -6,7 +6,8 @@ import re
 import unittest
 
 from app.i18n import preferred_language
-from app.science import summary
+from app.science import summary, report_sections, report_cell
+from app.milestone_details import DETAILS
 from app.science_catalog import MILESTONES, PUBLIC_REPORTS, PUBLIC_SUMMARIES, PUBLIC_METHODS, SCIENCE_ROUTES, LATEST_VERDICT
 from app.site import PAGES, render_page
 from tools.build_test_inventory import inventory
@@ -32,6 +33,92 @@ class EvidenceParser(HTMLParser):
 
 
 class ScienceTests(unittest.TestCase):
+    def test_milestone_reading_notes_and_report_sections_are_source_backed(self):
+        from hashlib import sha256
+        self.assertEqual(set(DETAILS),{row[0] for row in MILESTONES})
+        make=(ROOT/'Makefile').read_text()
+        for name,notes in DETAILS.items():
+            self.assertTrue((ROOT/notes[3]).is_file())
+            self.assertRegex(make,r'(?m)^'+re.escape(notes[4][5:])+':')
+            path,digest,sections=report_sections(name)
+            raw=(ROOT/path).read_bytes();lines=raw.decode().splitlines()
+            self.assertEqual(digest,sha256(raw).hexdigest())
+            for heading,blocks in sections:
+                self.assertIn(heading,lines)
+                for kind,start,block in blocks:
+                    if kind=='table':
+                        self.assertEqual(tuple(lines[start:start+len(block)]),block)
+                        width=len(block[0].strip('|').split('|'))
+                        for row in block[2:]:
+                            self.assertEqual(len(row.strip('|').split('|')),width,(name,row))
+                    else:
+                        self.assertEqual(lines[start][2:],block[0])
+        with self.assertRaises(KeyError):
+            report_sections('../private')
+
+    def test_rendered_report_evidence_preserves_source_rows_in_both_languages(self):
+        class ReportRows(HTMLParser):
+            def __init__(self):
+                super().__init__();self.rows=[];self.current=None
+            def handle_starttag(self,tag,attrs):
+                attrs=dict(attrs)
+                if 'data-report-source' in attrs:
+                    self.current=[tag,attrs,[]]
+            def handle_data(self,value):
+                if self.current is not None:self.current[2].append(value)
+            def handle_endtag(self,tag):
+                if self.current is not None and self.current[0]==tag:
+                    self.rows.append(self.current);self.current=None
+        for language in ('en','fr'):
+            parser=ReportRows();parser.feed(render_page('/research/programme',language).decode())
+            self.assertGreater(len(parser.rows),100)
+            for tag,attrs,values in parser.rows:
+                self.assertIn(attrs['data-report-source'],PUBLIC_REPORTS)
+                line=(ROOT/attrs['data-report-source']).read_text().splitlines()[int(attrs['data-report-line'])-1]
+                expected=[report_cell(c) or '—' for c in line.strip('|').split('|')] if tag=='tr' else [report_cell(line[2:])]
+                self.assertEqual(''.join(values),''.join(expected))
+            page=render_page('/research/programme',language).decode()
+            self.assertIn('DC7',page);self.assertIn('LP1',page);self.assertIn('HP13',page)
+            self.assertIn('lang="en"',page)
+        objective=DETAILS['objective_alignment'][2][0]
+        self.assertIn('None of the tested objectives',objective)
+        self.assertIn('predefined guardrail criterion is met',DETAILS['validated_optimizer'][2][0])
+
+    def test_historical_evidence_metrics_match_their_structured_sources(self):
+        from app.evidence import artifact, METRICS
+        class Attributes(HTMLParser):
+            def __init__(self):super().__init__();self.nodes=[]
+            def handle_starttag(self,tag,attrs):self.nodes.append(dict(attrs))
+        for language in ('en','fr'):
+            data,_=artifact('continuum_summary.json');parser=Attributes();parser.feed(render_page('/research/continual',language).decode())
+            rows=[a for a in parser.nodes if 'data-estimate' in a]
+            self.assertEqual(len(rows),len(data['methods'])*len(METRICS))
+            for a in rows:
+                r=data['methods'][a['data-method']][a['data-metric']]
+                self.assertEqual(float(a['data-estimate']),r['mean'])
+                self.assertEqual(float(a['data-ci-low']),r['ci95'][0])
+                self.assertEqual(float(a['data-ci-high']),r['ci95'][1])
+                self.assertEqual(int(a['data-n']),r['n'])
+            data,_=artifact('active_summary.json');parser=Attributes();parser.feed(render_page('/research/discovery',language).decode())
+            for a in parser.nodes:
+                if 'data-hypothesis' in a:self.assertEqual(a['data-verdict'],data['hypotheses'][a['data-hypothesis']]['verdict'])
+            data,_=artifact('predictive_coverage.json');parser=Attributes();parser.feed(render_page('/research/measurement',language).decode())
+            coverage=[a for a in parser.nodes if 'data-predictive' in a]
+            self.assertEqual(len(coverage),5)
+            for a in coverage:
+                r=data[a['data-source']]
+                self.assertEqual(float(a['data-predictive']),r['predictive'])
+                self.assertEqual(float(a['data-credible']),r['credible'])
+                self.assertEqual(int(a['data-n']),r['n'])
+
+    def test_architecture_explains_missing_measurement_and_discovery_stages(self):
+        en=render_page('/architecture/research-map','en').decode()
+        for key in ('Observable','ReferenceFrame / context','Fragment extraction','Type inference','Complete set','EvidenceGraph'):
+            self.assertIn(key,en)
+        fr=render_page('/architecture/research-map','fr').decode()
+        for key in ('Observable','ReferenceFrame / context','Extraction des fragments','Inférence du type','Ensemble complet'):
+            self.assertIn(key,fr)
+
     def test_all_displayed_scientific_values_match_exact_artifact_paths(self):
         for language in ('en','fr'):
             for route in ('/research/deep-composition','/research/high-precision'):

@@ -48,10 +48,25 @@ async function navigate(page,url){
     const canonical=await page.locator('link[rel=canonical]').getAttribute('href');check(canonical==='https://wcelabs.com'+route,'Canonical '+route);
     const links=await page.locator('a[href]').evaluateAll(nodes=>nodes.map(node=>node.getAttribute('href')));
     for(const href of links){if(href.startsWith('/en/')||href.startsWith('/fr/'))check(routes.includes(href.split('#')[0]),'Internal link '+href);}
+    const socials=await page.locator('footer a[target="_blank"]').evaluateAll(nodes=>nodes.map(node=>({href:node.getAttribute('href'),rel:node.getAttribute('rel')})));
+    const official=['https://github.com/wce-research','https://x.com/WCELabs','https://www.linkedin.com/company/wce-labs/','https://www.instagram.com/wcelabs/'];
+    check(socials.length===4&&official.every(href=>socials.some(link=>link.href===href&&link.rel==='noopener noreferrer')),'Official secure social links '+route);
+    check(await page.locator('footer .social-pending').count()===0,'No pending network '+route);
     const science=newRoutes.some(suffix=>route.endsWith(suffix));
     if(width===1440||(science&&width===390)){
      const result=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();report.axeScans++;
      report.violations.push(...result.violations.map(item=>({route,width,theme,id:item.id,impact:item.impact,nodes:item.nodes.map(node=>({target:node.target,summary:node.failureSummary}))})));
+    }
+    if(route.endsWith('/research/programme')){
+     check(await page.locator('[data-milestone]').count()===14,'Fourteen explained milestones');
+     await page.locator('[data-milestone],.science-report-evidence').evaluateAll(nodes=>nodes.forEach(node=>node.open=true));
+     check(await page.locator('[data-report-source]').count()>100,'Source-backed report rows visible');
+     check(!await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),'Expanded milestone overflow '+width+' '+theme);
+     if(width!==768){
+      const expanded=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();report.axeScans++;
+      report.violations.push(...expanded.violations.map(item=>({route:route+'#expanded',width,theme,id:item.id,impact:item.impact,nodes:item.nodes.map(node=>({target:node.target,summary:node.failureSummary}))})));
+     }
+     await page.locator('[data-milestone],.science-report-evidence').evaluateAll(nodes=>nodes.forEach(node=>node.open=false));
     }
     if(science&&width!==768){
      await screenshot(page,route.slice(1).replaceAll('/','-')+'-'+width+'-'+theme);
@@ -76,8 +91,12 @@ async function navigate(page,url){
   await page.goto(base+'/'+locale+'/research/programme');
   const first=page.locator('.science-timeline>li>details>summary').first();await first.focus();await page.keyboard.press('Enter');
   check(await page.locator('.science-timeline>li>details').first().getAttribute('open')!==null,'Keyboard timeline');
+  const evidence=page.locator('[data-milestone]').first().locator('.science-report-evidence>summary');
+  await evidence.focus();await page.keyboard.press('Enter');
+  check(await evidence.locator('..').getAttribute('open')!==null,'Keyboard report evidence');
+  await screenshot(page,locale+'-expanded-report-mobile');
  }
- report.checks.push('Keyboard acceptance/rollback, live status, reduced motion, keyboard milestone disclosure');
+ report.checks.push('Keyboard acceptance/rollback, live status, reduced motion, nested keyboard milestone/report disclosure, all four secure social links');
  const french=await browser.newContext({locale:'fr-FR'});const fp=await french.newPage();await fp.goto(base+'/');
  check(await fp.locator('html').getAttribute('lang')==='fr','Browser language detection');
  check(await fp.locator('.hero .lead').innerText().then(value=>value.includes('programme de recherche ouvert')),'French home explanation');
