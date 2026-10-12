@@ -932,3 +932,12 @@ frontend-science-browser:
 
 frontend-serve:
 	$(PYTHON) -m app.web
+
+# Local infrastructure review only: disposable loopback Docker benchmark, no cloud calls.
+.PHONY: production-benchmark production-aws-review
+PRODUCTION_BENCHMARK_ARGS ?=
+production-benchmark:
+	$(PYTHON) tools/production_benchmark.py $(PRODUCTION_BENCHMARK_ARGS)
+
+production-aws-review:
+	$(PYTHON) tools/production_aws_review.py
