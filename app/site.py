@@ -97,8 +97,9 @@ SOCIALS = [
 def social_links(language='fr') -> str:
     links = []
     for name, variable, hosts, icon in sorted(SOCIALS, key=lambda item: ('GitHub', 'LinkedIn', 'X', 'Instagram').index(item[0])):
-        from app.public_identity import GITHUB_ORG
-        url = (GITHUB_ORG if name == "GitHub" else os.environ.get(variable, "").strip())
+        from app.public_identity import SOCIAL_URLS
+        url = (SOCIAL_URLS[variable] if name == "GitHub" else
+               os.environ.get(variable, "").strip() or SOCIAL_URLS[variable])
         try:
             parsed = urlsplit(url)
             valid = (parsed.scheme == "https" and parsed.hostname in hosts

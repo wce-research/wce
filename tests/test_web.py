@@ -84,6 +84,42 @@ class WebTests(unittest.TestCase):
                 self.assertNotIn(b'javascript:', body)
                 self.assertNotIn(b'evil.test', body)
 
+    def test_official_social_defaults_in_every_localized_footer(self):
+        import os
+        from unittest.mock import patch
+        from app.site import PAGES, render_page
+        from html.parser import HTMLParser
+
+        class SocialLinks(HTMLParser):
+            def __init__(self):
+                super().__init__()
+                self.links = []
+
+            def handle_starttag(self, tag, attrs):
+                attrs = dict(attrs)
+                if tag == 'a' and attrs.get('target') == '_blank':
+                    self.links.append(attrs)
+
+        expected = {
+            'https://github.com/wce-research',
+            'https://x.com/WCELabs',
+            'https://www.instagram.com/wcelabs/',
+        }
+        # Compose passes empty values when no local override is configured.
+        with patch.dict(os.environ, {key: '' for key in (
+                'WCE_GITHUB_URL', 'WCE_X_URL', 'WCE_LINKEDIN_URL', 'WCE_INSTAGRAM_URL')}):
+            for language in ('fr', 'en'):
+                for route in PAGES:
+                    footer = render_page(route, language).decode().split('<footer', 1)[1].split('</footer>', 1)[0]
+                    parser = SocialLinks()
+                    parser.feed(footer)
+                    self.assertEqual({link['href'] for link in parser.links}, expected)
+                    for link in parser.links:
+                        self.assertEqual(link['rel'], 'noopener noreferrer')
+                        self.assertIn('aria-label', link)
+                    self.assertEqual(footer.count('class="social-pending"'), 1)
+                    self.assertIn('LinkedIn', footer)
+
     def test_identity_review_and_assets_are_explicit(self):
         import struct
         self.assertEqual(self.request("GET", "/identity")[0], 308)

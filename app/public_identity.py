@@ -9,6 +9,12 @@ SITE_NAME = 'WCE Labs'
 SITE_URL = 'https://wcelabs.com'
 GITHUB_ORG = 'https://github.com/wce-research'
 GITHUB_REPO = 'https://github.com/wce-research/wce'
+SOCIAL_URLS = {
+ 'WCE_GITHUB_URL': GITHUB_ORG,
+ 'WCE_X_URL': 'https://x.com/WCELabs',
+ 'WCE_LINKEDIN_URL': '',
+ 'WCE_INSTAGRAM_URL': 'https://www.instagram.com/wcelabs/',
+}
 DESCRIPTIONS = {
  'en': 'WCE Labs researches compact, compositional and verifiable AI architectures through the World Configuration Engine.',
  'fr': 'WCE Labs étudie des architectures d’IA compactes, compositionnelles et vérifiables à travers le World Configuration Engine.',
