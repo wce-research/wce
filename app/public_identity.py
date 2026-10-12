@@ -52,8 +52,7 @@ def metadata(route, language, title):
 
 def footer_links(language):
     label='Contact' if language=='fr' else 'Contact'
-    links=f'<a href="{SITE_URL}">wcelabs.com ↗</a>'
-    links+='<a href="mailto:security@wcelabs.com">'+('Sécurité' if language=='fr' else 'Security')+'</a>'
+    links='<a href="mailto:security@wcelabs.com">'+('Sécurité' if language=='fr' else 'Security')+'</a>'
     if contact_email():links+=f'<a href="mailto:{escape(contact_email(),quote=True)}">{label}</a>'
     if repository_link():links+=f'<a href="{GITHUB_REPO}">'+('Code scientifique ↗' if language=='fr' else 'Scientific source ↗')+'</a>'
     return '<div class="official-links">'+links+'</div>'
