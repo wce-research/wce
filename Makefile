@@ -27,7 +27,7 @@ help:
 	@echo "  make test-world  Tests the world model"
 	@echo "  make check       Checks the Python syntax"
 	@echo "  make clean       Removes temporary files"
-	@echo "  make docker-up   Builds and starts the site on the Dell"
+	@echo "  make docker-up   Builds and starts the site locally"
 	@echo "  make docker-down Stops the site"
 	@echo "  make docker-build Rebuilds the image"
 	@echo "  make docker-logs Follows the logs"
@@ -915,11 +915,20 @@ deep-timing:
 
 endif
 
-# Dell frontend verification; no scientific training or production deployment.
-.PHONY: frontend-test frontend-browser
+# Local frontend verification; no scientific training or production deployment.
+.PHONY: frontend-test frontend-browser frontend-science-browser frontend-serve test-inventory
+test-inventory:
+	$(PYTHON) tools/build_test_inventory.py
+
 frontend-test:
-	$(PYTHON) -m unittest tests.test_web tests.test_public_identity tests.test_public_source tests.test_wce -q
+	$(PYTHON) -m unittest tests.test_web tests.test_public_identity tests.test_public_source tests.test_science tests.test_wce -q
 
 NODE ?= node
 frontend-browser:
 	$(NODE) tests/browser/frontier.cjs
+
+frontend-science-browser:
+	$(NODE) tests/browser/science.cjs
+
+frontend-serve:
+	$(PYTHON) -m app.web

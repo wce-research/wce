@@ -93,7 +93,8 @@ def render_inventory(language):
             if len(symbols)>5:
                 more=''.join('<code>'+escape(symbol)+'</code>' for symbol in symbols[5:])
                 tags+=f'<details class="inventory-symbols"><summary>+{len(symbols)-5}</summary><div>{more}</div></details>'
-            rows.append('<li data-source-module><code class="inventory-path">'+escape(item['path'])+'</code><div>'+tags+'</div></li>')
+            from app.science import source_link
+            rows.append('<li data-source-module><span class="inventory-path">'+source_link(item['path'])+'</span><div>'+tags+'</div></li>')
         groups.append('<details class="inventory-group"><summary><span>'+labels[group][not fr]+f'</span><span>{len(items)} modules +</span></summary><ul>'+''.join(rows)+'</ul></details>')
     title='Le dépôt, au-delà des dix dossiers.' if fr else 'The repository beyond the ten dossiers.'
     intro=('Cet inventaire couvre les fichiers Python des dossiers core, language, physics, logic et les interfaces moteur de app. Les noms viennent d’une analyse statique du code ; ils ne certifient ni la maturité ni l’intégration des modules. Les outils éditoriaux et fichiers d’initialisation sont exclus.' if fr else 'This inventory covers Python files in core, language, physics, logic and the engine interfaces in app. Names come from static code analysis; they certify neither maturity nor integration. Editorial utilities and package initialisers are excluded.')

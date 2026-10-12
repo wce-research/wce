@@ -4,7 +4,7 @@ Baseline: `bcce9eb38cd43ab877e11cd9fad558953c5d5c66`, 12 October 2026. Scope: pu
 
 ## Initial assessment
 
-The frontend is already a lightweight research application, not just a landing page: bilingual routes, ten mechanism dossiers, source inventory, three source-backed evidence views, a symbolic laboratory, themes, responsive navigation, canonical URLs, OpenGraph, structured metadata and sitemap exist. Its central scientific weakness is recency and coverage: the active deep-discovery programme and its latest negative verdict are absent. The site explains mechanisms better than it explains how experiments changed the programme.
+The frontend is already a lightweight research application, not just a landing page: bilingual routes, ten mechanism dossiers, source inventory, three source-backed evidence views, a symbolic laboratory, themes, responsive navigation, canonical URLs, OpenGraph, structured metadata exist. Its central scientific weakness is recency and coverage: the active deep-discovery programme and its latest negative verdict are absent. The site explains mechanisms better than it explains how experiments changed the programme.
 
 The three existing evidence views read JSON artifacts and expose fingerprints. This is a sound pattern to extend, rather than replacing the framework. Static source paths are not yet actionable links. Three-horizon maturity labels do not clearly distinguish a tested implementation, a blocked capability and a future integration. The initial source inventory covers modules but cannot establish scientific completeness or comprehension.
 
@@ -15,14 +15,14 @@ Explanation grades: good = role, scope and example; partial = mechanism explaine
 | Backend/source | Important information | Frontend before | Current page | Explanation / visual | Gap / recommended action |
 |---|---|---|---|---|---|
 | README | Compact compositional thesis, explicit hypotheses | Partial | Home, vision | Good introduction / configuration study | Add current negative verdict and five maturity states |
-| core/world.py, entity.py, relation.py; tests/test_world.py | World, entity, relations, constraints | Yes | World-state, lab | Good / state transition | Place within separate symbolic execution path |
+| core/world.py (World, Entity, Relation); tests/test_world.py | World, entity, relations, constraints | Yes | World-state, lab | Good / state transition | Place within separate symbolic execution path |
 | core/transformations.py, invariants.py, transform_graph.py | Operators, algebra, macros, preserved properties | Yes | Primitives | Good / composition | Connect primitive → composition → verification |
-| core/algebra.py, reasoning.py, reasoning_core.py; related tests | Symbolic algebra, conditional reasoning | Partial | Planning | Partial / plan branches | Explain implemented small-domain operations and source entry points |
+| core/algebra.py, reasoning.py; related tests | Symbolic algebra, conditional reasoning | Partial | Planning | Partial / plan branches | Explain implemented small-domain operations and source entry points |
 | core/planner.py; tests/test_planner.py | Search from state to goal | Yes | Planning | Good / goal graph | Do not imply a general integrated planner |
 | core/model_state.py, learning.py, plasticity.py, safe_plasticity.py | Structural changes, adaptive neural components | Yes | Learning | Good / adaptation | Keep experimental label and separate integration from existence |
 | core/lifelong.py, symbolic.py, continuum.py | Lifelong/retention experiments | Yes | Learning, continual | Good / source-backed metric comparison | Preserve budget and distribution qualifiers |
 | core/language_core.py, grounded.py, discourse.py | Language research distinct from command grammar | Yes | Language, lab | Good / text-to-structure | Explicitly separate language experiments from language-model replacement |
-| core/source_reliability.py, epistemic.py, temporal.py | Evidence, ignorance, temporal belief | Partial | Evidence | Partial / evidence graph | Add temporal dynamics and epistemic boundaries to hierarchy |
+| core/source_reliability.py, entitlement.py, temporal_belief.py | Evidence, ignorance, temporal belief | Partial | Evidence | Partial / evidence graph | Add temporal dynamics and epistemic boundaries to hierarchy |
 | core/measurement.py | World ≠ outcome ≠ belief, compatible states | Yes | Measurement | Good / short sensor diagram | Expand operator → outcome → compatible states → update |
 | results/predictive_coverage.json | Coverage is not accuracy | Yes | Research/measurement | Good / source bars | Retain provenance and metric definition |
 | results/continuum_summary.json | Retention, costs, calibration across methods | Yes | Research/continual | Good / intervals and tables | Keep nine distinct metrics; no global leaderboard |
@@ -75,7 +75,7 @@ Reading levels: seconds = definition/current blocker; minutes = conceptual map a
 
 ## UX/engineering audit plan
 
-Baseline has responsive layouts, keyboard navigation/disclosure, focus states, reduced-motion CSS, day/night themes, metadata, sitemap/robots, favicon, bounded laboratory API and safe 500 responses. These are implementation observations, not a completed browser audit. Current browser dependency is missing. Phase B must install isolated test tooling, run existing and added checks on desktop/tablet/mobile in FR/EN and both themes, inspect screenshots, check overflow/focus/contrast/reduced motion, internal anchors, source provenance, public GitHub destinations and container artifact availability. No current score or production-readiness claim is inferred from code inspection alone.
+Baseline has responsive layouts, keyboard navigation/disclosure, focus states, reduced-motion CSS, day/night themes, metadata and favicon, bounded laboratory API and safe 500 responses. These are implementation observations, not a completed browser audit. Sitemap and robots endpoints are absent at baseline; they must be generated from the route catalog. Current browser dependency is missing. Phase B must install isolated test tooling, run existing and added checks on desktop/tablet/mobile in FR/EN and both themes, inspect screenshots, check overflow/focus/contrast/reduced motion, internal anchors, source provenance, public GitHub destinations and container artifact availability. No current score or production-readiness claim is inferred from code inspection alone.
 
 ## Phase B acceptance conditions
 

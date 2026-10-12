@@ -42,3 +42,36 @@ docs/identity/assets/*
 !docs/identity/assets/typeface-license.txt
 
 dist/
+
+# Explicitly public research reports and summaries used by the frontend.
+!docs/rapport_robust_reconstruction.md
+!docs/rapport_deep_candidate_generation.md
+!docs/rapport_primitive_discovery.md
+!docs/rapport_downstream_selection_loss.md
+!docs/rapport_validated_optimizer.md
+!docs/rapport_objective_alignment.md
+!docs/rapport_robust_primitive_discovery.md
+!docs/rapport_partial_observation_parameters.md
+!docs/rapport_fragment_type_inference.md
+!docs/rapport_boundary_ownership.md
+!docs/rapport_deep_composition_oracle_atoms.md
+!docs/rapport_end_to_end_discovered_atoms.md
+!docs/rapport_latent_primitive_recovery.md
+!docs/rapport_high_precision_primitives.md
+!results/robust_summary.json
+!results/deep_generation_summary.json
+!results/deep_primitive_summary.json
+!results/deep_downstream_summary.json
+!results/deep_validated_summary.json
+!results/deep_objective_summary.json
+!results/deep_robust_primitive_summary.json
+!results/deep_partial_observation_summary.json
+!results/deep_fragment_type_summary.json
+!results/deep_boundary_ownership_summary.json
+!results/deep_composition_oracle_summary.json
+!results/deep_end_to_end_summary.json
+!results/deep_latent_primitive_summary.json
+!results/deep_high_precision_summary.json
+!docs/hypotheses_deep_compositional_discovery.md
+!docs/architecture_validated_transformation.md
+!docs/sealed_sets.md

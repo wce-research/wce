@@ -84,11 +84,11 @@ dossier('/architecture/planning',
 dossier('/vision/now',
  ('Ce qui existe aujourd’hui','Le socle vérifiable de WCE.','État actuel',[
  ('Un moteur opérationnel','Le dépôt contient un moteur symbolique Python, une simulation physique simple, un REPL et le laboratoire web. Les commandes utilisent le même moteur de session.'),
- ('Des expériences consultables','Trois artefacts JSON sont exposés : couverture prédictive, apprentissage continu et découverte active. Les résultats restent spécifiques à leurs protocoles et incluent des limites et des verdicts négatifs.'),
+ ('Des expériences consultables','Les artefacts publics couvrent mesure, adaptation, découverte et la progression vers les primitives haute précision. Les résultats restent spécifiques à leurs protocoles et incluent des limites et des verdicts négatifs.'),
  ('Des composants à distinguer','Le moteur symbolique et les expériences neuronales ont des dépendances et des protocoles distincts. Leur présence dans un même dépôt ne signifie pas qu’ils forment déjà un modèle intégré.')]),
  ('What exists now','The verifiable foundation of WCE.','Current state',[
  ('An operational engine','The repository contains a Python symbolic engine, a simple physics simulation, a REPL and the web laboratory. Commands use the same session engine.'),
- ('Inspectable experiments','Three JSON artifacts are exposed: predictive coverage, continual learning and active discovery. Results remain specific to their protocols and include limitations and negative verdicts.'),
+ ('Inspectable experiments','Public artifacts cover measurement, adaptation, discovery and the progression toward high-precision primitives. Results remain specific to their protocols and include limitations and negative verdicts.'),
  ('Distinct components','The symbolic engine and neural experiments have distinct dependencies and protocols. Their presence in one repository does not mean they already form an integrated model.')]),
  ('app/session.py','app/repl.py'),('/architecture','/research'))
 
@@ -118,12 +118,12 @@ dossier('/vision/frontier-hub',
 
 dossier('/open/reproduce',
  ('Reproduire & exécuter','Relier le code scientifique, les conditions expérimentales et les résultats.','Protocole de reproduction',[
- ('Exécuter le moteur','Le moteur symbolique et son REPL fonctionnent avec Python : python -m app.repl. Vérifier ce parcours avec python -m unittest tests.test_wce. Cette vérification ne valide pas les expériences neuronales.'),
+ ('Exécuter le moteur','Le moteur symbolique et son REPL fonctionnent avec Python : make repl. Vérifier ce parcours avec make frontend-test. Cette vérification ne valide pas les expériences neuronales.'),
  ('Préparer la recherche','Les expériences utilisant PyTorch nécessitent leurs dépendances, fixtures et protocoles propres. Identifier le script, le jeu de données et le budget avant de lancer une expérience.'),
  ('Comparer sans modifier les critères','Conserver graines, baselines, seuils et hypothèses préenregistrées. Comparer les mesures avec leurs intervalles et publier également les échecs et résultats non concluants.'),
  ('Consigner le contexte','Documenter version du code, dépendances, plateforme, précision numérique, graines et empreinte des artefacts. Deux écarts numériques inter-plateformes restent connus ; une reproduction exacte n’est pas garantie pour tous les tests scientifiques.')]),
  ('Reproduce & run','Connect scientific code, experimental conditions and results.','Reproduction protocol',[
- ('Run the engine','The symbolic engine and REPL run with Python: python -m app.repl. Check this pathway with python -m unittest tests.test_wce. This check does not validate neural experiments.'),
+ ('Run the engine','The symbolic engine and REPL run with Python: make repl. Check this pathway with make frontend-test. This check does not validate neural experiments.'),
  ('Prepare research','PyTorch experiments require their own dependencies, fixtures and protocols. Identify the script, dataset and budget before starting an experiment.'),
  ('Compare without changing criteria','Preserve seeds, baselines, thresholds and preregistered hypotheses. Compare measurements with their intervals and report failures and inconclusive results too.'),
  ('Record context','Document code version, dependencies, platform, numerical precision, seeds and artifact hashes. Two cross-platform numerical discrepancies remain known; exact reproduction is not guaranteed for every scientific test.')]),
@@ -228,7 +228,8 @@ def render_dossier(route, language):
     labels={'fr':('Sommaire','Points d’entrée dans le dépôt','Pour poursuivre','Retour à la rubrique'), 'en':('On this page','Repository entry points','Continue exploring','Back to the section')}[language]
     toc=''.join(f'<a href="#section-{i}">{escape(name)}</a>' for i,(name,_) in enumerate(sections,1))
     article=''.join(f'<section id="section-{i}"><!-- section {i} --><h2>{escape(name)}</h2><p>{escape(text)}</p></section>' for i,(name,text) in enumerate(sections,1))
-    sources=''.join(f'<li><code>{escape(source)}</code></li>' for source in record['sources'])
+    from app.science import source_link
+    sources=''.join(f'<li>{source_link(source)}</li>' for source in record['sources'])
     resources=f'<section class="dossier-sources"><h2>{labels[1]}</h2><ul>{sources}</ul></section>' if sources else ''
     from app.site import page_title
     from app.presentation import render_route_cards

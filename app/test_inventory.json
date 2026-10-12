@@ -1,0 +1,272 @@
+{
+  "definition": "Static test_ function declarations; no execution or dynamic-case count",
+  "declared_methods": 4317,
+  "source_sha256": "6dd3374f68240d2dfcf914d2507d4000224edda4066cd11ed80640058b13bb32",
+  "files": [
+    {
+      "path": "tests/test_active.py",
+      "declared_methods": 105,
+      "sha256": "c782d8ae4fd3730e7f8442a1e60cc631fd313e936b930c698dc011ed0299c60f"
+    },
+    {
+      "path": "tests/test_algebra.py",
+      "declared_methods": 55,
+      "sha256": "1df1e42bcb11844f5ae6ffa92f5d5e5f571db7c3519650517134c369471751a3"
+    },
+    {
+      "path": "tests/test_boundary.py",
+      "declared_methods": 130,
+      "sha256": "da8987b123eb01511a180c7112cc0486d765773dc52bad6f32dd474a362bbb4b"
+    },
+    {
+      "path": "tests/test_compositional.py",
+      "declared_methods": 193,
+      "sha256": "0494a4c657df88726ee72d07410f52778e803c9f8c0742fec9673459ca609e83"
+    },
+    {
+      "path": "tests/test_constraint.py",
+      "declared_methods": 0,
+      "sha256": "354a9c33908b38330edcd56abc13effd7dadfa1c4b3af05c0b778b7080fc3e25"
+    },
+    {
+      "path": "tests/test_deep.py",
+      "declared_methods": 237,
+      "sha256": "82a870431c6e052ec23c431fb292c98601f2cca32cfd8e4ef5d21ba822d260aa"
+    },
+    {
+      "path": "tests/test_deep_compose.py",
+      "declared_methods": 56,
+      "sha256": "39302c1b870d2a7826e60bac79e239834c54363f5085e4e7e4af4f3b2409be1e"
+    },
+    {
+      "path": "tests/test_deep_downstream.py",
+      "declared_methods": 67,
+      "sha256": "e551a336f3235dbecf212d2526e842f9bb742fb020d53330f42669032608dce5"
+    },
+    {
+      "path": "tests/test_deep_e2e.py",
+      "declared_methods": 50,
+      "sha256": "bb300fdfe19e62b5256db1c2ead3b5ec1d1c93d8b4e6f569729c0adb9d28651d"
+    },
+    {
+      "path": "tests/test_deep_fragments.py",
+      "declared_methods": 57,
+      "sha256": "45fd109115640ee1a77a175047d199d72e4dab51d1df596d8e543a8d1a6219d7"
+    },
+    {
+      "path": "tests/test_deep_generation.py",
+      "declared_methods": 121,
+      "sha256": "86ac7036c3aafd58134dc404f1b095a085c7374f8db25658cb0821d21a72c060"
+    },
+    {
+      "path": "tests/test_deep_hp.py",
+      "declared_methods": 32,
+      "sha256": "2690ce054d529492d0ccf5cf1c808c11b1e7673a793e2c8d95d45f0a26b84d31"
+    },
+    {
+      "path": "tests/test_deep_lpr.py",
+      "declared_methods": 43,
+      "sha256": "a99791cf975f7936a333e2baa4b20fda8fb32f91aabab5588cae105b824a29f3"
+    },
+    {
+      "path": "tests/test_deep_objective.py",
+      "declared_methods": 88,
+      "sha256": "8157fd6271565f077efb3d2f8a7442165c1d525367b227c6b91a7ef0d2a890ef"
+    },
+    {
+      "path": "tests/test_deep_ownership.py",
+      "declared_methods": 54,
+      "sha256": "1fb68306f71357a7cd320cb379eab2035a734927a7166ea6dd2ea4b471e6d32a"
+    },
+    {
+      "path": "tests/test_deep_partial.py",
+      "declared_methods": 73,
+      "sha256": "4f2528ef925808501bcd833fc73783f41678490d6fdc08700a55f59e60a74ccd"
+    },
+    {
+      "path": "tests/test_deep_primitives.py",
+      "declared_methods": 146,
+      "sha256": "881d6e7b67724459c327c14e96c8a4dc5a1b18d2bfcf0905721938925ce00abf"
+    },
+    {
+      "path": "tests/test_deep_robust_primitives.py",
+      "declared_methods": 79,
+      "sha256": "0ce2eba5072f5ab60ece831b430bba0bcd35491317cbcc063a747867f9bd62af"
+    },
+    {
+      "path": "tests/test_deep_sealed.py",
+      "declared_methods": 13,
+      "sha256": "b6604701ba2f48b89b34d0f18b2b79864c05fb9b28c8723cb04926943272d37a"
+    },
+    {
+      "path": "tests/test_deep_validated.py",
+      "declared_methods": 67,
+      "sha256": "b5c9f3fc38a2df029975780b9598f8ccf5ede797dcf985a2dcaf9db7a6ba6aad"
+    },
+    {
+      "path": "tests/test_discourse.py",
+      "declared_methods": 92,
+      "sha256": "59cb38f47edd5bec9b64fcf50c17d76821cf48191b0168406dcae2ce5bf27a58"
+    },
+    {
+      "path": "tests/test_epistemic.py",
+      "declared_methods": 151,
+      "sha256": "1629b8cc46c65f1150763fa5b37957a5849dc17db982678dd81aa17ca5d32d88"
+    },
+    {
+      "path": "tests/test_generative.py",
+      "declared_methods": 155,
+      "sha256": "26c15074e012da622eb5b622217222bec45d74c2252b0c00d4167779a73935b4"
+    },
+    {
+      "path": "tests/test_gravity.py",
+      "declared_methods": 0,
+      "sha256": "f5c9c3f9118d81d9b00a69b83ec7531a2f3d028a0268a6937930323c5306bdb3"
+    },
+    {
+      "path": "tests/test_ground_collision.py",
+      "declared_methods": 0,
+      "sha256": "85e15ebecbef6da4462457e401c459b554dce67ac995120188073f0ab32e3cfa"
+    },
+    {
+      "path": "tests/test_grounded.py",
+      "declared_methods": 93,
+      "sha256": "6da3afabdea9f80809a7c87dbd1ab7f4f0325a613e3b6da2f5cd8d660f682188"
+    },
+    {
+      "path": "tests/test_history.py",
+      "declared_methods": 0,
+      "sha256": "7769c3019f5963bc91ee321b5b4deea17c6b8dce704a609300de0ccc63785800"
+    },
+    {
+      "path": "tests/test_independent.py",
+      "declared_methods": 105,
+      "sha256": "bcf32395939f820ce9eb4e4e7749733e5d9a874d1415630ad595abdd6973d7a5"
+    },
+    {
+      "path": "tests/test_language.py",
+      "declared_methods": 0,
+      "sha256": "e25bf363f8a7710fa289379423e791b7d1eeb2c3cb8dd5f201a5ceb1c6d5fdce"
+    },
+    {
+      "path": "tests/test_language_core.py",
+      "declared_methods": 164,
+      "sha256": "ec14ddf0db8c980a59ca6a41792beabb3a770276ad10ac5097f7b5aeade07928"
+    },
+    {
+      "path": "tests/test_learning.py",
+      "declared_methods": 56,
+      "sha256": "5318f817c7fdd466a209cb66c267f0328d90874594db592a1b4cbdc65eb79c9c"
+    },
+    {
+      "path": "tests/test_lifelong.py",
+      "declared_methods": 161,
+      "sha256": "bcb29b4115572d8283d970230d8c1d4e955e05b8bcdb0c9dd0a2d76e4b2f2bdd"
+    },
+    {
+      "path": "tests/test_lift_and_fall.py",
+      "declared_methods": 0,
+      "sha256": "dfda2daa9ec5d1f2c88ddd7c66f0827411793749fe82bf36cc033159c73a49c2"
+    },
+    {
+      "path": "tests/test_makefile_root.py",
+      "declared_methods": 3,
+      "sha256": "d67d1f144d714c8e0430ebdce2df59f9114068e42c701872d8e9b27ebc6e4266"
+    },
+    {
+      "path": "tests/test_measurement.py",
+      "declared_methods": 213,
+      "sha256": "58c44be4120e5374a5bddbd9b4b86f7487238aacccacf5b29e4f0141d5e33dd4"
+    },
+    {
+      "path": "tests/test_perturbation.py",
+      "declared_methods": 228,
+      "sha256": "c05cbfc556313940c931ba226d5aeb177b69f6f746136f36db7ff391431aef9b"
+    },
+    {
+      "path": "tests/test_planner.py",
+      "declared_methods": 57,
+      "sha256": "52902924007e4ed5eabc0d5aa0d9afd73180077b47bdadd172ee64659d0eaf9d"
+    },
+    {
+      "path": "tests/test_plasticity.py",
+      "declared_methods": 112,
+      "sha256": "f51a6ba610ab6afaf1936b6738df8044aef3cd21668b1a742213df2df22b25e9"
+    },
+    {
+      "path": "tests/test_public_identity.py",
+      "declared_methods": 4,
+      "sha256": "ac31fe0c8473ba4054e1540e0829dce706c95d2b1f62eacc5182baee929134a5"
+    },
+    {
+      "path": "tests/test_public_source.py",
+      "declared_methods": 13,
+      "sha256": "acc0823db6a637af5913e646a979fe8c042d1b9bbc9c2bdcf035c6e0c8f79177"
+    },
+    {
+      "path": "tests/test_reasoning.py",
+      "declared_methods": 51,
+      "sha256": "d0217dbf9875501cc838cecea50321092a28330d21558471c23fcc973727dd6d"
+    },
+    {
+      "path": "tests/test_reasoning_core.py",
+      "declared_methods": 13,
+      "sha256": "d4691e620615af1567d9ad05ca5d630d60c4cd759cc4e712282afa363e754035"
+    },
+    {
+      "path": "tests/test_robust.py",
+      "declared_methods": 225,
+      "sha256": "ab509d8e6b72e143cc71f903e720c82acbac8dfc006f04221273adf297e6ad8c"
+    },
+    {
+      "path": "tests/test_science.py",
+      "declared_methods": 9,
+      "sha256": "6cd1a340fe4058806b8a8993bed53762a2ab39415a8ab4a500fc1e53a0f69a6c"
+    },
+    {
+      "path": "tests/test_sources.py",
+      "declared_methods": 105,
+      "sha256": "36dacede344c3af56f3e382bc474af7cfa1728d8b71e076d63b0cbce5d2f0495"
+    },
+    {
+      "path": "tests/test_symbolic.py",
+      "declared_methods": 112,
+      "sha256": "deaf51bad43c27b98f09b40b9bf988e5c9a05f582edf57c2b05afd19b308f3de"
+    },
+    {
+      "path": "tests/test_temporal.py",
+      "declared_methods": 125,
+      "sha256": "ecec6a0601152c72ab94a8bc25cb716fe15f1c4dae691bbea022921e9c54b477"
+    },
+    {
+      "path": "tests/test_transformation.py",
+      "declared_methods": 0,
+      "sha256": "bd1a0e102e4f616956e233ec0d1f1b1f772dc5642180104e6847d7d45013ab44"
+    },
+    {
+      "path": "tests/test_transformations.py",
+      "declared_methods": 58,
+      "sha256": "171a2fb5986d8638ade1de31b8bc0874e0d874750ccb10c320011348a506eb3f"
+    },
+    {
+      "path": "tests/test_unified.py",
+      "declared_methods": 174,
+      "sha256": "96a829c5b9141ef93ea19daf7bd84da5f4423f2b24dbabbf56b9954b3eedfaab"
+    },
+    {
+      "path": "tests/test_wce.py",
+      "declared_methods": 155,
+      "sha256": "52dc69eee2abd27123cf994125531674c067561c6b7734b18a0bf7ee70726aea"
+    },
+    {
+      "path": "tests/test_web.py",
+      "declared_methods": 17,
+      "sha256": "877158f45d65de6580c79a19e2d52ecf0faf6726fdc152d74386977cb18ab4c2"
+    },
+    {
+      "path": "tests/test_world.py",
+      "declared_methods": 0,
+      "sha256": "fcaa9e8297d771339d93dca4fa1876b36441a99ad5e876eab6401d1fe82b431d"
+    }
+  ]
+}

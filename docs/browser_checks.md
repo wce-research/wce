@@ -1,8 +1,28 @@
 # WCE browser checks
 
-Run `make frontend-test` on the Dell canonical GitHub clone. It verifies HTTP routes, metadata, branding, sessions, input validation, safe API 500 responses, public-page privacy, the static inventory and the symbolic engine. It does not reproduce the whole scientific research suite.
+Run `make frontend-test` in the canonical workspace. It verifies HTTP routes, metadata, branding, sessions, input validation, safe API 500 responses, public-page privacy, the static inventory and the symbolic engine. It does not reproduce the whole scientific research suite.
 
-Browser checks run directly on the Dell, against the local Docker service. Playwright is a test dependency outside the repository and production image; Node.js 20 or later is required for Playwright Core 1.63.0.
+Browser checks run locally. Playwright and axe are test dependencies outside the repository and production image. The scientific audit was verified with Node.js 20, Playwright/Playwright Core 1.64.0, axe-core and @axe-core/playwright 4.13.0, and bundled Chromium 156.
+
+## Complete local scientific and accessibility audit
+
+Install the pinned test tools in a dedicated temporary directory; they are never copied into the web image:
+
+```sh
+npm install --prefix /tmp/wce-frontend-audit-tools playwright@1.64.0 @axe-core/playwright@4.13.0
+PLAYWRIGHT_BROWSERS_PATH=/tmp/wce-frontend-audit-tools/browsers \
+  /tmp/wce-frontend-audit-tools/node_modules/.bin/playwright install chromium
+NODE_PATH=/tmp/wce-frontend-audit-tools/node_modules \
+PLAYWRIGHT_BROWSERS_PATH=/tmp/wce-frontend-audit-tools/browsers \
+WCE_BROWSER_ARTIFACTS=/tmp/wce-frontend-audit \
+  make frontend-science-browser
+```
+
+This target starts a loopback-only server on an ephemeral port through `make frontend-serve`, audits the sitemap's complete bilingual route catalog at 1440, 768 and 390 pixels in both themes, and stops the entire temporary server process group. It does not start Docker services, use SSH, create a tunnel or call infrastructure APIs. It runs WCAG AA scans in both themes on every desktop route and on the new mobile evidence views, checks internal links, diagrams, keyboard transactions, language detection/persistence, reduced motion and no-JavaScript reading, and then runs the established browser regression suite against the same server. Screenshots, local timing samples and the complete accessibility record are written to `audit.json` in the artifact directory. A host `ERR_NETWORK_CHANGED` is retried at most twice; other errors fail immediately.
+
+`WCE_AUDIT_SCOPE=science` limits the page matrix to the four new research views for focused debugging; it is not the complete acceptance run. Automated axe scans are not a guarantee of accessibility for every assistive technology. Local timings are not production Core Web Vitals.
+
+## Existing browser regression target
 
 With Playwright Core installed in an external tools directory and a local Chromium browser available:
 

@@ -82,7 +82,7 @@ updateThemeButton();
 
 document.querySelectorAll('[data-language]').forEach(link => {
   link.addEventListener('click', () => {
-    document.cookie = `wce_language=${link.dataset.language}; Path=/; Max-Age=31536000; SameSite=Lax`;
+    document.cookie = `wce_language=${link.dataset.language}; Path=/; Max-Age=31536000; SameSite=Lax${location.protocol === 'https:' ? '; Secure' : ''}`;
   });
 });
 

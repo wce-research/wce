@@ -9,6 +9,7 @@ import xml.etree.ElementTree as ET
 
 from app.content import DOSSIERS, render_dossier
 from app.i18n import localized_path, translate_content
+from app.science_catalog import SCIENCE_ROUTES
 
 STATIC = Path(__file__).with_name("static")
 TEMPLATES = Path(__file__).with_name("templates")
@@ -25,6 +26,8 @@ PAGES = {
 }
 for route, record in DOSSIERS.items():
     PAGES[route] = (None, record['fr'][0])
+for route, titles in SCIENCE_ROUTES.items():
+    PAGES[route] = (None, titles[1])
 
 EN_TITLES = {
     "/": "Open architecture research", "/research": "Research", "/architecture": "Architecture",
@@ -35,10 +38,10 @@ EN_TITLES = {
 NAVIGATION = [
     ("/research", ("Recherche", "Research"),
      ("Mesures, protocoles et questions ouvertes.", "Measurements, protocols and open questions."),
-     ["/research", "/research/measurement", "/research/continual", "/research/discovery", "/research/methodology", "/research/limitations"]),
+     ["/research", "/research/programme", "/research/high-precision", "/research/deep-composition", "/research/measurement", "/research/continual", "/research/discovery", "/research/methodology", "/research/limitations"]),
     ("/architecture", ("Architecture", "Architecture"),
      ("Inspecter les mécanismes du prototype.", "Inspect the mechanisms of the prototype."),
-     ["/architecture", "/architecture/primitives", "/architecture/world-state", "/architecture/learning", "/architecture/planning", "/architecture/language", "/architecture/measurement", "/architecture/evidence", "/architecture/certificates", "/architecture/discovery", "/architecture/branching"]),
+     ["/architecture", "/architecture/research-map", "/architecture/primitives", "/architecture/world-state", "/architecture/learning", "/architecture/planning", "/architecture/language", "/architecture/measurement", "/architecture/evidence", "/architecture/certificates", "/architecture/discovery", "/architecture/branching"]),
     ("/vision", ("Vision", "Vision"),
      ("L’état actuel, l’exploration et l’ambition.", "Current state, exploration and ambition."),
      ["/vision", "/vision/now", "/vision/exploration", "/vision/frontier-hub"]),
@@ -52,6 +55,8 @@ NAVIGATION = [
 
 
 def page_title(route, language):
+    if route in SCIENCE_ROUTES:
+        return SCIENCE_ROUTES[route][language == 'fr']
     if route in DOSSIERS:
         return DOSSIERS[route][language][0]
     return EN_TITLES[route] if language == 'en' else ('Recherche en architectures ouvertes' if route == '/' else PAGES[route][1])
@@ -74,7 +79,7 @@ def navigation_html(route, language):
 
 def footer_directory(language):
     sections=[
-      ('/research',('/research/measurement','/research/methodology','/research/limitations')),
+      ('/research',('/research/programme','/research/high-precision','/research/methodology','/research/limitations')),
       ('/architecture',('/architecture/primitives','/architecture/learning','/architecture/measurement')),
       ('/vision',('/vision/now','/vision/exploration','/vision/frontier-hub')),
       ('/open',('/open/source','/open/reproduce','/open/contribute')),
@@ -94,7 +99,7 @@ SOCIALS = [
 ]
 
 
-def social_links(language='fr') -> str:
+def social_links(language='en') -> str:
     links = []
     for name, variable, hosts, icon in sorted(SOCIALS, key=lambda item: ('GitHub', 'LinkedIn', 'X', 'Instagram').index(item[0])):
         from app.public_identity import SOCIAL_URLS
@@ -125,14 +130,17 @@ def social_links(language='fr') -> str:
     return "".join(links)
 
 
-def render_page(route: str, language='fr') -> bytes:
+def render_page(route: str, language='en') -> bytes:
     if language not in ('fr', 'en'):
         raise ValueError('Unsupported language')
     filename, _ = PAGES[route]
     from app.presentation import render_architecture, render_section_directory
     from app.research_catalog import render_atlas
     from app.understanding import introduction, glossary, research_question
-    if route == '/architecture':
+    if route in SCIENCE_ROUTES:
+        from app.science import render_science
+        content = render_science(route,language)
+    elif route == '/architecture':
         content = render_architecture(language)
     else:
         content = render_dossier(route,language) if route in DOSSIERS else translate_content((TEMPLATES / 'pages' / filename).read_text(),language)
@@ -152,6 +160,21 @@ def render_page(route: str, language='fr') -> bytes:
         content=content[:boundary]+introduction(language)+content[boundary:]
     if route == '/architecture':
         content += glossary(language)
+        content += '<section class="section"><a class="text-link" href="/architecture/research-map">'+('Carte hiérarchique et boucle de validation →' if language=='fr' else 'Hierarchical map and validation loop →')+'</a></section>'
+    if route in ('/', '/research', '/vision/now', '/research/limitations'):
+        from app.science import status
+        current = status(language,compact=route in ('/', '/research'))
+        if route == '/':
+            boundary=content.index('<section class="manifesto">')
+            content=content[:boundary]+current+content[boundary:]
+        else:
+            content += current
+    if route in ('/open', '/open/source', '/open/contribute'):
+        from app.science import open_resources
+        content += open_resources(language)
+    if route in ('/open/reproduce', '/research/methodology'):
+        from app.science import reproducibility
+        content += reproducibility(language)
     if route in ('/research/measurement','/research/continual','/research/discovery'):
         from app.evidence import render_evidence
         # Replace the hand-entered metric teaser; the evidence view reads the source JSON.
@@ -192,6 +215,10 @@ def render_page(route: str, language='fr') -> bytes:
         target=match.group(1)
         return f'href="{localized_path(target,language)}"' if target in PAGES else match.group(0)
     content=re.sub(r'href="([^"]+)"',page_link,content)
+    # Wide result tables must remain reachable and scrollable from the keyboard.
+    table_label='Scrollable data table' if language=='en' else 'Tableau de données défilant'
+    content=re.sub(r'<div([^>]*class="table-scroll"[^>]*)>',
+                   lambda match: '<div'+match[1]+' tabindex="0" role="region" aria-label="'+table_label+'">',content)
     ui = {
       'fr': dict(skip='Aller au contenu',home_label='WCE Labs, accueil',menu_open='Menu +',menu_close='Fermer −',nav_label='Navigation principale',theme_dark='Mode nuit',theme_light='Mode jour',language_label='Langue',footer_message='Une architecture à explorer.<br>Une recherche à partager.',prototype='Prototype expérimental · 2026',open_research='Ouvrir la recherche',follow='SUIVRE WCE',social_label='Réseaux sociaux WCE',description='WCE explore des architectures alternatives d’intelligence artificielle. Architecture explicite, résultats mesurés et recherche ouverte.'),
       'en': dict(skip='Skip to content',home_label='WCE Labs, home',menu_open='Menu +',menu_close='Close −',nav_label='Main navigation',theme_dark='Dark mode',theme_light='Light mode',language_label='Language',footer_message='An architecture to explore.<br>Research to share.',prototype='Experimental prototype · 2026',open_research='Open the research',follow='FOLLOW WCE',social_label='WCE social profiles',description='WCE explores alternative AI architectures. Explicit mechanisms, measured results and open research.'),
@@ -202,5 +229,5 @@ def render_page(route: str, language='fr') -> bytes:
         **ui,public_metadata=metadata(route,language,page_title(route,language)),official_links=footer_links(language),footer_directory=footer_directory(language),language=language,title=escape(page_title(route,language)),navigation=navigation_html(route,language),socials=social_links(language),
         home=localized_path('/',language),open_url=localized_path('/open',language),fr_url=localized_path(route,'fr'),en_url=localized_path(route,'en'),
         fr_current=' aria-current="true"' if language == 'fr' else '',en_current=' aria-current="true"' if language == 'en' else '',
-        page_script=('<script type="module" src="/app.js"></script>' if route == '/lab' else '') + ('<script type="module" src="/frontier.js"></script>' if route in ('/','/research/measurement','/research/continual','/research/discovery') else ''),content=content,
+        page_script=('<script type="module" src="/app.js"></script>' if route == '/lab' else '') + ('<script type="module" src="/frontier.js"></script>' if route in ('/','/research/measurement','/research/continual','/research/discovery') else '') + ('<script type="module" src="/science.js"></script>' if route == '/architecture/research-map' else ''),content=content,
     ).encode()

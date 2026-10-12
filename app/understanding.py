@@ -76,7 +76,7 @@ def mechanism_scope(route, language):
 def public_release_state(language):
     fr=language=='fr'
     items=[
-      ('Consultable ici','Les dossiers, trois artefacts JSON et les protocoles scientifiques cités peuvent être lus sur ce site.','Available here','The dossiers, three JSON artifacts and cited scientific protocols can be read on this site.'),
+      ('Consultable ici','Les dossiers, les résumés JSON publics et les protocoles scientifiques cités peuvent être lus sur ce site.','Available here','The dossiers, public JSON summaries and cited scientific protocols can be read on this site.'),
       ('Dépôt canonique','Le code scientifique courant est publié sur github.com/wce-research/wce sous licence Apache-2.0. Les sources et documents scientifiques sont en anglais.','Canonical repository','Current scientific source is published at github.com/wce-research/wce under Apache-2.0. Scientific source and documentation are in English.'),
       ('Objectif de collaboration','Contributions, forks et comparaisons reproductibles passent par GitHub et CONTRIBUTING.md. Le hub collaboratif sur ce site reste une vision.','Collaboration goal','Contributions, forks and reproducible comparisons use GitHub and CONTRIBUTING.md. A collaborative hub on this website remains a vision.')]
     cards=''.join(f'<article><!-- card {i} --><h3>{a if fr else c}</h3><p>{b if fr else d}</p></article>' for i,(a,b,c,d) in enumerate(items,1))

@@ -44,7 +44,7 @@ def metadata(route, language, title):
         tags.append(f'<meta property="{key}" content="{escape(value,quote=True)}">')
     for key,value in {'twitter:card':'summary_large_image','twitter:title':full_title,'twitter:description':description,'twitter:image':image,'twitter:image:alt':'WCE Labs — World Configuration Engine'}.items():
         tags.append(f'<meta name="{key}" content="{escape(value,quote=True)}">')
-    org={'@context':'https://schema.org','@type':'Organization','name':SITE_NAME,'url':SITE_URL,'logo':SITE_URL+'/brand/wce-labs-avatar-light.png','description':description,'sameAs':[GITHUB_ORG]}
+    org={'@context':'https://schema.org','@type':'Organization','name':SITE_NAME,'url':SITE_URL,'logo':SITE_URL+'/brand/wce-labs-avatar-light.png','description':description,'sameAs':[url for url in SOCIAL_URLS.values() if url]}
     if contact_email():org['email']=contact_email()
     tags.append('<script type="application/ld+json">'+json.dumps(org,ensure_ascii=False).replace('<','\\u003c')+'</script>')
     return ''.join(tags)

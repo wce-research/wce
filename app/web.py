@@ -15,13 +15,14 @@ from pathlib import Path
 from urllib.parse import urlsplit
 
 from app.site import PAGES, STATIC, render_page
-from app.i18n import resolve_route
+from app.i18n import resolve_route, preferred_language
 from app.localization import canonical_command, answer_in_language, error_in_language
 from app.session import Session
 from language.command import AdvanceTimeCommand, parse_command
 
 
 ASSETS = {
+    "/science.js": ("science.js", "text/javascript; charset=utf-8"),
     "/site.webmanifest": ("site.webmanifest", "application/manifest+json"),
     "/frontier.js": ("frontier.js", "text/javascript; charset=utf-8"),
     "/theme.js": ("theme.js", "text/javascript; charset=utf-8"),
@@ -46,6 +47,11 @@ RESEARCH = {
     "/research/hypotheses_generative_certificates.md": (ROOT / "docs/hypotheses_generative_certificates.md", "text/markdown; charset=utf-8"),
     "/research/architecture_wce.md": (ROOT / "docs/architecture_wce.md", "text/markdown; charset=utf-8"),
 }
+from app.science_catalog import PUBLIC_REPORTS, PUBLIC_SUMMARIES, PUBLIC_METHODS
+for source in PUBLIC_REPORTS + PUBLIC_SUMMARIES + PUBLIC_METHODS:
+    file = ROOT / source
+    content_type = "application/json; charset=utf-8" if file.suffix == '.json' else "text/markdown; charset=utf-8"
+    RESEARCH['/research/' + file.name] = (file, content_type)
 IDENTITY_ROOT = ROOT / "docs/identity"
 IDENTITY_TYPES = {
     ".svg": "image/svg+xml", ".png": "image/png", ".ico": "image/vnd.microsoft.icon",
@@ -121,7 +127,14 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self) -> None:
         path = urlsplit(self.path).path
         route, language = resolve_route(path)
-        if path == "/healthz":
+        if path == '/robots.txt':
+            self._send(HTTPStatus.OK, b'User-agent: *\nAllow: /\nDisallow: /api/\nDisallow: /identity/\nSitemap: https://wcelabs.com/sitemap.xml\n', 'text/plain; charset=utf-8')
+        elif path == '/sitemap.xml':
+            from app.i18n import localized_path
+            from app.public_identity import SITE_URL
+            urls=''.join('<url><loc>'+SITE_URL+localized_path(page,locale)+'</loc></url>' for locale in ('en','fr') for page in PAGES)
+            self._send(HTTPStatus.OK, ('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'+urls+'</urlset>').encode(), 'application/xml; charset=utf-8')
+        elif path == "/healthz":
             self._json(HTTPStatus.OK, {"status": "ok"})
         elif route in PAGES:
             preference = SimpleCookie()
@@ -129,9 +142,13 @@ class Handler(BaseHTTPRequestHandler):
                 preference.load(self.headers.get("Cookie", ""))
             except Exception:
                 preference = SimpleCookie()
-            if path == "/" and "wce_language" in preference and preference["wce_language"].value == "en":
+            saved = preference['wce_language'].value if 'wce_language' in preference else None
+            if not path.startswith(('/en/', '/fr/')) and path not in ('/en', '/fr'):
+                language = preferred_language(saved, self.headers.get('Accept-Language', ''))
+            if path == "/" and saved in ('en', 'fr'):
                 self.send_response(HTTPStatus.TEMPORARY_REDIRECT)
-                self.send_header("Location", "/en/")
+                self.send_header("Location", f"/{saved}/")
+                self.send_header("Vary", "Cookie, Accept-Language")
                 self.send_header("Content-Length", "0")
                 self.end_headers()
                 return
@@ -152,6 +169,11 @@ class Handler(BaseHTTPRequestHandler):
         elif path in RESEARCH:
             file, content_type = RESEARCH[path]
             self._send(HTTPStatus.OK, file.read_bytes(), content_type)
+        elif 'text/html' in self.headers.get('Accept',''):
+            title='Page not found' if language=='en' else 'Page introuvable'
+            label='Return to WCE Labs' if language=='en' else 'Retour à WCE Labs'
+            body=f'<!doctype html><html lang="{language}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>404 — WCE Labs</title><link rel="stylesheet" href="/styles.css"></head><body><main class="section"><p>404</p><h1>{title}</h1><a href="/{language}/">{label} →</a></main></body></html>'
+            self._send(HTTPStatus.NOT_FOUND, body.encode(), 'text/html; charset=utf-8')
         else:
             self._json(HTTPStatus.NOT_FOUND, {"error": "Route inconnue."})
 
@@ -211,7 +233,7 @@ def main() -> None:
     host = os.environ.get("WCE_HOST", "127.0.0.1")
     port = int(os.environ.get("WCE_PORT", "8000"))
     server = ThreadingHTTPServer((host, port), Handler)
-    logging.info("WCE listening on %s:%s", host, port)
+    logging.info("WCE listening on %s:%s", host, server.server_port)
     server.serve_forever()
 
 

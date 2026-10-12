@@ -134,6 +134,32 @@ class WebTests(unittest.TestCase):
         for route in ("/identity/build.py", "/identity/assets/DejaVuSans.ttf", "/identity/../web.py"):
             self.assertEqual(self.request("GET", route)[0], 404)
 
+    def test_browser_language_and_saved_preference(self):
+        for header, cookie, expected in (
+                ('', '', 'en'), ('fr-FR,fr;q=0.9,en;q=0.8', '', 'fr'),
+                ('en-US', 'wce_language=fr', 'fr'), ('fr-FR', 'wce_language=en', 'en')):
+            _,_,body=self.request('GET','/research',headers={'Accept-Language':header,'Cookie':cookie})
+            self.assertIn(f'<html lang="{expected}">'.encode(),body)
+        _,_,body=self.request('GET','/en/research',headers={'Accept-Language':'fr','Cookie':'wce_language=fr'})
+        self.assertIn(b'<html lang="en">',body)
+        status,headers,_=self.request('GET','/',headers={'Cookie':'wce_language=fr'})
+        self.assertEqual((status,headers['Location']),(307,'/fr/'))
+
+    def test_sitemap_robots_and_browser_404(self):
+        from app.site import PAGES
+        import xml.etree.ElementTree as ET
+        status,_,body=self.request('GET','/sitemap.xml')
+        self.assertEqual(status,200)
+        locations=[node.text for node in ET.fromstring(body).iter() if node.tag.endswith('loc')]
+        self.assertEqual(len(locations),len(PAGES)*2)
+        self.assertIn('https://wcelabs.com/en/research/high-precision',locations)
+        self.assertIn(b'Disallow: /identity/',self.request('GET','/robots.txt')[2])
+        status,headers,body=self.request('GET','/en/missing',headers={'Accept':'text/html'})
+        self.assertEqual(status,404)
+        self.assertIn('text/html',headers['Content-Type'])
+        self.assertIn(b'noindex',body)
+        self.assertIn(b'Return to WCE Labs',body)
+
     def test_bilingual_routes_and_deep_navigation(self):
         from app.site import PAGES, page_title
         from app.i18n import resolve_route
