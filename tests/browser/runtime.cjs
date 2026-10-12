@@ -1,7 +1,7 @@
 /* HTTPS proxy contract test: browser requests are intercepted and relayed to loopback only.
  * No certificate, public DNS, proxy deployment or Internet request is created. */
 const {chromium}=require('playwright');
-const {spawn}=require('child_process');
+const {spawn,execFileSync}=require('child_process');
 const http=require('http');
 let server,browser;
 const check=(value,message)=>{if(!value)throw Error(message);};
@@ -45,5 +45,15 @@ function relay(port,request){return new Promise((resolve,reject)=>{
  check(errors.length===0,'No browser errors');
  console.log('PASS: intercepted HTTPS proxy contract; FR/EN lab continuity; Secure/HttpOnly/Strict/expiry; no public network or certificate');
 })().catch(error=>{console.error(error);process.exitCode=1;}).finally(async()=>{
- if(browser)await browser.close();if(server){try{process.kill(-server.pid,'SIGTERM');}catch{}}
+ // Signal the owned Python recipe directly: some managed process environments
+ // reject group signals. Do not silently leave the Make child/server running.
+ if(server&&server.exitCode===null){
+  const children=execFileSync('ps',['--ppid',String(server.pid),'-o','pid='],{encoding:'utf8'}).trim().split(/\s+/).filter(Boolean);
+  for(const pid of children)process.kill(Number(pid),'SIGTERM');
+  await new Promise((resolve,reject)=>{
+   const timeout=setTimeout(()=>reject(Error('Proxy fixture did not stop gracefully')),10000);
+   server.once('exit',()=>{clearTimeout(timeout);resolve();});
+  });
+ }
+ if(browser)await browser.close();
 });
