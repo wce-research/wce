@@ -104,8 +104,9 @@ class WebTests(unittest.TestCase):
             'https://github.com/wce-research',
             'https://x.com/WCELabs',
             'https://www.instagram.com/wcelabs/',
+            'https://www.linkedin.com/company/wce-labs/',
         }
-        # Compose passes empty values when no local override is configured.
+        # Empty environment values preserve the confirmed official defaults.
         with patch.dict(os.environ, {key: '' for key in (
                 'WCE_GITHUB_URL', 'WCE_X_URL', 'WCE_LINKEDIN_URL', 'WCE_INSTAGRAM_URL')}):
             for language in ('fr', 'en'):
@@ -117,7 +118,9 @@ class WebTests(unittest.TestCase):
                     for link in parser.links:
                         self.assertEqual(link['rel'], 'noopener noreferrer')
                         self.assertIn('aria-label', link)
-                    self.assertEqual(footer.count('class="social-pending"'), 1)
+                    self.assertNotIn('class="social-pending"', footer)
+                    self.assertNotIn('Coming soon', footer)
+                    self.assertNotIn('À venir', footer)
                     self.assertIn('LinkedIn', footer)
 
     def test_identity_review_and_assets_are_explicit(self):

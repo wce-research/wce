@@ -12,7 +12,7 @@ GITHUB_REPO = 'https://github.com/wce-research/wce'
 SOCIAL_URLS = {
  'WCE_GITHUB_URL': GITHUB_ORG,
  'WCE_X_URL': 'https://x.com/WCELabs',
- 'WCE_LINKEDIN_URL': '',
+ 'WCE_LINKEDIN_URL': 'https://www.linkedin.com/company/wce-labs/',
  'WCE_INSTAGRAM_URL': 'https://www.instagram.com/wcelabs/',
 }
 DESCRIPTIONS = {

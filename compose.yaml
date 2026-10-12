@@ -9,7 +9,7 @@ services:
       PUBLIC_CONTACT_EMAIL: ${PUBLIC_CONTACT_EMAIL:-}
       PUBLIC_WCE_REPO_ENABLED: ${PUBLIC_WCE_REPO_ENABLED:-true}
       WCE_X_URL: ${WCE_X_URL:-}
-      WCE_LINKEDIN_URL: ${WCE_LINKEDIN_URL:-}
+      WCE_LINKEDIN_URL: ${WCE_LINKEDIN_URL:-https://www.linkedin.com/company/wce-labs/}
       WCE_INSTAGRAM_URL: ${WCE_INSTAGRAM_URL:-}
     ports:
       - "127.0.0.1:${WCE_HOST_PORT:-3018}:8000"
