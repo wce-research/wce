@@ -84,4 +84,5 @@ secrets/
 *.pem
 *.key
 tools/
+ops/
 *.salt
