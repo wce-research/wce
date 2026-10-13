@@ -33,3 +33,14 @@ results/*.log
 
 # Local production-runtime verification environment.
 .venv-runtime/
+
+# Production identities and audit/rollback state must remain external.
+.aws/
+.ssh/
+*credentials*
+*gate2-token*
+*.bundle
+*.p12
+*.pfx
+known_hosts
+.repository-audit/

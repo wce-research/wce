@@ -939,6 +939,20 @@ outage-browser-bootstrap:
 outage-browser:
 	NODE_PATH=$(OUTAGE_BROWSER_TOOLS)/node_modules PLAYWRIGHT_BROWSERS_PATH=$(OUTAGE_BROWSER_TOOLS)/browsers $(NODE) tests/browser/outage.cjs
 
+# Repository boundary checks; reports are redacted and kept outside Git.
+AUDIT_REPO ?= .
+AUDIT_OUTPUT ?= /tmp/wce-repository-audit
+AUDIT_STRICT ?=
+AUDIT_BOUNDARY ?= public
+AUDIT_POLICY ?=
+.PHONY: repository-audit-bootstrap repository-audit repository-audit-summary
+repository-audit-bootstrap:
+	$(RUNTIME_PYTHON) tools/repository_audit.py bootstrap
+repository-audit:
+	$(RUNTIME_PYTHON) tools/repository_audit.py scan --repo "$(AUDIT_REPO)" --output "$(AUDIT_OUTPUT)" --boundary "$(AUDIT_BOUNDARY)" $(if $(AUDIT_POLICY),--policy "$(AUDIT_POLICY)",) $(if $(AUDIT_STRICT),--strict,)
+repository-audit-summary:
+	$(RUNTIME_PYTHON) tools/repository_audit.py summary --output "$(AUDIT_OUTPUT)"
+
 NODE ?= node
 frontend-browser:
 	$(NODE) tests/browser/frontier.cjs
@@ -950,7 +964,7 @@ frontend-serve:
 	$(RUNTIME_PYTHON) -m app.web
 
 # Local infrastructure review only: disposable loopback Docker benchmark, no cloud calls.
-.PHONY: production-benchmark production-aws-review
+.PHONY: production-benchmark
 PRODUCTION_BENCHMARK_ARGS ?=
 production-benchmark:
 	$(PYTHON) tools/production_benchmark.py $(PRODUCTION_BENCHMARK_ARGS)
@@ -1000,4 +1014,3 @@ runtime-status:
 .PHONY: runtime-evidence
 runtime-evidence:
 	$(RUNTIME_PYTHON) tools/runtime_evidence_check.py
-

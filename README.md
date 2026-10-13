@@ -259,3 +259,10 @@ Earlier commits were written in French and remain in the history unchanged.
 - [LICENSE](LICENSE) — Apache License 2.0.
 
 WCE Labs — <https://wcelabs.com> · GitHub — <https://github.com/wce-research>
+
+## Publication boundary
+
+This repository publishes WCE research, reproducible results and the portable
+frontend/runtime. Tenant-specific production administration and operational
+identifiers are excluded. See [publication policy](docs/repository_boundary.md)
+and [runtime deployment boundary](docs/runtime_deployment_boundary.md).

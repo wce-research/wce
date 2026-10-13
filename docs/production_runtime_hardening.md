@@ -1,6 +1,6 @@
 # WCE Labs — production runtime hardening
 
-Date: 2026-10-12. Previous audit: `391f41a0362ec691de3779b97a794b0f6a7787ad`, [infrastructure review](production_infrastructure_review.md). This milestone changes the local application runtime only. No AWS identity was used; no cloud resource, certificate, DNS, Cloudflare, mail record, public port or tunnel was created or changed.
+Date: 2026-10-12. See the [portable deployment boundary](runtime_deployment_boundary.md) for the public runtime scope. This milestone changes the local application runtime only. No AWS identity was used; no cloud resource, certificate, DNS, Cloudflare, mail record, public port or tunnel was created or changed.
 
 ## Initial blockers and implementation
 
@@ -175,6 +175,6 @@ Packaging: `requirements-web.txt`, `Dockerfile`, `compose.yaml`, `.dockerignore`
 
 Tests/tooling: `tests/test_web.py`, `tests/test_runtime.py`, `tests/runtime_signal_fixture.py`, `tests/browser/runtime.cjs`, `tools/production_benchmark.py`, `tools/runtime_build.py`, `tools/runtime_lifecycle.py`, `tools/runtime_status.py`, `tools/runtime_evidence_check.py`.
 
-Documentation: this report, dated follow-up link in `docs/production_infrastructure_review.md`, sanitized JSON evidence in `docs/runtime_hardening_evidence/`. Source scientific core, templates, styles and AWS tooling unchanged.
+Documentation: this report, public scope in `docs/runtime_deployment_boundary.md`, sanitized JSON evidence in `docs/runtime_hardening_evidence/`. Source scientific core, templates, styles and AWS tooling unchanged during the original runtime-hardening milestone.
 
 **RUNTIME HARDENING COMPLETE — READY FOR AWS PRODUCTION VALIDATION**
