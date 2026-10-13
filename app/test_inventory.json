@@ -1,7 +1,7 @@
 {
   "definition": "Static test_ function declarations; no execution or dynamic-case count",
-  "declared_methods": 4344,
-  "source_sha256": "dc583259d25c1bb9c8b471119d080bd504cbeca1a2b6bfb92b9d1e59ff77c3f8",
+  "declared_methods": 4350,
+  "source_sha256": "eb1de9441487104fce0de376752ef4053102fbac98a622dcd278cd1ffe9cb9b9",
   "files": [
     {
       "path": "tests/test_active.py",
@@ -177,6 +177,11 @@
       "path": "tests/test_measurement.py",
       "declared_methods": 213,
       "sha256": "58c44be4120e5374a5bddbd9b4b86f7487238aacccacf5b29e4f0141d5e33dd4"
+    },
+    {
+      "path": "tests/test_outage.py",
+      "declared_methods": 6,
+      "sha256": "dd0b5379ef7b5ec2cb4cd357940053168784383245085c26df05dfeafae3365d"
     },
     {
       "path": "tests/test_perturbation.py",

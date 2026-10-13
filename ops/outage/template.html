@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="{{language}}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="data:,">
+<title>{{title}} — WCE Labs</title>
+<style>
+*{box-sizing:border-box}
+html{background:#161817;color:#efeee8;font-family:Arial,Helvetica,sans-serif;-webkit-font-smoothing:antialiased}
+body{margin:0;min-height:100vh;min-height:100svh;display:flex;flex-direction:column;padding:0 clamp(24px,6vw,96px)}
+header{padding:32px 0;border-bottom:1px solid #3c403d}
+header svg{display:block;width:170px;height:36px;max-width:100%}
+main{width:100%;max-width:760px;margin:auto;padding:64px 0 72px}
+h1{font-family:Georgia,'Times New Roman',serif;font-weight:400;font-size:clamp(36px,5vw,64px);letter-spacing:-.045em;line-height:1.12;margin:0 0 32px;text-wrap:balance}
+p{font-size:clamp(16px,1.5vw,18px);line-height:1.7;margin:0;color:#b0b3ad}
+.patience{margin-top:24px}
+.retry{display:inline-flex;align-items:center;justify-content:center;min-height:48px;margin-top:32px;padding:12px 24px;border:1px solid #70766f;color:#efeee8;font-size:14px;text-decoration:none}
+.retry:hover{border-color:#efeee8;background:#242724}
+.retry:focus-visible{outline:3px solid #aeb5ff;outline-offset:5px}
+footer{padding:24px 0 28px;border-top:1px solid #3c403d;font-family:'Courier New',monospace;font-size:12px;line-height:1.7;color:#b0b3ad}
+@media(max-width:480px){header{padding:24px 0}main{padding:48px 0}footer{font-size:11px}}
+</style>
+</head>
+<body>
+<header>{{logo}}</header>
+<main>
+<h1>{{title}}</h1>
+<p>{{first}}<br>{{second}}</p>
+<p class="patience">{{patience}}</p>
+<a class="retry" href="">{{retry}}</a>
+</main>
+<footer>WCE Labs — World Configuration Engine</footer>
+</body>
+</html>

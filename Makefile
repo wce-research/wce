@@ -923,6 +923,22 @@ test-inventory:
 frontend-test:
 	$(RUNTIME_PYTHON) -m unittest tests.test_web tests.test_public_identity tests.test_public_source tests.test_science tests.test_wce tests.test_runtime -q
 
+# Portable outage artifacts: local only, isolated from normal application routing.
+OUTAGE_PORT ?= 0
+OUTAGE_BROWSER_TOOLS ?= /tmp/wce-outage-browser-tools
+.PHONY: outage-build outage-test outage-preview outage-browser-bootstrap outage-browser
+outage-build:
+	$(RUNTIME_PYTHON) tools/outage.py build
+outage-test:
+	$(RUNTIME_PYTHON) -m unittest tests.test_outage -v
+outage-preview:
+	$(RUNTIME_PYTHON) tools/outage.py preview --port $(OUTAGE_PORT)
+outage-browser-bootstrap:
+	npm install --prefix $(OUTAGE_BROWSER_TOOLS) --no-audit --no-fund playwright@1.64.0 @axe-core/playwright@4.13.0
+	PLAYWRIGHT_BROWSERS_PATH=$(OUTAGE_BROWSER_TOOLS)/browsers $(OUTAGE_BROWSER_TOOLS)/node_modules/.bin/playwright install chromium
+outage-browser:
+	NODE_PATH=$(OUTAGE_BROWSER_TOOLS)/node_modules PLAYWRIGHT_BROWSERS_PATH=$(OUTAGE_BROWSER_TOOLS)/browsers $(NODE) tests/browser/outage.cjs
+
 NODE ?= node
 frontend-browser:
 	$(NODE) tests/browser/frontier.cjs
