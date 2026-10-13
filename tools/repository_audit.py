@@ -39,7 +39,7 @@ def bootstrap():
 PATTERNS = {
     'PUBLIC_IPV4': re.compile(r'(?<![\w.])(?:\d{1,3}\.){3}\d{1,3}(?![\w.])'),
     'HOME_PATH': re.compile(r'/(?:home|Users)/[A-Za-z0-9_.-]+'),
-    'AWS_ACCOUNT_ID': re.compile(r'(?<![\w.])\d{12}(?![\w.])'),
+    'AWS_ACCOUNT_ID': re.compile(r'(?<![\w.])\d{12}(?!\w)'),
     'PRIVATE_KEY': re.compile(r'-----BEGIN (?:RSA |EC |DSA |OPENSSH |ENCRYPTED )?PRIVATE KEY-----\s+[A-Za-z0-9+/=\s]{40,}-----END (?:RSA |EC |DSA |OPENSSH |ENCRYPTED )?PRIVATE KEY-----'),
     'AWS_ACCESS_KEY': re.compile(r'\b(?:AKIA|ASIA)[A-Z0-9]{16}\b'),
     'GITHUB_TOKEN': re.compile(r'\b(?:gh[pousr]_[A-Za-z0-9]{36,255}|github_pat_[A-Za-z0-9_]{60,255})\b'),
